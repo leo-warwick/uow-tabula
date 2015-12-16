@@ -32,10 +32,12 @@ import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupC
 
 trait PermissionsService {
 	def saveOrUpdate(roleDefinition: CustomRoleDefinition)
-	def saveOrUpdate(permission: GrantedPermission[_])
-	def saveOrUpdate(role: GrantedRole[_])
+	def saveOrUpdate(permission: GrantedPermission[_ <: PermissionsTarget])
+	def saveOrUpdate(role: GrantedRole[_ <: PermissionsTarget])
 
 	def delete(roleDefinition: CustomRoleDefinition)
+	def delete(permission: GrantedPermission[_ <: PermissionsTarget])
+	def delete(role: GrantedRole[_ <: PermissionsTarget])
 
 	def getCustomRoleDefinitionById(id: String): Option[CustomRoleDefinition]
 
@@ -165,13 +167,15 @@ abstract class AbstractPermissionsService extends PermissionsService {
 	}
 
 	def saveOrUpdate(roleDefinition: CustomRoleDefinition) = permissionsDao.saveOrUpdate(roleDefinition)
-	def saveOrUpdate(permission: GrantedPermission[_]) = permissionsDao.saveOrUpdate(permission)
-	def saveOrUpdate(role: GrantedRole[_]) = permissionsDao.saveOrUpdate(role)
+	def saveOrUpdate(permission: GrantedPermission[_ <: PermissionsTarget]) = permissionsDao.saveOrUpdate(permission)
+	def saveOrUpdate(role: GrantedRole[_ <: PermissionsTarget]) = permissionsDao.saveOrUpdate(role)
 
 	def delete(roleDefinition: CustomRoleDefinition) = {
 		roleDefinition.department.customRoleDefinitions.remove(roleDefinition)
 		permissionsDao.delete(roleDefinition)
 	}
+	def delete(permission: GrantedPermission[_ <: PermissionsTarget]) = permissionsDao.delete(permission)
+	def delete(role: GrantedRole[_ <: PermissionsTarget]) = permissionsDao.delete(role)
 
 	def getCustomRoleDefinitionById(id: String) = permissionsDao.getCustomRoleDefinitionById(id)
 

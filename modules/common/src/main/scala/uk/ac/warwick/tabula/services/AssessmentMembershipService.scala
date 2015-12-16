@@ -71,6 +71,8 @@ trait AssessmentMembershipService {
 	def save(gb: GradeBoundary): Unit
 	def deleteGradeBoundaries(marksCode: String): Unit
 	def gradesForMark(component: AssessmentComponent, mark: Int): Seq[GradeBoundary]
+
+	def flushAndEvict(groups: Seq[UpstreamAssessmentGroup]): Unit
 }
 
 
@@ -167,10 +169,6 @@ class AssessmentMembershipServiceImpl
 	 */
 	def getAssessmentComponents(department: Department, includeSubDepartments: Boolean) = dao.getAssessmentComponents(department, includeSubDepartments)
 
-	def countPublishedFeedback(assignment: Assignment): Int = dao.countPublishedFeedback(assignment)
-
-	def countFullFeedback(assignment: Assignment): Int = dao.countFullFeedback(assignment)
-
 	def getUpstreamAssessmentGroups(component: AssessmentComponent, academicYear: AcademicYear): Seq[UpstreamAssessmentGroup] =
 		dao.getUpstreamAssessmentGroups(component, academicYear)
 
@@ -195,6 +193,8 @@ class AssessmentMembershipServiceImpl
 				Seq()
 		}
 	}
+
+	def flushAndEvict(groups: Seq[UpstreamAssessmentGroup]): Unit = dao.flushAndEvict(groups)
 
 }
 

@@ -70,7 +70,6 @@ class AssessmentMembershipDaoTest extends PersistenceTestBase {
 		upstreamGroup2.occurrence = "A"
 		upstreamGroup2.assessmentGroup = "A"
 		upstreamGroup2.academicYear = new AcademicYear(2010)
-		upstreamGroup2.members.sessionFactory = sessionFactory
 		upstreamGroup2.members.knownType.staticUserIds = Seq("0672089")
 
 		assignment2.assessmentGroups.add(assessmentGroup2)
@@ -100,7 +99,6 @@ class AssessmentMembershipDaoTest extends PersistenceTestBase {
 		upstreamGroup3.occurrence = "A"
 		upstreamGroup3.assessmentGroup = "A"
 		upstreamGroup3.academicYear = new AcademicYear(2010)
-		upstreamGroup3.members.sessionFactory = sessionFactory
 		upstreamGroup3.members.knownType.staticUserIds = Seq("0672089")
 
 		assignment3.assessmentGroups.add(assessmentGroup3)

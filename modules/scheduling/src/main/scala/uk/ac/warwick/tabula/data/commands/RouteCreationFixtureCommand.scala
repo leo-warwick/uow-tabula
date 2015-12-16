@@ -1,14 +1,14 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
+import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
+import uk.ac.warwick.tabula.data._
 import uk.ac.warwick.tabula.data.model.{DegreeType, Route}
 import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
-import uk.ac.warwick.tabula.data._
-import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 
 class RouteCreationFixtureCommand extends CommandInternal[Route] {
-	this: ModuleAndDepartmentServiceComponent with SessionComponent with TransactionalComponent =>
+	self: ModuleAndDepartmentServiceComponent with TransactionalComponent with SessionComponent =>
 
 	var routeDao:RouteDao = Wire[RouteDao]
 	var departmentCode: String = _
@@ -46,8 +46,8 @@ object RouteCreationFixtureCommand{
 		new RouteCreationFixtureCommand
 		with ComposableCommand[Route]
 		with AutowiringModuleAndDepartmentServiceComponent
-		with Daoisms
 		with AutowiringTransactionalComponent
+		with Daoisms
 		with Unaudited
 		with PubliclyVisiblePermissions
 

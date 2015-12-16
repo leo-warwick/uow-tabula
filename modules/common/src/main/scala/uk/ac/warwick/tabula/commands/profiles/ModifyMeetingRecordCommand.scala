@@ -3,15 +3,13 @@ package uk.ac.warwick.tabula.commands.profiles
 import org.joda.time.{DateTime, LocalDate}
 import org.springframework.validation.Errors
 import org.springframework.validation.ValidationUtils.rejectIfEmptyOrWhitespace
-import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.model.MeetingApprovalState.Pending
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.forms.FormattedHtml
-import uk.ac.warwick.tabula.data.{Daoisms, FileDao, MeetingRecordDao}
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.MonitoringPointMeetingRelationshipTermService
-import uk.ac.warwick.tabula.services.attendancemonitoring.AttendanceMonitoringMeetingRecordService
+import uk.ac.warwick.tabula.services.{AutowiringMonitoringPointMeetingRelationshipTermServiceComponent, AutowiringFileAttachmentServiceComponent, AutowiringMeetingRecordServiceComponent}
+import uk.ac.warwick.tabula.services.attendancemonitoring.AutowiringAttendanceMonitoringMeetingRecordServiceComponent
 import uk.ac.warwick.tabula.system.BindListener
 
 import scala.collection.JavaConverters._
@@ -20,12 +18,11 @@ abstract class ModifyMeetingRecordCommand(val creator: Member, var relationship:
 	extends Command[MeetingRecord] with Notifies[MeetingRecord, MeetingRecord]
 	with SchedulesNotifications[MeetingRecord, MeetingRecord]
 	with SelfValidating with FormattedHtml
-	with BindListener with Daoisms {
-
-	var meetingRecordDao = Wire.auto[MeetingRecordDao]
-	var fileDao = Wire.auto[FileDao]
-	var monitoringPointMeetingRelationshipTermService = Wire.auto[MonitoringPointMeetingRelationshipTermService]
-	var attendanceMonitoringMeetingRecordService = Wire.auto[AttendanceMonitoringMeetingRecordService]
+	with BindListener
+	with AutowiringMeetingRecordServiceComponent
+	with AutowiringFileAttachmentServiceComponent
+	with AutowiringMonitoringPointMeetingRelationshipTermServiceComponent
+	with AutowiringAttendanceMonitoringMeetingRecordServiceComponent {
 
 	var title: String = _
 	var description: String = _
@@ -35,7 +32,7 @@ abstract class ModifyMeetingRecordCommand(val creator: Member, var relationship:
 	var isRealTime: Boolean = _
 
 	var file: UploadedFile = new UploadedFile
-	var attachedFiles:JList[FileAttachment] = _
+	var attachedFiles: JList[FileAttachment] = _
 
 	var attachmentTypes = Seq[String]()
 
@@ -54,13 +51,13 @@ abstract class ModifyMeetingRecordCommand(val creator: Member, var relationship:
 				val filesToKeep = Option(attachedFiles).map(_.asScala.toList).getOrElse(List())
 				val filesToRemove = meeting.attachments.asScala -- filesToKeep
 				meeting.attachments = JArrayList[FileAttachment](filesToKeep)
-				filesToRemove.foreach(session.delete(_))
+				fileAttachmentService.deleteAttachments(filesToRemove)
 			}
 
 			file.attached.asScala map(attachment => {
 				attachment.meetingRecord = meeting
 				meeting.attachments.add(attachment)
-				fileDao.savePermanent(attachment)
+				fileAttachmentService.savePermanent(attachment)
 			})
 		}
 
@@ -76,7 +73,7 @@ abstract class ModifyMeetingRecordCommand(val creator: Member, var relationship:
 		persistAttachments(meeting)
 
 		// persist the meeting record
-		meetingRecordDao.saveOrUpdate(meeting)
+		meetingRecordService.saveOrUpdate(meeting)
 
 		if (features.meetingRecordApproval) {
 			updateMeetingApproval(meeting)
@@ -104,7 +101,7 @@ abstract class ModifyMeetingRecordCommand(val creator: Member, var relationship:
 			}
 
 			meetingRecordApproval.state = Pending
-			session.saveOrUpdate(meetingRecordApproval)
+			meetingRecordService.saveOrUpdate(meetingRecordApproval)
 			meetingRecordApproval
 		}
 

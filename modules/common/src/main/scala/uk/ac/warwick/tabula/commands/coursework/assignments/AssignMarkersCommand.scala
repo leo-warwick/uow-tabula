@@ -8,7 +8,7 @@ import uk.ac.warwick.tabula.services.coursework.docconversion.MarkerAllocationEx
 import uk.ac.warwick.tabula.services.coursework.docconversion.MarkerAllocationExtractor.{NoMarker, SecondMarker, FirstMarker, ParsedRow}
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.services.{AutowiringAssessmentServiceComponent, AssessmentServiceComponent}
+import uk.ac.warwick.tabula.services.{MaintenanceModeServiceComponent, AutowiringAssessmentServiceComponent, AssessmentServiceComponent}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.system.BindListener
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}

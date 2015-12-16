@@ -55,20 +55,20 @@ class FormValueTest extends PersistenceTestBase {
 
 		// Can fetch everything from db
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[SavedFormValue], ssv.id) should be (ssv)
-			session.get(classOf[FileAttachment], ssvAttachment1.id) should be (ssvAttachment1)
-			session.get(classOf[FileAttachment], ssvAttachment2.id) should be (ssvAttachment2)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[SavedFormValue](ssv.id) should be (Some(ssv))
+			session.getById[FileAttachment](ssvAttachment1.id) should be (Some(ssvAttachment1))
+			session.getById[FileAttachment](ssvAttachment2.id) should be (Some(ssvAttachment2))
 		}
 
 		flushing(session) { session.delete(ssv) }
 
 		// Ensure we can't fetch the extension, but all the other objects are returned
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[SavedFormValue], ssv.id) should be (null)
-			session.get(classOf[FileAttachment], ssvAttachment1.id) should be (ssvAttachment1)
-			session.get(classOf[FileAttachment], ssvAttachment2.id) should be (ssvAttachment2)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[SavedFormValue](ssv.id) should be ('empty)
+			session.getById[FileAttachment](ssvAttachment1.id) should be (Some(ssvAttachment1))
+			session.getById[FileAttachment](ssvAttachment2.id) should be (Some(ssvAttachment2))
 		}
 	}
 }

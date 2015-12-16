@@ -30,7 +30,7 @@ class EditAttendanceNoteCommandTest extends TestBase with Mockito {
 			absenceType = anAbsenceType
 			override val user = new CurrentUser(new User, new User)
 		}
-		command.file.maintenanceMode = smartMock[MaintenanceModeService]
+		command.file.maintenanceModeService = smartMock[MaintenanceModeService]
 
 		val errors = new BindException(command, "command")
 

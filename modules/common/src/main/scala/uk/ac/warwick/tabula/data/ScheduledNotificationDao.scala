@@ -7,9 +7,9 @@ import org.joda.time.DateTime
 
 trait ScheduledNotificationDao {
 
-		def save(scheduledNotification: ScheduledNotification[_]): Unit
+		def save(scheduledNotification: ScheduledNotification[_ >: Null <: ToEntityReference]): Unit
 
-		def delete(scheduledNotification: ScheduledNotification[_]): Unit
+		def delete(scheduledNotification: ScheduledNotification[_ >: Null <: ToEntityReference]): Unit
 
 		def getById(id: String): Option[ScheduledNotification[_  >: Null <: ToEntityReference]]
 
@@ -22,11 +22,11 @@ trait ScheduledNotificationDao {
 @Repository
 class ScheduledNotificationDaoImpl extends ScheduledNotificationDao with Daoisms {
 
-	override def save(scheduledNotification: ScheduledNotification[_]) = {
+	override def save(scheduledNotification: ScheduledNotification[_ >: Null <: ToEntityReference]) = {
 		session.saveOrUpdate(scheduledNotification)
 	}
 
-	override def getById(id: String) = getById[ScheduledNotification[_ >: Null <: ToEntityReference]](id)
+	override def getById(id: String) = session.getById[ScheduledNotification[_ >: Null <: ToEntityReference]](id)
 
 	override def getScheduledNotifications(entity: Any) = {
 		val targetEntity = entity match {
@@ -41,15 +41,15 @@ class ScheduledNotificationDaoImpl extends ScheduledNotificationDao with Daoisms
 			.seq
 	}
 
-	override def delete(scheduledNotification: ScheduledNotification[_]) = session.delete(scheduledNotification)
+	override def delete(scheduledNotification: ScheduledNotification[_ >: Null <: ToEntityReference]) = session.delete(scheduledNotification)
 
 	override def notificationsToComplete: Scrollable[ScheduledNotification[_  >: Null <: ToEntityReference]] = {
-		val scrollable =
+		val scrollableResults =
 			session.newCriteria[ScheduledNotification[_  >: Null <: ToEntityReference]]
 			.add(Restrictions.ne("completed", true))
 			.add(Restrictions.le("scheduledDate", DateTime.now))
 			.addOrder(Order.asc("scheduledDate"))
 			.scroll()
-		Scrollable(scrollable, session)
+		session.scrollable(scrollableResults)
 	}
 }

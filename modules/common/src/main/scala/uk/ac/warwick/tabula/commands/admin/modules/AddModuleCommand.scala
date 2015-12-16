@@ -7,7 +7,7 @@ import collection.JavaConversions._
 import org.springframework.validation.{ ValidationUtils, Errors }
 import uk.ac.warwick.tabula.permissions._
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
-import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
+import uk.ac.warwick.tabula.services.{MaintenanceModeServiceComponent, AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
 import uk.ac.warwick.tabula.helpers.StringUtils._
 
 object AddModuleCommand {

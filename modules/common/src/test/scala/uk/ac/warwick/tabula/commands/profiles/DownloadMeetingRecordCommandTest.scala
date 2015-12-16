@@ -1,15 +1,13 @@
 package uk.ac.warwick.tabula.commands.profiles
 
-import org.hibernate.{Session, SessionFactory}
 import org.joda.time.DateTimeConstants
 import org.springframework.web.multipart.MultipartFile
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.commands.UploadedFile
 import uk.ac.warwick.tabula.data.model.MeetingFormat._
 import uk.ac.warwick.tabula.data.model.{ExternalStudentRelationship, FileAttachment, StudentRelationshipType}
-import uk.ac.warwick.tabula.data.{FileDao, MeetingRecordDao}
-import uk.ac.warwick.tabula.services.MonitoringPointMeetingRelationshipTermService
 import uk.ac.warwick.tabula.services.attendancemonitoring.AttendanceMonitoringMeetingRecordService
+import uk.ac.warwick.tabula.services.{FileAttachmentService, MeetingRecordService, MonitoringPointMeetingRelationshipTermService}
 
 
 class DownloadMeetingRecordCommandTest extends TestBase with Mockito {
@@ -18,8 +16,8 @@ class DownloadMeetingRecordCommandTest extends TestBase with Mockito {
 
 	@Test
 	def validMeeting() = withUser("cusdx") { withFakeTime(aprilFool) {
-		val meetingRecordDao = smartMock[MeetingRecordDao]
-		val fileDao = smartMock[FileDao]
+		val meetingRecordService = smartMock[MeetingRecordService]
+		val fileAttachmentService = smartMock[FileAttachmentService]
 		val monitoringPointMeetingRelationshipTermService = smartMock[MonitoringPointMeetingRelationshipTermService]
 		val attendanceMonitoringMeetingRecordService = smartMock[AttendanceMonitoringMeetingRecordService]
 
@@ -41,13 +39,11 @@ class DownloadMeetingRecordCommandTest extends TestBase with Mockito {
 		uploadedFile.attached.add(fileAttach)
 
 		val createMeetingRecordCommand = new CreateMeetingRecordCommand(creator, relationship, false)
-		createMeetingRecordCommand.meetingRecordDao = meetingRecordDao
-		createMeetingRecordCommand.fileDao = fileDao
+		createMeetingRecordCommand.meetingRecordService = meetingRecordService
+		createMeetingRecordCommand.fileAttachmentService = fileAttachmentService
 		createMeetingRecordCommand.monitoringPointMeetingRelationshipTermService = monitoringPointMeetingRelationshipTermService
 		createMeetingRecordCommand.attendanceMonitoringMeetingRecordService = attendanceMonitoringMeetingRecordService
 		createMeetingRecordCommand.features = Features.empty
-		createMeetingRecordCommand.sessionFactory = smartMock[SessionFactory]
-		createMeetingRecordCommand.sessionFactory.getCurrentSession returns smartMock[Session]
 
 		createMeetingRecordCommand.title = "Title"
 		createMeetingRecordCommand.format = FaceToFace

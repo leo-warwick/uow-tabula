@@ -4,7 +4,7 @@ import scala.collection.JavaConverters._
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.{Assignment, Module}
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.services.{AssessmentServiceComponent, AutowiringAssessmentServiceComponent}
+import uk.ac.warwick.tabula.services.{MaintenanceModeServiceComponent, AssessmentServiceComponent, AutowiringAssessmentServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsCheckingMethods, PermissionsChecking, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.JavaImports._

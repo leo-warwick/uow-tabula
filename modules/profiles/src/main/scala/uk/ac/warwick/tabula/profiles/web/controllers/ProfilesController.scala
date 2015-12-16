@@ -1,6 +1,6 @@
 package uk.ac.warwick.tabula.profiles.web.controllers
 
-import uk.ac.warwick.tabula.data.AutowiringRelationshipDaoComponent
+import org.hibernate.Session
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.profiles.web.ProfileBreadcrumbs
 import uk.ac.warwick.tabula.services.{AutowiringProfileServiceComponent, AutowiringRelationshipServiceComponent}
@@ -26,7 +26,7 @@ abstract class ProfilesController extends BaseController with ProfileBreadcrumbs
 	def activeProfilesOnly = { _activeProfilesOnly = true }
 	def notActiveProfilesOnly = { _activeProfilesOnly = false }
 
-	final override def onPreRequest {
+	final override def onPreRequest(session: Session) {
 		// if studentsOnly has been called, activate the studentsOnly filter
 		if (_studentProfilesOnly) {
 			session.enableFilter(Member.StudentsOnlyFilter)

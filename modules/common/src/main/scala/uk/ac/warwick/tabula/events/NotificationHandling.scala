@@ -5,7 +5,7 @@ import uk.ac.warwick.tabula.services.{ScheduledNotificationService, Notification
 import uk.ac.warwick.tabula.commands.{CompletesNotifications, SchedulesNotifications, Notifies, Command}
 import uk.ac.warwick.tabula.jobs.{Job, NotifyingJob}
 import uk.ac.warwick.tabula.services.jobs.JobInstance
-import uk.ac.warwick.tabula.data.model.Notification
+import uk.ac.warwick.tabula.data.model.{ToEntityReference, Notification}
 import uk.ac.warwick.tabula.helpers.Logging
 
 trait NotificationHandling extends Logging {
@@ -53,7 +53,7 @@ trait NotificationHandling extends Logging {
 				if (notificationResult.notifications.nonEmpty) {
 					cmd.deferredMessages.append(
 						notificationService.updateWithDeferredIndex(
-							notificationResult.notifications.map(_.asInstanceOf[Notification[_, _]]),
+							notificationResult.notifications.map(_.asInstanceOf[Notification[_ >: Null <: ToEntityReference, _]]),
 							notificationResult.completedBy
 						)
 					)
@@ -68,7 +68,7 @@ trait NotificationHandling extends Logging {
 	 * For edge cases where manual notifications need to be made outside commands.
 	 * Use the command-triggered mixin above where possible for better type safety.
 	 */
-	def notify[A](notifications: Seq[Notification[_, _]]) {
+	def notify[A](notifications: Seq[Notification[_ >: Null <: ToEntityReference, _]]) {
 		notifications.foreach { n => notificationService.push(n) }
 	}
 }

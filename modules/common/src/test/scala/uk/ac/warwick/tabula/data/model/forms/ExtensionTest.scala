@@ -95,18 +95,18 @@ class ExtensionTest extends PersistenceTestBase {
 
 		// Can fetch everything from db
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[Extension], extension.id) should be (extension)
-			session.get(classOf[FileAttachment], extensionAttachment.id) should be (extensionAttachment)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[Extension](extension.id) should be (Some(extension))
+			session.getById[FileAttachment](extensionAttachment.id) should be (Some(extensionAttachment))
 		}
 
 		flushing(session) { session.delete(extension) }
 
 		// Ensure we can't fetch the extension or attachment, but all the other objects are returned
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[Extension], extension.id) should be (null)
-			session.get(classOf[FileAttachment], extensionAttachment.id) should be (null)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[Extension](extension.id) should be ('empty)
+			session.getById[FileAttachment](extensionAttachment.id) should be ('empty)
 		}
 	}
 

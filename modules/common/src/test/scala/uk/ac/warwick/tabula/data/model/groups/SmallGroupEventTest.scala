@@ -25,7 +25,6 @@ class SmallGroupEventTest extends TestBase with Mockito{
     source.startTime = new LocalTime(12,0,0,0)
     source.title= "test title"
     source.tutors = UserGroup.ofUsercodes
-		source.tutors.asInstanceOf[UserGroup].sessionFactory = mockSessionFactory
     source.weekRanges = Seq(WeekRange(1))
 
     val targetGroup = new SmallGroup()

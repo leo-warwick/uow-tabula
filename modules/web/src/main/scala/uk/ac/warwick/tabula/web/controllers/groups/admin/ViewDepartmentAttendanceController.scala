@@ -16,8 +16,8 @@ import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 import scala.collection.JavaConverters._
 
 abstract class AbstractViewDepartmentAttendanceController extends GroupsController
-	with DepartmentScopedController with AcademicYearScopedController with AutowiringUserSettingsServiceComponent with AutowiringModuleAndDepartmentServiceComponent
-	with AutowiringMaintenanceModeServiceComponent with GroupsDepartmentsAndModulesWithPermission {
+	with DepartmentScopedController with AcademicYearScopedController with AutowiringUserSettingsServiceComponent with AutowiringModuleAndDepartmentServiceComponent with GroupsDepartmentsAndModulesWithPermission
+	with AutowiringMaintenanceModeServiceComponent {
 
 	override val departmentPermission: Permission = null
 

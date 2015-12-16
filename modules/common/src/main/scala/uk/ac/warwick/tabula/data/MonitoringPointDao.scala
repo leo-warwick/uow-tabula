@@ -7,7 +7,6 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.model.{Department, Route, StudentMember}
 import org.hibernate.criterion.{Projections, Order}
 import uk.ac.warwick.tabula.AcademicYear
-import org.hibernate.criterion.Restrictions._
 import uk.ac.warwick.tabula.services.TermService
 import org.hibernate.FetchMode
 
@@ -26,6 +25,7 @@ trait MonitoringPointDao {
 	def getCheckpointsByStudent(monitoringPoints: Seq[MonitoringPoint], mostSiginificantOnly: Boolean = true): Seq[(StudentMember, MonitoringCheckpoint)]
 	def saveOrUpdate(monitoringPoint: MonitoringPoint)
 	def delete(monitoringPoint: MonitoringPoint)
+	def delete(monitoringPointSet: MonitoringPointSet)
 	def saveOrUpdate(monitoringPoint: MonitoringPointTemplate)
 	def delete(monitoringPoint: MonitoringPointTemplate)
 	def saveOrUpdate(monitoringCheckpoint: MonitoringCheckpoint)
@@ -78,15 +78,14 @@ trait MonitoringPointDao {
 @Repository
 class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 
-
 	def getPointById(id: String) =
-		getById[MonitoringPoint](id)
+		session.getById[MonitoringPoint](id)
 
 	def getPointTemplateById(id: String) =
-		getById[MonitoringPointTemplate](id)
+		session.getById[MonitoringPointTemplate](id)
 
 	def getSetById(id: String) =
-		getById[MonitoringPointSet](id)
+		session.getById[MonitoringPointSet](id)
 
 	def getCheckpointsByStudent(monitoringPoints: Seq[MonitoringPoint], mostSiginificantOnly: Boolean = true): Seq[(StudentMember, MonitoringCheckpoint)] = {
 		if (monitoringPoints.isEmpty) Nil
@@ -125,6 +124,7 @@ class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 
 	def saveOrUpdate(monitoringPoint: MonitoringPoint) = session.saveOrUpdate(monitoringPoint)
 	def delete(monitoringPoint: MonitoringPoint) = session.delete(monitoringPoint)
+	def delete(monitoringPointSet: MonitoringPointSet) = session.delete(monitoringPointSet)
 	def saveOrUpdate(monitoringPoint: MonitoringPointTemplate) = session.saveOrUpdate(monitoringPoint)
 	def delete(monitoringPoint: MonitoringPointTemplate) = session.delete(monitoringPoint)
 	def saveOrUpdate(monitoringCheckpoint: MonitoringCheckpoint) = session.saveOrUpdate(monitoringCheckpoint)
@@ -173,7 +173,7 @@ class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 	}
 
 	def getTemplateById(id: String): Option[MonitoringPointSetTemplate] =
-		getById[MonitoringPointSetTemplate](id)
+		session.getById[MonitoringPointSetTemplate](id)
 
 	def deleteTemplate(template: MonitoringPointSetTemplate) = session.delete(template)
 
@@ -213,9 +213,8 @@ class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 			.setParameter("academicYear", academicYear)
 
 		partionedUniversityIdsWithIndex.foreach{
-			case (ids, index) => {
+			case (ids, index) =>
 				query.setParameterList("universityIds" + index.toString, ids)
-			}
 		}
 
 		query.seq.distinct.map{ objArray =>
@@ -260,10 +259,9 @@ class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 
 
 
-		partionedUniversityIdsWithIndex.foreach{
-			case (ids, index) => {
+		partionedUniversityIdsWithIndex.foreach {
+			case (ids, index) =>
 				query.setParameterList("universityIds" + index.toString, ids)
-			}
 		}
 
 		val memberPointMap = query.seq.map{objArray =>
@@ -315,10 +313,9 @@ class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 			.setParameter("startWeek", startWeek)
 			.setParameter("endWeek", endWeek)
 
-		partionedUniversityIdsWithIndex.foreach{
-			case (ids, index) => {
+		partionedUniversityIdsWithIndex.foreach {
+			case (ids, index) =>
 				query.setParameterList("universityIds" + index.toString, ids)
-			}
 		}
 
 		studentsByCount(universityIds, academicYear, isAscending, maxResults, startResult, query)
@@ -372,10 +369,9 @@ class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 			.setParameter("startWeek", startWeek)
 			.setParameter("endWeek", endWeek)
 
-		partionedUniversityIdsWithIndex.foreach{
-			case (ids, index) => {
+		partionedUniversityIdsWithIndex.foreach {
+			case (ids, index) =>
 				query.setParameterList("universityIds" + index.toString, ids)
-			}
 		}
 
 		studentsByCount(universityIds, academicYear, isAscending, maxResults, startResult, query)
@@ -411,9 +407,9 @@ class MonitoringPointDaoImpl extends MonitoringPointDao with Daoisms {
 
 			universityIdsToFetch.flatMap{
 				u => students.find(_.universityId == u)
-			}.map{
-				s => s -> sortedAllUniversityIdCount.toMap.get(s.universityId).getOrElse(0)
-			}.toSeq
+			}.map {
+				s => s -> sortedAllUniversityIdCount.toMap.getOrElse(s.universityId, 0)
+			}
 		}
 	}
 

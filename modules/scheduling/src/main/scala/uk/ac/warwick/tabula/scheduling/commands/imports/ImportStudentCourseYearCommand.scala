@@ -5,17 +5,16 @@ import org.springframework.beans.{BeanWrapper, BeanWrapperImpl}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands.{Command, Description, Unaudited}
-import uk.ac.warwick.tabula.data.{Daoisms, StudentCourseYearDetailsDao}
-import uk.ac.warwick.tabula.data.model.{ModeOfAttendance, ModuleRegistrationStatus, StudentCourseDetails, StudentCourseYearDetails, StudentCourseYearProperties}
+import uk.ac.warwick.tabula.data.StudentCourseYearDetailsDao
+import uk.ac.warwick.tabula.data.model.{ModeOfAttendance, ModuleRegistrationStatus, StudentCourseDetails, StudentCourseYearDetails, StudentCourseYearKey}
 import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.scheduling.helpers.{SitsStudentRow, ImportRowTracker, PropertyCopying}
+import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.scheduling.helpers.{ImportRowTracker, PropertyCopying, SitsStudentRow}
 import uk.ac.warwick.tabula.scheduling.services.ModeOfAttendanceImporter
 import uk.ac.warwick.tabula.services.ProfileService
-import uk.ac.warwick.tabula.data.model.StudentCourseYearKey
-import uk.ac.warwick.tabula.helpers.StringUtils._
 
 class ImportStudentCourseYearCommand(row: SitsStudentRow, studentCourseDetails: StudentCourseDetails, importRowTracker: ImportRowTracker)
-	extends Command[StudentCourseYearDetails] with Logging with Daoisms
+	extends Command[StudentCourseYearDetails] with Logging
 	with Unaudited with PropertyCopying {
 	import ImportMemberHelpers._
 

@@ -45,18 +45,18 @@ class SubmissionTest extends PersistenceTestBase {
 
 		// Can fetch everything from db
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[Submission], submission.id) should be (submission)
-			session.get(classOf[FileAttachment], submissionAttachment.id) should be (submissionAttachment)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[Submission](submission.id) should be (Some(submission))
+			session.getById[FileAttachment](submissionAttachment.id) should be (Some(submissionAttachment))
 		}
 
 		flushing(session) { session.delete(submission) }
 
 		// Ensure we can't fetch the submission, but all the other objects are returned
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[Submission], submission.id) should be (null)
-			session.get(classOf[FileAttachment], submissionAttachment.id) should be (submissionAttachment)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[Submission](submission.id) should be ('empty)
+			session.getById[FileAttachment](submissionAttachment.id) should be (Some(submissionAttachment))
 		}
 	}
 }

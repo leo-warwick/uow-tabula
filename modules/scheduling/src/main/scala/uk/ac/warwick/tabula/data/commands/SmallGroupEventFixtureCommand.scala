@@ -1,14 +1,15 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Appliable, Unaudited, ComposableCommand, CommandInternal}
+import org.joda.time.LocalTime
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
+import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.NamedLocation
 import uk.ac.warwick.tabula.data.model.groups._
+import uk.ac.warwick.tabula.data.{AutowiringSmallGroupDaoComponent, SmallGroupDaoComponent}
 import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.data.{AutowiringSmallGroupDaoComponent, Daoisms, SmallGroupDaoComponent}
-import collection.JavaConverters._
-import org.joda.time.LocalTime
 import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.data.Transactions._
+
+import scala.collection.JavaConverters._
 
 class SmallGroupEventFixtureCommand extends CommandInternal[SmallGroupEvent] with Logging {
 	this: SmallGroupDaoComponent =>

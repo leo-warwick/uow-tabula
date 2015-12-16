@@ -1,5 +1,6 @@
 package uk.ac.warwick.tabula.web.controllers
 
+import org.hibernate.{Session, SessionFactory}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Required
 import org.springframework.context.MessageSource
@@ -8,6 +9,7 @@ import org.springframework.validation.Validator
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.InitBinder
 import javax.annotation.Resource
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.{PermissionDeniedException, CurrentUser, ItemNotFoundException, RequestInfo}
 import uk.ac.warwick.tabula.data.Daoisms
 import uk.ac.warwick.tabula.events.EventHandling
@@ -110,7 +112,6 @@ abstract class BaseController extends ControllerMethods
 	with ValidatesCommand
 	with Logging
 	with EventHandling
-	with Daoisms
 	with StringUtils
 	with ControllerImports
 	with PreRequestHandler
@@ -143,16 +144,24 @@ abstract class BaseController extends ControllerMethods
 	def hideDeletedItems = { _hideDeletedItems = true }
 	def showDeletedItems = { _hideDeletedItems = false }
 
+	private var _sessionFactory = Wire[SessionFactory]
+
+	// For tests
+	def setSessionFactoryForTest(sessionFactory: SessionFactory): Unit = { _sessionFactory = sessionFactory }
+
 	final def preRequest {
+		val session = _sessionFactory.getCurrentSession
+
 		// if hideDeletedItems has been called, exclude all "deleted=1" items from Hib queries.
 		if (_hideDeletedItems) {
 			session.enableFilter("notDeleted")
 		}
-		onPreRequest
+
+		onPreRequest(session)
 	}
 
 	// Stub implementation that can be overridden for logic that goes before a request
-	def onPreRequest {}
+	def onPreRequest(session: Session) {}
 
 	/**
 	 * Sets up @Valid validation.

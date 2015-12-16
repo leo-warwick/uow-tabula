@@ -1,14 +1,15 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
 import org.joda.time.DateTime
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
 import uk.ac.warwick.tabula.data.model.MarkingState.MarkingCompleted
-import uk.ac.warwick.tabula.data.{UserGroupDao, TransactionalComponent, AutowiringTransactionalComponent}
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent, UserGroupDao}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
+
 import scala.collection.JavaConverters._
 
 class CreatePremarkedAssignmentFixtureCommand extends CommandInternal[Assignment] with Logging {

@@ -65,12 +65,12 @@ trait SmallGroupDao {
 class SmallGroupDaoImpl extends SmallGroupDao with Daoisms {
 	import Order._
 
-	def getSmallGroupSetById(id: String) = getById[SmallGroupSet](id)
-	def getSmallGroupById(id: String) = getById[SmallGroup](id)
-	def getSmallGroupEventById(id: String) = getById[SmallGroupEvent](id)
-	def getSmallGroupEventOccurrenceById(id: String) = getById[SmallGroupEventOccurrence](id)
-	def getDepartmentSmallGroupSetById(id: String) = getById[DepartmentSmallGroupSet](id)
-	def getDepartmentSmallGroupById(id: String) = getById[DepartmentSmallGroup](id)
+	def getSmallGroupSetById(id: String) = session.getById[SmallGroupSet](id)
+	def getSmallGroupById(id: String) = session.getById[SmallGroup](id)
+	def getSmallGroupEventById(id: String) = session.getById[SmallGroupEvent](id)
+	def getSmallGroupEventOccurrenceById(id: String) = session.getById[SmallGroupEventOccurrence](id)
+	def getDepartmentSmallGroupSetById(id: String) = session.getById[DepartmentSmallGroupSet](id)
+	def getDepartmentSmallGroupById(id: String) = session.getById[DepartmentSmallGroup](id)
 	def saveOrUpdate(smallGroupSet: SmallGroupSet) = session.saveOrUpdate(smallGroupSet)
 	def saveOrUpdate(smallGroup: SmallGroup) = session.saveOrUpdate(smallGroup)
 	def saveOrUpdate(smallGroupEvent: SmallGroupEvent) = session.saveOrUpdate(smallGroupEvent)

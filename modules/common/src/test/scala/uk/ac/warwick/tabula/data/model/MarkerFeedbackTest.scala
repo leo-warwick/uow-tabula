@@ -68,10 +68,10 @@ class MarkerFeedbackTest extends PersistenceTestBase {
 		markerFeedbackAttachment.id should not be (null)
 
 		// Can fetch everything from db
-		session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-		session.get(classOf[Feedback], feedback.id) should be (feedback)
-		session.get(classOf[MarkerFeedback], markerFeedback.id) should be (markerFeedback)
-		session.get(classOf[FileAttachment], markerFeedbackAttachment.id) should be (markerFeedbackAttachment)
+		session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+		session.getById[Feedback](feedback.id) should be (Some(feedback))
+		session.getById[MarkerFeedback](markerFeedback.id) should be (Some(markerFeedback))
+		session.getById[FileAttachment](markerFeedbackAttachment.id) should be (Some(markerFeedbackAttachment))
 
 
 		flushing(session) { session.delete(markerFeedback) }
@@ -79,10 +79,10 @@ class MarkerFeedbackTest extends PersistenceTestBase {
 		session.clear()
 
 		// Ensure we can't fetch the markerFeedback or attachment, but all the other objects are returned
-		session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-		session.get(classOf[Feedback], feedback.id) should be (feedback)
-		session.get(classOf[MarkerFeedback], markerFeedback.id) should be (null)
-		session.get(classOf[FileAttachment], markerFeedbackAttachment.id) should be (null)
+		session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+		session.getById[Feedback](feedback.id) should be (Some(feedback))
+		session.getById[MarkerFeedback](markerFeedback.id) should be ('empty)
+		session.getById[FileAttachment](markerFeedbackAttachment.id) should be ('empty)
 
 	}
 

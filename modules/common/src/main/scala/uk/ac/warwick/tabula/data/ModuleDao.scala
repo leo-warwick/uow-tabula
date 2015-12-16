@@ -51,7 +51,7 @@ class ModuleDaoImpl extends ModuleDao with Daoisms {
 			.add(is("department.code", departmentCode.toLowerCase))
 			.uniqueResult
 
-	def getById(id: String) = getById[Module](id)
+	def getById(id: String) = session.getById[Module](id)
 
 	def stampMissingFromImport(staleModuleCodes: Seq[String]) = {
 		staleModuleCodes.grouped(Daoisms.MaxInClauseCount).foreach { staleCodes =>

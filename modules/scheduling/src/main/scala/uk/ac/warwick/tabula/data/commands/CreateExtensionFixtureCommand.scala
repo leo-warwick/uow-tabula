@@ -1,12 +1,12 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
-import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
 import org.joda.time.DateTime
-import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.data.model.forms.{ExtensionState, Extension}
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent, AssessmentService}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
+import uk.ac.warwick.tabula.data.model.forms.Extension
+import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
+import uk.ac.warwick.tabula.services.{AssessmentService, AutowiringUserLookupComponent, UserLookupComponent}
+import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 
 class CreateExtensionFixtureCommand extends CommandInternal[Extension] {
 	this: TransactionalComponent with UserLookupComponent =>

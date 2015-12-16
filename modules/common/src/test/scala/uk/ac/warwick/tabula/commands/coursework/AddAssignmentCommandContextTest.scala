@@ -21,7 +21,7 @@ class AddAssignmentCommandContextTest extends AppContextTestBase {
 	@Transactional
 	@Test def add() {
 		// hbm2ddl generates a swathe of conflicting foreign key constraints for entity_id, so ignore for this test
-		session.createSQLQuery("SET DATABASE REFERENTIAL INTEGRITY FALSE").executeUpdate()
+		session.newSQLQuery("SET DATABASE REFERENTIAL INTEGRITY FALSE").executeUpdate()
 
 		withUser("abc") {
 
@@ -45,7 +45,7 @@ class AddAssignmentCommandContextTest extends AppContextTestBase {
 			session.flush()
 			session.clear()
 
-			val assignment = session.get(classOf[Assignment], assignmentNew.id).asInstanceOf[Assignment]
+			val assignment = session.getById[Assignment](assignmentNew.id).get
 
 			assignment.fields.size should be >= (2)
 			assignment.submissionFields.size should be (2)

@@ -88,18 +88,18 @@ class FeedbackPersistenceTest extends PersistenceTestBase {
 
 		// Can fetch everything from db
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[Feedback], feedback.id) should be (feedback)
-			session.get(classOf[FileAttachment], feedbackAttachment.id) should be (feedbackAttachment)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[Feedback](feedback.id) should be (Some(feedback))
+			session.getById[FileAttachment](feedbackAttachment.id) should be (Some(feedbackAttachment))
 		}
 
 		flushing(session) { session.delete(feedback) }
 
 		// Ensure we can't fetch the feedback or attachment, but all the other objects are returned
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[Feedback], feedback.id) should be (null)
-			session.get(classOf[FileAttachment], feedbackAttachment.id) should be (null)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[Feedback](feedback.id) should be ('empty)
+			session.getById[FileAttachment](feedbackAttachment.id) should be ('empty)
 		}
 	}
 

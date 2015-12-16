@@ -14,7 +14,7 @@ trait SavedFormValueDao {
 
 
 abstract class AbstractSavedFormValueDao extends SavedFormValueDao {
-	self: ExtendedSessionComponent =>
+	self: SessionComponent =>
 
 	override def get(field: FormField, feedback: Feedback): Option[SavedFormValue] =
 		session.newCriteria[SavedFormValue]

@@ -3,20 +3,17 @@ package uk.ac.warwick.tabula.scheduling.commands.imports
 import org.joda.time.DateTime
 import org.springframework.beans.BeanWrapperImpl
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.Command
-import uk.ac.warwick.tabula.commands.Description
+import uk.ac.warwick.tabula.commands.{Command, Description, Unaudited}
+import uk.ac.warwick.tabula.data.LevelDao
 import uk.ac.warwick.tabula.data.Transactions.transactional
+import uk.ac.warwick.tabula.data.model.Level
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.scheduling.helpers.PropertyCopying
-import uk.ac.warwick.tabula.commands.Unaudited
-import uk.ac.warwick.tabula.data.Daoisms
-import uk.ac.warwick.tabula.data.LevelDao
-import uk.ac.warwick.tabula.data.model.Level
 import uk.ac.warwick.tabula.scheduling.services.LevelInfo
 
 class ImportLevelCommand(info: LevelInfo)
-	extends Command[(Level, ImportAcademicInformationCommand.ImportResult)] with Logging with Daoisms
+	extends Command[(Level, ImportAcademicInformationCommand.ImportResult)] with Logging
 	with Unaudited with PropertyCopying {
 
 	PermissionCheck(Permissions.ImportSystemData)

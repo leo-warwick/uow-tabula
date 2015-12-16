@@ -2,6 +2,7 @@ package uk.ac.warwick.tabula.commands.coursework.assignments
 
 import org.joda.time.DateTime
 import uk.ac.warwick.tabula.CurrentUser
+import uk.ac.warwick.tabula.services.AutowiringFeedbackServiceComponent
 import uk.ac.warwick.userlookup.User
 
 import scala.collection.JavaConversions._
@@ -15,10 +16,11 @@ import org.springframework.validation.Errors
 
 
 class AddMarkerFeedbackCommand(module: Module, assignment:Assignment, marker: User, val submitter: CurrentUser)
-	extends UploadFeedbackCommand[List[MarkerFeedback]](module, assignment, marker) with CanProxy {
+	extends UploadFeedbackCommand[List[MarkerFeedback]](module, assignment, marker) with CanProxy
+		with AutowiringFeedbackServiceComponent {
 
 	PermissionCheck(Permissions.AssignmentMarkerFeedback.Manage, assignment)
-	if(submitter.apparentUser != marker) {
+	if (submitter.apparentUser != marker) {
 		PermissionCheck(Permissions.Assignment.MarkOnBehalf, assignment)
 	}
 
@@ -71,8 +73,8 @@ class AddMarkerFeedbackCommand(module: Module, assignment:Assignment, marker: Us
 		markerFeedback.state = InProgress
 		parentFeedback.updatedDate = DateTime.now
 
-		session.saveOrUpdate(parentFeedback)
-		session.saveOrUpdate(markerFeedback)
+		feedbackService.saveOrUpdate(parentFeedback)
+		feedbackService.save(markerFeedback)
 
 		markerFeedback
 	}

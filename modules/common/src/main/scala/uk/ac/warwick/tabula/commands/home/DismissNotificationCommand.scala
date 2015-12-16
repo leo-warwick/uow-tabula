@@ -2,7 +2,7 @@ package uk.ac.warwick.tabula.commands.home
 
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Describable, Description, SelfValidating}
-import uk.ac.warwick.tabula.data.model.{Activity, Notification}
+import uk.ac.warwick.tabula.data.model.{ToEntityReference, Activity, Notification}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.NotificationServiceComponent
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
@@ -10,7 +10,7 @@ import uk.ac.warwick.userlookup.User
 
 object DismissNotificationCommand {
 
-	def apply(notifications: Seq[Notification[_,_]], dismiss: Boolean, user: User) =
+	def apply(notifications: Seq[Notification[_ >: Null <: ToEntityReference, _]], dismiss: Boolean, user: User) =
 		new DismissNotificationCommandInternal(notifications, dismiss, user)
 			with ComposableCommand[Seq[Activity[_]]]
 			with DismissNotificationCommandPermissions
@@ -18,7 +18,7 @@ object DismissNotificationCommand {
 			with DismissNotificationCommandValidation
 }
 
-abstract class DismissNotificationCommandInternal(val notifications: Seq[Notification[_,_]], val dismiss: Boolean, val user: User)
+abstract class DismissNotificationCommandInternal(val notifications: Seq[Notification[_ >: Null <: ToEntityReference, _]], val dismiss: Boolean, val user: User)
 		extends CommandInternal[Seq[Activity[_]]] with DismissNotificationCommandState with NotificationServiceComponent{
 
 	def applyInternal() = {

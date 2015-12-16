@@ -5,7 +5,7 @@ import uk.ac.warwick.tabula.JavaImports.JBoolean
 
 class FeedbackDaoTest extends PersistenceTestBase {
 
-	val dao = new AbstractFeedbackDao with ExtendedSessionComponent {
+	val dao = new AbstractFeedbackDao with SessionComponent {
 		override def session = FeedbackDaoTest.this.session
 	}
 

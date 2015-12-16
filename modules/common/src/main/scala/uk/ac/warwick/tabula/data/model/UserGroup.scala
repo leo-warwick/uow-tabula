@@ -3,15 +3,16 @@ package uk.ac.warwick.tabula.data.model
 import javax.persistence.CascadeType._
 import javax.persistence._
 
+import org.hibernate.SessionFactory
 import org.hibernate.annotations.Type
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.data.Daoisms
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.services.UserLookupService
 import uk.ac.warwick.userlookup.User
 
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 /**
  * Wherever a group of users is referenced in the app, it will be
@@ -37,8 +38,7 @@ import scala.collection.JavaConverters._
 class UserGroup private(val universityIds: Boolean)
 	extends UnspecifiedTypeUserGroup
 		with GeneratedId
-		with KnownTypeUserGroup
-		with Daoisms {
+		with KnownTypeUserGroup {
 
 	/* For Hibernate xx */
 	def this() { this(false) }
@@ -82,12 +82,18 @@ class UserGroup private(val universityIds: Boolean)
 
 		if (!staticIncludeUsers.isEmpty) {
 			staticIncludeUsers.clear()
-			// TAB-3343 - force deletions before inserts
-			optionalSession.foreach { _.flush() }
+			flushSession()
 		}
 
 		staticIncludeUsers.addAll(newMembers.asJava)
 	}
+
+	private def saveNewMembers(members: Seq[OrderedGroupMember]): Unit =
+		Wire.option[SessionFactory].flatMap { sf => Try(sf.getCurrentSession).toOption }.foreach { s => members.foreach(s.save) }
+
+	private def flushSession(): Unit =
+		// TAB-3343 - force deletions before inserts
+		Wire.option[SessionFactory].flatMap { sf => Try(sf.getCurrentSession).toOption }.foreach { _.flush() }
 
 	def replaceStaticUsers(registrations: Seq[UpstreamModuleRegistration]) {
 		val newMembers = registrations.map(member => {
@@ -102,12 +108,11 @@ class UserGroup private(val universityIds: Boolean)
 		if (!staticIncludeUsers.isEmpty) {
 
 			staticIncludeUsers.clear()
-			// TAB-3343 - force deletions before inserts
-			optionalSession.foreach { _.flush() }
+			flushSession()
 		}
 
 		staticIncludeUsers.addAll(distinctNewMembers.asJava)
-		optionalSession.foreach { s => distinctNewMembers.foreach(s.save) }
+		saveNewMembers(distinctNewMembers)
 	}
 
 	def excludedUserIds: Seq[String] = excludeUsers.asScala
@@ -202,7 +207,6 @@ class UserGroup private(val universityIds: Boolean)
 
 	def duplicate(): UserGroup = {
 		val newGroup = new UserGroup(this.universityIds)
-		newGroup.sessionFactory = this.sessionFactory
 		newGroup.copyFrom(this)
 		newGroup.userLookup = this.userLookup
 		newGroup

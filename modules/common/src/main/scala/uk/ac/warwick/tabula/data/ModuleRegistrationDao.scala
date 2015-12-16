@@ -8,6 +8,7 @@ import uk.ac.warwick.tabula.data.model.Module
 
 trait ModuleRegistrationDao {
 	def saveOrUpdate(moduleRegistration: ModuleRegistration)
+	def delete(moduleRegistration: ModuleRegistration)
 	def getByNotionalKey(
 		studentCourseDetails: StudentCourseDetails,
 		module: Module,
@@ -22,6 +23,7 @@ trait ModuleRegistrationDao {
 class ModuleRegistrationDaoImpl extends ModuleRegistrationDao with Daoisms {
 
 	def saveOrUpdate(moduleRegistration: ModuleRegistration) = session.saveOrUpdate(moduleRegistration)
+	def delete(moduleRegistration: ModuleRegistration) = session.delete(moduleRegistration)
 
 	def getByNotionalKey(
 		studentCourseDetails: StudentCourseDetails,
@@ -51,4 +53,6 @@ class ModuleRegistrationDaoImpl extends ModuleRegistrationDao with Daoisms {
 		query.setParameterList("usercodes", userCodes)
 					.seq
 	}
+
+	def evict(moduleRegistration: ModuleRegistration) = session.evict(moduleRegistration)
 }

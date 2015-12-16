@@ -2,19 +2,17 @@ package uk.ac.warwick.tabula.commands.coursework.assignments.extensions
 
 import uk.ac.warwick.tabula.commands.{Description, Describable, CommandInternal, SelfValidating}
 import org.springframework.validation.Errors
-import uk.ac.warwick.tabula.services.UserLookupComponent
+import uk.ac.warwick.tabula.services.{ExtensionServiceComponent, UserLookupComponent}
 import uk.ac.warwick.tabula.data.model.forms.{ExtensionState, Extension}
 import uk.ac.warwick.tabula.{DateFormats, CurrentUser}
-import uk.ac.warwick.tabula.data.model.{FileAttachment, Module, Assignment}
+import uk.ac.warwick.tabula.data.model.{Module, Assignment}
 import uk.ac.warwick.tabula.validators.WithinYears
 import org.joda.time.DateTime
 import org.springframework.format.annotation.DateTimeFormat
-import uk.ac.warwick.tabula.data.Daoisms
-
 
 abstract class ModifyExtensionCommand(val mod: Module, val ass: Assignment, uniId: String, val sub: CurrentUser, val act: String = "")
 		extends CommandInternal[Extension] with ModifyExtensionCommandState {
-	self: ExtensionPersistenceComponent with UserLookupComponent =>
+	self: ExtensionServiceComponent with UserLookupComponent =>
 
 	universityId = uniId
 	module = mod
@@ -97,23 +95,4 @@ trait ModifyExtensionCommandDescription extends Describable[Extension] {
 		d.module(module)
 		d.studentIds(Seq(universityId))
 	}
-}
-
-
-/**
- * This could be a separate service, but it's so noddy it's not (yet) worth it
- */
-trait HibernateExtensionPersistenceComponent extends ExtensionPersistenceComponent with Daoisms {
-	def delete(attachment: FileAttachment) = {
-		attachment.extension.removeAttachment(attachment)
-		session.delete(attachment)
-	}
-	def delete(extension: Extension) = session.delete(extension)
-	def save(extension: Extension) = session.saveOrUpdate(extension)
-}
-
-trait ExtensionPersistenceComponent {
-	def delete(attachment: FileAttachment)
-	def delete(extension: Extension)
-	def save(extension: Extension)
 }

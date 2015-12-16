@@ -6,7 +6,7 @@ import uk.ac.warwick.tabula.data.model.Department
 import uk.ac.warwick.tabula.data.model.notifications.coursework.FinaliseFeedbackNotificationSettings
 import uk.ac.warwick.tabula.data.model.notifications.groups.reminders.SmallGroupEventAttendanceReminderNotificationSettings
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent, ModuleAndDepartmentServiceComponent, AutowiringModuleAndDepartmentServiceComponent}
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.system.permissions.{PermissionsCheckingMethods, PermissionsChecking, RequiresPermissionsChecking}
 
 object NotificationSettingsCommand {

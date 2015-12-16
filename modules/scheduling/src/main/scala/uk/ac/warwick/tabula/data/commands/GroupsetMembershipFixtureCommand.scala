@@ -1,16 +1,16 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
-import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent, UserLookupService}
-import uk.ac.warwick.tabula.data.{Daoisms, AutowiringSmallGroupDaoComponent, SessionComponent, SmallGroupDaoComponent}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
 import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.data.model.UserGroup
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupSet
+import uk.ac.warwick.tabula.data.{AutowiringSmallGroupDaoComponent, SmallGroupDaoComponent}
+import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent}
+import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 
 class GroupsetMembershipFixtureCommand extends CommandInternal[SmallGroupSet] with Logging{
-	this: UserLookupComponent with SmallGroupDaoComponent with SessionComponent =>
+	self: UserLookupComponent with SmallGroupDaoComponent =>
 
 	var groupSetId: String = _
 	var userId: String = _
@@ -34,7 +34,6 @@ object GroupsetMembershipFixtureCommand{
 			with ComposableCommand[SmallGroupSet]
 			with AutowiringUserLookupComponent
 			with AutowiringSmallGroupDaoComponent
-			with Daoisms
 			with Unaudited
 			with PubliclyVisiblePermissions
 	}

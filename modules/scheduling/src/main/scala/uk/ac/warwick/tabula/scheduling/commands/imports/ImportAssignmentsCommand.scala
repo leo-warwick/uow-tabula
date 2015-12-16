@@ -5,7 +5,6 @@ import uk.ac.warwick.tabula.SprCode
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.data.{Daoisms, SessionComponent}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.permissions._
@@ -19,7 +18,6 @@ object ImportAssignmentsCommand {
 	def apply() = new ComposableCommand[Unit]
 		with ImportAssignmentsCommand
 		with ImportAssignmentsDescription
-		with Daoisms
 
 	case class Result(
 		assignmentsFound: Int,
@@ -29,7 +27,7 @@ object ImportAssignmentsCommand {
 }
 
 
-trait ImportAssignmentsCommand extends CommandInternal[Unit] with RequiresPermissionsChecking with Logging with SessionComponent {
+trait ImportAssignmentsCommand extends CommandInternal[Unit] with RequiresPermissionsChecking with Logging {
 
 	def permissionsCheck(p:PermissionsChecking) {
 		p.PermissionCheck(Permissions.ImportSystemData)
@@ -75,10 +73,7 @@ trait ImportAssignmentsCommand extends CommandInternal[Unit] with RequiresPermis
 		// Split into chunks so we commit transactions periodically.
 		for (groups <- logSize(assignmentImporter.getAllAssessmentGroups).grouped(ImportGroupSize)) {
 			saveGroups(groups)
-			transactional() {
-				session.flush()
-				groups foreach session.evict
-			}
+			assessmentMembershipService.flushAndEvict(groups)
 		}
 	}
 

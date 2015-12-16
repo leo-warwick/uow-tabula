@@ -9,14 +9,14 @@ import uk.ac.warwick.tabula.data.FileDao
 import uk.ac.warwick.tabula.data.model.{GradeBoundary, Assignment, FileAttachment, Assessment}
 import uk.ac.warwick.tabula.commands.exams.{BulkAdjustmentValidation, BulkAdjustmentCommand, BulkAdjustmentCommandState, BulkAdjustmentCommandBindListener}
 import uk.ac.warwick.tabula.helpers.SpreadsheetHelpers
-import uk.ac.warwick.tabula.services.{MaintenanceModeService, GeneratesGradesFromMarks}
+import uk.ac.warwick.tabula.services.{FileAttachmentService, MaintenanceModeService, GeneratesGradesFromMarks}
 import uk.ac.warwick.tabula.{Fixtures, CurrentUser, Mockito, TestBase}
 
 class BulkAdjustmentCommandTest extends TestBase with Mockito {
 
 	trait BindFixture {
-		val mockFileDao = smartMock[FileDao]
-		mockFileDao.getData(any[String]) returns None
+		val mockFileAttachmentService = smartMock[FileAttachmentService]
+		mockFileAttachmentService.getData(any[String]) returns None
 		val mockSpreadsheetHelper = smartMock[SpreadsheetHelpers]
 		val thisAssessment = new Assignment
 		val feedback = Fixtures.assignmentFeedback("1234")
@@ -28,13 +28,13 @@ class BulkAdjustmentCommandTest extends TestBase with Mockito {
 			override def spreadsheetHelper = mockSpreadsheetHelper
 		}
 		val file = new UploadedFile
-		file.maintenanceMode = smartMock[MaintenanceModeService]
+		file.maintenanceModeService = smartMock[MaintenanceModeService]
 		val attachment = new FileAttachment
 		attachment.name = "file.xlsx"
 		file.attached.add(attachment)
 		bindListener.file = file
-		file.fileDao = mockFileDao
-		attachment.fileDao = mockFileDao
+		file.fileAttachmentService = mockFileAttachmentService
+		attachment.fileAttachmentService = mockFileAttachmentService
 	}
 
 	@Test

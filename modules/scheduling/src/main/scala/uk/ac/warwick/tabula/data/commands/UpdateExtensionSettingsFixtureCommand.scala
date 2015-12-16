@@ -1,10 +1,10 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
-import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
 import uk.ac.warwick.tabula.data.model.Department
-import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
+import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
 import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 
 class UpdateExtensionSettingsFixtureCommand extends CommandInternal[Department] {
 	this: ModuleAndDepartmentServiceComponent with TransactionalComponent =>

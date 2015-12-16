@@ -1,34 +1,28 @@
 package uk.ac.warwick.tabula.scheduling.commands.imports
 
-import uk.ac.warwick.tabula.data.Daoisms
-import uk.ac.warwick.tabula.commands.Command
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.helpers.StringUtils._
-import uk.ac.warwick.tabula.data.model.Member
-import uk.ac.warwick.tabula.data.model.MemberProperties
-import java.sql.ResultSet
-import uk.ac.warwick.tabula.data.model.Gender
-import org.joda.time.LocalDate
-import uk.ac.warwick.tabula.AcademicYear
-import java.sql.Date
-import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.MemberDao
-import org.springframework.beans.BeanWrapper
-import org.joda.time.DateTime
-import uk.ac.warwick.tabula.permissions._
-import uk.ac.warwick.tabula.scheduling.services.MembershipInformation
-import uk.ac.warwick.tabula.commands.Unaudited
-import uk.ac.warwick.userlookup.User
-import org.apache.commons.lang3.text.WordUtils
-import scala.util.matching.Regex
-import uk.ac.warwick.tabula.scheduling.helpers.PropertyCopying
-import uk.ac.warwick.tabula.scheduling.services.MembershipMember
-import uk.ac.warwick.tabula.services.UserLookupService
+import java.sql.{Date, ResultSet}
 import java.util.UUID
 
-import scala.language.implicitConversions
+import org.apache.commons.lang3.text.WordUtils
+import org.joda.time.{DateTime, LocalDate}
+import org.springframework.beans.BeanWrapper
+import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.commands.{Command, Unaudited}
+import uk.ac.warwick.tabula.data.MemberDao
+import uk.ac.warwick.tabula.data.model.{Gender, Member, MemberProperties}
+import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.permissions._
+import uk.ac.warwick.tabula.scheduling.helpers.PropertyCopying
+import uk.ac.warwick.tabula.scheduling.services.{MembershipInformation, MembershipMember}
+import uk.ac.warwick.tabula.services.UserLookupService
+import uk.ac.warwick.userlookup.User
 
-abstract class ImportMemberCommand extends Command[Member] with Logging with Daoisms
+import scala.language.implicitConversions
+import scala.util.matching.Regex
+
+abstract class ImportMemberCommand extends Command[Member] with Logging
 with MemberProperties with Unaudited with PropertyCopying {
 	import ImportMemberHelpers._
 

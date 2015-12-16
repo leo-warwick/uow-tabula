@@ -53,8 +53,8 @@ trait AssessmentDao {
 @Repository
 class AssessmentDaoImpl extends AssessmentDao with Daoisms {
 
-	def getAssignmentById(id: String) = getById[Assignment](id)
-	def getExamById(id: String) = getById[Exam](id)
+	def getAssignmentById(id: String) = session.getById[Assignment](id)
+	def getExamById(id: String) = session.getById[Exam](id)
 
 	def save(assignment: Assignment) = session.saveOrUpdate(assignment)
 	def save(exam: Exam) = session.saveOrUpdate(exam)

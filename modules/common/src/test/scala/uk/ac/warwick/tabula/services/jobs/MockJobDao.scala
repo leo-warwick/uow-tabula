@@ -2,6 +2,8 @@ package uk.ac.warwick.tabula.services.jobs
 
 import java.util.UUID
 
+import uk.ac.warwick.tabula.data.JobDao
+
 import scala.collection.mutable.ArrayBuffer
 
 class MockJobDao extends JobDao {

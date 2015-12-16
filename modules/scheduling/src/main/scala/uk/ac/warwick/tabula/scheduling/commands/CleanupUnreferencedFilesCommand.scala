@@ -1,17 +1,14 @@
 package uk.ac.warwick.tabula.scheduling.commands
-import java.io.File
-import java.io.FileFilter
-import java.io.FileWriter
-import java.io.IOException
+import java.io.{File, FileFilter, FileWriter, IOException}
+
 import org.joda.time.DateTime
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.util.FileCopyUtils
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.Command
-import uk.ac.warwick.tabula.commands.Description
-import uk.ac.warwick.tabula.data.FileDao
-import uk.ac.warwick.util.core.spring.FileUtils
-import uk.ac.warwick.tabula.commands.ReadOnly
+import uk.ac.warwick.tabula.commands.{Command, Description, ReadOnly}
 import uk.ac.warwick.tabula.permissions._
+import uk.ac.warwick.tabula.services.FileAttachmentService
+import uk.ac.warwick.util.core.spring.FileUtils
 
 /**
  * Go through each synced file on the filesystem and delete any file where there isn't
@@ -27,7 +24,8 @@ class CleanupUnreferencedFilesCommand extends Command[Unit] with ReadOnly {
 
 	PermissionCheck(Permissions.ReplicaSyncing)
 
-	var fileDao = Wire.auto[FileDao]
+	@Value("${filesystem.attachment.dir}") var attachmentDir: File = _
+	var fileAttachmentService = Wire[FileAttachmentService]
 
 	var dataDir = Wire[String]("${base.data.dir}")
 
@@ -35,7 +33,7 @@ class CleanupUnreferencedFilesCommand extends Command[Unit] with ReadOnly {
 	val syncBuffer = startTime.minusDays(28)
 
 	// Get a list of all IDs in the database for us to check against, stripping hyphens (since we do that when we check)
-	lazy val ids = fileDao.getAllFileIds() map { _.replace("-", "") }
+	lazy val ids = fileAttachmentService.getAllFileIds() map { _.replace("-", "") }
 
 	lazy val lastCleanupJobDetailsFile = new File(new File(dataDir), LastCleanupJobDetailsFilename)
 
@@ -43,7 +41,7 @@ class CleanupUnreferencedFilesCommand extends Command[Unit] with ReadOnly {
 		timed("Cleanup file references") { timer =>
 			logger.debug("All ids size: " + ids.size)
 
-			val (successful, deleted) = checkBucket(fileDao.attachmentDir)
+			val (successful, deleted) = checkBucket(attachmentDir)
 
 			val logString = s"successfulFiles,$successful,deletedFiles,$deleted,timeTaken,${timer.getTotalTimeMillis},lastSuccessfulRun,${startTime.getMillis}"
 			logger.info(logString)
@@ -68,7 +66,7 @@ class CleanupUnreferencedFilesCommand extends Command[Unit] with ReadOnly {
 			if (ids contains id) {
 				// The file exists both on the filesystem and in the database
 				None
-			} else if (fileDao.getFileByStrippedId(id).isDefined) {
+			} else if (fileAttachmentService.getFileByStrippedId(id).isDefined) {
 				// This ID wasn't in our cached list, but it has since been created (or re-created) while cleanup was running
 				None
 			} else {

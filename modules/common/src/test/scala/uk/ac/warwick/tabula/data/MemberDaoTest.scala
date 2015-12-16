@@ -39,7 +39,7 @@ class MemberDaoTest extends PersistenceTestBase with Logging with Mockito {
 	@After def tidyUp: Unit = transactional { tx =>
 		session.disableFilter(Member.ActiveOnlyFilter)
 
-		session.createCriteria(classOf[Member]).list().asInstanceOf[JList[Member]].asScala map { session.delete(_) }
+		session.newCriteria[Member].seq.foreach(session.delete)
 	}
 
 	@Test

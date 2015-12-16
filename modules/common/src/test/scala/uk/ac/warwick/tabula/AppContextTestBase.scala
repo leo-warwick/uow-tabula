@@ -12,7 +12,9 @@ import org.springframework.test.context.{ActiveProfiles, ContextConfiguration}
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.transaction._
 import org.springframework.transaction.support._
-import uk.ac.warwick.tabula.data.Transactions
+import uk.ac.warwick.tabula.data.MaintenanceModeAwareSession.MaintenanceModeAwareSessionImpl
+import uk.ac.warwick.tabula.data.{MaintenanceModeAwareSession, Transactions}
+import uk.ac.warwick.tabula.services.{MaintenanceModeServiceImpl, MaintenanceModeService, MaintenanceModeServiceComponent}
 
 import scala.language.implicitConversions
 
@@ -53,7 +55,15 @@ trait TransactionalTesting {
 	@Autowired var dataSource:DataSource =_
 	@Autowired var transactionManager:PlatformTransactionManager =_
 
-	def session = sessionFactory.getCurrentSession
+	def session = new MaintenanceModeAwareSessionImpl(sessionFactory.getCurrentSession)
+		with MaintenanceModeServiceComponent
+		with FeaturesComponent {
+
+		val maintenanceModeService = new MaintenanceModeServiceImpl
+		maintenanceModeService.enable
+
+		val features = new FeaturesImpl
+	}
 
 	Transactions.enabled = true
 
@@ -68,7 +78,7 @@ trait TransactionalTesting {
 		})
 	}
 
-	def flushing[A](s:Session)(f: =>A):A= {
+	def flushing[A](s: MaintenanceModeAwareSession)(f: =>A):A= {
 		val a = f
 		s.flush()
 		a

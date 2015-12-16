@@ -1,16 +1,17 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
+import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.data.model.groups.SmallGroup
+import uk.ac.warwick.tabula.data.{AutowiringSmallGroupDaoComponent, SmallGroupDaoComponent}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent}
-import uk.ac.warwick.tabula.data.{Daoisms, AutowiringSmallGroupDaoComponent, SessionComponent, SmallGroupDaoComponent}
-import uk.ac.warwick.tabula.data.Transactions._
-import scala.collection.JavaConverters._
 import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.data.model.groups.SmallGroup
+
+import scala.collection.JavaConverters._
 
 class GroupMembershipFixtureCommand extends CommandInternal[SmallGroup] with Logging{
-	this: UserLookupComponent with SmallGroupDaoComponent with SessionComponent =>
+	this: UserLookupComponent with SmallGroupDaoComponent =>
 
 	var groupSetId: String = _
 	var groupName: String = _
@@ -32,7 +33,6 @@ object GroupMembershipFixtureCommand {
 			with ComposableCommand[SmallGroup]
 			with AutowiringUserLookupComponent
 			with AutowiringSmallGroupDaoComponent
-			with Daoisms
 			with Unaudited
 			with PubliclyVisiblePermissions
 	}

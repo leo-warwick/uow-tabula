@@ -4,16 +4,21 @@ import org.hibernate.dialect.HSQLDialect
 import org.joda.time.DateTime
 import org.springframework.transaction.annotation.Transactional
 import uk.ac.warwick.tabula.PersistenceTestBase
-import uk.ac.warwick.tabula.data.SessionComponent
+import uk.ac.warwick.tabula.data.{AuditEventDaoComponent, AbstractAuditEventDao, SessionComponent}
 import uk.ac.warwick.tabula.events.Event
 
 // scalastyle:off magic.number
 class AuditEventServiceTest extends PersistenceTestBase {
 
-	val service = new AuditEventServiceImpl with SessionComponent {
-		def session = sessionFactory.getCurrentSession
+	val auditEventDao = new AbstractAuditEventDao with SessionComponent {
+		override def session = AuditEventServiceTest.this.session
 	}
-	service.dialect = new HSQLDialect
+
+	val service: AuditEventServiceImpl = new AuditEventServiceImpl with AuditEventDaoComponent {
+		val auditEventDao = AuditEventServiceTest.this.auditEventDao
+	}
+
+	auditEventDao.dialect = new HSQLDialect
 
 	val now = new DateTime()
 

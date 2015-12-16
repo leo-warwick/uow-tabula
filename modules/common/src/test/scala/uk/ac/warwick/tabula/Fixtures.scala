@@ -146,16 +146,11 @@ object Fixtures extends Mockito {
 	}
 
 	def assessmentGroup(academicYear: AcademicYear, code: String, module: String, occurrence: String) = {
-		val sessionFactory = smartMock[SessionFactory]
-		val session = smartMock[Session]
-		sessionFactory.getCurrentSession returns session
-		sessionFactory.openSession() returns session
 		val group = new UpstreamAssessmentGroup
 		group.academicYear = academicYear
 		group.assessmentGroup = code
 		group.moduleCode = module
 		group.occurrence = occurrence
-		group.members.sessionFactory = sessionFactory
 		group.members.staticUserIds = Seq(
 			"0123456",
 			"0123457",

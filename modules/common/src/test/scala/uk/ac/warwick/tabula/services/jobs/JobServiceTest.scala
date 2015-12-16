@@ -1,4 +1,6 @@
 package uk.ac.warwick.tabula.services.jobs
+
+import uk.ac.warwick.tabula.data.JobDao
 import uk.ac.warwick.tabula.jobs.TestingJob
 import uk.ac.warwick.tabula.{Mockito, TestBase}
 

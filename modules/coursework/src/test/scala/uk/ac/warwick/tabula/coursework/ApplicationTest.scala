@@ -49,7 +49,7 @@ class ApplicationTest extends AppContextTestBase with FieldAccessByReflection{
 	  session.flush()
 	  session.clear()
 
-	  val fetchedAssignment = session.get(classOf[Assignment], assignment.id).asInstanceOf[Assignment]
+	  val fetchedAssignment = session.getById[Assignment](assignment.id).get
 	  fetchedAssignment.name should be("Cake Studies 1")
 	  fetchedAssignment.academicYear should be(assignment.academicYear)
 	}
@@ -73,16 +73,16 @@ class ApplicationTest extends AppContextTestBase with FieldAccessByReflection{
       session.flush()
       session.clear()
 
-      session.load(classOf[Department], id) match {
-        case loadedDepartment:Department => (loadedDepartment.getV("settings") == null) should be(false)
+      session.getById[Department](id) match {
+        case Some(loadedDepartment: Department) => (loadedDepartment.getV("settings") == null) should be(false)
 				case _ => fail("Department not found")
       }
     }
 
     @Transactional @Test def getModules = {
-      val modules = session.createCriteria(classOf[Module]).setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE).list
+      val modules = session.newCriteria(classOf[Module]).distinct.seq
       modules.size should be (4)
-      modules(0).asInstanceOf[Module].adminDepartment.name should be ("Computer Science")
+      modules.head.asInstanceOf[Module].adminDepartment.name should be ("Computer Science")
     }
 
 }

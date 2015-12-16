@@ -4,17 +4,16 @@ import org.hibernate.exception.ConstraintViolationException
 import org.joda.time.DateTime
 import org.springframework.beans.{BeanWrapper, BeanWrapperImpl}
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.{Command, Unaudited}
-import uk.ac.warwick.tabula.data.{Daoisms, MemberDao, StudentCourseDetailsDao}
+import uk.ac.warwick.tabula.commands.{Command, Description, Unaudited}
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.data.{MemberDao, StudentCourseDetailsDao}
 import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.scheduling.helpers.{SitsStudentRow, ImportCommandFactory, PropertyCopying}
+import uk.ac.warwick.tabula.scheduling.helpers.{ImportCommandFactory, PropertyCopying, SitsStudentRow}
 import uk.ac.warwick.tabula.scheduling.services.{AwardImporter, CourseImporter}
 import uk.ac.warwick.tabula.services.{AwardService, CourseAndRouteService, RelationshipService}
-import uk.ac.warwick.tabula.commands.Description
 
 class ImportStudentCourseCommand(row: SitsStudentRow, stuMem: StudentMember, importCommandFactory: ImportCommandFactory)
-	extends Command[StudentCourseDetails] with Logging with Daoisms
+	extends Command[StudentCourseDetails] with Logging
 	with Unaudited with PropertyCopying {
 
 	var memberDao = Wire[MemberDao]

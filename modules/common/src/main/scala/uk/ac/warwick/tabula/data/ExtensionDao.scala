@@ -18,6 +18,7 @@ trait AutowiringExtensionDaoComponent extends ExtensionDaoComponent {
 trait ExtensionDao {
 	def getExtensionById(id: String): Option[Extension]
 	def saveOrUpdate(extension: Extension)
+	def delete(extension: Extension)
 	def countExtensions(assignment: Assignment): Int
 	def countUnapprovedExtensions(assignment: Assignment): Int
 	def getUnapprovedExtensions(assignment: Assignment): Seq[Extension]
@@ -25,9 +26,10 @@ trait ExtensionDao {
 
 @Repository
 class ExtensionDaoImpl extends ExtensionDao with Daoisms {
-	def getExtensionById(id: String) = getById[Extension](id)
+	def getExtensionById(id: String) = session.getById[Extension](id)
 
 	def saveOrUpdate(extension: Extension) = session.saveOrUpdate(extension)
+	def delete(extension: Extension) = session.delete(extension)
 
 	def countExtensions(assignment: Assignment): Int = {
 		session.newCriteria[Extension]

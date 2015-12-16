@@ -71,7 +71,7 @@ class OldAllocateStudentsToRelationshipCommandTest extends TestBase with Mockito
 		cmd.relationshipService = relationshipService
 		cmd.profileService = profileService
 		cmd.maintenanceModeService = maintenanceModeService
-		cmd.file.maintenanceMode = maintenanceModeService
+		cmd.file.maintenanceModeService = maintenanceModeService
 	}
 
 	trait NoChangeScenario extends Environment {

@@ -2,10 +2,9 @@ package uk.ac.warwick.tabula.scheduling.commands.imports
 
 import org.joda.time.DateTime
 import org.springframework.beans.BeanWrapperImpl
-
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.commands.{Command, Description, Unaudited}
-import uk.ac.warwick.tabula.data.{AwardDao, Daoisms}
+import uk.ac.warwick.tabula.data.AwardDao
 import uk.ac.warwick.tabula.data.Transactions.transactional
 import uk.ac.warwick.tabula.data.model.Award
 import uk.ac.warwick.tabula.helpers.Logging
@@ -14,7 +13,7 @@ import uk.ac.warwick.tabula.scheduling.helpers.PropertyCopying
 import uk.ac.warwick.tabula.scheduling.services.AwardInfo
 
 class ImportAwardCommand(info: AwardInfo)
-	extends Command[(Award, ImportAcademicInformationCommand.ImportResult)] with Logging with Daoisms
+	extends Command[(Award, ImportAcademicInformationCommand.ImportResult)] with Logging
 	with Unaudited with PropertyCopying {
 
 	PermissionCheck(Permissions.ImportSystemData)

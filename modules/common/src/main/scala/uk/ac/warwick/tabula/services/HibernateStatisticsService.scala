@@ -1,5 +1,6 @@
 package uk.ac.warwick.tabula.services
 
+import org.hibernate.SessionFactory
 import org.springframework.stereotype.Component
 import uk.ac.warwick.util.queue.{Queue, QueueListener}
 import org.springframework.beans.factory.InitializingBean
@@ -16,10 +17,11 @@ import org.joda.time.format.DateTimeFormat
  * Listens for messages
  */
 @Component
-class HibernateStatisticsService extends QueueListener with InitializingBean with Logging with Daoisms {
+class HibernateStatisticsService extends QueueListener with InitializingBean with Logging {
 
 	private val DateFormat = DateTimeFormat.shortDateTime()
 
+	val sessionFactory = Wire[SessionFactory]
 	var queue = Wire.named[Queue]("settingsSyncTopic")
 	var context = Wire.property("${module.context}")
 

@@ -45,7 +45,7 @@ trait MaintenanceModeService extends MaintenanceStatus {
 	 * to do an unsupported op while in maintenance mode. Only returns
 	 * it; you need to throw it yourself. Like a dog!
 	 */
-	def exception(callee: Describable[_]): Exception
+	def exception(callee: Option[Describable[_]]): Exception
 
 	var until: Option[DateTime]
 	var message: Option[String]
@@ -75,9 +75,11 @@ class MaintenanceModeServiceImpl extends MaintenanceModeService with Logging {
 	// for other classes to listen to changes to maintenance mode.
 	val changingState = Reactor.EventSource[Boolean]
 
-	def exception(callee: Describable[_]) = {
-		val m = EventDescription.generateMessage(Event.fromDescribable(callee))
-		logger.info("[Maintenance Reject] " + m)
+	def exception(callee: Option[Describable[_]]) = {
+		callee.foreach { describable =>
+			val m = EventDescription.generateMessage(Event.fromDescribable(describable))
+			logger.info("[Maintenance Reject] " + m)
+		}
 
 		new MaintenanceModeEnabledException(until, message)
 	}
@@ -104,7 +106,7 @@ trait MaintenanceModeServiceComponent {
 }
 
 trait AutowiringMaintenanceModeServiceComponent extends MaintenanceModeServiceComponent {
-	var maintenanceModeService = Wire[MaintenanceModeService]
+	var maintenanceModeService: MaintenanceModeService = Wire[MaintenanceModeService]
 }
 
 trait SettingsSyncQueueComponent {

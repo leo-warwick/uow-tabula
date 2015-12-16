@@ -1,6 +1,7 @@
 package uk.ac.warwick.tabula.services
 
-import uk.ac.warwick.tabula.AppContextTestBase
+import uk.ac.warwick.tabula.{MockUserLookup, AppContextTestBase}
+import uk.ac.warwick.tabula.data.{UserGroupDaoImpl, UserGroupMembershipHelperLookup}
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, DayOfWeek, SmallGroupEvent}
 import uk.ac.warwick.userlookup.User
 import org.springframework.transaction.annotation.Transactional
@@ -8,13 +9,12 @@ import org.joda.time.LocalTime
 
 class UserGroupMembershipHelperTest extends AppContextTestBase {
 
-  var user:User = _
+  var user: User = _
   var fakeGroups = Map(
     "cusebr" -> List("unrelated-but-cool-group")
   )
 
   trait FakeLookups { self: UserGroupMembershipHelperLookup =>
-    override def getUser(usercode: String) = user
     override def getWebgroups(usercode: String) = fakeGroups.getOrElse(usercode, Nil)
   }
 
@@ -45,8 +45,14 @@ class UserGroupMembershipHelperTest extends AppContextTestBase {
 		user.setUserId("cusebr")
 		user.setWarwickId("0123456")
 
-		val eventHelper = new UserGroupMembershipHelper[SmallGroupEvent]("_tutors") with FakeLookups
+		val eventHelper = new UserGroupMembershipHelper[SmallGroupEvent]("_tutors") {
+			override val userGroupDao = new UserGroupDaoImpl with FakeLookups {
+				override def session = UserGroupMembershipHelperTest.this.session
+			}
+			userGroupDao.userLookup = new MockUserLookup()
+		}
 		eventHelper.sessionFactory = sessionFactory
+		eventHelper.userGroupDao.userLookup.asInstanceOf[MockUserLookup].registerUserObjects(user)
 
 		val events = eventHelper.findBy(user)
 		events should have size (2)

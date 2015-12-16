@@ -4,11 +4,6 @@ import org.hibernate.{Session, ScrollableResults}
 import uk.ac.warwick.tabula.helpers.Closeables
 import java.io.Closeable
 
-object Scrollable {
-	def apply[A](results: ScrollableResults, session: Session) =
-		new ScrollableImpl(results, session, { a: Array[AnyRef] => a(0).asInstanceOf[A] })
-}
-
 trait Scrollable[A] {
 	def take(count: Int): Iterator[A] with Closeable
 	def takeWhile(f: (A) => Boolean): Iterator[A] with Closeable

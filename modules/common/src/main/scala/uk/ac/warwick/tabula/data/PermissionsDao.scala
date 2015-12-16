@@ -14,10 +14,12 @@ import scala.reflect.ClassTag
 
 trait PermissionsDao {
 	def saveOrUpdate(roleDefinition: CustomRoleDefinition)
-	def saveOrUpdate(permission: GrantedPermission[_])
-	def saveOrUpdate(role: GrantedRole[_])
+	def saveOrUpdate(permission: GrantedPermission[_ <: PermissionsTarget])
+	def saveOrUpdate(role: GrantedRole[_ <: PermissionsTarget])
 
 	def delete(roleDefinition: CustomRoleDefinition)
+	def delete(permission: GrantedPermission[_ <: PermissionsTarget])
+	def delete(role: GrantedRole[_ <: PermissionsTarget])
 
 	def getCustomRoleDefinitionById(id: String): Option[CustomRoleDefinition]
 
@@ -52,15 +54,17 @@ class PermissionsDaoImpl extends PermissionsDao with Daoisms {
 	import Restrictions._
 
 	def saveOrUpdate(roleDefinition: CustomRoleDefinition) = session.saveOrUpdate(roleDefinition)
-	def saveOrUpdate(permission: GrantedPermission[_]) = session.saveOrUpdate(permission)
-	def saveOrUpdate(role: GrantedRole[_]) = session.saveOrUpdate(role)
+	def saveOrUpdate(permission: GrantedPermission[_ <: PermissionsTarget]) = session.saveOrUpdate(permission)
+	def saveOrUpdate(role: GrantedRole[_ <: PermissionsTarget]) = session.saveOrUpdate(role)
 
 	def delete(roleDefinition: CustomRoleDefinition) = session.delete(roleDefinition)
+	def delete(permission: GrantedPermission[_ <: PermissionsTarget]) = session.delete(permission)
+	def delete(role: GrantedRole[_ <: PermissionsTarget]) = session.delete(role)
 
-	def getCustomRoleDefinitionById(id: String) = getById[CustomRoleDefinition](id)
+	def getCustomRoleDefinitionById(id: String) = session.getById[CustomRoleDefinition](id)
 
-	def getGrantedRole[A <: PermissionsTarget: ClassTag](id: String) = getById[GrantedRole[A]](id)
-	def getGrantedPermission[A <: PermissionsTarget: ClassTag](id: String) = getById[GrantedPermission[A]](id)
+	def getGrantedRole[A <: PermissionsTarget: ClassTag](id: String) = session.getById[GrantedRole[A]](id)
+	def getGrantedPermission[A <: PermissionsTarget: ClassTag](id: String) = session.getById[GrantedPermission[A]](id)
 
 	def getGrantedRolesById[A <: PermissionsTarget: ClassTag](ids: Seq[String]) =
 		if (ids.isEmpty) Nil

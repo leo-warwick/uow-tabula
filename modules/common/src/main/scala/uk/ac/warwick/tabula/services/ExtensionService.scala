@@ -22,10 +22,14 @@ trait ExtensionService {
 	def countUnapprovedExtensions(assignment: Assignment): Int
 	def hasUnapprovedExtensions(assignment: Assignment): Boolean
 	def getUnapprovedExtensions(assignment: Assignment): Seq[Extension]
+
+	def deleteAttachment(extension: Extension, attachment: FileAttachment): Unit
+	def delete(extension: Extension): Unit
+	def save(extension: Extension): Unit
 }
 
 abstract class AbstractExtensionService extends ExtensionService {
-	self: ExtensionDaoComponent =>
+	self: ExtensionDaoComponent with FileAttachmentServiceComponent =>
 
 	def getExtensionById(id: String) = transactional(readOnly = true) { extensionDao.getExtensionById(id) }
 	def countExtensions(assignment: Assignment): Int = transactional(readOnly = true) { extensionDao.countExtensions(assignment) }
@@ -34,9 +38,19 @@ abstract class AbstractExtensionService extends ExtensionService {
 
 	def hasExtensions(assignment: Assignment): Boolean = countExtensions(assignment) > 0
 	def hasUnapprovedExtensions(assignment: Assignment): Boolean = countUnapprovedExtensions(assignment) > 0
+
+	def deleteAttachment(extension: Extension, attachment: FileAttachment) = {
+		attachment.extension.removeAttachment(attachment)
+		fileAttachmentService.deleteAttachments(Seq(attachment))
+	}
+
+	def delete(extension: Extension) = transactional() { extensionDao.delete(extension) }
+	def save(extension: Extension) = transactional() { extensionDao.saveOrUpdate(extension) }
 }
 
 @Service(value = "extensionService")
 class ExtensionServiceImpl
 	extends AbstractExtensionService
-	with AutowiringExtensionDaoComponent
+		with AutowiringExtensionDaoComponent
+		with AutowiringFileAttachmentServiceComponent
+		with AutowiringMaintenanceModeServiceComponent

@@ -8,7 +8,7 @@ import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.data.model.forms.Extension
 import uk.ac.warwick.tabula.data.model.{ScheduledNotification, Assignment, Module, Notification}
 import uk.ac.warwick.tabula.CurrentUser
-import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent}
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.data.Transactions._
 
 object EditExtensionCommand {
@@ -22,12 +22,12 @@ object EditExtensionCommand {
 			with EditExtensionCommandScheduledNotification
 			with EditExtensionCommandNotificationCompletion
 			with AutowiringUserLookupComponent
-			with HibernateExtensionPersistenceComponent
+			with AutowiringExtensionServiceComponent
 }
 
 class EditExtensionCommandInternal(module: Module, assignment: Assignment, uniId: String, currentUser: CurrentUser, action: String)
 		extends ModifyExtensionCommand(module, assignment, uniId, currentUser, action) with ModifyExtensionCommandState  {
-	self: ExtensionPersistenceComponent with UserLookupComponent =>
+	self: ExtensionServiceComponent with UserLookupComponent =>
 
 	val e = assignment.findExtension(universityId)
 	e match {
@@ -42,7 +42,7 @@ class EditExtensionCommandInternal(module: Module, assignment: Assignment, uniId
 
 	def applyInternal() = transactional() {
 		copyTo(extension)
-		save(extension)
+		extensionService.save(extension)
 		extension
 	}
 }

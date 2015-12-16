@@ -1,16 +1,11 @@
 package uk.ac.warwick.tabula.commands.coursework.departments
 
 import scala.collection.JavaConversions._
-import org.springframework.beans.factory.annotation.{Autowired, Configurable}
 import uk.ac.warwick.tabula.commands.{Description, Command}
 import uk.ac.warwick.tabula.commands.UploadedFile
-import uk.ac.warwick.tabula.data.Daoisms
 import uk.ac.warwick.tabula.data.model.{FeedbackTemplate, Department}
-import org.springframework.transaction.annotation.Transactional
-import beans.BeanProperty
 import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.services.ZipService
+import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ZipService}
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.system.BindListener
@@ -18,9 +13,9 @@ import uk.ac.warwick.tabula.permissions._
 import org.springframework.validation.BindingResult
 
 abstract class FeedbackTemplateCommand(val department:Department)
-	extends Command[Seq[FeedbackTemplate]] with Daoisms with BindListener {
+	extends Command[Seq[FeedbackTemplate]] with BindListener {
 
-	var file:UploadedFile = new UploadedFile
+	var file: UploadedFile = new UploadedFile
 
 	override def onBind(result:BindingResult) {
 		transactional() {
@@ -40,8 +35,7 @@ abstract class FeedbackTemplateCommand(val department:Department)
 	}
 }
 
-class BulkFeedbackTemplateCommand(department:Department) extends FeedbackTemplateCommand(department) {
-
+class BulkFeedbackTemplateCommand(department: Department) extends FeedbackTemplateCommand(department) with AutowiringModuleAndDepartmentServiceComponent {
 	PermissionCheck(Permissions.FeedbackTemplate.Manage, department)
 
 	override def applyInternal() = {
@@ -53,19 +47,19 @@ class BulkFeedbackTemplateCommand(department:Department) extends FeedbackTemplat
 					feedbackForm.department = department
 					feedbackForm.attachFile(attachment)
 					department.feedbackTemplates.add(feedbackForm)
-					session.saveOrUpdate(feedbackForm)
 
 					feedbackForm
 				}
 			} else Nil
-			session.saveOrUpdate(department)
+
+			moduleAndDepartmentService.save(department)
 
 			feedbackTemplates
 		}
 	}
 }
 
-class EditFeedbackTemplateCommand(department:Department, val template: FeedbackTemplate) extends FeedbackTemplateCommand(department) {
+class EditFeedbackTemplateCommand(department:Department, val template: FeedbackTemplate) extends FeedbackTemplateCommand(department) with AutowiringModuleAndDepartmentServiceComponent {
 
 	mustBeLinked(template, department)
 	PermissionCheck(Permissions.FeedbackTemplate.Manage, template)
@@ -82,12 +76,15 @@ class EditFeedbackTemplateCommand(department:Department, val template: FeedbackT
 			feedbackTemplate.name = name
 			feedbackTemplate.description = description
 			feedbackTemplate.department = department
+
 			if (!file.attached.isEmpty) {
 				for (attachment <- file.attached) {
 					feedbackTemplate.attachFile(attachment)
 				}
 			}
-			session.update(feedbackTemplate)
+
+			moduleAndDepartmentService.save(department)
+
 			// invalidate any zip files for linked assignments
 			feedbackTemplate.assignments.foreach(zipService.invalidateSubmissionZip(_))
 

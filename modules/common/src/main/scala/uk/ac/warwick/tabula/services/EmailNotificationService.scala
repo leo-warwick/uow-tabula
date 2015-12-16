@@ -2,14 +2,14 @@ package uk.ac.warwick.tabula.services
 
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.{Scrollable, Daoisms, NotificationDao}
+import uk.ac.warwick.tabula.data.{Scrollable, NotificationDao}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.notifications.EmailNotificationListener
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.notifications.RecipientNotificationInfo
 
 @Service
-class EmailNotificationService extends Logging with Daoisms {
+class EmailNotificationService extends Logging {
 
 	val RunBatchSize = 100
 
@@ -21,7 +21,7 @@ class EmailNotificationService extends Logging with Daoisms {
 			try {
 				logger.info("Emailing recipient - " + recipient)
 				listener.listen(recipient)
-				session.flush()
+				dao.flush()
 			} catch {
 				case throwable: Throwable => {
 					// TAB-2238 Catch and log, so that the overall transaction can still commit

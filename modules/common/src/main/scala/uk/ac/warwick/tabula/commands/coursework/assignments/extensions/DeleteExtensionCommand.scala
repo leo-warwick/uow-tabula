@@ -3,14 +3,14 @@ package uk.ac.warwick.tabula.commands.coursework.assignments.extensions
 import uk.ac.warwick.tabula.data.model.notifications.coursework.ExtensionRevokedNotification
 
 import scala.collection.JavaConverters._
-import uk.ac.warwick.tabula.commands.{Notifies, Description, ComposableCommand}
+import uk.ac.warwick.tabula.commands.{Notifies, ComposableCommand}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.data.model.{Assignment, Module, Notification}
 import uk.ac.warwick.tabula.CurrentUser
 import uk.ac.warwick.tabula.data.model.forms.{ExtensionState, Extension}
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent}
+import uk.ac.warwick.tabula.services._
 
 object DeleteExtensionCommand {
 	def apply(mod: Module, ass: Assignment, uniId: String, sub: CurrentUser) =
@@ -20,21 +20,21 @@ object DeleteExtensionCommand {
 			with ModifyExtensionCommandDescription
 			with DeleteExtensionCommandNotification
 			with AutowiringUserLookupComponent
-			with HibernateExtensionPersistenceComponent
+			with AutowiringExtensionServiceComponent
 }
 
 class DeleteExtensionCommandInternal(mod: Module, ass: Assignment, uniId: String, sub: CurrentUser)
 	extends ModifyExtensionCommand(mod, ass, uniId, sub) with ModifyExtensionCommandState {
 
-	self: ExtensionPersistenceComponent with UserLookupComponent =>
+	self: ExtensionServiceComponent with UserLookupComponent =>
 
 	extension = assignment.findExtension(universityId).getOrElse({ throw new IllegalStateException("Cannot delete a missing extension") })
 
 	def applyInternal() = transactional() {
 		extension._state = ExtensionState.Revoked
 		assignment.extensions.remove(extension)
-		extension.attachments.asScala.foreach(delete(_))
-		delete(extension)
+		extension.attachments.asScala.foreach(extensionService.deleteAttachment(extension, _))
+		extensionService.delete(extension)
 		extension
 	}
 }

@@ -3,9 +3,9 @@ package uk.ac.warwick.tabula.commands.coursework.assignments.extensions
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
 import uk.ac.warwick.tabula.data.model.forms.{ExtensionState, Extension}
-import uk.ac.warwick.tabula.data.model.{FileAttachment, Assignment}
+import uk.ac.warwick.tabula.data.model.Assignment
 import uk.ac.warwick.tabula.events.EventHandling
-import uk.ac.warwick.tabula.services.{UserLookupComponent, UserLookupService}
+import uk.ac.warwick.tabula.services.{ExtensionService, ExtensionServiceComponent, UserLookupComponent, UserLookupService}
 import uk.ac.warwick.tabula.{RequestInfo, Mockito, TestBase}
 import uk.ac.warwick.userlookup.User
 
@@ -13,8 +13,6 @@ import uk.ac.warwick.userlookup.User
 class EditExtensionCommandTest extends TestBase {
 
 	EventHandling.enabled = false
-
-
 
 	@Test
 	def addExtension() {
@@ -170,9 +168,9 @@ class EditExtensionCommandTest extends TestBase {
 }
 
 trait ModifyExtensionCommandTestSupport extends UserLookupComponent
-with ExtensionPersistenceComponent
-with ModifyExtensionCommandState
-with Mockito {
+	with ExtensionServiceComponent
+	with ModifyExtensionCommandState
+	with Mockito {
 
 	var userLookup = mock[UserLookupService]
 	val testuser = new User("cuslat")
@@ -181,9 +179,7 @@ with Mockito {
 
 	userLookup.getUserByWarwickUniId(any[String]) answers { id => testuser	}
 
-	def delete(attachment: FileAttachment) {}
-	def delete(extension: Extension) { }
-	def save(extension: Extension) {}
+	val extensionService = smartMock[ExtensionService]
 
 }
 
@@ -200,5 +196,5 @@ trait DeleteExtensionCommandTestSupport extends ModifyExtensionCommandTestSuppor
 
 	def apply(): Extension = this.applyInternal()
 
-	override def delete(extension: Extension) { deleted = true }
+	extensionService.delete(extension) answers { extension => deleted = true }
 }

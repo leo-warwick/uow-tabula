@@ -3,10 +3,7 @@ package uk.ac.warwick.tabula.scheduling.commands.imports
 import org.joda.time.DateTime
 import org.springframework.beans.BeanWrapperImpl
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.Command
-import uk.ac.warwick.tabula.commands.Description
-import uk.ac.warwick.tabula.commands.Unaudited
-import uk.ac.warwick.tabula.data.Daoisms
+import uk.ac.warwick.tabula.commands.{Command, Description, Unaudited}
 import uk.ac.warwick.tabula.data.ModeOfAttendanceDao
 import uk.ac.warwick.tabula.data.Transactions.transactional
 import uk.ac.warwick.tabula.data.model.ModeOfAttendance
@@ -16,7 +13,7 @@ import uk.ac.warwick.tabula.scheduling.helpers.PropertyCopying
 import uk.ac.warwick.tabula.scheduling.services.ModeOfAttendanceInfo
 
 class ImportModeOfAttendanceCommand(info: ModeOfAttendanceInfo)
-	extends Command[(ModeOfAttendance, ImportAcademicInformationCommand.ImportResult)] with Logging with Daoisms
+	extends Command[(ModeOfAttendance, ImportAcademicInformationCommand.ImportResult)] with Logging
 	with Unaudited with PropertyCopying {
 
 	PermissionCheck(Permissions.ImportSystemData)

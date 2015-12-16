@@ -24,7 +24,7 @@ class JobContextTest extends AppContextTestBase {
 				jsi.id
 			}
 
-			val jsiLoaded = session.get(classOf[JobInstanceImpl], id).asInstanceOf[JobInstanceImpl]
+			val jsiLoaded = session.getById[JobInstanceImpl](id).get
 			jsiLoaded.data should be ("""{"How":"Json"}""")
 			jsiLoaded.succeeded should be {true}
 		}

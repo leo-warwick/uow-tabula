@@ -5,9 +5,9 @@ import org.springframework.validation.BindException
 import org.springframework.web.multipart.MultipartFile
 import uk.ac.warwick.tabula.PersistenceTestBase
 import uk.ac.warwick.tabula.commands.UploadedFile
-import uk.ac.warwick.tabula.data.FileDao
 import uk.ac.warwick.tabula.data.model.MeetingFormat._
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.services.FileAttachmentService
 
 import scala.collection.JavaConverters._
 
@@ -17,9 +17,7 @@ class CreateMeetingRecordCommandTest extends PersistenceTestBase with MeetingRec
 	@Test
 	def validMeeting() = withUser("cuscav") { withFakeTime(aprilFool) {
 
-		val cmd = new CreateMeetingRecordCommand(creator, relationship, false) {
-			override val session = mockSession
-		}
+		val cmd = new CreateMeetingRecordCommand(creator, relationship, false)
 		cmd.title = "A title"
 		cmd.format = FaceToFace
 		cmd.meetingDateTime  = dateTime(3903, DateTimeConstants.MARCH) // it's the future
@@ -90,10 +88,10 @@ class CreateMeetingRecordCommandTest extends PersistenceTestBase with MeetingRec
 
 		uploadedFile.attached.add(fileAttach)
 
-		val dao: FileDao = mock[FileDao]
-		cmd.fileDao = dao
+		val fileAttachmentService: FileAttachmentService = mock[FileAttachmentService]
+		cmd.fileAttachmentService = fileAttachmentService
 		cmd.file = uploadedFile
-		cmd.meetingRecordDao = meetingRecordDao
+		cmd.meetingRecordService = meetingRecordService
 
 		val meeting = transactional { tx => cmd.apply() }
 

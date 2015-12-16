@@ -2,9 +2,9 @@ package uk.ac.warwick.tabula.commands.coursework.assignments
 
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.data.model.{ScheduledNotification, Assignment, Module}
+import uk.ac.warwick.tabula.data.model.{ToEntityReference, ScheduledNotification, Assignment, Module}
 import uk.ac.warwick.tabula.permissions._
-import uk.ac.warwick.tabula.services.{AutowiringAssessmentServiceComponent, AssessmentServiceComponent}
+import uk.ac.warwick.tabula.services.{MaintenanceModeServiceComponent, AutowiringAssessmentServiceComponent, AssessmentServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 
 /** Simply marks an assignment as archived. */
@@ -72,6 +72,6 @@ trait ArchiveAssignmentNotifications extends SchedulesNotifications[Assignment, 
 	override def transformResult(assignment: Assignment): Seq[Assignment] = Seq(assignment)
 
 	// Clear all notifications
-	override def scheduledNotifications(assignment: Assignment): Seq[ScheduledNotification[_]] = Seq()
+	override def scheduledNotifications(assignment: Assignment): Seq[ScheduledNotification[_ >: Null <: ToEntityReference]] = Seq()
 
 }

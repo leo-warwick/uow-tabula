@@ -1,47 +1,35 @@
 package uk.ac.warwick.tabula.scheduling.commands
 
-import java.io.File
-import java.io.FileReader
-import org.joda.time.DateTime
-import org.springframework.util.FileCopyUtils
-import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.Command
-import uk.ac.warwick.tabula.commands.Description
-import uk.ac.warwick.tabula.commands.ReadOnly
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.util.httpclient.httpclient4.SimpleHttpMethodExecutor
-import uk.ac.warwick.util.httpclient.httpclient4.HttpMethodExecutor.Method
-import uk.ac.warwick.util.web.Uri
-import java.io.IOException
-import org.json.JSONObject
-import uk.ac.warwick.tabula.scheduling.helpers.HttpResponseHandlers
+import java.io.{File, FileInputStream, FileNotFoundException, FileOutputStream, FileReader, FileWriter, IOException}
+
+import org.apache.commons.io.IOUtils
 import org.apache.http.HttpStatus
 import org.apache.http.util.EntityUtils
-import org.json.JSONArray
-import scala.util.control.Breaks._
-import uk.ac.warwick.tabula.scheduling.services.{AutowiringMessageAuthenticationCodeGeneratorComponent, MessageAuthenticationCodeGenerator}
-import uk.ac.warwick.tabula.data.{SHAFileHasherComponent, AutowiringFileDaoComponent, FileDao}
-import org.springframework.util.Assert
-import uk.ac.warwick.util.web.UriBuilder
-import java.io.FileOutputStream
-import java.io.FileNotFoundException
-import org.apache.commons.io.IOUtils
+import org.joda.time.DateTime
+import org.json.{JSONArray, JSONException, JSONObject}
+import org.springframework.util.{Assert, FileCopyUtils}
+import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.commands.{Command, Description, ReadOnly}
+import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.helpers.StringUtils._
-import java.io.FileWriter
-import uk.ac.warwick.util.core.StopWatch
-import uk.ac.warwick.tabula.scheduling.web.controllers.sync.DownloadFileController
-import uk.ac.warwick.tabula.scheduling.web.controllers.sync.ListFilesController
-import org.json.JSONException
 import uk.ac.warwick.tabula.permissions._
-import uk.ac.warwick.util.files.hash.FileHasher
+import uk.ac.warwick.tabula.scheduling.helpers.HttpResponseHandlers
+import uk.ac.warwick.tabula.scheduling.services.AutowiringMessageAuthenticationCodeGeneratorComponent
+import uk.ac.warwick.tabula.scheduling.web.controllers.sync.{DownloadFileController, ListFilesController}
+import uk.ac.warwick.tabula.services.{AutowiringFileAttachmentServiceComponent, SHAFileHasherComponent}
+import uk.ac.warwick.util.core.StopWatch
 import uk.ac.warwick.util.core.spring.FileUtils
-import java.io.FileInputStream
+import uk.ac.warwick.util.httpclient.httpclient4.HttpMethodExecutor.Method
+import uk.ac.warwick.util.httpclient.httpclient4.SimpleHttpMethodExecutor
+import uk.ac.warwick.util.web.{Uri, UriBuilder}
+
+import scala.util.control.Breaks._
 
 /**
  * This is a ReadOnly command because it runs in Maintenance mode on the replica
  */
 class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadOnly with Logging with HttpResponseHandlers
-	with AutowiringFileDaoComponent with SHAFileHasherComponent with AutowiringMessageAuthenticationCodeGeneratorComponent {
+	with AutowiringFileAttachmentServiceComponent with SHAFileHasherComponent with AutowiringMessageAuthenticationCodeGeneratorComponent {
 	import SyncReplicaFilesystemCommand._
 
 	PermissionCheck(Permissions.ReplicaSyncing)
@@ -74,10 +62,9 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 					try {
 						lastRetrievedCreationDate = new DateTime(json.getLong("lastFileReceived"))
 					} catch {
-						case e: Throwable => {
+						case e: Throwable =>
 							logger.debug("No files received")
 							break
-						}
 					}
 
 					if (json.getJSONArray("files") == files && lastRetrievedCreationDate != startDate) {
@@ -113,21 +100,20 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 			// Store the last created date of the last updated file
 			updateLastSynchedDateFile(result)
 
-			updateSyncLogFile(result, timer, true);
+			updateSyncLogFile(result, timer, success = true)
 
 			result
 		} catch {
-			case e: Exception => {
+			case e: Exception =>
 				logger.error("Couldn't sync replica - error reading file: " + lastCreatedFile.getPath, e)
 
 				// if we have synched any files, should update the last-created date file
-	            // Store the Last-Created Date of the last-updated file
-	            updateLastSynchedDateFile(result);
+				// Store the Last-Created Date of the last-updated file
+				updateLastSynchedDateFile(result)
 
-	            updateSyncLogFile(result, timer, false);
+				updateSyncLogFile(result, timer, success = false)
 
-	            null
-			}
+				null
 		}
 	}
 
@@ -163,7 +149,7 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 			",failedTransfers," + result.failedTransfers +
 			",filesAlreadyExisted," + result.filesAlreadyExist +
 			",fileTransferRetries," + result.fileTransferRetries +
-			",timeTaken," + timer.getTotalTimeMillis() +
+			",timeTaken," + timer.getTotalTimeMillis +
 			",successfullyCompleted," + success +
 			",lastCreatedDateBeforeAnyFailures," + lastCreatedDateBeforeFailures +
 			",lastRun," + new DateTime().getMillis
@@ -199,17 +185,15 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 						case _ => None
 					}
 				} catch {
-					case e: JSONException => {
+					case e: JSONException =>
 						logger.error("Invalid JSON received from " + url)
 						None
-					}
 				}
 			})).getRight
 		} catch {
-			case e: IOException => {
+			case e: IOException =>
 				logger.error("Couldn't get files from " + url)
 				None
-			}
 		}
 	}
 
@@ -219,7 +203,7 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 			while(true) {
 				// we've got a whole list of hashes with the same date
 				// so now get the ones with this date, from a certain hash onwards
-				logger.debug("Found a whole list of hashes with the last created date:" + startDate);
+				logger.debug("Found a whole list of hashes with the last created date:" + startDate)
 
 				val lastId = lastFiles.last.getString("id")
 
@@ -265,7 +249,7 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 			// a valid attachment, for which the file may or may not exist on the filesystem. It's also possible
 			// that the database isn't up to date yet, in which case we will get None - we may as well still
 			// write the file at this point.
-			val outputFile = fileDao.getData(id) getOrElse fileDao.targetFile(id)
+			val outputFile = fileAttachmentService.getData(id) getOrElse fileAttachmentService.targetFile(id)
 
 			// Does the attachment already exist on the filesystem?
 			if (outputFile.exists) {
@@ -275,17 +259,16 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 				logger.debug("Output file already exists: " + outputFile)
 
 				// SBTWO-4156 :: touch the file, so we don't over-zealously delete it before the DB has synched across
-                Assert.isTrue(outputFile.setLastModified(startDate.getMillis()));
+                Assert.isTrue(outputFile.setLastModified(startDate.getMillis))
 			} else if ((!outputFile.getParentFile.exists || !outputFile.getParentFile.isDirectory) && !outputFile.getParentFile.mkdirs()) {
 				throw new IllegalStateException("Couldn't create parent directory for " + outputFile)
 			} else {
 				fetchFile(id, hash, createdDate, authCode, outputFile, result)
 			}
 		} catch {
-			case e: IOException => {
+			case e: IOException =>
 				logger.debug("Error trying to sync file: " + file)
 				result.failedTransfer()
-			}
 		}
 	}
 
@@ -307,7 +290,7 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 
 			successful = ex.execute(handle({ response =>
 				response.getStatusLine.getStatusCode match {
-					case HttpStatus.SC_OK => {
+					case HttpStatus.SC_OK =>
 						// Create a temporary file and stream it to there, so that we can re-use the stream
 						val tmpFile = File.createTempFile(id, ".tmp")
 						tmpFile.deleteOnExit()
@@ -315,7 +298,7 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 						FileCopyUtils.copy(response.getEntity.getContent, new FileOutputStream(tmpFile))
 
 						val hashMismatch =
-							hash map { expectedHash =>
+							hash.exists { expectedHash =>
 								val actualHash = fileHasher.hash(new FileInputStream(tmpFile))
 								val mismatch = expectedHash != actualHash
 
@@ -324,7 +307,7 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 								}
 
 								mismatch
-							} getOrElse (false)
+							}
 
 						if (hashMismatch) {
 							false
@@ -341,25 +324,23 @@ class SyncReplicaFilesystemCommand extends Command[SyncReplicaResult] with ReadO
 
 								true
 							} catch {
-								case e: FileNotFoundException => {
+								case e: FileNotFoundException =>
 									logger.info("File not found: " + outputFile)
 									false
-								}
-								case e: IOException => {
+
+								case e: IOException =>
 									logger.info("Error copying file: " + e.getMessage + " - " + outputFile)
 									false
-								}
 							} finally {
 								IOUtils.closeQuietly(is)
 								IOUtils.closeQuietly(os)
 								FileUtils.recursiveDelete(tmpFile, false)
 							}
 						}
-					}
-					case code => {
+
+					case code =>
 						logger.info("Didn't receive a 200 retrieving file: " + id + "(" + code + ")")
 						false
-					}
 				}
 			})).getRight
 		}

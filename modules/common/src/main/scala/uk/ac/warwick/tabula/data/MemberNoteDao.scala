@@ -23,7 +23,7 @@ trait MemberNoteDao {
 
 @Repository
 class MemberNoteDaoImpl extends MemberNoteDao with Daoisms {
-	def getById(id: String): Option[MemberNote] = getById[MemberNote](id)
+	def getById(id: String): Option[MemberNote] = session.getById[MemberNote](id)
 
 	def list(student: Member, includeDeleted: Boolean): Seq[MemberNote] =	{
 			val criteria = session.newCriteria[MemberNote].add(is("member", student))

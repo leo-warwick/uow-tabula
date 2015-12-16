@@ -32,7 +32,7 @@ class DepartmentDaoImpl extends DepartmentDao with Daoisms {
 			.uniqueResult
 	}
 
-	def getById(id: String) = getById[Department](id)
+	def getById(id: String) = session.getById[Department](id)
 
 	def save(department: Department) = session.saveOrUpdate(department)
 

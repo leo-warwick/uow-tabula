@@ -3,7 +3,8 @@ package uk.ac.warwick.tabula.dev.web.controllers
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.{ModelAttribute, RequestMapping}
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import uk.ac.warwick.tabula.dev.web.commands._
+import uk.ac.warwick.tabula.data.commands._
+import uk.ac.warwick.tabula.data.commands._
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupSet
 import org.springframework.web.servlet.View
 import uk.ac.warwick.tabula.commands.Appliable

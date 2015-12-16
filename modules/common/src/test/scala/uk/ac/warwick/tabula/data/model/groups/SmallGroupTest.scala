@@ -98,7 +98,6 @@ class SmallGroupTest extends TestBase with Mockito {
 
 		// would be nice to use a mock here, but they don't work well with GeneratedId classes
 		val studentsGroup = UserGroup.ofUniversityIds
-		studentsGroup.sessionFactory = sessionFactory
 		studentsGroup.addUserId("test user")
     source.students = studentsGroup
 

@@ -3,6 +3,7 @@ package uk.ac.warwick.tabula.commands.admin.department
 import uk.ac.warwick.tabula.commands.{Description, Describable, SelfValidating, CommandInternal, ComposableCommand}
 import uk.ac.warwick.tabula.data.Transactions._
 import org.springframework.validation.Errors
+import uk.ac.warwick.tabula.services.MaintenanceModeServiceComponent
 import uk.ac.warwick.tabula.system.permissions.{PermissionsCheckingMethods, PermissionsChecking, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.data.model.permissions.CustomRoleDefinition

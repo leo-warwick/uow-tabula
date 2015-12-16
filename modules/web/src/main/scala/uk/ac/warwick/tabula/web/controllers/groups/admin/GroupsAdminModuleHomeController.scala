@@ -13,7 +13,8 @@ import uk.ac.warwick.tabula.web.controllers.groups.GroupsController
 @Controller
 @RequestMapping(value=Array("/groups/admin/module/{module}", "/groups/admin/module/{module}/groups"))
 class GroupsAdminModuleHomeController extends GroupsController
-	with AcademicYearScopedController with AutowiringUserSettingsServiceComponent with AutowiringMaintenanceModeServiceComponent {
+	with AcademicYearScopedController with AutowiringUserSettingsServiceComponent
+	with AutowiringMaintenanceModeServiceComponent {
 
 	@ModelAttribute("activeAcademicYear")
 	override def activeAcademicYear: Option[AcademicYear] = retrieveActiveAcademicYear(None)

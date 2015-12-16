@@ -1,19 +1,15 @@
 package uk.ac.warwick.tabula.commands
 
-import java.io.File
-import uk.ac.warwick.tabula.services.{MaintenanceModeEnabledException, MaintenanceModeService}
+import uk.ac.warwick.tabula.services.{FileAttachmentService, MaintenanceModeService}
 
 import scala.collection.JavaConverters._
 import org.springframework.web.multipart.MultipartFile
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.data.FileDao
-import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.FileAttachment
 import uk.ac.warwick.tabula.system.BindListener
 import uk.ac.warwick.tabula.system.NoBind
 import org.springframework.validation.BindingResult
-import uk.ac.warwick.tabula.RequestInfo
 
 /**
  * Encapsulates initially-uploaded MultipartFiles with a reference to
@@ -29,8 +25,8 @@ import uk.ac.warwick.tabula.RequestInfo
  * multipart/form-data encoding type on your form.
  */
 class UploadedFile extends BindListener {
-	var fileDao = Wire[FileDao]
-	var maintenanceMode = Wire[MaintenanceModeService]
+	@transient var fileAttachmentService = Wire[FileAttachmentService]
+	@transient var maintenanceModeService = Wire[MaintenanceModeService]
 
 	@NoBind var disallowedFilenames = commaSeparated(Wire[String]("${uploads.disallowedFilenames}"))
 	@NoBind var disallowedPrefixes = commaSeparated(Wire[String]("${uploads.disallowedPrefixes}"))
@@ -81,9 +77,8 @@ class UploadedFile extends BindListener {
 	 * command needs them. This method will throw an exception
 	 */
 	override def onBind(result: BindingResult) {
-
-		if (maintenanceMode.enabled) {
-			throw new MaintenanceModeEnabledException(maintenanceMode.until, maintenanceMode.message)
+		if (maintenanceModeService.enabled) {
+			throw maintenanceModeService.exception(None)
 		}
 
 		val bindResult = for (item <- attached.asScala) yield {
@@ -95,31 +90,19 @@ class UploadedFile extends BindListener {
 
 		// Early exit if we've failed binding
 		if (!bindResult.contains(false)) {
-
 			if (hasUploads) {
 				// convert MultipartFiles into FileAttachments
-				transactional() {
-					val newAttachments = for (item <- permittedUploads.asScala) yield {
-						val a = new FileAttachment
-						a.name = new File(item.getOriginalFilename).getName
-						a.uploadedData = item.getInputStream
-						a.uploadedDataLength = item.getSize
-						RequestInfo.fromThread.foreach { info => a.uploadedBy = info.user.userId }
-						fileDao.saveTemporary(a)
-						a
-					}
-					// remove converted files from upload to avoid duplicates
-					upload.clear()
-					attached.addAll(newAttachments.asJava)
-				}
+				val newAttachments = fileAttachmentService.persistTemporary(permittedUploads.asScala)
+
+				// remove converted files from upload to avoid duplicates
+				upload.clear()
+				attached.addAll(newAttachments.asJava)
 			} else {
 				// sometimes we manually add FileAttachments with uploaded data to persist
 				for (item <- attached.asScala if item.uploadedData != null)
-					fileDao.saveTemporary(item)
+					fileAttachmentService.saveTemporary(item)
 			}
-
 		}
-
 	}
 
 	private def commaSeparated(csv: String) =

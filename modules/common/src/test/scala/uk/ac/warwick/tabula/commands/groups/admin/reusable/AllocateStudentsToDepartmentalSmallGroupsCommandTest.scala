@@ -217,7 +217,7 @@ class AllocateStudentsToDepartmentalSmallGroupsCommandTest extends TestBase with
 
 		val file = new UploadedFile
 		file.attached.add(attachment)
-		file.maintenanceMode = smartMock[MaintenanceModeService]
+		file.maintenanceModeService = smartMock[MaintenanceModeService]
 		command.file = file
 
 		command.groupsExtractor.readXSSFExcelFile(any[FileInputStream]) returns Seq(

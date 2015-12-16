@@ -22,7 +22,7 @@ trait DatabaseEncodingChecker extends InitializingBean with Logging {
 
 	def fetchString: String
 
-	override def afterPropertiesSet {
+	override def afterPropertiesSet(): Unit = {
 		val fetchedString = fetchString
 
 		if (testString != fetchedString) {

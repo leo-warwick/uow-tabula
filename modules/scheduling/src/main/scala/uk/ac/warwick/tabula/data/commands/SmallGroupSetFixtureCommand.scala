@@ -1,21 +1,21 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.services.{AutowiringTermServiceComponent, TermServiceComponent, AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
+import org.joda.time.DateTime
+import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.JavaImports.JArrayList
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
 import uk.ac.warwick.tabula.data.{Daoisms, SessionComponent}
 import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupSet}
-import uk.ac.warwick.tabula.JavaImports.JArrayList
-import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.StudentSignUp
 import uk.ac.warwick.tabula.data.model.UserGroup
-import uk.ac.warwick.tabula.AcademicYear
-import org.joda.time.DateTime
+import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.StudentSignUp
+import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupSet}
+import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, AutowiringTermServiceComponent, ModuleAndDepartmentServiceComponent, TermServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 
 class SmallGroupSetFixtureCommand extends CommandInternal[SmallGroupSet] with Logging {
 
-	this: ModuleAndDepartmentServiceComponent with SessionComponent with TermServiceComponent =>
+	this: ModuleAndDepartmentServiceComponent with TermServiceComponent with SessionComponent =>
 
 	var moduleCode:String = _
 	var groupSetName:String = _

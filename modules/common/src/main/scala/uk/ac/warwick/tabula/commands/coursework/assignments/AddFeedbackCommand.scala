@@ -3,6 +3,7 @@ package uk.ac.warwick.tabula.commands.coursework.assignments
 import org.joda.time.DateTime
 import uk.ac.warwick.tabula.CurrentUser
 import uk.ac.warwick.tabula.data.HibernateHelpers
+import uk.ac.warwick.tabula.services.AutowiringFeedbackServiceComponent
 import uk.ac.warwick.userlookup.User
 import uk.ac.warwick.tabula.data.model.notifications.coursework.FeedbackChangeNotification
 
@@ -14,7 +15,8 @@ import uk.ac.warwick.tabula.permissions._
 import org.springframework.validation.Errors
 
 class AddFeedbackCommand(module: Module, assignment: Assignment, marker: User, currentUser: CurrentUser)
-	extends UploadFeedbackCommand[Seq[Feedback]](module, assignment, marker) with Notifies[Seq[Feedback], Feedback] {
+	extends UploadFeedbackCommand[Seq[Feedback]](module, assignment, marker) with Notifies[Seq[Feedback], Feedback]
+		with AutowiringFeedbackServiceComponent {
 
 	PermissionCheck(Permissions.AssignmentFeedback.Manage, assignment)
 
@@ -35,7 +37,7 @@ class AddFeedbackCommand(module: Module, assignment: Assignment, marker: User, c
 			val newAttachments = feedback.addAttachments(file.attached)
 
 			if (newAttachments.nonEmpty) {
-				session.saveOrUpdate(feedback)
+				feedbackService.saveOrUpdate(feedback)
 				Some(feedback)
 			} else {
 				None

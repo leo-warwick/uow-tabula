@@ -31,18 +31,18 @@ class FeedbackTemplateTest extends PersistenceTestBase {
 
 		// Can fetch everything from db
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[FeedbackTemplate], feedbackTemplate.id) should be (feedbackTemplate)
-			session.get(classOf[FileAttachment], feedbackAttachment.id) should be (feedbackAttachment)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[FeedbackTemplate](feedbackTemplate.id) should be (Some(feedbackTemplate))
+			session.getById[FileAttachment](feedbackAttachment.id) should be (Some(feedbackAttachment))
 		}
 
 		flushing(session) { session.delete(feedbackTemplate) }
 
 		// Ensure we can't fetch the FeedbackTemplate or attachment, but all the other objects are returned
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[FeedbackTemplate], feedbackTemplate.id) should be (null)
-			session.get(classOf[FileAttachment], feedbackAttachment.id) should be (null)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[FeedbackTemplate](feedbackTemplate.id) should be ('empty)
+			session.getById[FileAttachment](feedbackAttachment.id) should be ('empty)
 		}
 	}}
 

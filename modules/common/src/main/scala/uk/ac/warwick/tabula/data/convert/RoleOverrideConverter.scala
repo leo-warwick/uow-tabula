@@ -11,6 +11,6 @@ class RoleOverrideConverter extends TwoWayConverter[String, RoleOverride] with D
 
 	override def convertRight(id: String) =
 		if (!id.hasText) null
-		else getById[RoleOverride](id).orNull
+		else session.getById[RoleOverride](id).orNull
 
 }

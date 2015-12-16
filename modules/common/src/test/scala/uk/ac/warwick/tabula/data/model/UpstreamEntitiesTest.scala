@@ -74,7 +74,6 @@ class UpstreamEntitiesTest extends PersistenceTestBase {
 			group2010.occurrence = "A"
 			group2010.assessmentGroup = "A"
 			group2010.academicYear = new AcademicYear(2010)
-			group2010.members.sessionFactory = sessionFactory
 			group2010.members.staticUserIds = Seq("rob","kev","bib")
 
 			val group2011 = new UpstreamAssessmentGroup
@@ -82,7 +81,6 @@ class UpstreamEntitiesTest extends PersistenceTestBase {
 			group2011.occurrence = "A"
 			group2011.assessmentGroup = "A"
 			group2011.academicYear = new AcademicYear(2011)
-			group2011.members.sessionFactory = sessionFactory
 			group2011.members.staticUserIds = Seq("hog","dod","han")
 
 			// similar group but doesn't match the occurence of any assignment above, so ignored.
@@ -91,7 +89,6 @@ class UpstreamEntitiesTest extends PersistenceTestBase {
 			otherGroup.occurrence = "B"
 			otherGroup.assessmentGroup = "A"
 			otherGroup.academicYear = new AcademicYear(2011)
-			otherGroup.members.sessionFactory = sessionFactory
 			otherGroup.members.staticUserIds = Seq("hog","dod","han")
 
 			val member = new StaffMember
@@ -125,13 +122,13 @@ class UpstreamEntitiesTest extends PersistenceTestBase {
 
 			law2012.upstreamAssessmentGroups.isEmpty should be (true)
 
-			session.load(classOf[Member], "0672089") match {
-				case loadedMember:Member => loadedMember.firstName should be ("Mathew")
+			session.getById[Member]("0672089") match {
+				case Some(loadedMember: Member) => loadedMember.firstName should be ("Mathew")
 				case _ => fail("Member not found")
 			}
 
-			session.load(classOf[StudentMember], "0812345") match {
-				case loadedMember:StudentMember =>
+			session.getById[StudentMember]("0812345") match {
+				case Some(loadedMember: StudentMember) =>
 					loadedMember.firstName should be ("My")
 				case _ => fail("Student not found")
 			}

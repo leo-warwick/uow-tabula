@@ -39,7 +39,7 @@ class NotificationService extends Logging with FreemarkerTextRenderer {
 
 	def getNotificationById(id: String) = dao.getById(id)
 
-	def push(notification: Notification[_,_]){
+	def push(notification: Notification[_ >: Null <: ToEntityReference, _]){
 		// TODO - In future pushing a notification will add it to a queue, aggregate similar notifications etc.
 		logger.info("Notification pushed - " + notification)
 		dao.save(notification)
@@ -48,13 +48,13 @@ class NotificationService extends Logging with FreemarkerTextRenderer {
 	}
 
 	// update the notifications and rebuild their entries index
-	def update(notifications: Seq[Notification[_,_]], user: User) {
+	def update(notifications: Seq[Notification[_ >: Null <: ToEntityReference, _]], user: User) {
 		notifications.foreach(dao.update)
 		indexManager.indexNotificationRecipients(notifications, user)
 	}
 
 	// Update the notifications and return the index message, but don't index now
-	def updateWithDeferredIndex(notifications: Seq[Notification[_,_]], user: User): Object = {
+	def updateWithDeferredIndex(notifications: Seq[Notification[_ >: Null <: ToEntityReference, _]], user: User): Object = {
 		notifications.foreach(dao.update)
 		indexManager.createIndexMessage(notifications, user)
 	}

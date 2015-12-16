@@ -2,7 +2,7 @@ package uk.ac.warwick.tabula.dev.web.controllers
 
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.stereotype.Controller
-import uk.ac.warwick.tabula.dev.web.commands.FixturesCommand
+import uk.ac.warwick.tabula.data.commands.FixturesCommand
 import uk.ac.warwick.tabula.web.Mav
 
 @Controller

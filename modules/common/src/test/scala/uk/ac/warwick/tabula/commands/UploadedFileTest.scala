@@ -4,7 +4,7 @@ import org.springframework.mock.web.MockMultipartFile
 import org.springframework.validation.BindException
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.FileDao
-import uk.ac.warwick.tabula.services.MaintenanceModeService
+import uk.ac.warwick.tabula.services.{FileAttachmentService, MaintenanceModeService}
 import uk.ac.warwick.tabula.{Mockito, TestBase}
 
 
@@ -19,8 +19,8 @@ class UploadedFileTest extends TestBase with Mockito{
 	@Test // HFC-375
 	def ignoreEmptyMultipartFiles() {
 		val uploadedFile = new UploadedFile
-		uploadedFile.maintenanceMode = smartMock[MaintenanceModeService]
-		uploadedFile.fileDao = smartMock[FileDao]
+		uploadedFile.maintenanceModeService = smartMock[MaintenanceModeService]
+		uploadedFile.fileAttachmentService = smartMock[FileAttachmentService]
 		uploadedFile.upload = JArrayList(multi1, multiEmpty)
 		uploadedFile.onBind(new BindException(uploadedFile, "file"))
 
@@ -48,9 +48,9 @@ class UploadedFileTest extends TestBase with Mockito{
 	@Test // TAB-48
 	def ignoreSystemFiles() {
 		val uploadedFile = new UploadedFile
-		uploadedFile.maintenanceMode = smartMock[MaintenanceModeService]
+		uploadedFile.maintenanceModeService = smartMock[MaintenanceModeService]
 		uploadedFile.disallowedFilenames = List("thumbs.db")
-		uploadedFile.fileDao = smartMock[FileDao]
+		uploadedFile.fileAttachmentService = smartMock[FileAttachmentService]
 		uploadedFile.upload = JArrayList(multi1, multiSystemFile)
 		uploadedFile.onBind(new BindException(uploadedFile, "file"))
 
@@ -62,9 +62,9 @@ class UploadedFileTest extends TestBase with Mockito{
 	@Test // TAB-48
 	def ignoreAppleDouble() {
 		val uploadedFile = new UploadedFile
-		uploadedFile.maintenanceMode = smartMock[MaintenanceModeService]
+		uploadedFile.maintenanceModeService = smartMock[MaintenanceModeService]
 		uploadedFile.disallowedPrefixes = List("._")
-		uploadedFile.fileDao = smartMock[FileDao]
+		uploadedFile.fileAttachmentService = smartMock[FileAttachmentService]
 		uploadedFile.upload = JArrayList(multi1, multiAppleDouble)
 		uploadedFile.onBind(new BindException(uploadedFile, "file"))
 
@@ -75,8 +75,8 @@ class UploadedFileTest extends TestBase with Mockito{
 	@Test
 	def customDisallowed() {
 		val uploadedFile = new UploadedFile
-		uploadedFile.maintenanceMode = smartMock[MaintenanceModeService]
-		uploadedFile.fileDao = smartMock[FileDao]
+		uploadedFile.maintenanceModeService = smartMock[MaintenanceModeService]
+		uploadedFile.fileAttachmentService = smartMock[FileAttachmentService]
 		uploadedFile.disallowedPrefixes = List()
 		uploadedFile.disallowedFilenames = List("feedback.doc")
 		uploadedFile.upload = JArrayList(multiSystemFile, multiAppleDouble, multi1)

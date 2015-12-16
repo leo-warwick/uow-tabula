@@ -1,18 +1,17 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
-import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
 import uk.ac.warwick.tabula.data.{Daoisms, SessionComponent}
+import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.data.model.{DegreeType, Module}
+import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.scheduling.commands.imports.ImportAcademicInformationCommand
 import uk.ac.warwick.tabula.scheduling.services.ModuleInfo
-import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.data.model.{DegreeType, Module}
 
-class ModuleFixtureCommand extends CommandInternal[Module] with Logging{
-
-	this: ModuleAndDepartmentServiceComponent with SessionComponent=>
+class ModuleFixtureCommand extends CommandInternal[Module] with Logging {
+	self: ModuleAndDepartmentServiceComponent with SessionComponent =>
 	import ImportAcademicInformationCommand._
 
   var name:String = _
@@ -29,7 +28,7 @@ class ModuleFixtureCommand extends CommandInternal[Module] with Logging{
 				logger.info(s"Deleted module ${code}")
 			}
 			val m = newModuleFrom(moduleInfo, department)
-			session.save(m)
+			moduleAndDepartmentService.saveOrUpdate(m)
 			logger.info(s"Created module ${code}")
 			m
 		}
@@ -42,6 +41,5 @@ object ModuleFixtureCommand{
 			with Daoisms
 			with Unaudited
 			with PubliclyVisiblePermissions
-
 	}
 }

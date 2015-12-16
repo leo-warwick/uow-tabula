@@ -70,7 +70,7 @@ class RelationshipDaoImpl extends RelationshipDao with Daoisms with Logging {
 			.addOrder(Order.asc("id"))
 			.seq
 
-	def getStudentRelationshipTypeById(id: String) = getById[StudentRelationshipType](id)
+	def getStudentRelationshipTypeById(id: String) = session.getById[StudentRelationshipType](id)
 
 	def getStudentRelationshipTypeByUrlPart(urlPart: String) =
 		session.newCriteria[StudentRelationshipType]
@@ -80,7 +80,7 @@ class RelationshipDaoImpl extends RelationshipDao with Daoisms with Logging {
 	def saveOrUpdate(relationshipType: StudentRelationshipType) = session.saveOrUpdate(relationshipType)
 	def delete(relationshipType: StudentRelationshipType) = session.delete(relationshipType)
 
-	def getStudentRelationshipById(id: String) = getById[StudentRelationship](id)
+	def getStudentRelationshipById(id: String) = session.getById[StudentRelationship](id)
 
 	def saveOrUpdate(rel: StudentRelationship) = session.saveOrUpdate(rel)
 

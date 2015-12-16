@@ -11,8 +11,6 @@ import uk.ac.warwick.tabula.UniversityId
 import uk.ac.warwick.tabula.commands.Command
 import uk.ac.warwick.tabula.commands.Description
 import uk.ac.warwick.tabula.commands.UploadedFile
-import uk.ac.warwick.tabula.data.Daoisms
-import uk.ac.warwick.tabula.data.FileDao
 import uk.ac.warwick.tabula.data.model.{Assignment, FileAttachment}
 import uk.ac.warwick.tabula.helpers.FoundUser
 import uk.ac.warwick.tabula.helpers.LazyLists
@@ -74,7 +72,7 @@ class ExtractFeedbackZip(cmd: UploadFeedbackCommand[_]) extends Command[Unit] {
  * remove all the code in here that handles it, to simplify it a little.
  */
 abstract class UploadFeedbackCommand[A](val module: Module, val assignment: Assignment, val marker: User)
-	extends Command[A] with Daoisms with Logging with BindListener {
+	extends Command[A] with Logging with BindListener {
 
 	// Permissions checks delegated to implementing classes FOR THE MOMENT
 
@@ -84,11 +82,11 @@ abstract class UploadFeedbackCommand[A](val module: Module, val assignment: Assi
 	@NoBind var disallowedFilenames = commaSeparated(Wire[String]("${uploads.disallowedFilenames}"))
 	@NoBind var disallowedPrefixes = commaSeparated(Wire[String]("${uploads.disallowedPrefixes}"))
 
-	var zipService = Wire.auto[ZipService]
-	var userLookup = Wire.auto[UserLookupService]
-	var fileDao = Wire.auto[FileDao]
-	var assignmentService = Wire.auto[AssessmentService]
-	var stateService = Wire.auto[StateService]
+	var zipService = Wire[ZipService]
+	var userLookup = Wire[UserLookupService]
+	var fileAttachmentService = Wire[FileAttachmentService]
+	var assignmentService = Wire[AssessmentService]
+	var stateService = Wire[StateService]
 
 	/* for single upload */
 	var uniNumber: String = _
@@ -242,7 +240,7 @@ abstract class UploadFeedbackCommand[A](val module: Module, val assignment: Assi
 					f.uploadedData = new ZipEntryInputStream(zip, entry)
 					f.uploadedDataLength = entry.getSize
 					f.uploadedBy = marker.getUserId
-					fileDao.saveTemporary(f)
+					fileAttachmentService.saveTemporary(f)
 					(name, f)
 				}
 			}

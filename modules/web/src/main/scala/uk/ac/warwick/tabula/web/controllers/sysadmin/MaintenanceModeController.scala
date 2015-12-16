@@ -24,9 +24,7 @@ object MaintenanceModeCommand {
 			with ComposableCommand[MaintenanceModeMessage]
 			with MaintenanceModeCommandPopulation
 			with MaintenanceModeCommandValidation
-			with ManageMaintenanceModePermissions
-			with AutowiringMaintenanceModeServiceComponent
-			with AutowiringSettingsSyncQueueComponent
+			with ManageMaintenanceModePermissions with AutowiringSettingsSyncQueueComponent
 			with ReadOnly with Unaudited
 }
 

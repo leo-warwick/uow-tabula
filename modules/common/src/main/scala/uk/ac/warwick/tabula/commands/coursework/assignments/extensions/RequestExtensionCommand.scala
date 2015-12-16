@@ -15,7 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import uk.ac.warwick.tabula.system.BindListener
 import uk.ac.warwick.tabula.permissions._
 import org.springframework.validation.BindingResult
-import uk.ac.warwick.tabula.services.{AutowiringRelationshipServiceComponent, RelationshipServiceComponent}
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.validators.WithinYears
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.JavaImports._
@@ -23,24 +23,24 @@ import scala.collection.mutable
 
 object RequestExtensionCommand {
 	def apply (module: Module, assignment: Assignment, submitter: CurrentUser, action: String) = {
-		new RequestExtensionCommandInternal(module, assignment, submitter) with
-			ComposableCommand[Extension] with
-			AutowiringRelationshipServiceComponent with
-			RequestExtensionCommandDescription with
-			RequestExtensionCommandPermission with
-			RequestExtensionCommandValidation with
-			RequestExtensionCommandNotification with
-			HibernateExtensionPersistenceComponent
+		new RequestExtensionCommandInternal(module, assignment, submitter)
+			with ComposableCommand[Extension]
+			with AutowiringRelationshipServiceComponent
+			with RequestExtensionCommandDescription
+			with RequestExtensionCommandPermission
+			with RequestExtensionCommandValidation
+			with RequestExtensionCommandNotification
+			with AutowiringExtensionServiceComponent
 	}
 }
 
 
 class RequestExtensionCommandInternal(val module: Module, val assignment:Assignment, val submitter: CurrentUser)
-	extends CommandInternal[Extension] with
-	RequestExtensionCommandState with
-	BindListener {
+	extends CommandInternal[Extension]
+		with RequestExtensionCommandState
+		with BindListener {
 
-	self: RelationshipServiceComponent with ExtensionPersistenceComponent =>
+	self: RelationshipServiceComponent with ExtensionServiceComponent =>
 
 	override def onBind(result:BindingResult) = transactional() {
 		file.onBind(result)
@@ -63,7 +63,7 @@ class RequestExtensionCommandInternal(val module: Module, val assignment:Assignm
 		if (extension.attachments != null) {
 			// delete attachments that have been removed
 			val matchingAttachments: mutable.Set[FileAttachment] = extension.attachments -- attachedFiles
-			matchingAttachments.foreach(delete)
+			matchingAttachments.foreach(extensionService.deleteAttachment(extension, _))
 		}
 
 		if (!file.attached.isEmpty) {
@@ -72,7 +72,7 @@ class RequestExtensionCommandInternal(val module: Module, val assignment:Assignm
 			}
 		}
 
-		save(extension)
+		extensionService.save(extension)
 		extension
 	}
 }
@@ -146,7 +146,7 @@ trait RequestExtensionCommandNotification extends Notifies[Extension, Option[Ext
 
 		//Pick only the parts of scd required since passing the whole object fails due to the session not being available to load lazy objects
 		Map(
-			"relationships" -> relationships.filter({case (relationshipType,relations) => relations.length != 0}),
+			"relationships" -> relationships.filter({case (relationshipType,relations) => relations.nonEmpty}),
 			"scdCourse" -> scd.course,
 			"scdRoute" -> scd.route,
 			"scdAward" -> scd.award

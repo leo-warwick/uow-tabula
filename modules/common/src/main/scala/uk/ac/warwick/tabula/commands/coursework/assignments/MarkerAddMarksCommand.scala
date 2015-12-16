@@ -11,7 +11,7 @@ import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.MarkingState.{ReleasedForMarking, InProgress}
 import uk.ac.warwick.tabula.data.model.{Assignment, Module, _}
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.{AutowiringFeedbackServiceComponent, AutowiringUserLookupComponent, FeedbackServiceComponent, GeneratesGradesFromMarks, UserLookupComponent}
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.userlookup.User
 
@@ -35,7 +35,7 @@ object MarkerAddMarksCommand {
 class MarkerAddMarksCommandInternal(val module: Module, val assignment: Assignment, val marker: User, val submitter: CurrentUser, val firstMarker: Boolean, val gradeGenerator: GeneratesGradesFromMarks)
 	extends CommandInternal[List[MarkerFeedback]] with CanProxy {
 
-	self: MarkerAddMarksCommandState with FeedbackServiceComponent  =>
+	self: MarkerAddMarksCommandState with FeedbackServiceComponent =>
 
 	override def applyInternal(): List[MarkerFeedback] = transactional() {
 

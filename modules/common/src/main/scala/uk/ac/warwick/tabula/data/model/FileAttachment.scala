@@ -1,12 +1,13 @@
 package uk.ac.warwick.tabula.data.model
 
+import uk.ac.warwick.tabula.services.FileAttachmentService
+
 import scala.language.postfixOps
 import java.io._
 import com.google.common.io.Files
 import org.joda.time.DateTime
 import javax.persistence._
 import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.data.FileDao
 import uk.ac.warwick.tabula.data.model.forms.{SavedFormValue, Extension}
 import scala.util.matching.Regex
 import javax.persistence.CascadeType._
@@ -17,7 +18,7 @@ import uk.ac.warwick.tabula.helpers.DetectMimeType._
 class FileAttachment extends GeneratedId {
 	import FileAttachment._
 
-	@transient var fileDao = Wire.auto[FileDao]
+	@transient var fileAttachmentService = Wire[FileAttachmentService]
 
 	@Column(name="file_hash")
 	var hash: String = _
@@ -73,7 +74,7 @@ class FileAttachment extends GeneratedId {
 
 	@transient private var _file: File = null
 	def file = {
-		if (_file == null) _file = fileDao.getData(id).orNull
+		if (_file == null) _file = fileAttachmentService.getData(id).orNull
 		_file
 	}
 	def file_=(f: File) { _file = f }
@@ -110,7 +111,7 @@ class FileAttachment extends GeneratedId {
 		newFile.uploadedData = dataStream
 		newFile.uploadedDataLength = uploadedDataLength
 		newFile.uploadedBy = uploadedBy
-		fileDao.savePermanent(newFile)
+		fileAttachmentService.savePermanent(newFile)
 		newFile
 	}
 
@@ -165,7 +166,7 @@ object FileAttachment {
 		dotSplit match {
 			case Nil => s"$DefaultFilename.$DefaultExtension"
 			case extension :: Nil if leadingDot => s"$DefaultFilename.$extension"
-			case filename :: Nil => s"$filename.$DefaultExtension"
+			case name :: Nil => s"$name.$DefaultExtension"
 			case filenameWithExtension => filenameWithExtension.mkString(".")
 		}
 	}

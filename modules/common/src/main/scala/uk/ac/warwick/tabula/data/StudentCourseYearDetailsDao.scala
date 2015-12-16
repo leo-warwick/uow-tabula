@@ -36,7 +36,7 @@ class StudentCourseYearDetailsDaoImpl extends StudentCourseYearDetailsDao with D
 		session.flush()
 	}
 
-	def getStudentCourseYearDetails(id: String) = getById[StudentCourseYearDetails](id)
+	def getStudentCourseYearDetails(id: String) = session.getById[StudentCourseYearDetails](id)
 
 	def getBySceKey(studentCourseDetails: StudentCourseDetails, seq: Integer): Option[StudentCourseYearDetails] =
 		session.newCriteria[StudentCourseYearDetails]

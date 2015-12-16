@@ -9,10 +9,6 @@ abstract class GroupsController extends BaseController with GroupsBreadcrumbs {
 
 	hideDeletedItems
 
-	final override def onPreRequest {
-
-	}
-
 	type ModuleGroupsMap = Map[Module, Map[SmallGroupSet, Seq[SmallGroup]]]
 
 	def generateViewModules(mapping: ModuleGroupsMap, viewerRole:ViewerRole): ViewModules = {

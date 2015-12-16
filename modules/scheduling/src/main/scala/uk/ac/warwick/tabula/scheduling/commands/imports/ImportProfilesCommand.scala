@@ -3,37 +3,35 @@ package uk.ac.warwick.tabula.scheduling.commands.imports
 import org.joda.time.DateTime
 import org.springframework.validation.BindException
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.{Command, Description}
-import uk.ac.warwick.tabula.data.{Daoisms, MemberDao, ModuleRegistrationDaoImpl, StudentCourseDetailsDao, StudentCourseYearDetailsDao}
+import uk.ac.warwick.tabula.commands.{Command, Description, TaskBenchmarking}
 import uk.ac.warwick.tabula.data.Transactions.transactional
-import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.data.model.{StudentMember, _}
+import uk.ac.warwick.tabula.data.{MemberDao, ModuleRegistrationDaoImpl, StudentCourseDetailsDao, StudentCourseYearDetailsDao}
 import uk.ac.warwick.tabula.helpers.{FoundUser, Logging}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.scheduling.helpers.{ImportCommandFactory, ImportRowTracker}
 import uk.ac.warwick.tabula.scheduling.services.{AccreditedPriorLearningImporter, MembershipInformation, ModuleRegistrationImporter, ProfileImporter, SitsAcademicYearAware}
 import uk.ac.warwick.tabula.services.{ModuleAndDepartmentService, ProfileIndexService, ProfileService, SmallGroupService, UserLookupService}
 import uk.ac.warwick.userlookup.{AnonymousUser, User}
-import uk.ac.warwick.tabula.commands.TaskBenchmarking
-import uk.ac.warwick.tabula.data.model.StudentMember
 
-class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with SitsAcademicYearAware with TaskBenchmarking {
+class ImportProfilesCommand extends Command[Unit] with Logging with SitsAcademicYearAware with TaskBenchmarking {
 
 	type UniversityId = String
 
 	PermissionCheck(Permissions.ImportSystemData)
 
-	var madService = Wire.auto[ModuleAndDepartmentService]
-	var profileImporter = Wire.auto[ProfileImporter]
-	var profileService = Wire.auto[ProfileService]
-	var userLookup = Wire.auto[UserLookupService]
-	var moduleRegistrationImporter = Wire.auto[ModuleRegistrationImporter]
-	var accreditedPriorLearningImporter = Wire.auto[AccreditedPriorLearningImporter]
-	var moduleRegistrationDao = Wire.auto[ModuleRegistrationDaoImpl]
-	var smallGroupService = Wire.auto[SmallGroupService]
-	var profileIndexService = Wire.auto[ProfileIndexService]
-	var memberDao = Wire.auto[MemberDao]
-	var studentCourseDetailsDao = Wire.auto[StudentCourseDetailsDao]
-	var studentCourseYearDetailsDao = Wire.auto[StudentCourseYearDetailsDao]
+	var madService = Wire[ModuleAndDepartmentService]
+	var profileImporter = Wire[ProfileImporter]
+	var profileService = Wire[ProfileService]
+	var userLookup = Wire[UserLookupService]
+	var moduleRegistrationImporter = Wire[ModuleRegistrationImporter]
+	var accreditedPriorLearningImporter = Wire[AccreditedPriorLearningImporter]
+	var moduleRegistrationDao = Wire[ModuleRegistrationDaoImpl]
+	var smallGroupService = Wire[SmallGroupService]
+	var profileIndexService = Wire[ProfileIndexService]
+	var memberDao = Wire[MemberDao]
+	var studentCourseDetailsDao = Wire[StudentCourseDetailsDao]
+	var studentCourseYearDetailsDao = Wire[StudentCourseYearDetailsDao]
 
 	var deptCode: String = _
 
@@ -91,7 +89,7 @@ class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with
 					// each apply has its own transaction
 						transactional() {
 							importMemberCommands map { _.apply() }
-							session.flush()
+							memberDao.flush()
 						}
 					}
 
@@ -175,8 +173,8 @@ class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with
 			deleteOldModuleRegistrations(usercodesProcessed, newModuleRegistrations)
 		}
 
-		session.flush()
-		session.clear()
+		memberDao.flush()
+		memberDao.clear()
 
 		newModuleRegistrations
 	}
@@ -213,8 +211,8 @@ class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with
 			case student: StudentMember => ImportTier4ForStudentCommand(student, getCurrentSitsAcademicYear).apply()
 		}
 
-		session.flush()
-		session.clear()
+		memberDao.flush()
+		memberDao.clear()
 	}
 
 	def rationaliseRelationships(rowCommands: Seq[ImportMemberCommand]): Unit = {
@@ -243,8 +241,8 @@ class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with
 			case _ =>
 		}
 
-		session.flush()
-		session.clear()
+		memberDao.flush()
+		memberDao.clear()
 	}
 
 	def refresh(universityId: String, userId: Option[String]) {
@@ -267,7 +265,7 @@ class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with
 					// update missingFromSitsSince field in this student's member and course records:
 					updateMissingForIndividual(universityId, importCommandFactory.rowTracker)
 
-					session.flush()
+					memberDao.flush()
 
 					updateVisa(importMemberCommands)
 
@@ -285,8 +283,8 @@ class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with
 						memberDao.saveOrUpdate(member)
 					})
 
-					for (thisMember <- members) session.evict(thisMember)
-					for (modReg <- newModuleRegistrations) session.evict(modReg)
+					for (thisMember <- members) memberDao.evict(thisMember)
+					for (modReg <- newModuleRegistrations) moduleRegistrationDao.evict(modReg)
 
 					logger.info("Data refreshed for " + universityId)
 				case None => logger.warn("Student is no longer in uow_current_members in membership - not updating")
@@ -363,7 +361,7 @@ class ImportProfilesCommand extends Command[Unit] with Logging with Daoisms with
 		val existingModuleRegistrations = moduleRegistrationDao.getByUsercodesAndYear(usercodes, getCurrentSitsAcademicYear)
 		for (existingMR <- existingModuleRegistrations.filterNot(mr => newModuleRegistrations.contains(mr))) {
 			existingMR.studentCourseDetails.removeModuleRegistration(existingMR)
-			session.delete(existingMR)
+			moduleRegistrationDao.delete(existingMR)
 
 			if (features.autoGroupDeregistration) {
 				smallGroupService.removeFromSmallGroups(existingMR)

@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.CurrentUser
+import uk.ac.warwick.tabula.data.HasJobDao
 import uk.ac.warwick.tabula.events.JobNotificationHandling
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.jobs.{FailedJobException, Job, JobPrototype, ObsoleteJobException}
+import uk.ac.warwick.tabula.services.AutowiringMaintenanceModeServiceComponent
 import uk.ac.warwick.userlookup.User
 
 trait JobServiceComponent {

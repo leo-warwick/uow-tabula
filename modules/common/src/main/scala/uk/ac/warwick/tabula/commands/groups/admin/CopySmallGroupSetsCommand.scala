@@ -6,7 +6,7 @@ import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEventOccurrence, SmallGroupSet}
-import uk.ac.warwick.tabula.data.model.{AssessmentGroup, Department, Module, ScheduledNotification}
+import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.LazyLists
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, SmallGroupServiceComponent}
@@ -178,7 +178,7 @@ trait CopySmallGroupSetsScheduledNotifications
 		// get all the occurrences (even the ones in invalid weeks) so they can be cleared
 		sets.flatMap(_.groups.asScala.flatMap(_.events.flatMap(smallGroupService.getOrCreateSmallGroupEventOccurrences)))
 
-	override def scheduledNotifications(occurrence: SmallGroupEventOccurrence): Seq[ScheduledNotification[_]] = {
+	override def scheduledNotifications(occurrence: SmallGroupEventOccurrence): Seq[ScheduledNotification[_ >: Null <: ToEntityReference]] = {
 		generateNotifications(occurrence)
 	}
 }

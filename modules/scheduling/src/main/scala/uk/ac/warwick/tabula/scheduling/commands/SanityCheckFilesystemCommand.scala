@@ -1,16 +1,16 @@
 package uk.ac.warwick.tabula.scheduling.commands
 
 import java.io.{File, FileInputStream, FileReader, FileWriter, IOException}
+
 import org.joda.time.DateTime
 import org.springframework.util.FileCopyUtils
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.data.{SHAFileHasherComponent, AutowiringFileDaoComponent, FileDao}
+import uk.ac.warwick.tabula.data.AutowiringFileDaoComponent
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.permissions._
-import uk.ac.warwick.util.files.hash.FileHasher
-import uk.ac.warwick.tabula.services.{AutowiringMaintenanceModeServiceComponent, MaintenanceModeService}
+import uk.ac.warwick.tabula.services.{AutowiringFileAttachmentServiceComponent, SHAFileHasherComponent}
 
 /**
  * Job to go through each FileAttachment in the database and alert if there
@@ -20,11 +20,11 @@ import uk.ac.warwick.tabula.services.{AutowiringMaintenanceModeServiceComponent,
  * are a standby.
  */
 class SanityCheckFilesystemCommand extends Command[Unit] with ReadOnly
-	with AutowiringMaintenanceModeServiceComponent
+	with AutowiringFileAttachmentServiceComponent
 	with AutowiringFileDaoComponent
 	with SHAFileHasherComponent {
-	import SyncReplicaFilesystemCommand._
 	import SanityCheckFilesystemCommand._
+	import SyncReplicaFilesystemCommand._
 
 	PermissionCheck(Permissions.ReplicaSyncing)
 
@@ -38,12 +38,12 @@ class SanityCheckFilesystemCommand extends Command[Unit] with ReadOnly
 
 		timed("Sanity check filesystem") { timer =>
 			// TAB-593 we convert allIds to a Seq here, otherwise the for-comprehension will yield a Set
-			val allIds = fileDao.getAllFileIds(lastSyncDate).toSeq
+			val allIds = fileAttachmentService.getAllFileIds(lastSyncDate).toSeq
 
-			val checks = for (id <- allIds) yield fileDao.getData(id) match {
-				case Some(file) => {
+			val checks = for (id <- allIds) yield fileAttachmentService.getData(id) match {
+				case Some(file) =>
 					// TAB-664 populate file hash if we haven't already
-					fileDao.getFileById(id) map { attachment =>
+					fileAttachmentService.getFileById(id) map { attachment =>
 						val currentHash = fileHasher.hash(new FileInputStream(file))
 
 						if (!attachment.hash.hasText && !maintenanceModeService.enabled) {
@@ -57,10 +57,10 @@ class SanityCheckFilesystemCommand extends Command[Unit] with ReadOnly
 							(0, 1)
 						} else (1, 0)
 					} getOrElse (1, 0)
-				}
+
 				case None =>
 					// Check whether the file has since been cleaned up
-					if (!fileDao.getFileById(id).isDefined) (0, 0)
+					if (fileAttachmentService.getFileById(id).isEmpty) (0, 0)
 					else {
 						logger.error("*** File didn't exist for: " + id)
 						(0, 1)

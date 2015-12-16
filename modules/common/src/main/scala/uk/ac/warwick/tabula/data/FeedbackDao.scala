@@ -1,5 +1,7 @@
 package uk.ac.warwick.tabula.data
 
+import org.hibernate.criterion.Restrictions._
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.model._
 import org.springframework.stereotype.Repository
 import uk.ac.warwick.userlookup.User
@@ -12,14 +14,17 @@ trait FeedbackDao {
 	def delete(feedback: Feedback)
 	def save(feedback: MarkerFeedback)
 	def delete(feedback: MarkerFeedback)
+	def save(mark: Mark)
 	def getExamFeedbackMap(exam: Exam, users: Seq[User]): Map[User, ExamFeedback]
+	def countPublishedFeedback(assignment: Assignment): Int
+	def countFullFeedback(assignment: Assignment): Int
 }
 
 abstract class AbstractFeedbackDao extends FeedbackDao with Daoisms {
-	self: ExtendedSessionComponent =>
+	self: SessionComponent =>
 
-	override def getAssignmentFeedback(id: String) = getById[AssignmentFeedback](id)
-	override def getMarkerFeedback(id: String) = getById[MarkerFeedback](id)
+	override def getAssignmentFeedback(id: String) = session.getById[AssignmentFeedback](id)
+	override def getMarkerFeedback(id: String) = session.getById[MarkerFeedback](id)
 
 	override def getAssignmentFeedbackByUniId(assignment: Assignment, uniId: String): Option[AssignmentFeedback] =
 		session.newCriteria[AssignmentFeedback]
@@ -50,6 +55,10 @@ abstract class AbstractFeedbackDao extends FeedbackDao with Daoisms {
 		session.delete(feedback)
 	}
 
+	override def save(mark: Mark) = {
+		session.saveOrUpdate(mark)
+	}
+
 	override def getExamFeedbackMap(exam: Exam, users: Seq[User]): Map[User, ExamFeedback] = {
 		safeInSeq(
 			() => {
@@ -63,7 +72,30 @@ abstract class AbstractFeedbackDao extends FeedbackDao with Daoisms {
 		}
 	}
 
+	override def countPublishedFeedback(assignment: Assignment): Int =
+		session.newCriteria[AssignmentFeedback]
+			.add(is("assignment", assignment))
+			.add(is("released", true))
+			.count.intValue()
 
+	override def countFullFeedback(assignment: Assignment): Int =
+		session.newCriteria[AssignmentFeedback]
+			.add(is("assignment", assignment))
+			.add(not(
+				conjunction()
+					.add(isNull("actualMark"))
+					.add(isNull("actualGrade"))
+					.add(isEmpty("attachments"))
+			))
+			.count.intValue()
+}
+
+trait FeedbackDaoComponent {
+	def feedbackDao: FeedbackDao
+}
+
+trait AutowiringFeedbackDaoComponent extends FeedbackDaoComponent {
+	override val feedbackDao = Wire[FeedbackDao]
 }
 
 @Repository

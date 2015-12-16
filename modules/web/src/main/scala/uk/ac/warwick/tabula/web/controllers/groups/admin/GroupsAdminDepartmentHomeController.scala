@@ -17,8 +17,8 @@ import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 import scala.collection.JavaConverters._
 
 abstract class AbstractGroupsAdminDepartmentHomeController extends GroupsController with AutowiringTermServiceComponent
-	with DepartmentScopedController with AcademicYearScopedController with AutowiringUserSettingsServiceComponent with AutowiringModuleAndDepartmentServiceComponent with AutowiringMaintenanceModeServiceComponent
-	with GroupsDepartmentsAndModulesWithPermission {
+	with DepartmentScopedController with AcademicYearScopedController with AutowiringUserSettingsServiceComponent with AutowiringModuleAndDepartmentServiceComponent with GroupsDepartmentsAndModulesWithPermission
+	with AutowiringMaintenanceModeServiceComponent {
 
 	type AdminSmallGroupsHomeCommand = Appliable[AdminSmallGroupsHomeInformation] with AdminSmallGroupsHomeCommandState
 

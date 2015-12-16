@@ -1,16 +1,17 @@
 package uk.ac.warwick.tabula.data
 
-import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.userlookup.User
-import uk.ac.warwick.tabula.data.model._
-import org.hibernate.criterion.{Order, Restrictions}
 import org.hibernate.criterion.Order._
 import org.hibernate.criterion.Restrictions._
-import uk.ac.warwick.tabula.AcademicYear
+import org.hibernate.criterion.{Order, Restrictions}
 import org.springframework.stereotype.Repository
 import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupSet
+import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.userlookup.User
+
 import scala.collection.JavaConverters._
 
 trait AssessmentMembershipDaoComponent {
@@ -61,9 +62,6 @@ trait AssessmentMembershipDao {
 	def emptyMembers(groupsToEmpty:Seq[String]): Int
 	def updateSeatNumbers(group: UpstreamAssessmentGroup, seatNumberMap: Map[String, Int]): Unit
 
-	def countPublishedFeedback(assignment: Assignment): Int
-	def countFullFeedback(assignment: Assignment): Int
-
 	/**
 	 * Get SITS enrolled assignments/small group sets *only* - doesn't include any assignments where someone
 	 * has modified the members group. Also doesn't take into account assignments where the
@@ -76,6 +74,8 @@ trait AssessmentMembershipDao {
 	def save(gb: GradeBoundary): Unit
 	def deleteGradeBoundaries(marksCode: String): Unit
 	def getGradeBoundaries(marksCode: String): Seq[GradeBoundary]
+
+	def flushAndEvict(groups: Seq[UpstreamAssessmentGroup]): Unit
 }
 
 @Repository
@@ -164,9 +164,9 @@ class AssessmentMembershipDaoImpl extends AssessmentMembershipDao with Daoisms w
 		find(group).getOrElse { session.save(group) }
 
 
-	def getAssessmentGroup(id:String) = getById[AssessmentGroup](id)
+	def getAssessmentGroup(id:String) = session.getById[AssessmentGroup](id)
 
-	def getUpstreamAssessmentGroup(id:String) = getById[UpstreamAssessmentGroup](id)
+	def getUpstreamAssessmentGroup(id:String) = session.getById[UpstreamAssessmentGroup](id)
 
 	def delete(group: AssessmentGroup) {
 		group.assignment.assessmentGroups.remove(group)
@@ -174,7 +174,7 @@ class AssessmentMembershipDaoImpl extends AssessmentMembershipDao with Daoisms w
 		session.flush()
 	}
 
-	def getAssessmentComponent(id: String) = getById[AssessmentComponent](id)
+	def getAssessmentComponent(id: String) = session.getById[AssessmentComponent](id)
 
 	def getAssessmentComponent(group: UpstreamAssessmentGroup) = {
 		session.newCriteria[AssessmentComponent]
@@ -218,29 +218,12 @@ class AssessmentMembershipDaoImpl extends AssessmentMembershipDao with Daoisms w
 	}
 
 	/** Just gets components of type Assignment for this SITS module code, not all components. */
-	def getAssessmentComponents(moduleCode: String) = {
+	def getAssessmentComponents(moduleCode: String) =
 		session.newCriteria[AssessmentComponent]
 			.add(is("moduleCode", moduleCode))
 			.add(is("inUse", true))
 			.addOrder(Order.asc("sequence"))
 			.seq
-	}
-
-	def countPublishedFeedback(assignment: Assignment): Int = {
-		session.createSQLQuery("""select count(*) from feedback where assignment_id = :assignmentId and released = 1""")
-			.setString("assignmentId", assignment.id)
-			.uniqueResult
-			.asInstanceOf[Number].intValue
-	}
-
-	def countFullFeedback(assignment: Assignment): Int = {  //join f.attachments a
-		session.createQuery("""select count(*) from Feedback f
-			where f.assignment = :assignment
-			and not (actualMark is null and actualGrade is null and f.attachments is empty)""")
-			.setEntity("assignment", assignment)
-			.uniqueResult
-			.asInstanceOf[Number].intValue
-	}
 
 	def getUpstreamAssessmentGroups(component: AssessmentComponent, academicYear: AcademicYear): Seq[UpstreamAssessmentGroup] = {
 		session.newCriteria[UpstreamAssessmentGroup]
@@ -259,22 +242,21 @@ class AssessmentMembershipDaoImpl extends AssessmentMembershipDao with Daoisms w
 			.seq
 			.map(_.id)
 
-	def emptyMembers(groupsToEmpty:Seq[String]) = {
+	def emptyMembers(groupsToEmpty: Seq[String]) = {
 		var count = 0
 		val partitionedIds = groupsToEmpty.grouped(Daoisms.MaxInClauseCount)
 		partitionedIds.map(batch => {
 			val numDeleted = transactional() {
-				session.createSQLQuery(s"""delete from usergroupstatic where group_id in (
-						select membersgroup_id from UpstreamAssessmentGroup where id in (:batch)
-					)""")
-					.setParameterList("batch", batch.asJava)
-					.executeUpdate
+				session.newSQLQuery(s"""delete from usergroupstatic where group_id in (
+					select membersgroup_id from UpstreamAssessmentGroup where id in (:batch)
+				)""")
+				.setParameterList("batch", batch)
+				.executeUpdate()
 			}
 			count += 1000
 			logger.info(s"Emptied $count groups")
 			numDeleted
 		}).sum
-
 	}
 
 	def updateSeatNumbers(group: UpstreamAssessmentGroup, seatNumberMap: Map[String, Int]): Unit = {
@@ -298,5 +280,10 @@ class AssessmentMembershipDaoImpl extends AssessmentMembershipDao with Daoisms w
 		session.newCriteria[GradeBoundary]
 			.add(is("marksCode", marksCode))
 			.seq
+	}
+
+	def flushAndEvict(groups: Seq[UpstreamAssessmentGroup]) = transactional() {
+		session.flush()
+		groups.foreach(session.evict)
 	}
 }

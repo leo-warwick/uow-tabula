@@ -10,15 +10,9 @@ import scala.collection.JavaConverters._
 
 class UserGroupTest extends PersistenceTestBase  with Mockito{
 
-	val mockSessionFactory = smartMock[SessionFactory]
-	val mockSession = smartMock[Session]
-	mockSessionFactory.getCurrentSession returns mockSession
-	mockSessionFactory.openSession() returns mockSession
-
-	@Test def membership() {
+	@Test def membership(): Unit = {
 		transactional { t =>
 			var group = UserGroup.ofUsercodes
-			group.sessionFactory = mockSessionFactory
 			// users that can't be changed (i.e. as imported from upstream)
 			group.staticUserIds = Seq( "exoman", "eggdog" )
 			// users added manually
@@ -29,7 +23,7 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 			session.flush()
 			session.clear()
 
-			group = session.get(classOf[UserGroup], group.id).asInstanceOf[UserGroup]
+			group = session.getById[UserGroup](group.id).get
 
 			group.staticUserIds.size should be (2)
 			group.staticUserIds should (contain ("exoman") and contain ("eggdog"))
@@ -54,11 +48,10 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 		}
 	}
 
-	@Test def withWebgroup() {
+	@Test def withWebgroup(): Unit = {
 		val userLookup = new MockUserLookup
 
 		val group = UserGroup.ofUsercodes
-		group.sessionFactory = mockSessionFactory
 		group.userLookup = userLookup
 
 		group.addUserId("cuscav")
@@ -75,9 +68,8 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 		group.members should be (Seq("sb_systemtest", "cuscav", "curef", "cusebr"))
 	}
 
-	@Test def copy() {
+	@Test def copy(): Unit = {
 		val group = UserGroup.ofUsercodes
-		group.sessionFactory = mockSessionFactory
 		group.addUserId("cuscav")
 		group.addUserId("curef")
 		group.excludeUserId("cusmab") // we don't like Steve
@@ -85,7 +77,6 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 		group.baseWebgroup = "in-elab"
 
 		val group2 = UserGroup.ofUsercodes
-		group2.sessionFactory = mockSessionFactory
 		group2.copyFrom(group)
 
 		group.eq(group2) should be {false}
@@ -98,14 +89,14 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 	}
 
 	@Test(expected=classOf[AssertionError])
-	def cannotCopyBetweenDifferentGroupTypes() {
+	def cannotCopyBetweenDifferentGroupTypes(): Unit = {
 		val group = UserGroup.ofUniversityIds
 		val group2 = UserGroup.ofUsercodes
 		group2.copyFrom(group)
 	}
 
 	@Test
-	def canGetUsersWhenHoldingUserIds() {
+	def canGetUsersWhenHoldingUserIds(): Unit = {
 		val test = new User("test")
 		val group = UserGroup.ofUsercodes
 		group.addUserId("test")
@@ -117,7 +108,7 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 	}
 
 	@Test
-	def canGetUsersWhenHoldingWarwickIds() {
+	def canGetUsersWhenHoldingWarwickIds(): Unit = {
 		val test = new User("test")
 		val group = UserGroup.ofUniversityIds
 		group.addUserId("test")
@@ -129,7 +120,7 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 	}
 
 	@Test
-	def canGetExcludedUsersWhenHoldingUserIds() {
+	def canGetExcludedUsersWhenHoldingUserIds(): Unit = {
 		val test = new User("test")
 		val group = UserGroup.ofUsercodes
 		group.excludeUserId("test")
@@ -141,7 +132,7 @@ class UserGroupTest extends PersistenceTestBase  with Mockito{
 	}
 
 	@Test
-	def canGetExcludedUsersWhenHoldingWarwickIds() {
+	def canGetExcludedUsersWhenHoldingWarwickIds(): Unit = {
 		val test = new User("test")
 		val group = UserGroup.ofUniversityIds
 		group.excludeUserId("test")

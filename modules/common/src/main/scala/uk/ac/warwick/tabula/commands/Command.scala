@@ -47,13 +47,13 @@ trait KnowsEventName {
  * Takes an A (usually the result of a Command) and generates notifications for Bs. Often, A == B.
  */
 trait Notifies[A, B] {
-	def emit(result: A): Seq[Notification[_, _]]
+	def emit(result: A): Seq[Notification[_ >: Null <: ToEntityReference, _]]
 }
 
 
 trait SchedulesNotifications[A, B] {
 	def transformResult(commandResult: A): Seq[B]
-	def scheduledNotifications(notificationTarget: B): Seq[ScheduledNotification[_]]
+	def scheduledNotifications(notificationTarget: B): Seq[ScheduledNotification[_ >: Null <: ToEntityReference]]
 }
 
 trait CompletesNotifications[A] {
@@ -70,9 +70,8 @@ trait GeneratesTriggers[A] {
 	def generateTriggers(commandResult: A): Seq[Trigger[_ >: Null <: ToEntityReference, _]]
 }
 
-
 trait Appliable[A]{
-  def apply():A
+  def apply(): A
 }
 
 /**
@@ -113,7 +112,7 @@ trait Command[A] extends Describable[A] with Appliable[A]
 						}
 					}
 				} else if (maintenanceModeService.enabled) {
-					throw maintenanceModeService.exception(this)
+					throw maintenanceModeService.exception(Some(this))
 				} else {
 					throw new CannotPerformWriteOperationException(this)
 				}
@@ -153,9 +152,9 @@ trait Command[A] extends Describable[A] with Appliable[A]
 	}
 
 	private def isReadOnlyMasquerade =
-		RequestInfo.fromThread.filter { info =>
+		RequestInfo.fromThread.exists { info =>
 			info.user.masquerading && !info.user.sysadmin && !features.masqueradersCanWrite
-		}.isDefined
+		}
 
 	private def readOnlyCheck(callee: Describable[_]) = {
 		callee.isInstanceOf[ReadOnly] || (!maintenanceModeService.enabled && !isReadOnlyMasquerade)

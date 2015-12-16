@@ -13,8 +13,9 @@ import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.commands.CurrentSITSAcademicYear
 import uk.ac.warwick.tabula.data.model.forms.Extension
 import uk.ac.warwick.tabula.data.model.forms.ExtensionState.Unreviewed
-import uk.ac.warwick.tabula.data.model.{UpstreamAssessmentGroup, Notification, UnspecifiedTypeUserGroup, UserGroup}
+import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.events.EventListener
+import uk.ac.warwick.tabula.notifications
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.permissions.PermissionsService
 import uk.ac.warwick.userlookup.{AnonymousUser, User}
@@ -54,9 +55,9 @@ class ModifyAssignmentCommandTest extends TestBase with Mockito with FunctionalC
 	}
 
 	class MockNotificationService extends NotificationService {
-		var notifications: ListBuffer[Notification[_,_]] = new ListBuffer[Notification[_,_]]()
+		var notifications: ListBuffer[Notification[_ >: Null <: ToEntityReference, _]] = new ListBuffer[Notification[_ >: Null <: ToEntityReference, _]]()
 
-		override def push(n: Notification[_,_]) {
+		override def push(n: Notification[_ >: Null <: ToEntityReference, _]) {
 			notifications += n
 		}
 	}

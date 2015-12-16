@@ -1,43 +1,20 @@
 package uk.ac.warwick.tabula.scheduling.commands.imports
 
-import uk.ac.warwick.tabula.data.Daoisms
-import uk.ac.warwick.tabula.commands.Command
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.data.model.Member
-import uk.ac.warwick.tabula.data.model.AlumniProperties
-import uk.ac.warwick.tabula.data.model.StudentProperties
-import uk.ac.warwick.tabula.data.model.MemberProperties
-import uk.ac.warwick.tabula.data.model.StaffProperties
-import uk.ac.warwick.tabula.commands.Description
-import uk.ac.warwick.tabula.services.ModuleAndDepartmentService
 import java.sql.ResultSet
-import uk.ac.warwick.tabula.data.FileDao
-import uk.ac.warwick.tabula.data.model.Gender
-import uk.ac.warwick.tabula.data.model.MemberUserType
-import java.sql.Blob
-import org.joda.time.LocalDate
-import uk.ac.warwick.tabula.AcademicYear
-import uk.ac.warwick.tabula.data.model.FileAttachment
-import uk.ac.warwick.tabula.data.Transactions._
-import java.sql.Date
-import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.MemberDao
-import org.springframework.beans.BeanWrapperImpl
-import org.springframework.beans.BeanWrapper
+
 import org.joda.time.DateTime
-import uk.ac.warwick.tabula.helpers.Closeables._
-import java.io.InputStream
-import org.apache.commons.codec.digest.DigestUtils
-import uk.ac.warwick.tabula.data.model.Department
-import uk.ac.warwick.tabula.scheduling.services.MembershipInformation
-import uk.ac.warwick.tabula.commands.Unaudited
-import uk.ac.warwick.userlookup.User
-import uk.ac.warwick.tabula.data.model.OtherMember
+import org.springframework.beans.{BeanWrapper, BeanWrapperImpl}
+import uk.ac.warwick.tabula.commands.{Description, Unaudited}
+import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.data.model.{AlumniProperties, Member, OtherMember}
+import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.permissions.Permission
+import uk.ac.warwick.tabula.scheduling.services.MembershipInformation
+import uk.ac.warwick.userlookup.User
 
 class ImportAlumniCommand(member: MembershipInformation, ssoUser: User, rs: ResultSet)
 	extends ImportMemberCommand(member, ssoUser, Some(rs))
-	with Logging with Daoisms with AlumniProperties with Unaudited {
+	with Logging with AlumniProperties with Unaudited {
 
 	// any initialisation code specific to alumni (e.g. setting alumni properties) can go here
 

@@ -1,31 +1,19 @@
 package uk.ac.warwick.tabula.scheduling.commands.imports
 
 import java.sql.ResultSet
-import java.sql.ResultSetMetaData
-import scala.language.implicitConversions
+
 import org.apache.commons.lang3.text.WordUtils
-import org.joda.time.LocalDate
-import uk.ac.warwick.tabula.commands.Description
-import uk.ac.warwick.tabula.commands.Unaudited
-import uk.ac.warwick.tabula.data.Daoisms
-import uk.ac.warwick.tabula.data.FileDao
-import uk.ac.warwick.tabula.data.MemberDao
-import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.data.model.AlumniProperties
-import uk.ac.warwick.tabula.data.model.Gender
-import uk.ac.warwick.tabula.data.model.MemberProperties
-import uk.ac.warwick.tabula.data.model.MemberUserType
-import uk.ac.warwick.tabula.data.model.StaffProperties
-import uk.ac.warwick.tabula.data.model.StudentProperties
-import uk.ac.warwick.tabula.helpers.Closeables._
+import uk.ac.warwick.tabula.commands.{Description, Unaudited}
+import uk.ac.warwick.tabula.data.model.{Gender, MemberProperties}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.scheduling.helpers.PropertyCopying
 import uk.ac.warwick.tabula.scheduling.services.MembershipInformation
-import uk.ac.warwick.tabula.services.ModuleAndDepartmentService
 import uk.ac.warwick.userlookup.User
 
+import scala.language.implicitConversions
+
 abstract class ImportMemberFromMembershipCommand
-	extends ImportMemberCommand with Logging with Daoisms
+	extends ImportMemberCommand with Logging
 	with MemberProperties with Unaudited with PropertyCopying {
 
 	import ImportMemberHelpers._

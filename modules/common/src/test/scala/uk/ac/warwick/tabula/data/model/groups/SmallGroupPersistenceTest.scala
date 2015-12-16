@@ -38,8 +38,8 @@ class SmallGroupPersistenceTest extends PersistenceTestBase with FieldAccessByRe
 			session.flush()
 			session.clear()
 
-			session.load(classOf[SmallGroupSet], id) match {
-				case loadedSet:SmallGroupSet => (loadedSet.getV("settings") == null) should be(false)
+			session.getById[SmallGroupSet](id) match {
+				case Some(loadedSet: SmallGroupSet) => (loadedSet.getV("settings") == null) should be(false)
 				case _ => fail("Set not found")
 			}
 

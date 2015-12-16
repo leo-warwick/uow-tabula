@@ -43,18 +43,18 @@ class MeetingRecordTest extends PersistenceTestBase {
 
 		// Can fetch everything from db
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[MeetingRecord], meetingRecord.id) should be (meetingRecord)
-			session.get(classOf[FileAttachment], meetingRecordkAttachment.id) should be (meetingRecordkAttachment)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[MeetingRecord](meetingRecord.id) should be (Some(meetingRecord))
+			session.getById[FileAttachment](meetingRecordkAttachment.id) should be (Some(meetingRecordkAttachment))
 		}
 
 		flushing(session) { session.delete(meetingRecord) }
 
 		// Ensure we can't fetch the feedback or attachment, but all the other objects are returned
 		flushing(session) {
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[MeetingRecord], meetingRecord.id) should be (null)
-			session.get(classOf[FileAttachment], meetingRecordkAttachment.id) should be (null)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[MeetingRecord](meetingRecord.id) should be ('empty)
+			session.getById[FileAttachment](meetingRecordkAttachment.id) should be ('empty)
 		}
 	}
 

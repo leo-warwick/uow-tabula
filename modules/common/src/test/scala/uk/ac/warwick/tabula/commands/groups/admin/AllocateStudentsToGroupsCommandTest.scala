@@ -239,7 +239,7 @@ class AllocateStudentsToGroupsCommandTest extends TestBase with Mockito {
 		attachment.name = "file.xlsx"
 
 		val file = new UploadedFile
-		file.maintenanceMode = smartMock[MaintenanceModeService]
+		file.maintenanceModeService = smartMock[MaintenanceModeService]
 		file.attached.add(attachment)
 		command.file = file
 

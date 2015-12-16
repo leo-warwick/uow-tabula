@@ -24,8 +24,8 @@ class GrantedPermissionPersistenceTest extends PersistenceTestBase with Reflecti
 			session.flush()
 			session.clear()
 
-			session.load(classOf[GrantedPermission[_]], permission.id) match {
-				case permission: GrantedPermission[Department @unchecked] =>
+			session.getById[GrantedPermission[_]](permission.id) match {
+				case Some(permission: GrantedPermission[Department @unchecked]) =>
 					permission.scope.code should be ("IN")
 				case _ => fail("What is this!")
 			}

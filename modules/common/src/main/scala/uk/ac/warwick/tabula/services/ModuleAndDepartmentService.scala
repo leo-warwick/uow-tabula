@@ -13,20 +13,20 @@ import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.permissions.Permission
 import uk.ac.warwick.tabula.roles.DepartmentalAdministratorRoleDefinition
 import uk.ac.warwick.tabula.roles.ModuleManagerRoleDefinition
-import uk.ac.warwick.tabula.services.permissions.PermissionsService
+import uk.ac.warwick.tabula.services.permissions.AutowiringPermissionsServiceComponent
 import uk.ac.warwick.spring.Wire
 
 /**
  * Handles data about modules and departments
  */
 @Service
-class ModuleAndDepartmentService extends Logging {
+class ModuleAndDepartmentService extends Logging
+	with AutowiringUserLookupComponent
+	with AutowiringSecurityServiceComponent
+	with AutowiringPermissionsServiceComponent {
 
 	@Autowired var moduleDao: ModuleDao = _
 	@Autowired var departmentDao: DepartmentDao = _
-	@Autowired var userLookup: UserLookupService = _
-	@Autowired var securityService: SecurityService = _
-	@Autowired var permissionsService: PermissionsService = _
 	def groupService = userLookup.getGroupService
 
 	def allDepartments = transactional(readOnly = true) {

@@ -5,7 +5,6 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.joda.time.format.DateTimeFormat
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.profiles.PhotosWarwickMemberPhotoUrlGeneratorComponent
-import uk.ac.warwick.tabula.data.{AutowiringFileDaoComponent, FileDaoComponent}
 import uk.ac.warwick.tabula.data.model.attendance.{AttendanceMonitoringPoint, AttendanceMonitoringPointType, MonitoringPoint, MonitoringPointType}
 import uk.ac.warwick.tabula.data.model.groups.DayOfWeek
 import uk.ac.warwick.tabula.data.model.{AttendanceNote, FileAttachment, StudentMember}
@@ -37,7 +36,7 @@ object ProfileExportSingleCommand {
 			with AutowiringRelationshipServiceComponent
 			with AutowiringMeetingRecordServiceComponent
 			with AutowiringSmallGroupServiceComponent
-			with AutowiringFileDaoComponent
+			with AutowiringFileAttachmentServiceComponent
 			with ComposableCommand[Seq[FileAttachment]]
 			with ProfileExportSingleDescription
 			with ProfileExportSinglePermissions
@@ -53,7 +52,7 @@ class ProfileExportSingleCommandInternal(val student: StudentMember, val academi
 		with RelationshipServiceComponent with MeetingRecordServiceComponent
 		with SmallGroupServiceComponent
 		with TermServiceComponent with UserLookupComponent
-		with FileDaoComponent =>
+		with FileAttachmentServiceComponent =>
 
 	import uk.ac.warwick.tabula.helpers.DateTimeOrdering._
 
@@ -182,7 +181,7 @@ class ProfileExportSingleCommandInternal(val student: StudentMember, val academi
 		pdfFileAttachment.name = s"${student.universityId}-profile.pdf"
 		pdfFileAttachment.uploadedData = new ByteArrayInputStream(tempOutputStream.toByteArray)
 		pdfFileAttachment.uploadedDataLength = 0
-		fileDao.saveTemporary(pdfFileAttachment)
+		fileAttachmentService.saveTemporary(pdfFileAttachment)
 
 		// Return results
 		Seq(pdfFileAttachment) ++

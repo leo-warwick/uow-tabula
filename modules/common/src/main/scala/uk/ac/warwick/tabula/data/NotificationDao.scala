@@ -5,38 +5,40 @@ import org.hibernate.criterion.{Order, Restrictions}
 import org.joda.time.DateTime
 import org.springframework.stereotype.Repository
 import uk.ac.warwick.tabula.data.model.notifications.RecipientNotificationInfo
-import uk.ac.warwick.tabula.data.model.{ActionRequiredNotification, Notification, ToEntityReference}
+import uk.ac.warwick.tabula.data.model.{ToEntityReference, ActionRequiredNotification, Notification}
 
 import scala.reflect.ClassTag
 
 trait NotificationDao {
-	def save(notification: Notification[_,_])
+	def save(notification: Notification[_ >: Null <: ToEntityReference, _])
 	def save(recipientInfo: RecipientNotificationInfo)
 
-	def update(notification: Notification[_,_])
+	def update(notification: Notification[_ >: Null <: ToEntityReference, _])
 
 	def getById(id: String): Option[Notification[_  >: Null <: ToEntityReference, _]]
 	def findActionRequiredNotificationsByEntityAndType[A <: ActionRequiredNotification : ClassTag](entity: ToEntityReference): Seq[ActionRequiredNotification]
 
-	def recent(start: DateTime): Scrollable[Notification[_,_]]
+	def recent(start: DateTime): Scrollable[Notification[_ >: Null <: ToEntityReference, _]]
 	def unemailedRecipientCount: Number
 	def unemailedRecipients: Scrollable[RecipientNotificationInfo]
 	def recentRecipients(start: Int, count: Int): Seq[RecipientNotificationInfo]
+
+	def flush(): Unit
 }
 
 @Repository
 class NotificationDaoImpl extends NotificationDao with Daoisms {
 
-	private def idFunction(notification: Notification[_,_]) = notification.id
+	private def idFunction(notification: Notification[_ >: Null <: ToEntityReference, _]) = notification.id
 
 	/** A Scrollable of all notifications since this date, sorted date ascending.
 		*/
-	def recent(start: DateTime): Scrollable[Notification[_,_]] = {
-		val scrollable = session.newCriteria[Notification[_,_]]
+	def recent(start: DateTime): Scrollable[Notification[_ >: Null <: ToEntityReference, _]] = {
+		val scrollableResults = session.newCriteria[Notification[_ >: Null <: ToEntityReference, _]]
 			.add(Restrictions.ge("created", start))
 			.addOrder(Order.asc("created"))
 			.scroll()
-		Scrollable(scrollable, session)
+		session.scrollable(scrollableResults)
 	}
 
 	private def unemailedRecipientCriteria =
@@ -49,10 +51,10 @@ class NotificationDaoImpl extends NotificationDao with Daoisms {
 		unemailedRecipientCriteria.count
 
 	def unemailedRecipients: Scrollable[RecipientNotificationInfo] = {
-		val scrollable = unemailedRecipientCriteria
+		val scrollableResults = unemailedRecipientCriteria
 			.addOrder(Order.asc("notification.created"))
 			.scroll()
-		Scrollable(scrollable, session)
+		session.scrollable(scrollableResults)
 	}
 
 	def recentRecipients(start: Int, count: Int): Seq[RecipientNotificationInfo] =
@@ -66,7 +68,7 @@ class NotificationDaoImpl extends NotificationDao with Daoisms {
 			.setMaxResults(count)
 			.seq
 
-	def save(notification: Notification[_,_]) {
+	def save(notification: Notification[_ >: Null <: ToEntityReference, _]): Unit = {
 		/**
 		 * FIXME This should no longer be required but submitting assignments
 		 * doesn't work without it.
@@ -87,11 +89,11 @@ class NotificationDaoImpl extends NotificationDao with Daoisms {
 		session.saveOrUpdate(recipientInfo)
 	}
 
-	def update(notification: Notification[_,_]) {
+	def update(notification: Notification[_ >: Null <: ToEntityReference, _]) {
 		session.saveOrUpdate(notification)
 	}
 
-	def getById(id: String) = getById[Notification[_ >: Null <: ToEntityReference,_]](id)
+	def getById(id: String) = session.getById[Notification[_ >: Null <: ToEntityReference,_]](id)
 
 	def findActionRequiredNotificationsByEntityAndType[A <: ActionRequiredNotification : ClassTag](entity: ToEntityReference): Seq[ActionRequiredNotification] = {
 		val targetEntity = entity match {
@@ -103,4 +105,6 @@ class NotificationDaoImpl extends NotificationDao with Daoisms {
 			.add(is("items.entity", targetEntity))
 			.seq
 	}
+
+	def flush() = session.flush()
 }

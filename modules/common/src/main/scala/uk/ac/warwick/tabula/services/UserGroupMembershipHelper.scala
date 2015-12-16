@@ -1,20 +1,18 @@
 package uk.ac.warwick.tabula.services
 
+import org.hibernate.SessionFactory
+
 import scala.reflect._
-import scala.collection.JavaConverters._
 import scala.beans.BeanProperty
-import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.data.{HelperRestrictions, SessionComponent, Daoisms}
+import uk.ac.warwick.tabula.data._
 import uk.ac.warwick.userlookup.User
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.util.cache.{Cache, Caches, SingularCacheEntryFactory}
-import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.data.model.{StringId, KnownTypeUserGroup, UnspecifiedTypeUserGroup}
 import uk.ac.warwick.util.queue.{Queue, QueueListener}
 import org.springframework.beans.factory.InitializingBean
 import uk.ac.warwick.util.queue.conversion.ItemType
 import com.fasterxml.jackson.annotation.JsonAutoDetect
-import org.hibernate.criterion.Projections
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.ScalaFactoryBean
 import org.joda.time.Days
@@ -49,14 +47,14 @@ trait UserGroupMembershipHelperMethods[A <: StringId with Serializable] {
  */
 private[services] class UserGroupMembershipHelper[A <: StringId with Serializable : ClassTag] (val path: String, val checkUniversityIds: Boolean = true)
 	extends UserGroupMembershipHelperMethods[A]
-	with UserGroupMembershipHelperLookup
-	with Daoisms
-	with AutowiringUserLookupComponent
-	with Logging {
+		with AutowiringUserLookupComponent
+		with AutowiringUserGroupDaoComponent
+		with Logging with HelperRestrictions {
 
+	var sessionFactory = Wire[SessionFactory]
 	val runtimeClass = classTag[A].runtimeClass
 
-	lazy val cacheName = simpleEntityName + "-" + path.replace(".","-")
+	lazy val cacheName = runtimeClass.getSimpleName + "-" + path.replace(".","-")
 	lazy val cache: Option[Cache[String, Array[String]]] = Wire.optionNamed[Cache[String, Array[String]]](cacheName)
 
 	def findBy(user: User): Seq[A] = {
@@ -65,107 +63,23 @@ private[services] class UserGroupMembershipHelper[A <: StringId with Serializabl
 				c.get(user.getUserId).toSeq
 			case None =>
 				logger.warn(s"Couldn't find a cache bean named $cacheName")
-				findByInternal(user)
+				userGroupDao.getUserGroupIds(user, runtimeClass, path, checkUniversityIds)
 		}
 
 		if (ids.isEmpty) Nil
-		else session.newCriteria[A].add(safeIn("id", ids)).seq
+		else {
+			val session = MaintenanceModeAwareSession(sessionFactory.getCurrentSession)
+			safeInSeq({ () => session.newCriteria[A] }, "id", ids)
+		}
 	}
 }
 
-trait UserGroupMembershipHelperLookup {
-	self: SessionComponent with HelperRestrictions with UserLookupComponent =>
-
-	def runtimeClass: Class[_]
-	def path: String
-	def checkUniversityIds: Boolean
-
-	lazy val simpleEntityName = runtimeClass.getSimpleName
-
-	// A series of confusing variables for building joined queries across paths split by.dots
-	private lazy val pathParts = {
-		val parts = path.split("\\.").toList.reverse
-
-		if (parts.size > 2) throw new IllegalArgumentException("Only allowed one or two parts to the path")
-
-		parts
-	}
-
-	// The actual name of the UserGroup
-	lazy val usergroupName = pathParts.head
-	// A possible table to join through to get to userProp
-	lazy val joinTable: Option[String] = pathParts.tail.headOption
-	// The overall property name, possibly including the joinTable
-	lazy val prop: String = joinTable.fold("")(_ + ".") + usergroupName
-
-	lazy val groupsByUserSql = {
-		val leftJoin = joinTable.fold("")( table => s"left join r.$table as $table" )
-
-		// skip the university IDs check if we know we only ever use usercodes
-		val universityIdsClause =
-			if (checkUniversityIds) s""" or (
-					$prop.universityIds = true and
-					((:universityId in (select memberId from usergroupstatic where userGroup = r.$prop)
-					or :universityId in elements($prop.includeUsers))
-					and :universityId not in elements($prop.excludeUsers))
-				)"""
-			else ""
-
-		s"""
-			select r.id
-			from $simpleEntityName r
-			$leftJoin
-			where
-				(
-					$prop.universityIds = false and
-					((:userId in (select memberId from usergroupstatic where userGroup = r.$prop)
-					or :userId in elements($prop.includeUsers))
-					and :userId not in elements($prop.excludeUsers))
-				) $universityIdsClause
-		"""
-	}
-
-	// To override in tests
-	protected def getUser(usercode: String) = userLookup.getUserByUserId(usercode)
-	protected def getWebgroups(usercode: String): Seq[String] = usercode.maybeText.map {
-		usercode => userLookup.getGroupService.getGroupsNamesForUser(usercode).asScala
-	}.getOrElse(Nil)
-
-	protected def findByInternal(user: User): Seq[String] = {
-		val groupsByUser = session.createQuery(groupsByUserSql)
-			.setString("universityId", user.getWarwickId)
-			.setString("userId", user.getUserId)
-			.list.asInstanceOf[JList[String]]
-			.asScala
-
-		val webgroupNames: Seq[String] = getWebgroups(user.getUserId)
-		val groupsByWebgroup =
-			if (webgroupNames.isEmpty) Nil
-			else {
-				val criteria = session.createCriteria(runtimeClass)
-
-				joinTable.foreach { table =>
-					criteria.createAlias(table, table)
-				}
-
-				criteria
-					.createAlias(prop, "usergroupAlias")
-					.add(safeIn("usergroupAlias.baseWebgroup", webgroupNames))
-					.setProjection(Projections.id())
-					.list.asInstanceOf[JList[String]]
-					.asScala
-			}
-
-		(groupsByUser ++ groupsByWebgroup).distinct
-	}
-}
-
-class UserGroupMembershipCacheFactory(val runtimeClass: Class[_], val path: String, val checkUniversityIds: Boolean = true)
-	extends SingularCacheEntryFactory[String, Array[String]] with UserGroupMembershipHelperLookup with Daoisms with AutowiringUserLookupComponent {
+class UserGroupMembershipCacheFactory(val runtimeClass: Class[_ <: StringId with Serializable], val path: String, val checkUniversityIds: Boolean = true)
+	extends SingularCacheEntryFactory[String, Array[String]] with AutowiringUserLookupComponent with AutowiringUserGroupDaoComponent {
 
 	def create(usercode: String) = {
-		val user = getUser(usercode)
-		findByInternal(user).toArray
+		val user = userLookup.getUserByUserId(usercode)
+		userGroupDao.getUserGroupIds(user, runtimeClass, path, checkUniversityIds).toArray
 	}
 
 	def shouldBeCached(value: Array[String]) = true

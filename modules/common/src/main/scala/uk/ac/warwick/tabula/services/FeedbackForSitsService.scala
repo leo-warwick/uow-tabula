@@ -16,6 +16,7 @@ case class ValidateAndPopulateFeedbackResult(
 
 trait FeedbackForSitsService {
 	def saveOrUpdate(feedbackForSits: FeedbackForSits)
+	def delete(feedbackForSits: FeedbackForSits)
 	def feedbackToLoad: Seq[FeedbackForSits]
 	def getByFeedback(feedback: Feedback): Option[FeedbackForSits]
 	def getByFeedbacks(feedbacks: Seq[Feedback]): Map[Feedback, FeedbackForSits]
@@ -37,6 +38,9 @@ abstract class AbstractFeedbackForSitsService extends FeedbackForSitsService {
 
 	def saveOrUpdate(feedbackForSits: FeedbackForSits) =
 		feedbackForSitsDao.saveOrUpdate(feedbackForSits)
+
+	def delete(feedbackForSits: FeedbackForSits) =
+		feedbackForSitsDao.delete(feedbackForSits)
 
 	def feedbackToLoad: Seq[FeedbackForSits] =
 		feedbackForSitsDao.feedbackToLoad

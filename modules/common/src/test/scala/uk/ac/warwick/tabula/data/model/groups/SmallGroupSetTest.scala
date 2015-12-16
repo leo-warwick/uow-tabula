@@ -36,8 +36,6 @@ class SmallGroupSetTest extends TestBase with Mockito {
     source.groups  = JArrayList(group)
     source.members = UserGroup.ofUniversityIds.tap(_.addUserId("test user"))
     source.defaultTutors = UserGroup.ofUniversityIds.tap(_.addUserId("test tutor"))
-		source.members.asInstanceOf[UserGroup].sessionFactory = sessionFactory
-		source.defaultTutors.asInstanceOf[UserGroup].sessionFactory = sessionFactory
 
     source.membershipService = mock[AssessmentMembershipService]
     source.module = new Module
@@ -76,7 +74,6 @@ class SmallGroupSetTest extends TestBase with Mockito {
 	def duplicateWithNullDefaultTutors(){
 		val source = new SmallGroupSet
 		source.defaultTutors = null
-		source.members.asInstanceOf[UserGroup].sessionFactory = sessionFactory
 		val clone = source.duplicateTo(module = source.module, transient = true)
 		clone.defaultTutors.size should be (0)
 	}
@@ -85,8 +82,6 @@ class SmallGroupSetTest extends TestBase with Mockito {
 	def duplicateCreatesNewSettingsMap(){
 		val source = new SmallGroupSet
 		source.studentsCanSeeOtherMembers = true
-		source.members.asInstanceOf[UserGroup].sessionFactory = sessionFactory
-		source.defaultTutors.asInstanceOf[UserGroup].sessionFactory = sessionFactory
 		val clone = source.duplicateTo(transient = true)
 		clone.studentsCanSeeOtherMembers should be {true}
 		source.studentsCanSeeOtherMembers = false

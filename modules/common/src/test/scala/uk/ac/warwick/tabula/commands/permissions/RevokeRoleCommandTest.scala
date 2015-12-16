@@ -46,7 +46,7 @@ class RevokeRoleCommandTest extends TestBase with Mockito {
 		// Doesn't blow up, just a no-op
 		command.applyInternal() should be (null)
 
-		verify(command.permissionsService, times(0)).saveOrUpdate(any[GrantedRole[_]])
+		verify(command.permissionsService, times(0)).saveOrUpdate(any[GrantedRole[_ <: PermissionsTarget]])
 	}}
 
 	@Test def itWorksWithExisting { new Fixture {

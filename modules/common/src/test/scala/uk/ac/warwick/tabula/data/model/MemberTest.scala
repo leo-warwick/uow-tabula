@@ -241,14 +241,14 @@ class MemberPersistenceTest extends PersistenceTestBase with Mockito {
 
 	@Test def deleteFileAttachmentOnDelete() = transactional { tx =>
 		// TAB-667
-		val orphanAttachment =flushing(session){
+		val orphanAttachment = flushing(session){
 			val attachment = new FileAttachment
 
 			session.save(attachment)
 			attachment
 		}
 
-		val member = flushing(session){
+		val member = flushing(session) {
 			val member = new StudentMember
 			member.universityId = "01234567"
 			member.userId = "steve"
@@ -263,17 +263,17 @@ class MemberPersistenceTest extends PersistenceTestBase with Mockito {
 
 		// Can fetch everything from db
 		flushing(session){
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
 			// Can't do an exact equality check because of Hibernate polymorphism
-			session.get(classOf[Member], member.id).asInstanceOf[Member].universityId should be (member.universityId)
+			session.getById[Member](member.id).map { _.universityId } should be (Some(member.universityId))
 		}
 
 		flushing(session){session.delete(member) }
 
 		// Ensure we can't fetch the FeedbackTemplate or attachment, but all the other objects are returned
 		flushing(session){
-			session.get(classOf[FileAttachment], orphanAttachment.id) should be (orphanAttachment)
-			session.get(classOf[Member], member.id) should be {null}
+			session.getById[FileAttachment](orphanAttachment.id) should be (Some(orphanAttachment))
+			session.getById[Member](member.id) should be ('empty)
 		}
 	}
 

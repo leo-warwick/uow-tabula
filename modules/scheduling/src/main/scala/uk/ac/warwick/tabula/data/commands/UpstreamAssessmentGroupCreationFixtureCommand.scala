@@ -1,14 +1,15 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
+import org.joda.time.DateTime
+import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
-import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 import uk.ac.warwick.tabula.data.model.UpstreamAssessmentGroup
 import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
-import uk.ac.warwick.tabula.services.{AutowiringAssessmentMembershipServiceComponent, AssessmentMembershipServiceComponent}
-import uk.ac.warwick.tabula.AcademicYear
-import org.joda.time.DateTime
+import uk.ac.warwick.tabula.services.{AssessmentMembershipServiceComponent, AutowiringAssessmentMembershipServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
+
 import scala.collection.JavaConverters._
-import uk.ac.warwick.tabula.JavaImports._
 
 class UpstreamAssessmentGroupCreationFixtureCommandInternal extends CommandInternal[UpstreamAssessmentGroup] {
 	 self: AssessmentMembershipServiceComponent with TransactionalComponent =>
@@ -43,4 +44,3 @@ object UpstreamAssessmentGroupCreationFixtureCommand {
 			with Unaudited
 			with PubliclyVisiblePermissions
 }
-

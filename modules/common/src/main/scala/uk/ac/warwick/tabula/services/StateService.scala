@@ -2,7 +2,6 @@ package uk.ac.warwick.tabula.services
 
 import uk.ac.warwick.tabula.data.model.{MarkerFeedback, MarkingState}
 import org.springframework.stereotype.Service
-import uk.ac.warwick.tabula.data.{SessionComponent, Daoisms}
 import uk.ac.warwick.spring.Wire
 
 trait StateServiceComponent {
@@ -19,10 +18,11 @@ trait StateService {
 }
 
 @Service(value = "stateService")
-class StateServiceImpl extends ComposableStateServiceImpl with Daoisms
+class StateServiceImpl extends ComposableStateServiceImpl
+	with AutowiringFeedbackServiceComponent
 
 class ComposableStateServiceImpl extends StateService {
-	this:SessionComponent =>
+	self: FeedbackServiceComponent =>
 
 	def updateState(markerFeedback: MarkerFeedback, state: MarkingState) {
 		if (markerFeedback.state != null && !markerFeedback.state.canTransitionTo(state))
@@ -35,6 +35,6 @@ class ComposableStateServiceImpl extends StateService {
 
 	def updateStateUnsafe(markerFeedback: MarkerFeedback, state: MarkingState) {
 		markerFeedback.state = state
-		session.saveOrUpdate(markerFeedback)
+		feedbackService.save(markerFeedback)
 	}
 }

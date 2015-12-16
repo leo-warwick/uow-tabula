@@ -4,7 +4,7 @@ import org.springframework.validation.BindException
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.FileDao
 import uk.ac.warwick.tabula.data.model.{Assignment, FileAttachment}
-import uk.ac.warwick.tabula.services.{UserLookupService, ZipService}
+import uk.ac.warwick.tabula.services.{FileAttachmentService, UserLookupService, ZipService}
 import uk.ac.warwick.userlookup.{AnonymousUser, User}
 
 
@@ -33,8 +33,8 @@ class DownloadFeedbackCommandTest extends TestBase with Mockito {
 
 		val attachment = new FileAttachment
 		attachment.id = "123"
-		attachment.fileDao = smartMock[FileDao]
-		attachment.fileDao.getData(attachment.id) returns Option(createTemporaryFile())
+		attachment.fileAttachmentService = smartMock[FileAttachmentService]
+		attachment.fileAttachmentService.getData(attachment.id) returns Option(createTemporaryFile())
 		attachment.name = "0123456-feedback.doc"
 		feedback.attachments.add(attachment)
 	}

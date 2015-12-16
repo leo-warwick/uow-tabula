@@ -1,12 +1,12 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.data._
-import uk.ac.warwick.tabula.data.Transactions.transactional
-import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent}
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.model.{StaffMember, Gender, Member}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
+import uk.ac.warwick.tabula.data.Transactions.transactional
+import uk.ac.warwick.tabula.data._
+import uk.ac.warwick.tabula.data.model.{Gender, StaffMember}
+import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, UserLookupComponent}
 import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 
 class StaffMemberFixtureCommand extends CommandInternal[StaffMember] with Logging {
@@ -56,5 +56,3 @@ object StaffMemberFixtureCommand {
 			with PubliclyVisiblePermissions
 	}
 }
-
-

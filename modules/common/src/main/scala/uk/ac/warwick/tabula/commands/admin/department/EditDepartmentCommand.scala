@@ -11,8 +11,7 @@ import uk.ac.warwick.tabula.commands.Description
 import uk.ac.warwick.tabula.commands.Describable
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.services.ModuleAndDepartmentServiceComponent
-import uk.ac.warwick.tabula.services.AutowiringModuleAndDepartmentServiceComponent
+import uk.ac.warwick.tabula.services.{MaintenanceModeServiceComponent, ModuleAndDepartmentServiceComponent, AutowiringModuleAndDepartmentServiceComponent}
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.commands.SelfValidating
 import uk.ac.warwick.tabula.helpers.StringUtils._

@@ -3,31 +3,32 @@ package uk.ac.warwick.tabula.services
 import org.springframework.stereotype.Service
 import uk.ac.warwick.tabula.data.model.{CanBeDeleted, ToEntityReference, Notification, ScheduledNotification}
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.{Daoisms, ScheduledNotificationDao}
+import uk.ac.warwick.tabula.data.{MaintenanceModeAwareSession, ScheduledNotificationDao}
 import uk.ac.warwick.tabula.helpers.{Logging, ReflectionHelper}
 import uk.ac.warwick.userlookup.AnonymousUser
 import uk.ac.warwick.tabula.data.Transactions._
-import org.hibernate.ObjectNotFoundException
+import org.hibernate.{SessionFactory, ObjectNotFoundException}
 
 trait ScheduledNotificationService {
 	def removeInvalidNotifications(target: Any)
-	def push(sn: ScheduledNotification[_])
+	def push(sn: ScheduledNotification[_ >: Null <: ToEntityReference])
 	def generateNotification(sn: ScheduledNotification[_ >: Null <: ToEntityReference]) : Option[Notification[_,_]]
 	def processNotifications()
 }
 
 @Service
-class ScheduledNotificationServiceImpl extends ScheduledNotificationService with Logging with Daoisms {
+class ScheduledNotificationServiceImpl extends ScheduledNotificationService with Logging
+	with AutowiringNotificationServiceComponent {
 
 	val RunBatchSize = 10
 
-	var dao = Wire.auto[ScheduledNotificationDao]
-	var notificationService = Wire.auto[NotificationService]
+	var dao = Wire[ScheduledNotificationDao]
+	var sessionFactory = Wire[SessionFactory]
 
 	// a map of DiscriminatorValue -> Notification
 	lazy val notificationMap = ReflectionHelper.allNotifications
 
-	override def push(sn: ScheduledNotification[_]) = dao.save(sn)
+	override def push(sn: ScheduledNotification[_ >: Null <: ToEntityReference]) = dao.save(sn)
 
 	override def removeInvalidNotifications(target: Any) = {
 		val existingNotifications = dao.getScheduledNotifications(target)
@@ -51,6 +52,11 @@ class ScheduledNotificationServiceImpl extends ScheduledNotificationService with
 		}
 	}
 
+	private def inSession(fn: MaintenanceModeAwareSession => Unit) {
+		val sess = MaintenanceModeAwareSession(sessionFactory.openSession())
+		try fn(sess) finally sess.close()
+	}
+
 	/**
 	 * This is called peridoically to convert uncompleted ScheduledNotifications into real instances of notification.
 	 */
@@ -62,7 +68,7 @@ class ScheduledNotificationServiceImpl extends ScheduledNotificationService with
 		ids.foreach { id =>
 			inSession { session =>
 				transactional(readOnly = true) { // Some things that use notification require a read-only session to be bound to the thread
-					Option(session.get(classOf[ScheduledNotification[_]], id)).foreach {
+					session.getById[ScheduledNotification[_]](id).foreach {
 						rawSn =>
 							val sn = rawSn.asInstanceOf[ScheduledNotification[_ >: Null <: ToEntityReference]]
 

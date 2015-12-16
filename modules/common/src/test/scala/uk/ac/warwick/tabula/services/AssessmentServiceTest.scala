@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.forms.{CommentField, FormFieldContext, WordCountField, Extension}
-import uk.ac.warwick.tabula.data.{AssessmentDaoComponent, AssessmentDaoImpl, ExtensionDaoComponent, ExtensionDaoImpl, AssessmentMembershipDaoImpl, DepartmentDaoImpl}
+import uk.ac.warwick.tabula.data._
 import uk.ac.warwick.userlookup.User
 import uk.ac.warwick.tabula.data.model.PlagiarismInvestigation.SuspectPlagiarised
 
@@ -27,23 +27,26 @@ class AssessmentServiceTest extends PersistenceTestBase with Mockito {
 		val markingWorkflowService = thisMarkingWorkflowService
 	}
 	val assignmentMembershipService = new AssessmentMembershipServiceImpl
-	val feedbackService = new FeedbackServiceImpl
-	val submissionService = new SubmissionServiceImpl
+	val feedbackService = new AbstractFeedbackService with FeedbackDaoComponent with UserLookupComponent {
+		val userLookup = new MockUserLookup()
+		val feedbackDao = new FeedbackDaoImpl
+	}
+	val submissionService = new SubmissionServiceImpl with SubmissionDaoComponent {
+		val submissionDao = new SubmissionDaoImpl
+	}
 	val originalityReportService = new OriginalityReportServiceImpl
   val modAndDeptService = new ModuleAndDepartmentService
   var userLookup:MockUserLookup = _
 	var extensionService: ExtensionService = _
 
   @Before def setup() {
-		userLookup = new MockUserLookup()
-		userLookup.defaultFoundUser = true
+		feedbackService.userLookup.defaultFoundUser = true
 		thisAssignmentDao.sessionFactory = sessionFactory
-		submissionService.sessionFactory = sessionFactory
+		submissionService.submissionDao.sessionFactory = sessionFactory
 		val deptDao = new DepartmentDaoImpl
 		deptDao.sessionFactory = sessionFactory
 		modAndDeptService.departmentDao = deptDao
-		feedbackService.userLookup = userLookup
-		feedbackService.sessionFactory = sessionFactory
+		feedbackService.feedbackDao.sessionFactory = sessionFactory
 		val amDao = new AssessmentMembershipDaoImpl
 		amDao.sessionFactory = sessionFactory
 		assignmentMembershipService.dao = amDao
@@ -53,8 +56,9 @@ class AssessmentServiceTest extends PersistenceTestBase with Mockito {
 		assignmentMembershipService.userLookup = userLookup
 		val extDao = new ExtensionDaoImpl
 		extDao.sessionFactory = sessionFactory
-		extensionService = new AbstractExtensionService with ExtensionDaoComponent {
+		extensionService = new AbstractExtensionService with ExtensionDaoComponent with FileAttachmentServiceComponent {
 			val extensionDao = extDao
+			val fileAttachmentService = new FileAttachmentServiceImpl
 		}
 	}
 
@@ -85,7 +89,7 @@ class AssessmentServiceTest extends PersistenceTestBase with Mockito {
 
 		assignment.fields.get(1)
 
-		assignmentService.assessmentDao.isFilterEnabled("notDeleted") should be (false)
+		session.isFilterEnabled("notDeleted") should be (false)
 		assignmentService.getAssignmentById(assignment.id) should be (Some(assignment))
 		session.enableFilter("notDeleted")
 		assignmentService.getAssignmentById(assignment.id) should be (None)
@@ -362,7 +366,6 @@ class AssessmentServiceTest extends PersistenceTestBase with Mockito {
 		group.sequence = "A01"
 		group.academicYear = new AcademicYear(2010)
 
-		group.members.sessionFactory = sessionFactory
 		group.members.staticUserIds = Seq("rob","kev","bib")
 
 		assignmentMembershipService.save(group)
@@ -507,7 +510,6 @@ class AssessmentServiceTest extends PersistenceTestBase with Mockito {
 		upstreamGroup.occurrence = "A"
 		upstreamGroup.assessmentGroup = "A"
 		upstreamGroup.academicYear = new AcademicYear(2010)
-		upstreamGroup.members.sessionFactory = sessionFactory
 		upstreamGroup.members.staticUserIds = Seq("rob","kev","bib")
 
 		assignmentMembershipService.save(upstreamGroup)
@@ -702,13 +704,10 @@ class AssessmentServiceTest extends PersistenceTestBase with Mockito {
     upstreamAg3.occurrence = "C"
 		upstreamAg3.sequence = "A03"
 
-		upstreamAg1.members.sessionFactory = sessionFactory
     upstreamAg1.members.staticUserIds = Seq("0000001", "0000002")
 
-		upstreamAg2.members.sessionFactory = sessionFactory
 		upstreamAg2.members.staticUserIds = Seq("0000002", "0000003")
 
-		upstreamAg3.members.sessionFactory = sessionFactory
 		upstreamAg3.members.staticUserIds = Seq("0000001", "0000002", "0000003", "0000004", "0000005")
 
 		assignmentMembershipService.save(upstreamAg1)

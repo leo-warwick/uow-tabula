@@ -10,7 +10,7 @@ import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.helpers.{FoundUser, LazyLists, NoUser}
-import uk.ac.warwick.tabula.services.{SubmissionServiceComponent, ProfileServiceComponent, GeneratesGradesFromMarks, UserLookupComponent}
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.system.BindListener
 
 import scala.collection.JavaConverters._
@@ -112,7 +112,6 @@ object AddMarksCommandBindListener {
 }
 
 trait AddMarksCommandBindListener extends BindListener {
-
 	self: AddMarksCommandState with MarksExtractorComponent =>
 
 	override def onBind(result:BindingResult) {

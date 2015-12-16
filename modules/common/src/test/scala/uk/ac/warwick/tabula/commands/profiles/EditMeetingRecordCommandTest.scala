@@ -14,15 +14,13 @@ class EditMeetingRecordCommandTest extends PersistenceTestBase with MeetingRecor
 	@Test
 	def creatorEditMeeting() = withUser(creator.userId) {  withFakeTime(aprilFool) {
 
-		val cmd = new EditMeetingRecordCommand(meeting){
-			override val session = mockSession
-		}
+		val cmd = new EditMeetingRecordCommand(meeting)
 		cmd.copyToCommand(meeting)
 		cmd.title = "Updated title fools"
 		cmd.maintenanceModeService = maintenanceModeService
 		cmd.notificationService = notificationService
 		cmd.scheduledNotificationService = scheduledNotificationService
-		cmd.meetingRecordDao = meetingRecordDao
+		cmd.meetingRecordService = meetingRecordService
 		cmd.features = emptyFeatures
 		cmd.features.meetingRecordApproval = true
 		cmd.features.attendanceMonitoringMeetingPointType = false
@@ -74,14 +72,12 @@ class EditMeetingRecordCommandTest extends PersistenceTestBase with MeetingRecor
 		meeting.pendingRevisionBy(new CurrentUser(creator.asSsoUser, creator.asSsoUser)) should be {true}
 
 		// The tutor sees the rejection. They add a description about herons to placate the student.
-		val editCmd = new EditMeetingRecordCommand(meeting) {
-			override val session = mockSession
-		}
+		val editCmd = new EditMeetingRecordCommand(meeting)
 		editCmd.features = emptyFeatures
 		editCmd.features.meetingRecordApproval = true
 		editCmd.features.attendanceMonitoringMeetingPointType = false
 
-		editCmd.meetingRecordDao = meetingRecordDao
+		editCmd.meetingRecordService = meetingRecordService
 		editCmd.notificationService = notificationService
 		editCmd.scheduledNotificationService = scheduledNotificationService
 		editCmd.copyToCommand(meeting)

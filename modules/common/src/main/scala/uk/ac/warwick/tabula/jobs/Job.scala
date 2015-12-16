@@ -2,12 +2,11 @@ package uk.ac.warwick.tabula.jobs
 
 import org.springframework.transaction.annotation.Propagation._
 import uk.ac.warwick.tabula.data.Transactions._
-import org.springframework.stereotype.Service
 import uk.ac.warwick.tabula.services.jobs._
 import org.springframework.stereotype.Component
 import uk.ac.warwick.tabula.helpers.Logging
 import org.springframework.beans.factory.annotation.Autowired
-import uk.ac.warwick.tabula.data.model.Notification
+import uk.ac.warwick.tabula.data.model.{ToEntityReference, Notification}
 import scala.collection.mutable
 
 /**
@@ -72,10 +71,10 @@ abstract class Job extends Logging {
 trait NotifyingJob[A] { // Doesn't extend Notifies[A] because we don't know which instance to emit for
 	this: Job =>
 
-	var notifications = mutable.Map[JobInstance, mutable.ListBuffer[Notification[_,_]]]()
+	var notifications = mutable.Map[JobInstance, mutable.ListBuffer[Notification[_ >: Null <: ToEntityReference, _]]]()
 
-	def pushNotification(instance: JobInstance, n: Notification[_,_]) {
-		notifications.getOrElseUpdate(instance, new mutable.ListBuffer[Notification[_,_]]).append(n)
+	def pushNotification(instance: JobInstance, n: Notification[_ >: Null <: ToEntityReference, _]) {
+		notifications.getOrElseUpdate(instance, new mutable.ListBuffer[Notification[_ >: Null <: ToEntityReference, _]]).append(n)
 	}
 
 	def popNotifications(instance: JobInstance) = notifications.remove(instance).getOrElse(Nil)

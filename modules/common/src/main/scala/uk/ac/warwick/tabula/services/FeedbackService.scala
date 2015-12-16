@@ -4,8 +4,7 @@ import scala.collection.JavaConversions._
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
-import uk.ac.warwick.tabula.data.Daoisms
-import uk.ac.warwick.tabula.data.FeedbackDao
+import uk.ac.warwick.tabula.data.{FeedbackDaoComponent, AutowiringFeedbackDaoComponent, Daoisms, FeedbackDao}
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.Logging
@@ -27,11 +26,8 @@ trait FeedbackService {
 	def getExamFeedbackMap(exam: Exam, users: Seq[User]): Map[User, ExamFeedback]
 }
 
-@Service(value = "feedbackService")
-class FeedbackServiceImpl extends FeedbackService with Daoisms with Logging {
-
-	@Autowired var userLookup: UserLookupService = _
-	@Autowired var dao: FeedbackDao = _
+abstract class AbstractFeedbackService extends FeedbackService with Logging {
+	self: UserLookupComponent with FeedbackDaoComponent =>
 
 	/* get users whose feedback is not published and who have not submitted work suspected
 	 * of being plagiarised */
@@ -47,39 +43,29 @@ class FeedbackServiceImpl extends FeedbackService with Daoisms with Logging {
 		assessment.findFullFeedback(uniId)
 	}
 
-	def countPublishedFeedback(assignment: Assignment): Int = {
-		session.createSQLQuery("""select count(*) from feedback where assignment_id = :assignmentId and released = 1""")
-			.setString("assignmentId", assignment.id)
-			.uniqueResult
-			.asInstanceOf[Number].intValue
-	}
+	def countPublishedFeedback(assignment: Assignment): Int = feedbackDao.countPublishedFeedback(assignment)
 
 	def getAssignmentFeedbackByUniId(assignment: Assignment, uniId: String) = transactional(readOnly = true) {
-		dao.getAssignmentFeedbackByUniId(assignment, uniId)
+		feedbackDao.getAssignmentFeedbackByUniId(assignment, uniId)
 	}
 
 	def getAssignmentFeedbackById(feedbackId: String): Option[AssignmentFeedback] = {
-		dao.getAssignmentFeedback(feedbackId)
+		feedbackDao.getAssignmentFeedback(feedbackId)
 	}
 
 	def getMarkerFeedbackById(markerFeedbackId: String): Option[MarkerFeedback] = {
-		dao.getMarkerFeedback(markerFeedbackId)
+		feedbackDao.getMarkerFeedback(markerFeedbackId)
 	}
 
 	def delete(feedback: Feedback) = transactional() {
-		dao.delete(feedback)
+		feedbackDao.delete(feedback)
 	}
 
-	def saveOrUpdate(feedback:Feedback){
-		session.saveOrUpdate(feedback)
-	}
-
-	def saveOrUpdate(mark: Mark) {
-		session.saveOrUpdate(mark)
-	}
+	def saveOrUpdate(feedback:Feedback) = transactional() { feedbackDao.save(feedback) }
+	def saveOrUpdate(mark: Mark) = transactional() { feedbackDao.save(mark) }
 
 	def save(feedback: MarkerFeedback) = transactional() {
-		dao.save(feedback)
+		feedbackDao.save(feedback)
 	}
 
 	def delete(markerFeedback: MarkerFeedback) = transactional() {
@@ -91,13 +77,18 @@ class FeedbackServiceImpl extends FeedbackService with Daoisms with Logging {
 		else if (markerFeedback == parentFeedback.thirdMarkerFeedback) parentFeedback.thirdMarkerFeedback = null
 		saveOrUpdate(parentFeedback)
 
-		dao.delete(markerFeedback)
+		feedbackDao.delete(markerFeedback)
 	}
 
 	def getExamFeedbackMap(exam: Exam, users: Seq[User]): Map[User, ExamFeedback] =
-		dao.getExamFeedbackMap(exam, users)
+		feedbackDao.getExamFeedbackMap(exam, users)
 
 }
+
+@Service(value = "feedbackService")
+class FeedbackServiceImpl extends AbstractFeedbackService
+	with AutowiringFeedbackDaoComponent
+	with AutowiringUserLookupComponent
 
 trait FeedbackServiceComponent {
 	def feedbackService: FeedbackService

@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.data
+
 import org.hibernate.event.spi._
-import javax.annotation.PostConstruct
-import org.springframework.stereotype.Component
 import org.springframework.beans.factory.InitializingBean
 import org.hibernate.SessionFactory
 import org.hibernate.internal.SessionFactoryImpl
@@ -28,7 +27,7 @@ class HibernateLifecycle extends InitializingBean with PostLoadEventListener wit
 
 	var sessionFactory: SessionFactory = _
 
-	override def afterPropertiesSet() {
+	override def afterPropertiesSet(): Unit = {
 		assert(sessionFactory != null)
 
 		// Supposed correct way to register listeners is to wire in your own Integrator,

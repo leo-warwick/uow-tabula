@@ -42,7 +42,7 @@ class RouteDaoImpl extends RouteDao with Daoisms {
 	def getByCode(code: String) =
 		session.newQuery[Route]("from Route r where code = :code").setString("code", code).uniqueResult
 
-	def getById(id: String) = getById[Route](id)
+	def getById(id: String) = session.getById[Route](id)
 
 	def findByDepartment(department:Department) =
 		session.newQuery[Route]("from Route r where adminDepartment = :dept").setEntity("dept",department).seq

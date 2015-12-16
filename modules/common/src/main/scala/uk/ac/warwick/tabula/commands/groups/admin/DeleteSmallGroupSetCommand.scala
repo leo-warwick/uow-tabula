@@ -7,7 +7,7 @@ import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.services.SmallGroupService
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.model.{ScheduledNotification, Module}
+import uk.ac.warwick.tabula.data.model.{ToEntityReference, ScheduledNotification, Module}
 import collection.JavaConverters._
 
 class DeleteSmallGroupSetCommand(val module: Module, val set: SmallGroupSet)
@@ -47,5 +47,5 @@ class DeleteSmallGroupSetCommand(val module: Module, val set: SmallGroupSet)
 			_.events.flatMap(service.getAllSmallGroupEventOccurrencesForEvent)
 		)
 
-	override def scheduledNotifications(notificationTarget: SmallGroupEventOccurrence): Seq[ScheduledNotification[_]] = Seq()
+	override def scheduledNotifications(notificationTarget: SmallGroupEventOccurrence): Seq[ScheduledNotification[_ >: Null <: ToEntityReference]] = Seq()
 }

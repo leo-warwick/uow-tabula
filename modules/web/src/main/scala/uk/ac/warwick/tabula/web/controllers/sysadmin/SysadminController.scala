@@ -36,9 +36,7 @@ class BlankForm {
 
 @Controller
 @RequestMapping(Array("/sysadmin"))
-class SysadminController extends BaseSysadminController
-	with AutowiringMaintenanceModeServiceComponent
-	with AutowiringEmergencyMessageServiceComponent {
+class SysadminController extends BaseSysadminController with AutowiringMaintenanceModeServiceComponent with AutowiringEmergencyMessageServiceComponent {
 
 	@ModelAttribute("blankForm") def blankForm = new BlankForm
 

@@ -20,6 +20,6 @@ class RoleDefinitionConverter extends TwoWayConverter[String, RoleDefinition] wi
 
 	override def convertRight(name: String) =
 		if (!name.hasText) null
-		else getById[CustomRoleDefinition](name) getOrElse { try { builtInUserType.convertToObject(name) } catch { case e: IllegalArgumentException => null } }
+		else session.getById[CustomRoleDefinition](name).getOrElse { try { builtInUserType.convertToObject(name) } catch { case e: IllegalArgumentException => null } }
 
 }

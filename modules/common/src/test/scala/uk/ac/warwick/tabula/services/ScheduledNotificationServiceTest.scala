@@ -3,15 +3,9 @@ package uk.ac.warwick.tabula.services
 import uk.ac.warwick.tabula.{Mockito, TestBase}
 import uk.ac.warwick.tabula.data.model.{ToEntityReference, Notification, HeronWarningNotification, Heron, ScheduledNotification}
 import org.joda.time.DateTime
-import uk.ac.warwick.tabula.data.{MockScrollableResults, Scrollable, ScheduledNotificationDao}
+import uk.ac.warwick.tabula.data.{MaintenanceModeAwareSession, MockScrollableResults, ScheduledNotificationDao}
 import org.mockito.Mockito._
-import org.hibernate.{SessionFactory, Session, ScrollableResults}
-import java.sql.{Clob, Blob}
-import java.util.{Locale, TimeZone, Calendar, Date}
-import java.math.{BigDecimal, BigInteger}
-import java.lang.{Double, Float, Long, Byte, Short}
-import java.lang
-import org.hibernate.`type`.Type
+import org.hibernate.{SessionFactory, Session}
 
 class ScheduledNotificationServiceTest extends TestBase with Mockito {
 
@@ -48,7 +42,7 @@ class ScheduledNotificationServiceTest extends TestBase with Mockito {
 
 	val scrollingScheduledNotifications = new MockScrollableResults(scheduledNotifications)
 
-	when (dao.notificationsToComplete) thenReturn (Scrollable[ScheduledNotification[_  >: Null <: ToEntityReference]](scrollingScheduledNotifications, session))
+	when (dao.notificationsToComplete) thenReturn MaintenanceModeAwareSession(session).scrollable[ScheduledNotification[_  >: Null <: ToEntityReference]](scrollingScheduledNotifications)
 
 	@Test
 	def generateNotifications() {

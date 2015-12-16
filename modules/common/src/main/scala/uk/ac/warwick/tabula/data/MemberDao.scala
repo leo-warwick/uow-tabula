@@ -57,7 +57,10 @@ trait MemberDao {
 	def getMemberByTimetableHash(timetableHash: String): Option[Member]
 	def setTimetableHash(member: Member, timetableHash: String)
 
-
+	def cleanFixturesData()
+	def evict(member: Member)
+	def flush()
+	def clear()
 
 }
 
@@ -209,15 +212,15 @@ class MemberDaoImpl extends MemberDao with Daoisms with Logging with AttendanceM
 			.setMaxResults(max).seq.distinct
 
 	def listUpdatedSince(startDate: DateTime) = {
-		val scrollable = session.newCriteria[Member]
+		val scrollableResults = session.newCriteria[Member]
 			.add(gt("lastUpdatedDate", startDate))
 			.addOrder(asc("lastUpdatedDate"))
 			.scroll()
-		Scrollable(scrollable, session)
+		session.scrollable(scrollableResults)
 	}
 
 	def listUpdatedSince(startDate: DateTime, department: Department) = {
-		val scrollable = session.newCriteria[Member]
+		val scrollableResults = session.newCriteria[Member]
 			.createAlias("studentCourseDetails", "scd")
 			.add(gt("lastUpdatedDate", startDate))
 			.add(
@@ -232,7 +235,7 @@ class MemberDaoImpl extends MemberDao with Daoisms with Logging with AttendanceM
 			.addOrder(asc("lastUpdatedDate"))
 			.scroll()
 
-		Scrollable(scrollable, session)
+		session.scrollable(scrollableResults)
 	}
 
 	def countUpdatedSince(startDate: DateTime): Int =
@@ -287,7 +290,7 @@ class MemberDaoImpl extends MemberDao with Daoisms with Logging with AttendanceM
 		val idCriteria = session.newCriteria[StudentMember]
 		restrictions.foreach { _.apply(idCriteria) }
 
-		if (orders.size > 0) {
+		if (orders.nonEmpty) {
 			orders.foreach { idCriteria.addOrder }
 			idCriteria.project[String](property("universityId")).seq.distinct
 		} else {
@@ -414,5 +417,17 @@ class MemberDaoImpl extends MemberDao with Daoisms with Logging with AttendanceM
 				.setParameter("timetableHash", timetableHash)
 				.setParameter("universityId", member.universityId)
 				.executeUpdate()
+	}
+
+	def evict(member: Member) = session.evict(member)
+	def flush() = session.flush()
+	def clear() = session.clear()
+
+	def cleanFixturesData(): Unit = {
+		sessionWithoutFreshFilters.newQuery("delete from StudentCourseYearDetails where studentCourseDetails.scjCode like '3000%'").executeUpdate()
+		sessionWithoutFreshFilters.newQuery("delete from ModuleRegistration where studentCourseDetails.scjCode like '3000%'").executeUpdate()
+		sessionWithoutFreshFilters.newQuery("delete from MemberStudentRelationship where studentCourseDetails.scjCode like '3000%'").executeUpdate()
+		sessionWithoutFreshFilters.newQuery("delete from StudentCourseDetails where scjCode like '3000%'").executeUpdate()
+		sessionWithoutFreshFilters.newQuery("delete from StudentMember where universityId like '3000%'").executeUpdate()
 	}
 }

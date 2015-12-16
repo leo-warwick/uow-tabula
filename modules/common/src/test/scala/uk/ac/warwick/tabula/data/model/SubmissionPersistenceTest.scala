@@ -47,7 +47,7 @@ class SubmissionPersistenceTest extends PersistenceTestBase {
 
         	session.flush
 
-        	val retrievedSubmission = session.get(classOf[Submission], submission.id).asInstanceOf[Submission]
+					val retrievedSubmission = session.getById[Submission](submission.id).get
         	val report2 = retrievedSubmission.allAttachments.find(_.originalityReport != null).get.originalityReport
         	report2.overlap should be (Some(1))
         	report2.webOverlap should be (None)

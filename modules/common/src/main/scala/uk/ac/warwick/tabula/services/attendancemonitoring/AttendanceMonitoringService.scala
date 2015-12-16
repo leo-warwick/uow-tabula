@@ -46,6 +46,7 @@ trait AttendanceMonitoringService {
 	def deletePoint(point: AttendanceMonitoringPoint)
 	def deleteTemplate(template: AttendanceMonitoringTemplate)
 	def deleteTemplatePoint(point: AttendanceMonitoringTemplatePoint)
+	def deleteCheckpoint(checkpoint: AttendanceMonitoringCheckpoint)
 	def getTemplateSchemeById(id: String): Option[AttendanceMonitoringTemplate]
 	def getTemplatePointById(id: String): Option[AttendanceMonitoringTemplatePoint]
 	def listAllSchemes(department: Department): Seq[AttendanceMonitoringScheme]
@@ -142,6 +143,9 @@ abstract class AbstractAttendanceMonitoringService extends AttendanceMonitoringS
 
 	def deleteTemplatePoint(point: AttendanceMonitoringTemplatePoint) =
 		attendanceMonitoringDao.delete(point)
+
+	def deleteCheckpoint(checkpoint: AttendanceMonitoringCheckpoint) =
+		attendanceMonitoringDao.delete(checkpoint)
 
 	def getTemplateSchemeById(id: String): Option[AttendanceMonitoringTemplate] =
 		attendanceMonitoringDao.getTemplateSchemeById(id)
@@ -506,8 +510,10 @@ class AttendanceMonitoringServiceImpl
 	with AutowiringUserLookupComponent
 
 
-class AttendanceMonitoringServiceListener extends QueueListener with InitializingBean with Logging with Daoisms
-	with AutowiringAttendanceMonitoringServiceComponent with AutowiringProfileServiceComponent with AutowiringModuleAndDepartmentServiceComponent {
+class AttendanceMonitoringServiceListener extends QueueListener with InitializingBean with Logging
+	with AutowiringAttendanceMonitoringServiceComponent
+	with AutowiringProfileServiceComponent
+	with AutowiringModuleAndDepartmentServiceComponent {
 
 	var queue = Wire.named[Queue]("settingsSyncTopic")
 	@Autowired var env: Environment = _

@@ -5,15 +5,13 @@ import uk.ac.warwick.tabula.permissions._
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.{CourseType, StudentRelationshipType, Department}
-import uk.ac.warwick.tabula.services.{ AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent }
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod
 import uk.ac.warwick.tabula.system.permissions.{ PermissionsChecking, RequiresPermissionsChecking }
 import org.springframework.validation.{ BindingResult, Errors }
 import uk.ac.warwick.tabula.system.BindListener
 import scala.collection.JavaConverters._
 import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.services.RelationshipServiceComponent
-import uk.ac.warwick.tabula.services.AutowiringRelationshipServiceComponent
 
 object DisplaySettingsCommand {
 	def apply(department: Department) =
@@ -32,7 +30,7 @@ trait DisplaySettingsCommandState {
 class DisplaySettingsCommandInternal(val department: Department) extends CommandInternal[Department] with PopulateOnForm
 	with SelfValidating with BindListener with DisplaySettingsCommandState {
 
-	this: ModuleAndDepartmentServiceComponent with RelationshipServiceComponent =>
+	self: ModuleAndDepartmentServiceComponent with RelationshipServiceComponent =>
 
 	var showStudentName = department.showStudentName
 	var plagiarismDetection = department.plagiarismDetectionEnabled

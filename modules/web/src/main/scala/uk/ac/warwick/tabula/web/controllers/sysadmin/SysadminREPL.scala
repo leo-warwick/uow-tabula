@@ -11,10 +11,11 @@ import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.StandardEvaluationContext
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.services._
-import org.hibernate.Session
+import org.hibernate.{SessionFactory, Session}
 import scala.beans.BeanProperty
 
 @Controller
@@ -25,12 +26,14 @@ class SysadminREPL extends BaseSysadminController with BeanFactoryAware {
 	@Autowired var assignmentService: AssessmentService = _
 	@Autowired var moduleAndDepartmentService: ModuleAndDepartmentService = _
 
+	val sessionFactory = Wire[SessionFactory]
+
 	val spel: SpelExpressionParser = new SpelExpressionParser
 
 	@annotation.RequestMapping
 	def evaluate(@RequestParam(value = "query", defaultValue = "") query: String) = {
 		val response = if (query.hasText) {
-			val context = new StandardEvaluationContext(RootObject(session))
+			val context = new StandardEvaluationContext(RootObject(sessionFactory.getCurrentSession))
 			val expression = spel.parseExpression(query)
 			try Return(expression.getValue(context))
 			catch { case e: Exception => Return(null, e) }

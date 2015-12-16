@@ -1,11 +1,10 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
 import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
-import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.data.model.{AssessmentType, AssessmentComponent}
+import uk.ac.warwick.tabula.data.model.{AssessmentComponent, AssessmentType}
 import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
-import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent, AutowiringAssessmentMembershipServiceComponent, AssessmentMembershipServiceComponent}
-import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.services.{AssessmentMembershipServiceComponent, AutowiringAssessmentMembershipServiceComponent, AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
 
 class AssessmentComponentCreationFixtureCommandInternal extends CommandInternal[AssessmentComponent] {
 	self: AssessmentMembershipServiceComponent with ModuleAndDepartmentServiceComponent with TransactionalComponent =>

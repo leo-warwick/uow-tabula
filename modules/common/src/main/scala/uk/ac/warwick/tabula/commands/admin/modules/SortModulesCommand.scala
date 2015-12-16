@@ -8,7 +8,7 @@ import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.Department
 import uk.ac.warwick.tabula.data.model.Module
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.{ModuleAndDepartmentServiceComponent, AutowiringModuleAndDepartmentServiceComponent}
+import uk.ac.warwick.tabula.services.{MaintenanceModeServiceComponent, ModuleAndDepartmentServiceComponent, AutowiringModuleAndDepartmentServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 
 object SortModulesCommand {

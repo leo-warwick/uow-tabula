@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.data.model.AuditEvent
 import org.hibernate.dialect.HSQLDialect
-import uk.ac.warwick.tabula.data.SessionComponent
+import uk.ac.warwick.tabula.data.{AuditEventDaoImpl, AbstractAuditEventDao, AuditEventDaoComponent, SessionComponent}
 
 // scalastyle:off magic.number
 class AuditEventIndexServiceTest extends PersistenceTestBase with Mockito with Logging {
@@ -28,9 +28,14 @@ class AuditEventIndexServiceTest extends PersistenceTestBase with Mockito with L
 	override implicit val patienceConfig =
 		PatienceConfig(timeout = Span(2, Seconds), interval = Span(50, Millis))
 
-	var indexer:AuditEventIndexService = _
-	val service:AuditEventServiceImpl = new AuditEventServiceImpl with SessionComponent {
-		def session = sessionFactory.getCurrentSession
+	var indexer: AuditEventIndexService = _
+
+	val auditEventDao = new AbstractAuditEventDao with SessionComponent {
+		override def session = AuditEventIndexServiceTest.this.session
+	}
+
+	val service: AuditEventServiceImpl = new AuditEventServiceImpl with AuditEventDaoComponent {
+		val auditEventDao = AuditEventIndexServiceTest.this.auditEventDao
 	}
 
 	var TEMP_DIR:File = _
@@ -43,12 +48,12 @@ class AuditEventIndexServiceTest extends PersistenceTestBase with Mockito with L
 		indexer.features = new FeaturesImpl
 		indexer.features.searchOnApiComponent = false
 		indexer.afterPropertiesSet
-		service.dialect = new HSQLDialect()
+		auditEventDao.dialect = new HSQLDialect()
 	}
 
 	@After def tearDown {
 		indexer.destroy()
-		session.createSQLQuery("delete from auditevent").executeUpdate()
+		session.newSQLQuery("delete from auditevent").executeUpdate()
 		try {
 			FileUtils.deleteDirectory(TEMP_DIR)
 		} catch {

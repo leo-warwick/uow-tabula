@@ -10,14 +10,14 @@ import uk.ac.warwick.tabula.data.model.FileAttachment
 import org.springframework.mock.web.MockMultipartFile
 import uk.ac.warwick.tabula.data.FileDao
 import org.springframework.beans.factory.annotation.Autowired
-import uk.ac.warwick.tabula.services.UserLookupService
+import uk.ac.warwick.tabula.services.{FileAttachmentService, UserLookupService}
 import uk.ac.warwick.tabula.Mockito
 
 // scalastyle:off magic.number
 class AddFeedbackCommandTest extends TestBase with Mockito {
 
-	var dao: FileDao = mock[FileDao]
-	dao.getData(null) returns (None)
+	var service: FileAttachmentService = mock[FileAttachmentService]
+	service.getData(null) returns (None)
 
 	val module = Fixtures.module("cs118")
 	val assignment = Fixtures.assignment("my assignment")
@@ -32,20 +32,20 @@ class AddFeedbackCommandTest extends TestBase with Mockito {
 	@Test def duplicateFileNames = withUser("cuscav") {
 		val cmd = new AddFeedbackCommand(module, assignment, currentUser.apparentUser, currentUser)
 		cmd.userLookup = userLookup
-		cmd.fileDao = dao
+		cmd.fileAttachmentService = service
 		cmd.uniNumber = "1010101"
 
 		val file = new UploadedFile
 		val a = new FileAttachment
 		a.name = "file.txt"
 		a.uploadedDataLength = 300
-		a.fileDao = dao
+		a.fileAttachmentService = service
 		file.attached.add(a)
 
 		val b = new FileAttachment
 		b.name = "file2.txt"
 		b.uploadedDataLength = 300
-		b.fileDao = dao
+		b.fileAttachmentService = service
 		file.attached.add(b)
 
 		val item = new FeedbackItem("1010101")
@@ -60,7 +60,7 @@ class AddFeedbackCommandTest extends TestBase with Mockito {
 		val b2 = new FileAttachment
 		b2.name = "file2.txt"
 		b2.uploadedDataLength = 305
-		b2.fileDao = dao
+		b2.fileAttachmentService = service
 		feedback.addAttachment(b2)
 
 		assignment.feedbacks.add(feedback)

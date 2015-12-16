@@ -1,5 +1,6 @@
 package uk.ac.warwick.tabula.services.fileserver
 
+import uk.ac.warwick.tabula.services.FileAttachmentService
 import uk.ac.warwick.tabula.{FeaturesImpl, TestBase, Mockito}
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.mock.web.MockHttpServletRequest
@@ -29,11 +30,11 @@ class FileServerTest extends TestBase with Mockito {
 		implicit val req = new MockHttpServletRequest
 		implicit val res = new MockHttpServletResponse
 
-		val dao = mock[FileDao]
-		dao.getData(anyString) returns (None)
+		val fileAttachmentService = mock[FileAttachmentService]
+		fileAttachmentService.getData(anyString) returns (None)
 
 		val a = new FileAttachment
-		a.fileDao = dao
+		a.fileAttachmentService = fileAttachmentService
 
 		val file = new RenderableAttachment(a)
 
@@ -48,11 +49,11 @@ class FileServerTest extends TestBase with Mockito {
 		implicit val req = new MockHttpServletRequest
 		implicit val res = new MockHttpServletResponse
 
-		val dao = mock[FileDao]
-		dao.getData(anyString) returns (Some(tmpFile))
+		val fileAttachmentService = mock[FileAttachmentService]
+		fileAttachmentService.getData(anyString) returns (Some(tmpFile))
 
 		val a = new FileAttachment
-		a.fileDao = dao
+		a.fileAttachmentService = fileAttachmentService
 
 		val file = new RenderableAttachment(a)
 
@@ -71,11 +72,11 @@ class FileServerTest extends TestBase with Mockito {
 		implicit val req = new MockHttpServletRequest
 		implicit val res = new MockHttpServletResponse
 
-		val dao = mock[FileDao]
-		dao.getData(anyString) returns (Some(tmpFile))
+		val fileAttachmentService = mock[FileAttachmentService]
+		fileAttachmentService.getData(anyString) returns (Some(tmpFile))
 
 		val a = new FileAttachment
-		a.fileDao = dao
+		a.fileAttachmentService = fileAttachmentService
 
 		val file = new RenderableAttachment(a)
 
@@ -108,11 +109,11 @@ class FileServerTest extends TestBase with Mockito {
 		implicit val req = new MockHttpServletRequest
 		implicit val res = new MockHttpServletResponse
 
-		val dao = mock[FileDao]
-		dao.getData(anyString) returns (Some(tmpFile))
+		val fileAttachmentService = mock[FileAttachmentService]
+		fileAttachmentService.getData(anyString) returns (Some(tmpFile))
 
 		val a = new FileAttachment
-		a.fileDao = dao
+		a.fileAttachmentService = fileAttachmentService
 
 		val file = new RenderableAttachment(a)
 

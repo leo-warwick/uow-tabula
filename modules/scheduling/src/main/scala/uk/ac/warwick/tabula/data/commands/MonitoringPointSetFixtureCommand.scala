@@ -1,13 +1,14 @@
-package uk.ac.warwick.tabula.dev.web.commands
+package uk.ac.warwick.tabula.data.commands
 
-import uk.ac.warwick.tabula.commands.{Unaudited, ComposableCommand, CommandInternal}
-import uk.ac.warwick.tabula.data.model.attendance.{MonitoringPoint, MonitoringPointSet}
-import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
-import uk.ac.warwick.tabula.services.{AutowiringMonitoringPointServiceComponent, MonitoringPointServiceComponent, AutowiringCourseAndRouteServiceComponent, CourseAndRouteServiceComponent}
-import uk.ac.warwick.tabula.AcademicYear
-import scala.collection.JavaConverters._
 import org.joda.time.DateTime
+import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, Unaudited}
+import uk.ac.warwick.tabula.data.model.attendance.{MonitoringPoint, MonitoringPointSet}
 import uk.ac.warwick.tabula.data.{Daoisms, SessionComponent, AutowiringTransactionalComponent, TransactionalComponent}
+import uk.ac.warwick.tabula.services.{AutowiringCourseAndRouteServiceComponent, AutowiringMonitoringPointServiceComponent, CourseAndRouteServiceComponent, MonitoringPointServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.PubliclyVisiblePermissions
+
+import scala.collection.JavaConverters._
 
 object MonitoringPointSetFixtureCommand {
 	def apply() =
@@ -22,8 +23,7 @@ object MonitoringPointSetFixtureCommand {
 }
 
 class MonitoringPointSetFixtureCommand extends CommandInternal[MonitoringPointSet] {
-
-	this: CourseAndRouteServiceComponent with MonitoringPointServiceComponent
+	self: CourseAndRouteServiceComponent with MonitoringPointServiceComponent
 		with TransactionalComponent with SessionComponent =>
 
 	var routeCode: String = _

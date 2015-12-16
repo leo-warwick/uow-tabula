@@ -2,6 +2,7 @@ package uk.ac.warwick.tabula.services.jobs
 
 import org.springframework.beans.factory.annotation.Autowired
 import uk.ac.warwick.tabula.AppContextTestBase
+import uk.ac.warwick.tabula.data.HasJobDao
 import uk.ac.warwick.tabula.jobs.TestingJob
 
 // scalastyle:off magic.number

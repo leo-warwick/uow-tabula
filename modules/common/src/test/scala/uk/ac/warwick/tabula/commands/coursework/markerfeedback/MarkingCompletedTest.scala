@@ -50,12 +50,11 @@ class MarkingCompletedTest extends TestBase with MarkingWorkflowWorld with Mocki
 	private trait CommandTestSupport extends StateServiceComponent with FeedbackServiceComponent with FinaliseFeedbackTestImpl {
 		self: UserAware =>
 
-		val mockSession = mock[Session]
-		val stateService: StateService = new ComposableStateServiceImpl with SessionComponent {
-			def session = mockSession
-		}
-
 		val feedbackService = MarkingCompletedTest.this.feedbackService
+
+		val stateService: StateService = new ComposableStateServiceImpl with FeedbackServiceComponent {
+			val feedbackService = CommandTestSupport.this.feedbackService
+		}
 	}
 
 	trait FinaliseFeedbackTestImpl extends FinaliseFeedbackComponent {

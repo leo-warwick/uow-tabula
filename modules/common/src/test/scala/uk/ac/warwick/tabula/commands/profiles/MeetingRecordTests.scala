@@ -1,9 +1,7 @@
 package uk.ac.warwick.tabula.commands.profiles
 
-import org.hibernate.Session
 import org.joda.time.DateTimeConstants
 import org.junit.Before
-import uk.ac.warwick.tabula.data.MeetingRecordDao
 import uk.ac.warwick.tabula.data.model.MeetingApprovalState.Pending
 import uk.ac.warwick.tabula.data.model.MeetingFormat.FaceToFace
 import uk.ac.warwick.tabula.data.model._
@@ -20,13 +18,12 @@ trait MeetingRecordTests extends PersistenceTestBase with Mockito {
 
 	EventHandling.enabled = false
 
-	val meetingRecordDao = smartMock[MeetingRecordDao]
+	val meetingRecordService = smartMock[MeetingRecordService]
 	val maintenanceModeService = smartMock[MaintenanceModeService]
 	maintenanceModeService.enabled returns false
 	val notificationService = smartMock[NotificationService]
 	val scheduledNotificationService = smartMock[ScheduledNotificationService]
 	val securityService = smartMock[SecurityService]
-	val mockSession = smartMock[Session]
 
 	var student:StudentMember = _
 	var creator: StaffMember = _

@@ -1,9 +1,10 @@
-package uk.ac.warwick.tabula.services.jobs
+package uk.ac.warwick.tabula.data
 
-import org.springframework.stereotype.Service
-import uk.ac.warwick.tabula.data.Daoisms
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.services.AutowiringMaintenanceModeServiceComponent
+import uk.ac.warwick.tabula.services.jobs.{JobInstanceImpl, JobInstance}
 
 /**
  * Provides low level access to JobDefinitions in the database.
@@ -53,7 +54,7 @@ class JobDaoImpl extends JobDao with Daoisms {
 	}
 
 	def getById(id: String) = transactional(readOnly = true) {
-		getById[JobInstanceImpl](id)
+		session.getById[JobInstanceImpl](id)
 	}
 
 	def saveJob(instance: JobInstance) = transactional() {
