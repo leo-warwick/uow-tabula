@@ -9,7 +9,6 @@ import uk.ac.warwick.tabula.services.timetables.TimetableFetchingService.EventLi
 import uk.ac.warwick.tabula.timetables.TimetableEvent
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 import uk.ac.warwick.userlookup.User
-import uk.ac.warwick.tabula.helpers.Futures._
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -46,21 +45,29 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
 
 		protected def eventsFor(user: User, currentUser: CurrentUser): EventList = {
 			/* Include SGT teaching responsibilities for students (mainly PGR) and students for staff (e.g. Chemistry) */
-			val allEvents = studentEvents(user, currentUser) ++ tutorEvents(user, currentUser)
+			val eventsForStudents = studentEvents(user, currentUser)
 
 			// TAB-4643 - Don't show event if it has been replaced
-			val attendanceMap = smallGroupService.findStudentAttendanceInEvents(user.getWarwickId, allEvents).groupBy(_.occurrence.event)
+			val attendanceMap = smallGroupService.findStudentAttendanceInEvents(user.getWarwickId, eventsForStudents).groupBy(_.occurrence.event)
 
-			val autoTimetableEvents: Seq[TimetableEvent] = allEvents.map { event =>
+			val autoStudentTimetableEvents: Seq[TimetableEvent] = eventsForStudents.map { event =>
 				attendanceMap.get(event) match {
 					case Some(attendanceList) =>
 						val attendanceForEvent = attendanceList.groupBy(_.occurrence.week).mapValues(_.head.state)
 						val weeksToRemove = attendanceList.filter(a => a.state == AttendanceState.MissedAuthorised && !a.replacedBy.isEmpty).map(_.occurrence.week)
-						TimetableEvent(event, attendanceForEvent, withoutWeeks = weeksToRemove)
+						event -> TimetableEvent(event, attendanceForEvent, withoutWeeks = weeksToRemove)
 					case None =>
-						TimetableEvent(event, Map[WeekRange.Week, AttendanceState]())
+						event -> TimetableEvent(event, Map[WeekRange.Week, AttendanceState]())
 				}
+			}.map { case (sge, timetableEvent) =>
+				if (user != currentUser.apparentUser || sge.group.groupSet.studentsCanSeeTutorName)
+					timetableEvent
+				else
+					timetableEvent.copy(staff = Seq())
 			}
+
+			val eventsForTutors = tutorEvents(user, currentUser).map(event => TimetableEvent(event, Map[WeekRange.Week, AttendanceState]()))
+
 
 			// TAB-2682 Also include events that the student has been manually added to
 			val manualTimetableEvents = smallGroupService.findManuallyAddedAttendance(user.getWarwickId)
@@ -71,7 +78,7 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
 				}
 				.map { a => TimetableEvent(a.occurrence, Option(a.state).getOrElse(AttendanceState.NotRecorded)) }
 
-			EventList.fresh(autoTimetableEvents ++ manualTimetableEvents)
+			EventList.fresh(autoStudentTimetableEvents ++ manualTimetableEvents ++ eventsForTutors)
 		}
 
 		private def studentEvents(user: User, currentUser: CurrentUser) = smallGroupService.findSmallGroupsByStudent(user).filter {
