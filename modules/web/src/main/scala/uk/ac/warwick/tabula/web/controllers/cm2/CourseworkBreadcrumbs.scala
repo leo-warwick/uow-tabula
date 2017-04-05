@@ -11,6 +11,8 @@ object CourseworkBreadcrumbs {
 
 	abstract class Abstract extends BreadCrumb
 
+
+
 	object Assignment {
 
 		case class AssignmentManagement() extends Abstract {
@@ -19,5 +21,12 @@ object CourseworkBreadcrumbs {
 		}
 
 	}
+	object Department {
 
+		case class DepartmentManagement() extends Abstract {
+			val title: String = "Department Management"
+			val url = Some(Routes.admin.department)
+		}
+
+	}
 }
