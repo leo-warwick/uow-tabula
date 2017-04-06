@@ -7,7 +7,7 @@ If you add a field it should also be added to _common_fields_hidden.ftl
 so that they can be passed around between requests.
 
 -->
-
+<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 <#if features.submissions>
 	<fieldset id="submission-options">
 		<details <#if ((assignment.collectSubmissions)?? && assignment.collectSubmissions) || collectSubmissions?? && collectSubmissions > open </#if> class="submissions">
