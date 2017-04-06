@@ -1,3 +1,4 @@
+<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 <@f.form method="post" action="${info.requestedUri.path}" cssClass="form-inline filter-form" commandName="submissionAndFeedbackCommand">
 	<div class="filter">
 		<label for="filter">Show all</label>

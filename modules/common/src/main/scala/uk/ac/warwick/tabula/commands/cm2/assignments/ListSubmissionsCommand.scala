@@ -13,7 +13,7 @@ import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, Permissions
 import scala.collection.JavaConversions._
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
+// FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes
 object ListSubmissionsCommand {
 	type CommandType = Appliable[Seq[SubmissionListItem]] with ListSubmissionsRequest
 

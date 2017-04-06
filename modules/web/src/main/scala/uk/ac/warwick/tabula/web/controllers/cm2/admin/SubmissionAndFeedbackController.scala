@@ -19,6 +19,7 @@ import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.controllers.cm2.{CourseworkBreadcrumbs, CourseworkController}
 import uk.ac.warwick.util.web.bind.AbstractPropertyEditor
 
+//FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes
 @Profile(Array("cm2Enabled")) @Controller
 @RequestMapping(Array("/${cm2.prefix}/admin/assignments/{assignment}"))
 class SubmissionAndFeedbackController extends CourseworkController {

@@ -2,7 +2,7 @@
 <#import "/WEB-INF/freemarker/_profile_link.ftl" as pl />
 <#import "*/submission_components.ftl" as components />
 <#escape x as x?html>
-
+<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 <div id="feedback-modal" class="modal fade"></div>
 <div id="profile-modal" class="modal fade profile-subset"></div>
 

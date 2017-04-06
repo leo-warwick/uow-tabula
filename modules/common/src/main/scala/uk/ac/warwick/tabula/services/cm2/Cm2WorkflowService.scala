@@ -9,6 +9,8 @@ import uk.ac.warwick.tabula.data.model.Assignment
 import uk.ac.warwick.tabula.data.model.MarkingMethod.{ModeratedMarking, SeenSecondMarking}
 import uk.ac.warwick.tabula.data.model.MarkingState.{MarkingCompleted, Rejected}
 
+//FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes
+
 @Service
 class Cm2WorkflowService {
 	import Cm2WorkflowStages._

@@ -1,4 +1,4 @@
-
+<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 
 <#if students??>
 	<div class="btn-toolbar">

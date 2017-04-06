@@ -1,3 +1,4 @@
+<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 <#macro lateness submission="" assignment="" user=""><#compress>
 	<#if submission?has_content && submission.submittedDate?? && (submission.late || submission.authorisedLate)>
 		<#if submission.late>

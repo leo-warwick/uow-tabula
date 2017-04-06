@@ -9,6 +9,7 @@ import uk.ac.warwick.tabula.data.model.Assignment
 import uk.ac.warwick.tabula.data.model.MarkingState.MarkingCompleted
 import uk.ac.warwick.tabula.helpers.StringUtils._
 
+// FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes
 /**
  * Filters a set of "Student" case objects (which are a representation of the current
  * state of a single student's submission workflow on an assignment, containing the

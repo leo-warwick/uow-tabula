@@ -1,3 +1,4 @@
+<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 <#import "_submission_details.ftl" as sd />
 <#import "/WEB-INF/freemarker/_profile_link.ftl" as pl />
 <#import "*/submission_components.ftl" as components />
