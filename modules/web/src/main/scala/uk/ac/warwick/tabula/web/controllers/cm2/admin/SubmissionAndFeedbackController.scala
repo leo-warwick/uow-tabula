@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation._
-import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.cm2.web.Routes
 import uk.ac.warwick.tabula.commands.SelfValidating
 import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackCommand
@@ -21,7 +21,6 @@ import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.controllers.AcademicYearScopedController
 import uk.ac.warwick.tabula.web.controllers.cm2.{CourseworkBreadcrumbs, CourseworkController}
 import uk.ac.warwick.tabula.web.views.{CSVView, ExcelView, XmlView}
-import uk.ac.warwick.tabula.{AcademicYear, Features}
 import uk.ac.warwick.util.csv.GoodCsvDocument
 import uk.ac.warwick.util.web.bind.AbstractPropertyEditor
 
@@ -29,8 +28,6 @@ import uk.ac.warwick.util.web.bind.AbstractPropertyEditor
 @RequestMapping(Array("/${cm2.prefix}/admin/assignments/{assignment}"))
 class SubmissionAndFeedbackController extends CourseworkController
 	with AcademicYearScopedController with AutowiringUserSettingsServiceComponent with AutowiringMaintenanceModeServiceComponent {
-
-	override var features: Features = Wire[Features]
 
 	validatesSelf[SelfValidating]
 
@@ -68,7 +65,7 @@ class SubmissionAndFeedbackController extends CourseworkController
 				Mav(s"$urlPrefix/admin/assignments/submissionsandfeedback/progress",
 					"department" -> assignment.module.adminDepartment,
 					"academicYear" -> academicYear
-				).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement())
+				).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
 
 			} else {
 
@@ -78,7 +75,7 @@ class SubmissionAndFeedbackController extends CourseworkController
 					"department" -> assignment.module.adminDepartment,
 					"academicYear" -> academicYear,
 					"results" ->	resultMap(results)
-				).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement())
+				).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
 		}
 	}
 	}
@@ -90,7 +87,7 @@ class SubmissionAndFeedbackController extends CourseworkController
 			Mav(s"$urlPrefix/admin/assignments/submissionsandfeedback/list",
 				"department" -> assignment.module.adminDepartment,
 				"academicYear" -> academicYear
-			).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement())
+			).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
 
 		} else {
 
@@ -99,7 +96,7 @@ class SubmissionAndFeedbackController extends CourseworkController
 				"department" -> assignment.module.adminDepartment,
 				"academicYear" -> academicYear,
 				"results" ->	resultMap(results)
-			).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement())
+			).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
 
 		}
 	}

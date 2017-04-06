@@ -39,7 +39,7 @@ object Routes {
 
 		object department {
 			def apply(department: Department, academicYear: AcademicYear): String =
-				admin() + "/department/%s/%s" format(encoded(department.code), encoded(academicYear.startYear.toString))
+				admin() + s"/department/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/"
 		}
 
 		object workflows {
