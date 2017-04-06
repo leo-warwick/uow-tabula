@@ -47,7 +47,7 @@
 		<#if results.students??>
 	</div>
 
-	<table class="coursework-progress-table results.students table table-bordered table-striped tabula-greenLight sticky-table-headers ">
+	<table class="cm2-progress-table results.students table table-bordered table-striped tabula-greenLight sticky-table-headers ">
 		<thead<#if results.students?size == 0> style="display: none;"</#if> class="fix-header">
 			<tr>
 				<th class="check-col" style="padding-right: 0px;"><input type="checkbox" class="collection-check-all"></th>
@@ -499,7 +499,7 @@
 			}
 		};
 
-		$('.coursework-progress-table').each(function() { $(this).expandingTable({ tableSorterOptions: options }); });
+		$('.cm2-progress-table').each(function() { $(this).expandingTable({ tableSorterOptions: options }); });
 
 		$('#feedback-modal').on('hidden.bs.modal', function() {
 			$(this).html('');
