@@ -30,12 +30,13 @@ object Routes {
 	object admin {
 		def apply() = s"$context/admin"
 		def feedbackTemplates(department: Department): String = apply() + s"/department/${encoded(department.code)}/settings/feedback-templates/"
-		def extensionSettings (department: Department): String = apply() + "/admin/department/%s/settings/extensions" format encoded(department.code)
+		def extensionSettings (department: Department): String = apply() + "/department/%s/settings/extensions" format encoded(department.code)
 		object extensions {
 			def apply(): String = admin() + "/extensions"
 			def detail(extension: Extension): String = extensions() + s"/${extension.id}/detail/"
 			def modify(extension: Extension): String = extensions() + s"/${extension.id}/update/"
 		}
+		def feedbackReports (department: Department): String = apply() + "/department/%s/reports/feedback/" format encoded(department.code)
 
 		object department {
 			def apply(department: Department, academicYear: AcademicYear): String =

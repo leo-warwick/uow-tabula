@@ -103,6 +103,7 @@
 			$('input#allowExtensionRequests').slideMoreOptions($('#request-extension-fields'), true);
 		}
 
+
 		var $assignmentpicker = $('.assignment-picker-input');
 		var $assignmentQuery = $assignmentpicker.find('input[name=query]').attr('autocomplete', 'off');
 		var target = $assignmentpicker.attr('data-target');
@@ -153,5 +154,49 @@
 		headers: {0:{sorter:false}}
 	});
 
+
+	// modals use ajax to retrieve their contents
+
+	$(function() {
+
+		$('body').on('submit', 'a[data-toggle=modal]', function(e){
+
+			e.preventDefault();
+
+			var $this = $(this);
+
+			var $target = $($this.data('target'));
+
+			var url = $this.attr('href');
+
+			$target.load(url, function(){
+
+				$target.bindFormHelpers()
+
+			});
+
+		});
+
+		$("#modal-container").on("submit","input[type='submit']", function(e){
+
+			e.preventDefault();
+
+			var $this = $(this);
+
+			var $form = $this.closest("form").trigger('tabula.ajaxSubmit');
+
+			$form.removeClass('dirty');
+
+			var updateTargetId = $this.data("update-target");
+
+			var randomNumber = Math.floor(Math.random() * 10000000);
+
+			jQuery.post($form.attr('action') + "?rand=" + randomNumber, $form.serialize(), function(data){
+				window.location = data.result;
+			});
+
+		});
+
+	});
 
 })(jQuery);

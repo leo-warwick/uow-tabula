@@ -1,11 +1,11 @@
 package uk.ac.warwick.tabula.web.views
 
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.web.servlet.View
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.JavaImports._
 
 class JSONView(var json: Any) extends View {
 	var objectMapper: ObjectMapper = Wire[ObjectMapper]
