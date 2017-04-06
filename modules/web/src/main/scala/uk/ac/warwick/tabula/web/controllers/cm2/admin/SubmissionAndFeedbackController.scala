@@ -1,6 +1,5 @@
 package uk.ac.warwick.tabula.web.controllers.cm2.admin
 
-import java.io.StringWriter
 import javax.validation.Valid
 
 import org.springframework.context.annotation.Profile
@@ -18,8 +17,6 @@ import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.cm2.{Cm2Filter, Cm2Filters}
 import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.controllers.cm2.{CourseworkBreadcrumbs, CourseworkController}
-import uk.ac.warwick.tabula.web.views.{CSVView, ExcelView, XmlView}
-import uk.ac.warwick.util.csv.GoodCsvDocument
 import uk.ac.warwick.util.web.bind.AbstractPropertyEditor
 
 @Profile(Array("cm2Enabled")) @Controller
@@ -103,44 +100,6 @@ class SubmissionAndFeedbackController extends CourseworkController {
 			"hasPublishedFeedback" -> results.hasPublishedFeedback,
 			"hasOriginalityReport" -> results.hasOriginalityReport,
 			"mustReleaseForMarking" -> results.mustReleaseForMarking)
-	}
-
-	@RequestMapping(Array("/export.csv"))
-	def csv(@Valid @ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, module: Module, @PathVariable assignment: Assignment): CSVView = {
-		val results = command.apply()
-
-		val items = results.students
-
-		val writer = new StringWriter
-		val csvBuilder = new CSVBuilder(items, assignment, module)
-		val doc = new GoodCsvDocument(csvBuilder, null)
-
-		doc.setHeaderLine(true)
-		csvBuilder.headers foreach (header => doc.addHeaderField(header))
-		items foreach (item => doc.addLine(item))
-		doc.write(writer)
-
-		new CSVView(module.code + "-" + assignment.id + ".csv", writer.toString)
-	}
-
-	@RequestMapping(Array("/export.xml"))
-	def xml(@Valid @ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): XmlView = {
-		val results = command.apply()
-
-		val items = results.students
-
-		new XmlView(new XMLBuilder(items, assignment, assignment.module).toXML, Some(assignment.module.code + "-" + assignment.id + ".xml"))
-	}
-
-	@RequestMapping(Array("/export.xlsx"))
-	def xlsx(@Valid @ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, module: Module, @PathVariable assignment: Assignment): ExcelView = {
-		val results = command.apply()
-
-		val items = results.students
-
-		val workbook = new ExcelBuilder(items, assignment, module).toXLSX
-
-		new ExcelView(assignment.name + ".xlsx", workbook)
 	}
 
 	override def binding[A](binder: WebDataBinder, cmd: A) {
