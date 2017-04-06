@@ -3,22 +3,20 @@ package uk.ac.warwick.tabula.web.controllers.cm2.admin
 import java.io.StringWriter
 import javax.validation.Valid
 
-import org.joda.time.DateTime
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation._
-import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.Features
 import uk.ac.warwick.tabula.cm2.web.Routes
 import uk.ac.warwick.tabula.commands.SelfValidating
 import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackCommand
 import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.cm2.{Cm2Filter, Cm2Filters}
-import uk.ac.warwick.tabula.services.{AutowiringMaintenanceModeServiceComponent, AutowiringUserSettingsServiceComponent}
 import uk.ac.warwick.tabula.web.Mav
-import uk.ac.warwick.tabula.web.controllers.AcademicYearScopedController
 import uk.ac.warwick.tabula.web.controllers.cm2.{CourseworkBreadcrumbs, CourseworkController}
 import uk.ac.warwick.tabula.web.views.{CSVView, ExcelView, XmlView}
 import uk.ac.warwick.util.csv.GoodCsvDocument
@@ -26,16 +24,15 @@ import uk.ac.warwick.util.web.bind.AbstractPropertyEditor
 
 @Profile(Array("cm2Enabled")) @Controller
 @RequestMapping(Array("/${cm2.prefix}/admin/assignments/{assignment}"))
-class SubmissionAndFeedbackController extends CourseworkController
-	with AcademicYearScopedController with AutowiringUserSettingsServiceComponent with AutowiringMaintenanceModeServiceComponent {
+class SubmissionAndFeedbackController extends CourseworkController {
+
+	var features: Features = Wire[Features]
 
 	validatesSelf[SelfValidating]
 
-	val academicYear = activeAcademicYear.getOrElse(AcademicYear.guessSITSAcademicYearByDate(DateTime.now))
-
 	@ModelAttribute("submissionAndFeedbackCommand")
-	def command(@PathVariable module: Module, @PathVariable assignment: Assignment): SubmissionAndFeedbackCommand.CommandType =
-		SubmissionAndFeedbackCommand(module, assignment)
+	def command(@PathVariable assignment: Assignment): SubmissionAndFeedbackCommand.CommandType =
+		SubmissionAndFeedbackCommand(assignment)
 
 	@ModelAttribute("allFilters")
 	def allFilters(@PathVariable assignment: Assignment): Seq[Cm2Filter with Product with Serializable] =
@@ -63,20 +60,20 @@ class SubmissionAndFeedbackController extends CourseworkController
 			if (errors.hasErrors) {
 
 				Mav(s"$urlPrefix/admin/assignments/submissionsandfeedback/progress",
-					"department" -> assignment.module.adminDepartment,
-					"academicYear" -> academicYear
-				).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
+					"module" -> assignment.module,
+					"department" -> assignment.module.adminDepartment
+				).crumbs(CourseworkBreadcrumbs.SubmissionsAndFeedback.SubmissionsAndFeedbackManagement(assignment))
 
 			} else {
 
 				val results = command.apply()
 
 				Mav(s"$urlPrefix/admin/assignments/submissionsandfeedback/progress",
+					"module" -> assignment.module,
 					"department" -> assignment.module.adminDepartment,
-					"academicYear" -> academicYear,
 					"results" ->	resultMap(results)
-				).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
-		}
+				).crumbs(CourseworkBreadcrumbs.SubmissionsAndFeedback.SubmissionsAndFeedbackManagement(assignment))
+			}
 	}
 	}
 
@@ -85,18 +82,16 @@ class SubmissionAndFeedbackController extends CourseworkController
 		if (errors.hasErrors) {
 
 			Mav(s"$urlPrefix/admin/assignments/submissionsandfeedback/list",
-				"department" -> assignment.module.adminDepartment,
-				"academicYear" -> academicYear
-			).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
+				"department" -> assignment.module.adminDepartment
+			).crumbs(CourseworkBreadcrumbs.SubmissionsAndFeedback.SubmissionsAndFeedbackManagement(assignment))
 
 		} else {
 
 			val results = command.apply()
 			Mav(s"$urlPrefix/admin/assignments/submissionsandfeedback/list",
 				"department" -> assignment.module.adminDepartment,
-				"academicYear" -> academicYear,
 				"results" ->	resultMap(results)
-			).crumbs(CourseworkBreadcrumbs.Department.DepartmentManagement(assignment.module.adminDepartment, academicYear))
+			).crumbs(CourseworkBreadcrumbs.SubmissionsAndFeedback.SubmissionsAndFeedbackManagement(assignment))
 
 		}
 	}

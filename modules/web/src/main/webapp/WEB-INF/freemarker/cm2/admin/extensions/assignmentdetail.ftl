@@ -53,7 +53,7 @@
 
 
 	<details>
-		<summary>About this student (${universityId})</summary>
+		<summary>About this student (${student.universityId})</summary>
 		<dl class="unstyled">
 			<#if (studentContext.course)?has_content>
 				<#assign c = studentContext.course />

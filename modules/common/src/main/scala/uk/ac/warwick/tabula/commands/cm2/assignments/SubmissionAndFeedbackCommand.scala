@@ -26,8 +26,8 @@ import scala.collection.immutable.ListMap
 object SubmissionAndFeedbackCommand {
 	type CommandType = Appliable[SubmissionAndFeedbackResults]
 
-	def apply(module: Module, assignment: Assignment) =
-		new SubmissionAndFeedbackCommandInternal(module, assignment)
+	def apply(assignment: Assignment) =
+		new SubmissionAndFeedbackCommandInternal(assignment)
 			with ComposableCommand[SubmissionAndFeedbackResults]
 			with SubmissionAndFeedbackRequest
 			with SubmissionAndFeedbackPermissions
@@ -80,8 +80,8 @@ object SubmissionAndFeedbackCommand {
 }
 
 trait SubmissionAndFeedbackState {
-	def module: Module
 	def assignment: Assignment
+	def module: Module = assignment.module
 }
 
 trait SubmissionAndFeedbackRequest extends SubmissionAndFeedbackState {
@@ -124,7 +124,7 @@ trait SubmissionAndFeedbackPermissions extends RequiresPermissionsChecking with 
 	}
 }
 
-abstract class SubmissionAndFeedbackCommandInternal(val module: Module, val assignment: Assignment)
+abstract class SubmissionAndFeedbackCommandInternal(val assignment: Assignment)
 	extends CommandInternal[SubmissionAndFeedbackResults] with SubmissionAndFeedbackState with TaskBenchmarking {
 	self: SubmissionAndFeedbackRequest
 		with AssessmentMembershipServiceComponent

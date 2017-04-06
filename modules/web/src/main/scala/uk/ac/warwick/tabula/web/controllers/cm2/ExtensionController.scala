@@ -206,6 +206,7 @@ class EditExtensionController extends CourseworkController with ExtensionService
 		}
 		Mav(s"$urlPrefix/admin/extensions/assignmentdetail",
 			"usercode" -> student.getUserId,
+			"universityId" -> student.getWarwickId,
 			"student" -> studentMember,
 			"studentContext" -> studentContext,
 			"detail" -> detail,

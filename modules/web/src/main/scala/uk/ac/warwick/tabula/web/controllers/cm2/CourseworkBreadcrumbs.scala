@@ -1,8 +1,7 @@
 package uk.ac.warwick.tabula.web.controllers.cm2
 
-import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.cm2.web.Routes
-import uk.ac.warwick.tabula.data.model.Department
+import uk.ac.warwick.tabula.data.model.Assignment
 import uk.ac.warwick.tabula.web.BreadCrumb
 
 
@@ -24,11 +23,11 @@ object CourseworkBreadcrumbs {
 		}
 
 	}
-	object Department {
+	object SubmissionsAndFeedback {
 
-		case class DepartmentManagement(val department: Department, val academicYear: AcademicYear) extends Abstract {
-			val title: String = "Department Management"
-			val url = Some(Routes.admin.department.apply(department, academicYear))
+		case class SubmissionsAndFeedbackManagement(val assignment: Assignment) extends Abstract {
+			val title: String = "Submissions and Feedback Management"
+			val url = Some(Routes.admin.assignment.submissionsandfeedback(assignment))
 
 		}
 

@@ -19,7 +19,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.xml._
 
-class XMLBuilder(val items: Seq[Student], val assignment: Assignment, val module: Module) extends SubmissionAndFeedbackExport {
+class XMLBuilder(val items: Seq[Student], val assignment: Assignment, override val module: Module) extends SubmissionAndFeedbackExport {
 
 	var topLevelUrl: String = Wire.property("${toplevel.url}")
 
@@ -93,7 +93,7 @@ class XMLBuilder(val items: Seq[Student], val assignment: Assignment, val module
 			Nil //empty Node seq, no element
 }
 
-class CSVBuilder(val items: Seq[Student], val assignment: Assignment, val module: Module)
+class CSVBuilder(val items: Seq[Student], val assignment: Assignment, override val module: Module)
 	extends CSVLineWriter[Student] with SubmissionAndFeedbackSpreadsheetExport {
 
 	var topLevelUrl: String = Wire.property("${toplevel.url}")
@@ -103,7 +103,7 @@ class CSVBuilder(val items: Seq[Student], val assignment: Assignment, val module
 	def getColumn(item:Student, i:Int): String = formatData(itemData(item).get(headers(i)))
 }
 
-class ExcelBuilder(val items: Seq[Student], val assignment: Assignment, val module: Module) extends SubmissionAndFeedbackSpreadsheetExport {
+class ExcelBuilder(val items: Seq[Student], val assignment: Assignment, override val module: Module) extends SubmissionAndFeedbackSpreadsheetExport {
 
 	var topLevelUrl: String = Wire.property("${toplevel.url}")
 
@@ -118,7 +118,7 @@ class ExcelBuilder(val items: Seq[Student], val assignment: Assignment, val modu
 	}
 
 	def generateNewSheet(workbook: XSSFWorkbook): XSSFSheet = {
-		val sheet = workbook.createSheet(module.code.toUpperCase + " - " + safeAssignmentName)
+		val sheet = workbook.createSheet(assignment.module.code.toUpperCase + " - " + safeAssignmentName)
 
 		def formatHeader(header: String) =
 			WordUtils.capitalizeFully(header.replace('-', ' '))
@@ -241,7 +241,7 @@ trait SubmissionAndFeedbackSpreadsheetExport extends SubmissionAndFeedbackExport
 
 trait SubmissionAndFeedbackExport {
 	val assignment: Assignment
-	val module: Module
+	val module: Module = assignment.module
 
 	def topLevelUrl: String
 
@@ -251,7 +251,7 @@ trait SubmissionAndFeedbackExport {
 	// This Seq specifies the core field order
 	val baseFields = Seq("module-code", "id", "open-date", "open-ended", "close-date")
 	val identityFields: Seq[String] =
-		if (module.adminDepartment.showStudentName) Seq("university-id", "name")
+		if (assignment.module.adminDepartment.showStudentName) Seq("university-id", "name")
 		else Seq("university-id")
 
 	val submissionFields = Seq("id", "time", "downloaded")
@@ -262,7 +262,7 @@ trait SubmissionAndFeedbackExport {
 	val adjustmentFields = Seq("mark", "grade", "reason")
 
 	protected def assignmentData: Map[String, Any] = Map(
-		"module-code" -> module.code,
+		"module-code" -> assignment.module.code,
 		"id" -> assignment.id,
 		"open-date" -> assignment.openDate,
 		"open-ended" -> assignment.openEnded,
@@ -272,7 +272,7 @@ trait SubmissionAndFeedbackExport {
 
 	protected def identityData(item: Student): Map[String, Any] = Map(
 		"university-id" -> CurrentUser.studentIdentifier(item.user)
-	) ++ (if (module.adminDepartment.showStudentName) Map("name" -> item.user.getFullName) else Map())
+	) ++ (if (assignment.module.adminDepartment.showStudentName) Map("name" -> item.user.getFullName) else Map())
 
 	protected def submissionData(student: Student): Map[String, Any] = student.cm2.enhancedSubmission match {
 		case Some(item) if item.submission.id.hasText => Map(
