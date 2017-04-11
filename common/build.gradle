@@ -1,0 +1,159 @@
+dependencies {
+    compile "org.scala-lang.modules:scala-parser-combinators_${scalaMajorVersion}:1.0.3"
+
+    compile "org.springframework:spring-aop:${springVersion}"
+    compile "org.springframework:spring-beans:${springVersion}"
+    compile "org.springframework:spring-context:${springVersion}"
+    compile "org.springframework:spring-context-support:${springVersion}"
+    compile "org.springframework:spring-core:${springVersion}"
+    compile "org.springframework:spring-expression:${springVersion}"
+    compile "org.springframework:spring-instrument:${springVersion}"
+    compile "org.springframework:spring-instrument-tomcat:${springVersion}"
+    compile "org.springframework:spring-jdbc:${springVersion}"
+    compile "org.springframework:spring-jms:${springVersion}"
+    compile "org.springframework:spring-orm:${springVersion}"
+    compile "org.springframework:spring-oxm:${springVersion}"
+    compile "org.springframework:spring-tx:${springVersion}"
+    compile "org.springframework:spring-web:${springVersion}"
+    compile "org.springframework:spring-webmvc:${springVersion}"
+
+    compile 'javax.activation:activation:1.1.1'
+
+    compile "net.databinder:dispatch_${scalaMajorVersion}:${dispatchVersion}"
+    compile "net.databinder:dispatch-core_${scalaMajorVersion}:${dispatchVersion}"
+    compile "net.databinder:dispatch-futures_${scalaMajorVersion}:${dispatchVersion}"
+    compile "net.databinder:dispatch-http_${scalaMajorVersion}:${dispatchVersion}"
+    compile "net.databinder:dispatch-jsoup_${scalaMajorVersion}:${dispatchVersion}"
+    compile "net.databinder:dispatch-mime_${scalaMajorVersion}:${dispatchVersion}"
+    compile "net.databinder:dispatch-tagsoup_${scalaMajorVersion}:${dispatchVersion}"
+
+    compile "uk.ac.warwick.util:warwickutils-core:${warwickUtilsVersion}"
+    compile "uk.ac.warwick.util:warwickutils-mail:${warwickUtilsVersion}"
+    compile "uk.ac.warwick.util:warwickutils-web:${warwickUtilsVersion}"
+    compile "uk.ac.warwick.util:warwickutils-queue:${warwickUtilsVersion}"
+    compile "uk.ac.warwick.util:warwickutils-files:${warwickUtilsVersion}"
+    compile "uk.ac.warwick.util:warwickutils-hibernate4:${warwickUtilsVersion}"
+    compile "uk.ac.warwick.util:warwickutils-csv:${warwickUtilsVersion}"
+    compile "uk.ac.warwick.util:warwickutils-mywarwick:${warwickUtilsVersion}"
+
+    compile 'uk.ac.warwick.sso:sso-client:2.30'
+    compile 'xalan:xalan:2.7.2'
+
+    // Explicitly stated here to upgrade the version from dispatch
+    compile 'org.apache.httpcomponents:httpclient:4.5.1'
+    compile 'org.apache.httpcomponents:httpcore:4.4.5'
+    compile 'org.apache.httpcomponents:httpmime:4.5.2'
+
+    compile "uk.ac.warwick:spring-scala-glue_${scalaMajorVersion}:1.6"
+
+    compile 'org.apache.tika:tika-core:1.1'
+    compile "org.apache.poi:poi:${poiVersion}"
+    compile "org.apache.poi:poi-ooxml:${poiVersion}"
+    compile "org.apache.poi:poi-ooxml-schemas:${poiVersion}"
+    compile 'org.apache.poi:ooxml-schemas:1.1'
+    compile "org.apache.poi:poi-scratchpad:${poiVersion}"
+
+    compile 'org.freemarker:freemarker:2.3.21'
+
+    compile "org.hibernate:hibernate-core:${hibernateVersion}"
+    compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
+    compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final"
+
+    compile "org.hibernate:hibernate-validator:5.1.3.Final"
+    compile "org.hibernate:hibernate-validator-annotation-processor:5.1.3.Final"
+    compile "javax.el:javax.el-api:2.2.4"
+    compile "org.glassfish.web:javax.el:2.2.4"
+
+    compile "joda-time:joda-time:2.8.2"
+    compile "joda-time:joda-time-jsptags:1.1.1"
+    compile "org.jadira.usertype:usertype.core:3.2.0.GA"
+    compile "org.joda:joda-convert:1.1"
+
+    compile "com.google.guava:guava:18.0"
+    compile "com.google.code.findbugs:jsr305:2.0.1"
+
+    compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    compile "com.fasterxml.jackson.module:jackson-module-scala_${scalaMajorVersion}:${jacksonVersion}"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:${jacksonVersion}"
+
+    compile 'javax.mail:mail:1.4.5'
+
+    compile 'org.apache.commons:commons-compress:1.10'
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.1'
+    compile 'commons-codec:commons-codec:1.6'
+    compile 'commons-configuration:commons-configuration:1.1'
+    compile 'commons-logging:commons-logging:1.1.1'
+
+    compile "org.apache.tiles:tiles-api:${tilesVersion}"
+    compile "org.apache.tiles:tiles-core:${tilesVersion}"
+    compile "org.apache.tiles:tiles-el:${tilesVersion}"
+    compile "org.apache.tiles:tiles-extras:${tilesVersion}"
+    compile "org.apache.tiles:tiles-freemarker:${tilesVersion}"
+    compile "org.apache.tiles:tiles-jsp:${tilesVersion}"
+    compile "org.apache.tiles:tiles-servlet:${tilesVersion}"
+    compile "org.apache.tiles:tiles-template:${tilesVersion}"
+
+    compile 'net.sf.ehcache:ehcache:2.9.0'
+    compile 'net.spy:spymemcached:2.10.6'
+
+    compile "org.springframework.scala:spring-scala_${scalaMajorVersion}:1.0.0.RC1"
+
+    compile 'org.xhtmlrenderer:flying-saucer-pdf-itext5:9.0.4'
+
+    compile "uk.co.halfninja:random-name-generator_${scalaMajorVersion}:0.2-warwick"
+
+    // libphonenumber, for formatting phone numbers
+    compile 'com.googlecode.libphonenumber:libphonenumber:5.2'
+
+    // offline geocoder for libphonenumber
+    compile 'com.googlecode.libphonenumber:geocoder:2.3'
+
+    compile 'com.vladsch.flexmark:flexmark:0.18.5'
+    compile 'com.vladsch.flexmark:flexmark-ext-autolink:0.18.5'
+
+    compile 'org.mnode.ical4j:ical4j:1.0.3'
+
+    compile 'com.google.code.gson:gson:2.3.1'
+
+    compile "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
+    compile "com.sksamuel.elastic4s:elastic4s-core_${scalaMajorVersion}:${elasticsearchVersion}"
+
+    compile "org.apache.jclouds:jclouds-blobstore:${jcloudsVersion}"
+    compile "org.apache.jclouds.driver:jclouds-slf4j:${jcloudsVersion}"
+    compile "org.apache.jclouds.api:openstack-swift:${jcloudsVersion}"
+    compile "org.apache.jclouds.api:filesystem:${jcloudsVersion}"
+
+    compile 'org.tuckey:urlrewritefilter:4.0.4'
+
+    compile 'org.quartz-scheduler:quartz:2.2.1'
+    compile 'org.quartz-scheduler:quartz-jobs:2.2.1'
+
+    compile 'com.github.mfornos:humanize-slim:1.2.2'
+
+    // Test dependencies
+    testCompile "org.springframework:spring-test:${springVersion}"
+
+    // FIXME We need this for the sandbox (because it uses jdbc:embedded-datasource to mock up SITS and FIM databases) but that seems incredibly wasteful
+    compile 'org.hsqldb:hsqldb:2.2.9'
+
+    testCompile "org.elasticsearch:elasticsearch:${elasticsearchVersion}:tests"
+    testCompile "com.sksamuel.elastic4s:elastic4s-testkit_${scalaMajorVersion}:${elasticsearchVersion}"
+}
+
+jar.dependsOn(generateRebel)
+
+// Create a test JAR for inclusion in other projects
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+configurations {
+    testArtifacts.extendsFrom testRuntime
+}
+
+artifacts {
+    testArtifacts testJar
+}

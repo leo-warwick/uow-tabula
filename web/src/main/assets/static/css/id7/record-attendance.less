@@ -1,0 +1,96 @@
+@import (reference) "../css3";
+@import (reference) "id7/less/variables.less";
+@import (reference) "colours.less";
+
+.recordCheckpointForm {
+	.submit-buttons {
+		width:100%;
+
+		.pull-right {
+			padding-right:2.5em;
+		}
+	}
+
+	.row .bg {
+		padding-top: 10px;
+		padding-bottom: 10px;
+	}
+	.row:nth-of-type(even) .bg {
+		background-color: @zebra-pale;
+	}
+	.check-all .bg {
+		background-color: @zebra-dark;
+	}
+}
+
+.active-colour(@activeColour, @textColour: #fff) {
+	// Remove the text shadow because it makes things look weird against dark backgrounds
+	text-shadow: none;
+
+	// Hover/focus state
+	&:hover,
+	&:focus {
+		text-decoration: none;
+		background-position: 0 -36px;
+
+		.transition(none);
+	}
+
+	// in these cases the gradient won't cover the background, so we override
+	&:hover, &:focus, &:active, &.active, &.active:hover, &.active:focus {
+		color: @textColour !important;
+		background-color: @activeColour;
+		*background-color: darken(@activeColour, 5%);
+	}
+
+	&:disabled, &.disabled {
+		color: @activeColour !important;
+		background-color: #e6e6e6;
+		*background-color: darken(#e6e6e6, 5%);
+	}
+
+	// IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
+	&:active, &.active {
+		background-color: @activeColour e("\9");
+	}
+}
+
+.btn-attended {
+	color: @brand-success !important;
+	.active-colour(@brand-success);
+}
+.btn-unauthorised {
+	color: @brand-danger !important;
+	.active-colour(@brand-danger);
+}
+.btn-authorised {
+	color: @brand-primary !important;
+	.active-colour(@brand-primary);
+}
+
+.checkAllMessage {
+	padding-right: 6px;
+}
+
+a.attendance-note.edit {
+	text-shadow: none;
+	background-image: none;
+	color: #fff !important;
+	background-color: #3a3a3c;
+	*background-color: darken(#3a3a3c, 5%);
+	background-color: #3a3a3c e("\9");
+}
+
+.recordCheckpointForm .btn-group {
+	margin-right:13px;
+
+	button { margin-right: 0; }
+}
+
+@media print {
+	.tabula-page, #container {
+		.recordCheckpointForm {
+			.checkAllMessage, .btn-group, .save-row, .check-all, .submit-buttons, .attendance-note { display: none; }
+		}
+	}
+}

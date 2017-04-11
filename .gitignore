@@ -2,9 +2,15 @@
 /bin
 /dist
 /target
-/modules/*/target
-/modules/*/bin
-/modules/*/overlays
+/.gradle
+/build
+/out
+/*/target
+/*/bin
+/*/overlays
+/*/build
+/*/out
+/*/.gradle
 junit*.properties
 /project/target
 /project/project
@@ -17,8 +23,10 @@ local.properties
 /config/scripts/dev/courses-private.properties
 console.properties
 tabula-private.properties
-!/modules/*/src/test/resources/tabula-private.properties
+!/*/src/test/resources/tabula-private.properties
 atlassian-ide-plugin.xml
+gulpopts.json
+gradle-local.properties
 
 # Error dumps, logs
 hs_err*
@@ -36,6 +44,7 @@ ajcore*
 /activemq-data
 /out
 ${*
+/mocha.json
 
 # Eclipse IDE
 /.classpath
@@ -46,6 +55,9 @@ ${*
 !/.idea/modules/*.iml
 !/.idea/codeStyleSettings.xml
 !/.idea/fileTemplates/*
+!/.idea/gradle.xml
+!/.idea/compiler.xml
+!/.idea/encodings.xml
 /.idea/*
 *.iml
 *.iws

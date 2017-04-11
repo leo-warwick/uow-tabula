@@ -1,35 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="EntryPointsManager">
-    <entry_points version="2.0" />
+  <component name="JavaScriptSettings">
+    <option name="languageLevel" value="ES6" />
   </component>
-  <component name="FrameworkDetectionExcludesConfiguration">
-    <file url="file://$PROJECT_DIR$/modules/scheduling/overlays" />
-    <file type="javaeeApplication" url="file://$PROJECT_DIR$/modules/all" />
-    <file type="web" url="file://$PROJECT_DIR$/modules/api" />
-    <file type="web" url="file://$PROJECT_DIR$/modules/attendance" />
-    <file type="web" url="file://$PROJECT_DIR$/modules/coursework" />
-    <file type="web" url="file://$PROJECT_DIR$/modules/home" />
-    <file type="web" url="file://$PROJECT_DIR$/modules/profiles" />
-    <file type="web" url="file://$PROJECT_DIR$/modules/scheduling" />
-    <file type="web" url="file://$PROJECT_DIR$/modules/web" />
-  </component>
-  <component name="IdProvider" IDEtalkID="5FE0E67EA65D5BCC42D3B9C01843C6B1" />
-  <component name="MavenProjectsManager">
-    <option name="originalFiles">
-      <list>
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/modules/functional-test/pom.xml" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/modules/web/src/main/webapp/WEB-INF/freemarker/coursework/admin/assignments/batch_new_select_js.ftl" />
-  </component>
-  <component name="ProjectResources">
-    <resource url="http://ehcache.org/ehcache.xsd" location="$PROJECT_DIR$/modules/common/src/main/resources/ehcache.xsd" />
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="Java" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

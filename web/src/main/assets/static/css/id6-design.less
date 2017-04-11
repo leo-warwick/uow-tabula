@@ -1,0 +1,233 @@
+@import (reference) "bootstrap/variables.less";
+@import (reference) "css3.less";
+@import (reference) "variables.less";
+
+@background-colour: #f2e8cf;
+
+@body-colour: @tabulaGray;
+
+// Link colours
+@link-colour: @tabulaBlueDark;
+@link-hover: @tabulaTurquoise;
+@link-visited-colour: @link-colour;
+
+// Search tab background and colour
+@search-tab-background: @tabulaGreenDark;
+@search-tab-colour: #ffffff;
+
+// Navigation
+@nav-colour: #80716a;
+@nav-border-colour: #a0958f;
+@nav-link-colour: #fff;
+@nav-hover-colour: #bbb;
+
+// Heading colours - defaults to inheriting the base font colour
+@h1-colour: @tabulaTurquoise;
+@h2-colour: @tabulaPurple;
+@h3-colour: @tabulaBlueDark;
+@h4-colour: @tabulaYellowGreen;
+@h5-colour: @tabulaGray;
+@h6-colour: @tabulaPurple;
+
+// Heading link colours - defaults to the standard link colours
+// Change these to inherit and they will have the same colours as the heading colour
+@h1-link-colour: @link-colour;
+@h1-hover-colour: @link-hover;
+@h1-visited-link-colour: @link-visited-colour;
+@h2-link-colour: @link-colour;
+@h2-hover-colour: @link-hover;
+@h2-visited-link-colour: @link-visited-colour;
+@h3-link-colour: @link-colour;
+@h3-hover-colour: @link-hover;
+@h3-visited-link-colour: @link-visited-colour;
+@h4-link-colour: @link-colour;
+@h4-hover-colour: @link-hover;
+@h4-visited-link-colour: @link-visited-colour;
+@h5-link-colour: @link-colour;
+@h5-hover-colour: @link-hover;
+@h5-visited-link-colour: @link-visited-colour;
+@h6-link-colour: @link-colour;
+@h6-hover-colour: @link-hover;
+@h6-visited-link-colour: @link-visited-colour;
+
+// Dividing line colour
+@hr-colour: #888;
+
+// Footer
+@footer-bg: @nav-colour;
+@footer-colour: #aaa;
+@footer-link-colour: @nav-link-colour;
+@footer-hover-colour: @nav-hover-colour;
+
+#custom-header {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+
+html {
+  // Always show scrollbars to avoid horizontal jerkothon
+  // when moving between pages that are taller and shorter than
+  // the window
+  overflow-y: scroll;
+
+  background: @background-colour url(../images/bg.png) no-repeat fixed center -100px;
+  color: @body-colour;
+}
+
+body {
+  background: none;
+}
+
+#container {
+  // Hello Mister Coggy wog!
+  background: white url(../images/inner-bg.png) no-repeat fixed center -100px;
+  .box-shadow(0, 0, 48px, rgba(0, 0, 0, 0.4));
+}
+
+.is-tablet #container, .is-smallscreen #container {
+  background: white;
+  .box-shadow-none();
+}
+
+#page-header #site-header-container {
+  text-shadow: none;
+}
+
+// Link colours
+a:link, a:visited {
+  color: @link-colour;
+}
+
+a:hover {
+  color: @link-hover;
+}
+
+// Search tab
+#search-container ul.index-section li.active {
+  background-color: @search-tab-background;
+  color: @search-tab-colour;
+}
+
+// Heading colours and HR colour
+// .mceContentBody makes it work in the JScript editor too
+#main-content, .mceContentBody {
+  h1, .colour-h1 {
+    color: @h1-colour;
+
+    a:link, a:visited {
+      color: @h1-link-colour;
+    }
+    a:hover {
+      color: @h1-hover-colour;
+    }
+  }
+  h2, .colour-h2 {
+    color: @h2-colour;
+
+    a:link, a:visited {
+      color: @h2-link-colour;
+    }
+    a:hover {
+      color: @h2-hover-colour;
+    }
+  }
+  h3, .colour-h3 {
+    color: @h3-colour;
+
+    a:link, a:visited {
+      color: @h3-link-colour;
+    }
+    a:hover {
+      color: @h3-hover-colour;
+    }
+  }
+  h4, .colour-h4 {
+    color: @h4-colour;
+
+    a:link, a:visited {
+      color: @h4-link-colour;
+    }
+    a:hover {
+      color: @h4-hover-colour;
+    }
+  }
+  h5, .colour-h5 {
+    color: @h5-colour;
+
+    a:link, a:visited {
+      color: @h5-link-colour;
+    }
+    a:hover {
+      color: @h5-hover-colour;
+    }
+  }
+  h6, .colour-h6 {
+    color: @h6-colour;
+
+    a:link, a:visited {
+      color: @h6-link-colour;
+    }
+    a:hover {
+      color: @h6-hover-colour;
+    }
+  }
+
+  hr {
+    background: @hr-colour;
+  }
+}
+
+#footer {
+  background-color: @footer-bg;
+  color: @footer-colour;
+
+  a:link, a:visited {
+    color: @footer-link-colour;
+  }
+  a:hover {
+    color: @footer-hover-colour;
+  }
+}
+
+#primary-navigation-wrapper {
+  background: @nav-colour;
+  border-top: 1px solid @nav-border-colour;
+  border-bottom: 1px solid @nav-border-colour;
+}
+
+#primary-navigation li.rendered-link {
+  padding-right: 20px;
+  background: transparent url(../images/crumb-divider.png) right center no-repeat;
+
+  &:hover {
+    .box-shadow-none();
+    background-color: transparent;
+  }
+  .rendered-link-content {
+    a:link, a:visited {
+      color: @nav-link-colour;
+    }
+    a:hover {
+      color: @nav-hover-colour;
+      text-decoration: underline;
+    }
+  }
+}
+
+// Remove the 1px bottom padding
+#container {
+  padding-bottom: 0;
+}
+
+// Turn off some smallscreen ID6 stuff that isn't really needed here
+.is-smallscreen {
+  // Our breadcrumbs are better than the automatic ones, and we don't need the dropdown nav
+  #navigation.horizontal {
+    display: block;
+  }
+  .alternate-breadcrumbs, #alternate-navigation, .smallscreen-anchor-links {
+    display: none;
+  }
+
+}

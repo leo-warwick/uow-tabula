@@ -1,0 +1,1096 @@
+@import (reference) "id7/less/variables.less";
+@import (reference) "id7/less/bootstrap/mixins/vendor-prefixes.less";
+@import (reference) "colours.less";
+@import (reference) "../css3.less";
+
+h1, h2, h3, h4, h5, h6 {
+	a.help-popover {
+		font-size: @main-font-size;
+	}
+	&.with-settings {
+		margin-top: 0;
+		margin-right: 0;
+	}
+}
+
+h2 + h3, h2 + h4, h2 + h5, h2 + h6,
+h3 + h4, h3 + h5, h3 + h6,
+h4 + h5, h4 + h6,
+h5 + h6 { margin: -8px 0 12px; }
+
+h1.modal-title {
+	padding: 0;
+	border: 0;
+}
+
+.modal-xl {
+	width: auto;
+	max-width: 90%;
+}
+
+.deptheader {
+	margin-bottom: 12px;
+
+	&:after {
+		content: "";
+		display: block;
+		clear: both;
+	}
+
+	h1.with-related,
+	h4.with-related,
+	h5.with-related {
+		display: inline-block;
+		margin-bottom: 0;
+		margin-top: 0;
+
+		+ a,
+		+ a + .use-introductory {
+			display: inline-block;
+			width: 16px;
+			height: 16px;
+
+			i { margin-left: 8px; }
+		}
+	}
+	h4.with-related + a,
+	h4.with-related + a + .use-introductory { margin-top: -13px; }
+
+	border-bottom: 1px solid @id7-subtle-line-colour;
+	h1 {
+		border-bottom: 0;
+		padding-bottom: 0;
+	}
+}
+
+.header-with-tooltip {
+	> * {
+		.inline-block;
+		margin-right: 10px;
+	}
+
+	> .use-tooltip {
+		vertical-align: top;
+	}
+}
+
+#god-notice {
+	padding: 0.3em;
+	text-align: center;
+	color: white;
+	background-color: @tabulaRedDark;
+
+	form { display: inline; margin: 0; }
+}
+
+#emergency-message {
+	padding: 0.3em;
+	text-align: center;
+	color: white;
+	background-color: @tabulaRedDark;
+}
+
+#masquerade-notice {
+	padding: 0.3em;
+	text-align: center;
+	background-color: #ffcc66;
+}
+
+#proxy-notice {
+	padding: 0.3em;
+	text-align: center;
+	color: #FFF;
+	background-color: #56a84f;
+}
+
+.navbar.navbar-secondary.sibling-breadcrumbs .navbar-nav > li.nav-breadcrumb:not(:first-child):not(:last-child):not(.dropdown) {
+	margin-left: 0;
+	margin-right: 0;
+	&::after {
+		font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		top: 5px;
+		width: 2px;
+		font-size: 15px;
+		font-weight: 400;
+		content: '|';
+		filter: alpha(opacity=50);
+		opacity: .5;
+		left: 100%;
+		margin-left: -2px;
+		line-height: 24px;
+	}
+}
+@media (max-width: @screen-xs-max) {
+	.navbar.navbar-secondary.sibling-breadcrumbs .nav-breadcrumb.active::before {
+		border: 0;
+	}
+}
+
+.subtle { color: @subtle-text-color; }
+.subtler { color: @very-subtle-text-color; }
+.very-subtle { color: @very-subtle-text-color; font-size: @very-subtle-font-size; }
+
+.mac-cmd {
+	font-size: 140%;
+	vertical-align: middle;
+}
+
+label.disabled {
+	color: @tabulaGrayLight;
+	cursor: not-allowed;
+}
+
+ul.unstyled, ol.unstyled {
+	margin-left: 0;
+	list-style: none;
+	padding-left: 0;
+
+	li{
+		margin-left: 0;
+	}
+}
+
+ul.file-list {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	li {
+		padding: 5px 0 5px 10px;
+		margin: 3px 0;
+		a {
+			max-width: 28em;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		&:not(:last-child){
+			border-bottom: solid 1px #aaa;
+		}
+	}
+}
+
+ul.user-list {
+	list-style: none;
+	padding-left: 0;
+	li {
+		margin: 0;
+	}
+}
+
+ul.links {
+	list-style: none;
+	padding-left:0;
+	margin: 7px 0;
+}
+
+// Make WPopupBox appear above bootstrap modals
+.WPopupGlass, .WPopupBox, .WPopupBoxContent { z-index: 1060 !important; }
+
+.box-style() {
+	border: 1px solid @tabulaGrayLight;
+	border-bottom-color: @tabulaGray;
+}
+
+.subtle-box-style() {
+	border: 1px solid #bbb;
+	border-bottom: 1px solid #aaa;
+}
+
+// details polyfill support
+details, summary { display: block; }
+
+// The following styles are not really needed, since the jQuery script takes care of hiding/displaying the elements.
+// However, we're still gonna use CSS as well to prevent FOUC in browsers that understand these selectors.
+// Remember: by default (and probably most of the time), the contents of the <details> element are hidden.
+
+// Hide all direct descendants of every <details> element
+// Note that IE6 doesn't support the child selector; we'll work around that using jQuery later
+.no-details details > * { display: none; }
+
+// Make sure summary remains visible
+.no-details details summary { display: block; }
+
+// Apply a pointer cursor upon hover to indicate it's clickable; prevent Chrome outlining
+// These styles can be applied regardless of whether the fallback is needed
+summary {
+	cursor: pointer;
+	&:focus { outline: none; }
+}
+
+// polyfill disclosure triangle
+
+.no-details details summary:before {
+	content: '\25ba\00a0';
+	font-size: 11px;
+	margin-right: 4px;
+}
+.no-details details.open summary:before {
+	content: '\25bc\00a0';
+}
+
+// some sections use a large chevron instead of the smaller triangle
+.no-details details summary.large-chevron:before {
+	font-family: FontAwesome, sans-serif;
+	content: '\f054';
+	font-size: 16px;
+	margin-right: 5px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.no-details details.open summary.large-chevron:before {
+	font-family: FontAwesome, sans-serif;
+	content: '\f078';
+	font-size: 16px;
+	padding-bottom: 10px;
+	padding-top: 10px;
+	margin-right: 0;
+}
+
+// Fix popovers to be on top of modals
+.popover {
+	z-index: @zindex-popover  + @zindex-modal;
+
+	.close {
+		margin-top: 3px;
+		margin-right: 8px;
+	}
+
+	&.introductory {
+		max-width: 600px;
+
+
+		.footer {
+			margin: 0; // reset heading margin
+			padding: 8px 14px;
+			font-size: 14px;
+			font-weight: normal;
+			line-height: 18px;
+			background-color: @id7-account-popover-actions-bg;
+			border-top: 1px solid darken(@id7-account-popover-actions-bg, 5%);
+			.border-radius(0 0 5px 5px);
+
+			form {
+				margin-bottom: 0;
+				label {
+					font-weight: normal;
+				}
+			}
+
+			&:empty {
+				display: none;
+			}
+		}
+	}
+	&.wide {
+		max-width: 600px;
+
+		.popover-content {
+			max-height: 450px;
+		}
+	}
+	.popover-content {
+		overflow-y: auto;
+		max-height: 450px;
+	}
+}
+
+.module-info, .striped-section {
+	.box-style;
+
+	&.empty { display: none; }
+
+	padding: 0.5em;
+	margin: 0.7em 0;
+	background-color: @zebra-dark;
+
+	h2 small { font-size: 0.7em; color: @very-subtle-text-color; float:right; }
+
+	.section-title {
+		color: #606060 !important;
+		margin-top: 0;
+		margin-bottom: 0;
+		&.with-button {
+			margin-top: 6px;
+			margin-bottom: 6px;
+		}
+		&.with-contents {
+			margin-bottom: 6px;
+		}
+
+		i.fa-chevron-right, i.fa-chevron-down, i.fa-refresh {
+			.opacity-one(0.6);
+			color: #606060 !important;
+		}
+	}
+
+	.button-list .btn {
+		text-align: left !important;
+		padding-left: 10px !important;
+	}
+
+	&.collapsible {
+		.striped-section-contents { display: none; }
+
+		&.expanded {
+			.striped-section-contents { display: block; }
+			.section-title {
+				margin-bottom: 11px;
+			}
+		}
+	}
+	&.expanded {
+		padding-bottom: 0;
+	}
+
+	:not(.striped-section-contents) div.checkbox {
+		margin: 0;
+	}
+}
+
+.module-info .module-manage-button, .striped-section .section-manage-button {
+	display: inline-block;
+	margin-left: 8px;
+	float:right;
+}
+
+.striped-section-contents {
+	.item-info {
+		border-top: 2px groove white;
+
+		padding: 0.5em;
+		&.row {
+			padding-left: 0;
+			padding-right: 0;
+		}
+		margin-left: -0.5em;
+		margin-right: -0.5em;
+
+		&:nth-of-type(odd) {
+			background-color: @zebra-pale;
+			.well {
+				background-color: @zebra-dark;
+				border-color: darken(@zebra-dark, 7%);;
+			}
+		}
+	}
+	:nth-of-type(odd) .item-info {
+		background-color: @zebra-pale;
+	}
+	:nth-of-type(even) .item-info {
+		background-color: @zebra-dark;
+	}
+}
+
+.striped-section.no-title {
+	padding-top: 0;
+
+	.striped-section-contents .item-info:first-of-type {
+		border-top: 0;
+	}
+}
+
+.striped-section.spacing-only {
+	background-color: transparent;
+	border-color: transparent;
+
+	.striped-section-contents .item-info {
+		background-color: transparent;
+		border-color: transparent;
+	}
+}
+
+.collapse-trigger { .cursor-pointer(); }
+
+h4.collapse-trigger { margin-top: 11px; }
+
+.user-picker-collection .user-picker-container, .flexi-picker-collection .flexi-picker-container {
+	display: block !important;
+	&.input-group {
+		display: table !important;
+	}
+}
+
+.flexi-picker-container.input-group {
+	margin-bottom: 0;
+	position: relative;
+
+	div.spinner-container {
+		position: absolute;
+		top: 16px;
+		right: 60px;
+	}
+}
+
+@flexi-picker-vertical-align: middle;
+
+input.flexi-picker {
+	vertical-align: @flexi-picker-vertical-align;
+}
+
+.flexi-picker-result {
+	min-width: 219px;
+
+	span.type {
+		font-size: 75%;
+		opacity: 0.5;
+		padding: 0.5em;
+	}
+
+	.description, .department, .no-groups, .no-assignments {
+		font-size: 75%;
+		opacity: 0.8;
+		padding-left: 0;
+		margin-top: -4px;
+	}
+
+	i {
+		margin-left: -17px;
+		margin-right: 3px;
+	}
+
+	a {
+		text-decoration: none;
+	}
+}
+.rich-result-field {
+	color: green !important;
+	position: relative;
+	vertical-align: @flexi-picker-vertical-align;
+
+	.val {
+		display: block;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		padding-right: 13px;
+		white-space: nowrap;
+	}
+
+	a.clear-field {
+		position: absolute;
+		right: 0;
+		top: 0;
+		padding: 0 5px 0 0;
+		color: #666;
+		font-size: 150%;
+		text-decoration: none;
+		display: block;
+		width: 20px;
+	}
+}
+
+.activity-stream {
+
+	.hint { color: @tabulaGrayLight; }
+
+	.activity {
+		padding-bottom: 12px;
+		margin-bottom: 12px;
+		border-bottom: 1px solid #cccccc;
+	}
+	.headline {
+		i {
+			padding-right: 1em;
+			position: relative;
+			left: 8px;
+			top: -1px;
+		}
+		h5 {
+			display: inline;
+		}
+		a h5 {
+			color: @link-color;
+		}
+	}
+
+	.priority-complete .headline {
+		i { color: @brand-success; }
+		.title { text-decoration: line-through; }
+	}
+	.priority-trivial .headline i { color: @brand-primary; }
+	.priority-info .headline i { color: @brand-primary; }
+	.priority-warning .headline i { color: @brand-warning; }
+	.priority-critical .headline i { color: @brand-danger; }
+
+	.timestamp {
+		color: #666;
+		font-size: @font-size-base * @font-scale-xs;
+		display: inline;
+		padding-left: 1em;
+	}
+	.content {
+		padding-left: 40px;
+
+		// Compact down some content.
+		// Annoyingly need !important as the ID6 styles are qualified by ID.
+		p { margin: 0 0 0.2em !important; }
+		ul { margin: 0.2em !important; }
+		li { margin: 0 !important; color: @tabulaGray; }
+
+	}
+	.more-link {
+		margin-top: 16px;
+	}
+	.deleted-notice {
+		margin-bottom: 0;
+	}
+
+	.collapsible {
+		@detailsRightArrow: '\25b8';
+		@detailsDownArrow: '\25be';
+
+		height: 1.6em;
+		cursor: pointer;
+
+		width: 100%;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		box-sizing: border-box;
+		overflow: hidden;
+		position: relative;
+
+		* {
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+
+			// show an ellipsis even if the first line fits - there will be a URL below the fold maybe more
+			&:first-child::after {
+				content: ' …';
+			}
+		}
+
+		&::before {
+			content: @detailsRightArrow;
+			position: absolute;
+			margin-left: -13px;
+			margin-top: -1px;
+		}
+
+
+
+		&.open {
+			height: auto;
+
+			* {
+				white-space: normal;
+				&:first-child::after {
+					content: "";
+				}
+			}
+
+			&::before {
+				content: @detailsDownArrow;
+			}
+		}
+	}
+}
+
+table.tablesorter {
+	> thead > tr {
+		th {
+			background-color: transparent;
+			padding-right: 20px;
+
+			&.header {
+				background: transparent url(/static/images/tablesorter/bg.gif) no-repeat center right;
+				cursor: pointer;
+				.user-select(none);
+			}
+
+			&.headerSortUp {
+				background-image: url(/static/images/tablesorter/asc.gif);
+			}
+
+			&.headerSortDown {
+				background-image: url(/static/images/tablesorter/desc.gif);
+			}
+
+			&.no-sort {
+				padding-right: @table-condensed-cell-padding;
+			}
+		}
+	}
+}
+
+// Icon colours for attendance-style data
+.fa-check.attended { color: @brand-success; }
+.fa-times.unauthorised { color: @brand-danger; }
+.fa-times-circle-o.authorised, .fa-check-circle-o.authorised { color: @brand-info; }
+.fa-exclamation-triangle.late { color: @brand-warning; }
+.fa-check.attended, .fa-times.unauthorised, .fa-times-circle-o.authorised, .fa-check-circle-o.authorised {
+	&.non-active {
+		opacity: 0.3;
+	}
+}
+
+.fa-stack.fa-stack-original-size {
+	width: 1em;
+	height: 1em;
+	line-height: 1em;
+	&.fa-fw {
+		width: (18em / 14);
+	}
+
+	.fa-stack-2x {
+		font-size: 1em;
+	}
+	.fa-stack-1x {
+		font-size: 0.6em;
+	}
+}
+.fa-stack.fa-stack-right {
+	margin-right: 3px;
+	.fa-stack-1x {
+		width: auto;
+		line-height: 1em;
+		right: -2px;
+		left: auto;
+		bottom: -2px;
+		background: white;
+	}
+}
+.fa-filled-white {
+	background: white;
+}
+
+//Filter pages
+.student-filter, .small-groups-filter, .filters {
+	.filter-list {
+		max-height: 300px;
+		overflow-y: auto;
+		overflow-x: hidden;
+
+		.close {
+			margin: 0 10px;
+		}
+
+		.clear-this-filter {
+			.btn {
+				margin: 2px 8px 2px 0;
+				padding-left: 0;
+			}
+			hr {
+				margin: 0;
+			}
+		}
+
+		ul {
+			margin: 0 10px;
+			padding-left: 0;
+			list-style: none;
+
+			label.checkbox, label.radio {
+				padding-right: 10px;
+				max-width: 300px;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				display: block;
+				cursor: pointer;
+				font-weight: normal;
+			}
+		}
+	}
+
+	.filter-short-values {
+		display: inline-block;
+		width: 90px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		vertical-align: bottom;
+	}
+
+	.clear-all-filters {
+		padding-left: 5px;
+		padding-right: 5px;
+		margin: 0;
+		color: @tabulaGray;
+
+		&:hover, &:focus {
+			text-decoration: none;
+		}
+
+		&[disabled] .fa-stack-2x {
+			visibility: hidden;
+		}
+
+		.fa-stack-2x {
+			color: rgba(255,128,128,0.25);
+
+			&:hover, &:focus {
+				color: rgba(255,128,128,1);
+			}
+		}
+	}
+}
+
+.pagination {
+	margin-top: -10px;
+	margin-bottom: 10px;
+}
+
+.small-groups-filter {
+	.filter-short-values { width: 120px; }
+	.filter-list { width: 300px; }
+}
+
+#filter-results {
+	.opacity-one(1);
+	.transition(opacity 0.3s ease-in-out);
+
+	&.loading { .opacity-one(0.3); }
+}
+
+.dept-settings, .user-settings, .dept-show {
+	display: inline-block;
+
+}
+
+.dept-settings {
+	margin-bottom: 16px;
+}
+
+.dept-toolbar {
+	display: inline-block;
+	float:right
+}
+
+.mod-code, .route-code {
+	letter-spacing: 1px;
+	font-weight: bold;
+	font-size: 130%;
+	color: #606060;
+}
+
+h3 .mod-code, h3 .route-code, .h3 .mod-code, .h3 .route-code,
+h4 .mod-code, h4 .route-code, .h4 .mod-code, .h4 .route-code,
+h5 .mod-code, h5 .route-code, .h5 .mod-code, .h5 .route-code,
+h6 .mod-code, h6 .route-code, .h6 .mod-code, .h6 .route-code {
+	letter-spacing: 0.5px;
+	margin-left: 4px;
+	font-size: 100%;
+}
+
+.mod-name, .route-name, .group-name {
+	color: #666;
+	font-size: 85%;
+	&:before {
+		content: '// ';
+		position: relative;
+		bottom: 1px;
+		color: #AAA;
+	}
+}
+
+h2 {
+	.mod-name, .route-name {
+		letter-spacing: -1px;
+
+		&:before {
+			letter-spacing: -3px;
+			margin-right: 4px;
+		}
+	}
+}
+
+.permission-list {
+	border: 1px solid #ddd;
+	padding: 16px;
+	.col-md-12 .col-md-12 {
+		margin-top: 8px;
+		&.user {
+			padding-bottom: 8px;
+			border-bottom: 1px solid #ddd;
+		}
+	}
+	margin-bottom: 16px;
+}
+
+.permission-group {
+	.box-style;
+	padding: 0.5em;
+	h3 { line-height: 1em; }
+	.description {
+		color: #666;
+	}
+
+	.permission-list {
+		margin: 1em 0 0.3em 1em;
+		.anon-user {
+			color: #666;
+		}
+
+
+	}
+}
+
+.progress-arrows {
+	span {
+		line-height: 26px;
+		float: left;
+		padding: 5px 10px;
+		background: @tabulaGrayLight;
+		position: relative;
+		color: white;
+		a, a:hover {
+			color: white;
+		}
+		&.active {
+			background: @tabulaGray;
+		}
+
+		&.arrow-right {
+			padding-right: 5px;
+			&:after {
+				position: absolute;
+				top: 0;
+				left: 100%;
+				content: " ";
+				height: 0;
+				width: 0;
+				border: 18px solid transparent;
+				border-left-color: @tabulaGrayLight;
+				border-right-width: 0;
+				z-index: 2;
+
+			}
+			&.active:after {
+				border-left-color: @tabulaGray;
+			}
+		}
+
+		&.arrow-left {
+			margin-left: 10px;
+			padding-left: 25px;
+			&:before {
+				position: absolute;
+				top: 0;
+				left: 0;
+				content: " ";
+				height: 0;
+				width: 0;
+				border: 18px solid transparent;
+				border-left-color: white;
+				border-right-width: 0;
+			}
+		}
+
+		button {
+			border: 0;
+			margin: 0;
+			text-decoration: underline;
+			color: white;
+			&:hover {
+				color: white;
+			}
+			padding: 0;
+			font-size: 16px;
+			vertical-align: top;
+		}
+	}
+
+	height: 40px;
+}
+
+summary.collapsible {
+	border-bottom: 0;
+	border-top: 1px solid #e5e5e5;
+	display: inline-block;
+	width: 100%;
+	line-height: 3;
+}
+
+ul.profile-user-list {
+	margin: 0;
+	padding-left: 0;
+	list-style: none;
+
+	li {
+		padding: 0.5em 0;
+		border: 0 solid lighten(@tabulaGrayLight, 25%);
+		border-bottom-width: 1px;
+
+		h3 { margin-bottom: 0; }
+
+		&:first-child { border-top-width: 1px; }
+	}
+} // ul.profile-user-list
+
+// Mixin. Not for use directly - use the .size-* classes below,
+// which are used by the FTL macro so just use that!
+.tabula-photo (@width, @padding) {
+	float: left;
+	margin-right: 16px;
+	img {
+		padding: @padding;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border: 1px solid rgba(0,0,0,.2);
+		.box-shadow(3px, 3px, 2px, rgba(0,0,0,.2));
+		max-width: @width;
+	}
+	min-width: @width;
+	min-height: @width;
+}
+
+.photo.size-tinythumbnail {
+	.tabula-photo(50px, 5px);
+}
+
+.photo.size-smallthumbnail {
+	.tabula-photo(130px, 6px);
+}
+
+.photo.size-thumbnail {
+	.tabula-photo(186px, 8px);
+}
+
+.datetimepicker table tr td.active {
+	&:active,
+	&:hover:active,
+	&.disabled:active,
+	&.disabled:hover:active,
+	&.active,
+	&:hover.active,
+	&.disabled.active,
+	&.disabled:hover.active {
+		background: @btn-primary-bg none;
+		border-color: @btn-primary-border;
+	}
+}
+
+.content-container {
+	position: absolute;
+	width: 100%;
+	padding: 10px;
+	border-top: 1px solid @table-border-color;
+
+	.content {
+		h3 {
+			font-size: 18px;
+			letter-spacing: -1px;
+
+			display: inline-block;
+		}
+
+		h3 + .labels {
+			display: inline-block;
+
+			position: relative;
+			top: -2px;
+		}
+
+		.stage-group {
+			margin-top: 12px;
+			&:first-child { margin-top: 0; }
+
+			.stage {
+				&.incomplete {
+					color: @very-subtle-text-color;
+
+					&.preconditions-not-met {
+						color: lighten(@very-subtle-text-color, 10%);
+					}
+
+					&.current {
+						color: darken(@very-subtle-text-color, 10%);
+					}
+				}
+			}
+		}
+	}
+}
+
+// Handle rotated hedares when scrolling
+.id7-wide-table-wrapper-container .table-responsive {
+	position: relative;
+}
+
+#profile-modal {
+	z-index: @zindex-popover + @zindex-modal + 1;
+}
+
+
+// styles for text lists
+.textBoxListContainer ul {
+	display: block;
+	overflow: hidden;
+	margin: 0px !important;
+	padding: 0px !important;
+	border: 1px solid @tabulaGrayLightTint;
+	width:100%;
+	li {
+		list-style-type: none;
+		float: left;
+		display: block;
+		margin-bottom: 2px !important;
+		padding: 0px;
+		cursor: default;
+
+		&.item {
+			border: 1px solid @tabulaGrayLightTint;
+			border-color: @tabulaBlueDark @tabulaBlueDark @tabulaBlue;
+			background-color: @tabulaBlue;
+			margin: 8px 0px 2px 6px;
+			box-shadow: none;
+			padding: 2px 0px 2px 4px;
+			line-height: 14px;
+
+			span {
+				margin-right: 2px;
+				color: @id7-brand-white;
+				text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+			}
+
+			a.close {
+				opacity: 1.0;
+				width: 12px;
+				height: 12px;
+				background:url(/static/images/text-list-close.png) -48px -96px;
+			}
+		}
+
+		&.inputContainer {
+			line-height: 14px;
+			margin-bottom: 0px !important;
+			input {
+				border: 0;
+				width:100%;
+				box-shadow: none;
+				&:focus{
+					box-shadow: none;
+				}
+			}
+		}
+	}
+}
+
+#fileExtensionList .inputContainer .text {
+	border: none;
+	box-shadow: none;
+}
+
+.cm2-progress-table {
+	margin-top: 20px;
+
+	th, td {
+		white-space: nowrap;
+	}
+
+	.check-col {
+		width: 1%;
+	}
+
+	.student-col {
+		width: 10%;
+	}
+
+	.progress-col {
+		width: 40%;
+	}
+
+	.action-col {
+		width: 40%;
+	}
+}

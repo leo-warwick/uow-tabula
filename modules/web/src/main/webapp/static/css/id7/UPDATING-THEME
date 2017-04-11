@@ -1,1 +1,0 @@
-curl -H'Content-Type: text/less' --data-binary @id7-theme.inc.less http://site-css-compiler.warwick.ac.uk > id7-theme.css

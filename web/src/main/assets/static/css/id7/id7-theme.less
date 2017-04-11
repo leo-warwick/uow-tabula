@@ -1,0 +1,98 @@
+@import (reference) "id7/less/bootstrap/variables.less";
+@import (reference) "id7/less/bootstrap/mixins.less";
+@import (reference) "id7/less/font-awesome/variables.less";
+@import (reference) "id7/less/font-awesome/mixins.less";
+@import (reference) "id7/less/variables.less";
+@import (reference) "id7/less/mixins.less";
+
+.apply-brand(#333333);
+.apply-site-imagery('../../images/id7','masthead-image.png','border-image-left.png','border-image-right.png');
+.link-colour(#3C5E7F);
+.btn-brand {
+	.button-variant(contrast(#666, @text-color, white, 50%); #666; darken(#666, 5%));
+}
+
+.tabula-apply-navbar-brand(@colour, @text-colour) {
+	@border-colour: multiply(@colour, darken(white, 20%));
+	@contrast-colour: @text-colour;
+	@active-colour: screen(@colour, lighten(black, 30%));
+
+	.apply-navbar-brand(@colour,
+		@contrast-colour,
+		@contrast-colour,
+		@contrast-colour,
+		@border-colour,
+		@active-colour,
+		@contrast-colour,
+		@border-colour
+	);
+}
+
+.id7-navigation .navbar-primary {
+	.tabula-apply-navbar-brand(#239B92, #ffffff);
+}
+
+.id7-navigation .navbar-secondary {
+	.tabula-apply-navbar-brand(#90C0BD, #222222);
+}
+
+.apply-footer-brand(#6B695D);
+
+/** This needs to be sent to the compile server as it won't compile with the Ant plugin **/
+.cog {
+	@cog-width: 25px;
+	@cog-height: 81px;
+	@cog-top: 599px;
+	display: none;
+	background: url(../../images/id7/cog2.png) no-repeat;
+	width: @cog-width;
+	height: @cog-height;
+	position: fixed;
+	top: @cog-top;
+	left: 50%;
+	@media (min-width: @screen-sm-min) {
+		display: block;
+		margin-left: @container-tablet / 2 * -1 - 1;
+	}
+	@media (min-width: @screen-md-min) {
+		display: block;
+		margin-left: @container-desktop / 2 * -1 - 1;
+	}
+	@media (min-width: @screen-lg-min) {
+		display: block;
+		margin-left: @container-large-desktop / 2 * -1 - 1;
+	}
+
+	.fix-cog-for-large-screen-border-image-sizes(@step: 160) {
+		.border-image-size-above(@width, @height) when (@width < 3360px) {
+			@max-width: (@width + @step);
+			@max-height: (@height + ((@height / @width) * @step));
+			@bg-width: ((@max-width - @container-large-desktop) / 2);
+			@bg-scale: @bg-width / @id7-border-image-width;
+
+			@media (min-width: (@width + 1)), (min-height: (@height + 1)) {
+				background-size: (@cog-width * @bg-scale) (@cog-height * @bg-scale);
+				width: @cog-width * @bg-scale;
+				height: @cog-height * @bg-scale;
+				top: @cog-top * @bg-scale;
+			}
+
+			.border-image-size-above(@max-width, @max-height);
+		}
+		.border-image-size-above(@width, @height) when (@width >= 3360px) { // Just hide
+			@this-width: @width + 1;
+			@this-height: @height + 1;
+			@media (min-width: @this-width), (min-height: @this-height) {
+				display: none;
+			}
+		}
+
+		@max-border-image-screen-width: ((@id7-border-image-width * 2) + @container-large-desktop); // 1920px
+		@max-border-image-screen-height: @id7-border-image-height; // 1200px
+
+		// Kickstart
+		.border-image-size-above(@max-border-image-screen-width, @max-border-image-screen-height);
+	}
+
+	.fix-cog-for-large-screen-border-image-sizes();
+}

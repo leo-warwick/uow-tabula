@@ -1,0 +1,40 @@
+@import (reference) "../css3.less";
+@import (reference) "id7/less/variables.less";
+@import "colours.less";
+
+.monitoring-points-profile {
+	h3, .missed-info, .attendance-note-info  { display: inline-block; }
+	h3 { margin-right: 20px; }
+	.missed-info, .attendance-note-info {
+		color: @brand-success;
+		vertical-align: middle;
+		.missed {
+			color: @brand-danger;
+		}
+	}
+	.checkbox.checkpointState-all {
+		margin-left: 10px;
+	}
+
+	.attendance-note-record {
+		margin-top: 20px;
+	}
+	table {
+		td { width: 1px; }
+		td.point {
+			width: 100%;
+		}
+	}
+}
+
+.seminar-attendance-profile {
+	h3, .missed-info { display: inline-block; }
+	h3 { margin-right: 20px; }
+	.missed-info {
+		color: @brand-success;
+		vertical-align: middle;
+		.missed {
+			color: @brand-danger;
+		}
+	}
+}

@@ -1,0 +1,103 @@
+@import (reference) "../css3.less";
+@import (reference) "id7/less/variables.less";
+
+.allocate-associations {
+	.header-with-tooltip {
+		margin-top: (@line-height-computed / 2);
+	}
+
+	table.scrollable-tbody {
+		table-layout: fixed;
+
+		thead {
+			display: block;
+		}
+
+		tbody {
+			display: block;
+			overflow: auto;
+			width: 100%;
+			max-height: 450px;
+		}
+
+		.check {
+			width: 5px;
+			padding-right: 5px;
+		}
+
+		.single-name {
+			width: 210px;
+			&.sortable {
+				width: 210px;
+			}
+		}
+
+		.universityid {
+			width: 100px;
+			&.sortable {
+				width: 98px;
+			}
+		}
+
+		.full-name {
+			width: 365px;
+			&.sortable {
+				width: 365px;
+			}
+		}
+
+		.counter {
+			width: 90px;
+			&.sortable {
+				width: 90px;
+			}
+		}
+
+		.edit {
+			width: 65px;
+			padding-right: 5px;
+		}
+
+		.fa-pencil-square-o {
+			.cursor-pointer()
+		}
+
+		.toggle, .remove {
+			padding-top: @table-condensed-cell-padding - 2;
+			width: 65px;
+		}
+
+		[colspan="3"] {
+			padding-left: 29px;
+		}
+
+		tr.expanded {
+			background-color: @table-bg;
+			td {
+				border-bottom: 1px solid @table-border-color;
+			}
+		}
+		tr.forentity {
+			td {
+				border-bottom: 1px solid @table-border-color;
+			}
+			&.last td {
+				border-bottom: 1px solid @table-border-color;
+			}
+		}
+	}
+
+	.student-filter .wide .filter-short-values {
+		width: 130px;
+	}
+	.student-filter .narrow .filter-short-values {
+		width: 50px;
+	}
+	.student-filter .input-group {
+		width: 100%;
+	}
+}
+
+details .relationship-change-summary {
+	line-height: 2em;
+}

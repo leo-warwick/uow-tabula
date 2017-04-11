@@ -1,0 +1,187 @@
+@import (reference) "colours.less";
+@import (reference) "id7/less/bootstrap/variables.less";
+@import (reference) "scrollable-table.less";
+
+.events .deleted, .item-info.deleted, .item-info.deleted .name, .item-info.deleted .events li {
+	text-decoration: line-through;
+	color: @tabulaGrayLight;
+}
+
+input.deleted {
+	cursor: not-allowed;
+	background-color: @input-bg-disabled !important;
+	text-decoration: line-through;
+}
+
+.groupDetail {
+	.checkbox {
+		float: left;
+		margin: 6px 6px 6px 12px;
+		padding-top: 0;
+	}
+	.controls {
+		margin-left: 0;
+	}
+	.maxGroupSize .checkbox {
+		display: inline;
+	}
+	label.checkbox, h3{
+		float: left;
+	}
+	.groupSizeDetails {
+		float: left;
+		padding-left: 12px;
+		padding-top: 6px;
+	}
+	&.maxGroupSize .input-small {
+		margin-top: 8px;
+	}
+}
+
+// arrange students into groups
+
+#allocateStudentsToGroupsCommand, .allocateStudentsToGroupsCommand, #editEvents {
+
+	.filter {
+		select { width: 100%; }
+
+		margin: 0 0 10px;
+	}
+
+	// Give the student list some affordance for dragging around students
+	.student-list {
+		margin: -16px;
+		padding: 16px;
+	}
+
+	ul.drag-list li {
+		display: block;
+		float: none;
+
+		background: white;
+		margin: 0 0 10px;
+
+		&:hover { background-color: darken(@well-bg, 10%); }
+
+		&.ui-selecting { background: darken(@well-bg, 10%) !important; }
+		&.ui-selected { background: darken(@well-bg, 15%) !important; }
+
+		.profile .photo {
+			float: left;
+			max-width: 50px;
+			padding-right: 10px;
+		}
+	}
+
+	.well.drop-hover {
+		background-color: #dddddd;
+	}
+
+	.group-header {
+		> h4, > div { display: inline-block; }
+		> h4 { margin-right: 10px; }
+	}
+
+	.direction-icon {
+		font-size: 8em;
+		text-align: center;
+		padding-top: 33px;
+		color: #d6d6d6;
+	}
+
+}
+
+// end arrange students into groups
+
+// fix width of week select for recording attendance
+.weekSelector {
+	width: 7em;
+}
+
+
+.small-group-modules-list .item-info {
+	h4.name { margin-bottom: 0; }
+
+	//Change margins for ul,h4 in module view group list.
+	.margin-fix {
+		margin: 0 0 14px 0;
+		h4 { margin: 0; }
+	}
+	h3 i {
+		margin-left: 0.2em;
+		font-size: 0.8em;
+	}
+}
+
+table.table.attendance-table {
+	th.instance-date-header {
+		font-weight: normal;
+		font-size: 12px;
+		line-height: 12px;
+		padding-right: 5px !important;
+		text-align: center;
+	}
+
+	&.tablesorter > thead > tr th.header {
+		/* Position from bottom, CSS3 feature */
+		background-position: bottom 10px right;
+		&.headerSortDown {
+			background-position: bottom 14px right;
+		}
+	}
+}
+
+.seminar-attendance-profile {
+	h3, .missed-info { display: inline-block; }
+	h3 { margin-right: 20px; }
+	.missed-info {
+		color: @brand-success;
+		vertical-align: middle;
+		.missed {
+			color: @brand-danger;
+		}
+	}
+}
+
+
+table.week-selector {
+	&.table {
+		margin-bottom: 0;
+	}
+	th .checkbox label {
+		font-weight: bold;
+	}
+	.checkbox {
+		margin: 0;
+	}
+	td.empty {
+		padding: 0;
+	}
+}
+
+
+.tabula-page #import-groups-table {
+	.striped-section { margin: 0; }
+
+	tr.selected td, tr.highlight td {
+		background-color: lighten(@tabulaGreenLight, 40%) !important;
+	}
+}
+
+.group-attendance {
+	th.missed {
+		width: 40px;
+	}
+	.right td {
+		text-align: center;
+	}
+	.scrollable-table(150px, 90px, 90px);
+}
+
+.striped-section-contents {
+	i.fa-unlock-alt, i.fa-lock, i.fa-link, i.fa-random {
+		color: #606060 !important;
+	}
+}
+
+@import "record-attendance.less";

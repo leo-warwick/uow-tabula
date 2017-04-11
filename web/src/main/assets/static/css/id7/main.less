@@ -1,0 +1,112 @@
+@import "embeddable.less";
+@import (reference) "id7/less/variables.less";
+@import (reference) "../css3.less";
+
+@media (max-width: @screen-xs-max) {
+	.id7-utility-masthead {
+		background: #1f9990 none;
+	}
+}
+
+#sysadmin-link {
+	position: fixed;
+	right: 0;
+	top: 30%;
+	z-index: 100;
+	.dropdown-menu {
+		margin-right: 2em;
+		li { display: block; }
+	}
+}
+
+#sysadmin-button {
+	.rotation(-90deg);
+	-webkit-transform-origin: 100% 100%;
+	-moz-transform-origin: 100% 100%;
+	-ms-transform-origin: 100% 100%;
+	-o-transform-origin: 100% 100%;
+	transform-origin: 100% 100%;
+}
+
+// Multi-select drag and drop widgets. Common styles.
+// Specific usages of the plugin may customise on top of this, e.g. #sortModulesCommand
+ul.drag-list {
+	.cloned { opacity: 0.5; }
+
+	li {
+		display:inline-block;
+		margin: 1px 3px;
+		min-width: 80px;
+
+		cursor: default;
+		text-align: left;
+
+		.handle {
+			opacity: 0.5;
+			cursor: move;
+		}
+		&:hover {
+			.handle { opacity: 1.0; }
+		}
+
+		&.ui-selecting { background: @brand-primary !important; color: @btn-primary-color; }
+		&.ui-selected { background: darken(@brand-primary, 5%) !important; color: @btn-primary-color; }
+	}
+}
+
+
+.ui-draggable-dragging {
+	z-index: 1;
+}
+
+// fixHeaderFooter plugin CSS
+.scroll-to-fixed-fixed {
+	background-color: white; // hide anything under the fixed element
+
+	.btn-toolbar {
+		margin-top: 2px !important; // ugh, stuck with important for bootstrap compatibility
+	}
+
+	hr.header-shadow,
+	hr.footer-shadow {
+		position: absolute;
+		z-index: auto;
+		width: 100%;
+		bottom: -20px;
+		height: 20px;
+		background-color: white !important;
+		margin: 0;
+		overflow: visible;
+		border: 0;
+	}
+
+	hr.footer-shadow {
+		top: -20px;
+		bottom: auto;
+	}
+
+	hr.header-shadow:before,
+	hr.footer-shadow:before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		box-shadow:0 0 12px rgba(100,130,100,0.8);
+		top: 10px;
+		bottom: 0;
+		left: 10px;
+		right: 10px;
+		height: 10px;
+		border-bottom-right-radius: 100px 10px;
+		border-bottom-left-radius: 100px 10px;
+	}
+
+	hr.footer-shadow:before {
+		box-shadow:0 0 -12px rgba(100,130,100,0.8);
+		top: 0;
+		bottom: 10px;
+		border-top-right-radius: 100px 10px;
+		border-top-left-radius: 100px 10px;
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+}

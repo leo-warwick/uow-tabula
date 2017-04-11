@@ -1,0 +1,258 @@
+plugins {
+    id 'com.moowork.node' version '1.1.1'
+    id 'com.moowork.gulp' version '1.1.1'
+}
+
+apply plugin: 'war'
+
+ext.contextPath = 'ROOT'
+war.archiveName = 'ROOT.war'
+
+// Define integration test sources
+sourceSets {
+    integrationTest {
+        scala {
+            compileClasspath += test.output + main.output
+            runtimeClasspath += test.output + main.output
+            srcDir file('src/integration-test/scala')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+// Define cucumber and integration test configurations
+configurations {
+    cucumber
+    cucumberCompile {
+        extendsFrom compile
+        // we'll pick out a good bcprov in cucumber
+        exclude group: 'org.bouncycastle'
+    }
+
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+dependencies {
+    compile project(':common')
+    testCompile project(path: ':common', configuration: 'testArtifacts')
+
+    cucumber 'org.jruby:jruby-complete:9.1.6.0'
+    cucumber 'ch.qos.logback:logback-classic:1.1.7'
+
+    integrationTestCompile 'org.seleniumhq.selenium:selenium-server:3.0.1'
+}
+
+task deployToTomcat(dependsOn: 'war') {
+    doLast {
+        logger.info("----------------------------------------------------")
+        logger.info("Initialising deploy to Tomcat")
+        logger.info("Base name is '${project.archivesBaseName}'")
+        logger.info("Tomcat directory is ${tomcatHome}")
+        logger.info("Deleting ${tomcatHome}\\webapps\\${war.archiveName}")
+
+        delete "${tomcatHome}/webapps/${contextPath}"
+        delete "${tomcatHome}/webapps/${war.archiveName}"
+
+        logger.info("Copying file from ${war.archivePath} to ${tomcatHome}/webapps")
+        copy {
+            from war.archivePath
+            into "${tomcatHome}/webapps"
+        }
+
+        logger.info("----------------------------------------------------")
+    }
+}
+
+rebel {
+    web {
+        resource {
+            directory = "build/rootContent/static"
+            target = "/static/"
+        }
+
+        resource {
+            directory = "build/rootContent/WEB-INF"
+            target = "/WEB-INF/"
+        }
+    }
+}
+
+task commonWebInf(type: Copy) {
+    from project(':common').file('src/main/webapp/WEB-INF')
+    into file('build/rootContent/WEB-INF')
+}
+
+task webInf(type: Copy, dependsOn: 'commonWebInf') {
+    from 'src/main/webapp/WEB-INF'
+    into 'build/rootContent/WEB-INF'
+}
+
+task buildInformation(dependsOn: 'webInf') {
+    doFirst {
+        mkdir 'build/rootContent/WEB-INF'
+    }
+
+    outputs.file("build/rootContent/WEB-INF/build.properties")
+
+    doLast {
+        ant.tstamp {
+            format(property: 'buildTime', pattern: 'yyyy-MM-dd\'T\'HH:mm:ssZ')
+        }
+
+        ant.propertyfile(file: "build/rootContent/WEB-INF/build.properties") {
+            entry(key: "build.time", value: ant.buildTime)
+            entry(key: "module.name", value: project.name)
+            entry(key: "module.context", value: '')
+        }
+    }
+}
+
+task bamboo(dependsOn: ['clean', 'test', 'war']) {}
+task deployApplicationLocally(dependsOn: ['war', 'deployToTomcat']) {}
+
+gulp {
+    colors = true
+}
+
+task installGulpDependencies(type: NpmTask) {
+    inputs.file 'package.json'
+    outputs.dir 'node_modules'
+
+    args = ['install', '-d']
+}
+
+gulp_assets.inputs.files 'gulpfile.js', 'src/main/assets/static'
+gulp_assets.outputs.dir 'build/rootContent/static'
+
+// run npm install
+gulp_assets.dependsOn 'installGulpDependencies'
+
+// run gulp install
+gulp_assets.dependsOn 'installGulp'
+
+def srcDir = new File(projectDir, "src/main/static")
+def targetDir = new File(project.buildDir, "static")
+gulp_dist.inputs.dir srcDir
+gulp_dist.outputs.dir targetDir
+
+war {
+    dependsOn gulp_assets, buildInformation
+    rootSpec.exclude '**/WEB-INF'
+    webInf { from 'build/rootContent/WEB-INF' }
+    from 'build/rootContent'
+}
+
+task integrationTest(type: Test) {
+    doFirst {
+        mkdir 'build/integrationTest-screenshots'
+    }
+
+    systemProperty 'phantomjs.binary.path', new File("node_modules/.bin/phantomjs").absolutePath
+    systemProperty 'screenshot.dir', new File("build/integrationTest-screenshots").absolutePath
+
+    // Run integration test classes in parallel
+    maxParallelForks = 2
+
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+// run npm install
+task installPhantomJSDependency(type: NpmTask) {
+    inputs.file 'package.json'
+    outputs.dir 'node_modules/phantomjs'
+
+    args = ['install', 'phantomjs-prebuilt']
+}
+
+integrationTest.dependsOn 'installPhantomJSDependency'
+
+def bundlerEnvironment = [
+        GEM_HOME: 'vendor/gem_home',
+        GEM_PATH: 'vendor/gem_home'
+]
+
+task cukeInstallBundler(type: JavaExec) {
+    copy {
+        from 'src/integration-test/cucumber/.bundle'
+        into 'build/cucumber/.bundle'
+    }
+
+    copy {
+        from 'src/integration-test/cucumber/Gemfile'
+        into 'build/cucumber'
+    }
+
+    workingDir 'build/cucumber'
+    outputs.dir 'build/cucumber/vendor/gem_home'
+    environment bundlerEnvironment
+
+    main "org.jruby.Main"
+    classpath configurations.cucumber
+
+    args "-S", "gem", "install", "bundler"
+    args "--no-ri"
+    args "--no-rdoc"
+}
+
+task cukeInstallDeps(type: JavaExec) {
+    dependsOn cukeInstallBundler
+
+    workingDir 'build/cucumber'
+    inputs.file 'build/cucumber/Gemfile'
+    outputs.file 'build/cucumber/Gemfile.lock'
+    environment bundlerEnvironment
+
+    main "org.jruby.Main"
+    classpath configurations.cucumber
+
+    args "-S", "vendor/gem_home/bin/bundle", "install"
+    args "--path=vendor/bundle"
+    args "--binstubs"
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+task cucumberReplaceTokens(type: Copy) {
+    dependsOn cukeInstallDeps
+
+    inputs.file "src/integration-test/cucumber/tokens-${System.getProperty("server.environment", "test")}.properties"
+
+    from 'src/integration-test/cucumber/features'
+    into 'build/cucumber/features'
+
+    Properties props = new Properties()
+    props.load(new FileInputStream(new File(projectDir, "src/integration-test/cucumber/tokens-${System.getProperty("server.environment", "test")}.properties")))
+    filter(ReplaceTokens, tokens: props)
+}
+
+task cucumber(type: JavaExec) {
+    dependsOn cucumberReplaceTokens
+
+    // To debug you can add "--jvm-args" (general Gradle feature)
+    main "org.jruby.Main"
+    classpath "src/integration-test/resources/cucumber"
+    classpath configurations.cucumberCompile, configurations.cucumber
+    workingDir 'build/cucumber'
+    environment bundlerEnvironment
+
+    args "bin/cucumber"
+    args "--format", "pretty"
+    args "--strict"
+    args "--guess"
+    args "--format", "junit", "--out", "results"
+    args "--format", "html", "--out", "results.html"
+    args "-r", "features"
+
+    // Can use e.g. -Dfeature.name=blocking to run a single file
+    if (System.getProperty("feature.name", "") != "") {
+        args "-n", System.getProperty("feature.name")
+    }
+
+    environment bundlerEnvironment
+
+    systemProperties = [
+        'log4j.disable' : 'ERROR'
+    ]
+}

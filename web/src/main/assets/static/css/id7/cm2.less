@@ -1,0 +1,120 @@
+@import (reference) "../../libs/font-awesome/less/variables.less";
+@import (reference) "colours.less";
+@import "embeddable";
+
+a.profile-link {
+	text-decoration: none;
+}
+
+
+// extension management
+.detail-row {
+	padding: 0;
+	margin: 0;
+
+	td {
+		padding: 0;
+		margin: 0;
+	}
+
+	.buttons {
+		margin: 10px 0;
+	}
+
+	// styles to make a details summary look like a form label
+	summary {
+		font-weight: 700;
+		color: #555;
+		margin-bottom: 5px;
+	}
+}
+
+.clickable {
+	cursor: pointer;
+
+	&.collapsed .toggle-icon:before {
+		font-family: 'FontAwesome';
+		content: @caret-right;
+	}
+
+	.toggle-icon:before {
+		font-family: 'FontAwesome';
+		content: @caret-down;
+	}
+
+	&.collapsed .toggle-icon-large:before {
+		font-family: 'FontAwesome';
+		content: @chevron-right;
+	}
+
+	.toggle-icon-large:before {
+		font-family: 'FontAwesome';
+		content: @chevron-down;
+	}
+}
+
+
+table.expanding-row-pairs {
+	td.can-expand {
+		i.fa-caret-down, i.fa-caret-right {
+			font-size: 1.5em;
+			vertical-align: middle;
+			cursor: pointer;
+		}
+	}
+	.deleted {
+		text-decoration: line-through;
+	}
+	.disabled {
+		text-decoration: none;
+		color: @tabulaGrayLight;
+		cursor: not-allowed;
+	}
+}
+
+.audit-info {
+	margin-top: 20px;
+}
+
+
+#editExtensionCommand.form-horizontal .form-group {
+	margin-right: 0;
+	margin-left: 0;
+}
+
+.assignmentEnrolment {
+	.remove-restore, .add-students-manually {
+		margin-bottom: 10px;
+	}
+
+}
+
+// setup assignments - hidden options groups
+.options-button .options-group {
+	display: none;
+}
+
+#batch-add-table, .options-button {
+	// distinct coloured labels for assigning options groups.
+	.label-A { background-color: @tabulaTurquoise; }
+	.label-B { background-color: @tabulaPurple; }
+	.label-C { background-color: @tabulaBlueLight; }
+	.label-D { background-color: @tabulaGreen; }
+	.label-E { background-color: @tabulaPink; }
+	.label-F { background-color: @tabulaBlue; }
+	.label-G { background-color: @tabulaGreenDark; }
+	.label-H { background-color: @tabulaOrangeLight; }
+	.label-I { background-color: @tabulaBlueDark; }
+	.label-J { background-color: @tabulaYellowGreen; }
+	.label-K { background-color: @tabulaOrange; }
+	.label-L { background-color: @tabulaRed; }
+	.label-M { background-color: @tabulaGreenLight; }
+	.label-N { background-color: @tabulaOrangeDark; }
+	.label-O { background-color: @tabulaRedDark; }
+	.label-P { background-color: @tabulaPurpleDark; }
+	.label-Q { background-color: @tabulaGrayLight; }
+	.label-R { background-color: @tabulaGrayDark; }
+	.label-S { background-color: @tabulaGray; }
+	// if you've gone past S then you have too many options. Grey for you!
+
+}

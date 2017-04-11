@@ -29,15 +29,23 @@ tabula/
 │   └── setenv.sh
 ├── conf/
 │   ├── context.xml
-│   ├── membership-ds.xml
+│   ├── fim-ds.xml
 │   ├── server.xml
 │   ├── sits-ds.xml
 │   ├── tabula-ds.xml
 │   └── web.xml
 ├── lib/
-│   ├── logback.xml
-│   ├── ojdbc7.jar
+│   ├── jackson-annotations-2.6.5.jar
+│   ├── jackson-core-2.6.5.jar
+│   ├── jackson-databind-2.6.5.jar
 │   ├── jtds-1.3.1.jar
+│   ├── logback-access-1.1.7.jar
+│   ├── logback-classic-1.1.7.jar
+│   ├── logback-core-1.1.7.jar
+│   ├── logback.xml
+│   ├── logstash-logback-encoder-4.7.jar
+│   ├── ojdbc7.jar
+│   ├── slf4j-api-1.7.20.jar
 │   ├── tabula.properties
 │   └── tabula-sso-config.xml
 ├── logs/
@@ -46,7 +54,7 @@ tabula/
 └── work/
 ```
 
-On production instances, we symlink `/usr/local/tomcat-8/instances` to `/var/tomcat/instances`.
+You may find it useful to symlink `/usr/local/tomcat-8/instances` to `/var/tomcat/instances` if you're comfortable with Jboss-style layouts.
 
 The contents of these files are as follows:
 
@@ -72,13 +80,45 @@ There is a sample `server.xml` in `config/servers/augustus/conf`
 
 This is just copied from the `conf` directory in the Tomcat 8 install. I couldn't get Tomcat to run without it being copied, which sucks a bit.
 
-### `lib/ojdbc7.jar`
+### `lib/jackson-annotations-2.6.5.jar`
 
-You can get this from http://pkg.elab.warwick.ac.uk/oracle.com/ojdbc7.jar
+You can get this from http://pkg.elab.warwick.ac.uk/net.logstash.logback/dependencies/jackson-annotations-2.6.5.jar
+
+### `lib/jackson-core-2.6.5.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/net.logstash.logback/dependencies/jackson-core-2.6.5.jar
+
+### `lib/jackson-databind-2.6.5.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/net.logstash.logback/dependencies/jackson-databind-2.6.5.jar
 
 ### `lib/jtds-1.3.1.jar`
 
 You can get this from http://pkg.elab.warwick.ac.uk/net.sourceforge.jtds/jtds-1.3.1.jar
+
+### `lib/logback-access-1.1.7.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/ch.qos.logback/logback-access-1.1.7.jar
+
+### `lib/logback-classic-1.1.7.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/ch.qos.logback/logback-classic-1.1.7.jar
+
+### `lib/logback-core-1.1.7.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/ch.qos.logback/logback-core-1.1.7.jar
+
+### `lib/logstash-logback-encoder-4.7.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/net.logstash.logback/logstash-logback-encoder-4.7.jar
+
+### `lib/slf4j-api-1.7.20.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/net.logstash.logback/dependencies/slf4j-api-1.7.20.jar
+
+### `lib/ojdbc7.jar`
+
+You can get this from http://pkg.elab.warwick.ac.uk/oracle.com/ojdbc7.jar
 
 ### `lib/logback.xml`
 
@@ -93,21 +133,6 @@ Properties passed into the app. You can get one of these off of tabula-test and 
 The usual SSO config guff. You will need to get this configuration added to Web Sign-on for SSO to work.
 Ensure it includes a `<trustedapps />` section or you _will_ see NPEs from one of the bouncycastle crypto libraries.
 Also, ensure that the cluster datasource matches the sample - older configs may not match, which will cause _datasource not found_ exceptions.
-
-### The following jars are now provided to newworld apps so they will need to be manually included on dev instances
-
-#### `lib/logback-classic-1.1.3.jar`
-
-You can get this from http://pkg.elab.warwick.ac.uk/ch.qos.logback/logback-classic-1.1.3.jar
-
-#### `lib/logback-core-1.1.3.jar`
-
-You can get this from http://pkg.elab.warwick.ac.uk/ch.qos.logback/logback-core-1.1.3.jar
-
-#### `lib/jtds-1.3.1.jar`
-
-You can get this from https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.3.1
-
 
 ### ActiveMQ
 
@@ -223,8 +248,8 @@ The above line should point to a file containing this line (assuming default Tom
 
 ### Local properties
 
-Copy `local-example.properties` as `local.properties` and edit the properties in there
-to match your system. `local.properties` will be ignored by Git.
+Copy `gradle-local-example.properties` as `gradle-local.properties` and edit the properties in there
+to match your system. `gradle-local.properties` will be ignored by Git.
 
 ### Troubleshooting updates
 
@@ -235,25 +260,55 @@ If you get an `IllegalStateException` from Lucene, it means one of your indexes 
 
 ### Deployment
 
-Run `mvn -Pdeploy` to build the app and copy an exploded WAR to the
+Run `./gradlew deployToTomcat` to build the app and copy an exploded WAR to the
 location you specified in your properties file.
 
-Some other useful Maven commands:
+Gradle will initialise a zinc server for doing incremental compiles, but that only lasts for the duration that the Gradle
+daemon runs for - this makes it pretty inefficient for doing lots of compiles (luckily, the compile speed is pretty good,
+even for Scala).
 
-- `mvn -DskipTests` - skip tests during deploy (Maven will run tests by default)
-- `mvn -DskipTests -Dmaven.test.skip=true` - also skip test compilation
-- `mvn --projects modules/coursework --also-make` - work on a single module, but make module dependencies like common
-- `mvn -Pdeploy --projects modules/attendance --also-make -DskipTests` - Deploy a single module
+Gradle unit test results go to a HTML file which is pretty good, so you probably don't want to spend too long trying to make the
+console output more verbose.
+
+If you run `node_modules/.bin/gulp` from inside the `web` folder in a tab, that will constantly build assets and JRebel will
+then sync these across to the war, along with WEB-INF content such as Freemarker views.
+
+Some other useful Gradle commands:
+
+- `./gradlew test deployToTomcat` - also run tests during deploy (no tests are run by default)
+- `./gradlew web:deployToTomcat` - deploy a single module, but make module dependencies like common
     (Remember Tomcat will still deploy old wars unless you delete them!)
-- `mvn test -Dsurefire.useFile=false` - run tests, showing stack trace of failures in the console
-- `mvn test -Dtest=uk.ac.warwick.tabula.coursework.ApplicationTest` - run a specific test
-- `mvn -Pfunctional-test --projects modules/functional-test clean test` - run functional tests (start Tomcat instance first)
-- `mvn -Pfunctional-test --projects modules/functional-test clean test -Dtest=CourseworkModuleManagerTest` - run a specific functional test
-- `mvn -Pdev-deploy-views` - syncs the latest Freemarker templates into the deployed app - no need to redeploy
-- `mvn -Pdev-deploy-static` - syncs the latest static content, including compiled assets like LessCSS
-- `mvn scala:cc` - continuously compile sources as they are saved in your IDE
-- `mvn scala:cctest` - continuously compile sources and run tests as they are saved in your IDE (tests only run if it passes)
-- `mvn scala:cctest -Dtest=MyTest` - continously compile and run a single test
+- `./gradlew test` - run tests, showing stack trace of failures in the console and proper output to a HTML file
+- `./gradlew web:test --tests *.ApplicationTest` - run a specific test
+- `./gradlew integrationTest` - run functional tests (start Tomcat instance first)
+- `./gradlew integrationTest --tests *.CourseworkModuleManagerTest` - run a specific functional test
+- `./gradlew cucumber` - run Cucumber tests (against tabula-test.warwick.ac.uk)
+- `./gradlew cucumber -Dserver.environment=production` - run Cucumber tests against production
+- `./gradlew cucumber -Dfeature.name=gzip` - run Cucumber scenarios for a single feature
+- `./gradlew --continuous` - continuously compile sources as they are saved in your IDE
+- `./gradlew test --continuous` - continuously compile sources and run tests as they are saved in your IDE (tests only run if it passes)
+- `./gradlew web:test --tests *.ApplicationTest --continuous` - continously compile and run a single test
+
+### Building assets
+
+The `web` module contains a call to `node_modules/.bin/gulp assets` to build assets as part of the deployment.
+You can run this manually to build new static content into `build/rootContent` (which is monitored by JRebel for changes).
+
+If you don't want to mess with gulp at all, you can call `./gradlew gulp_assets` to rebuild the assets (or replace `assets` with another task name as below).
+
+Other useful `gulp` commands:
+
+- `gulp assets` - build all assets and exit
+- `gulp` - build all assets then watch for any changes and rebuild
+- `gulp watch-assets` - just watch for changes before rebuilding
+- `gulp clean` - clean out anything from `build/rootContent` (sometimes necessary if you delete files)
+- `gulp concat-scripts-id6` - generate the concatenated JS files for ID6 modules
+- `gulp concat-scripts-id7` - generate the concatenated JS files for ID7 modules
+- `gulp compile-less` - compile any LESS files to CSS
+
+At the moment, we still have a lot of JS libraries in `src/main/assets/static/libs/` - these should be gradually replaced
+with proper dependency management in `package.json` (we already do this for ID7). If you need to update ID7, change the version
+number in `package.json` and run `npm install` (the build will do this automatically).
 
 Directory structure
 ----------
@@ -263,28 +318,28 @@ Directory structure
     - `common` - stuff most servers use for Apache config etc.
   - `scripts`
     - `schema` - SQL migration scripts for any database schema changes.
-    - `varsrc` - Deploy scripts, usually found in /var/src/courses on servers
-- `modules` - Tabula modules
-  - `(modulename)`
-    - `src`
-      - `main`
-        - `scala` - Scala source files
-        - `java` - Java source files
-        - `resources` - non-code files that will be available in the app classpath
-        - `webapp` - other non-code files that make up the WAR.
-        - `artwork` - source graphics not included in the app, but used to generate static images. Usually SVG/Inkscape.
-      - `test`
-      - `console`
+- `api|common|web` - Tabula modules
+  - `src`
+    - `main`
+      - `scala` - Scala source files
+      - `java` - Java source files
+      - `resources` - non-code files that will be available in the app classpath
+      - `assets` - JS/CSS files etc. to be asset-processed by gulp before being added to the WAR
+      - `webapp` - other non-code files that make up the WAR.
+      - `artwork` - source graphics not included in the app, but used to generate static images. Usually SVG/Inkscape.
+    - `test`
+    - `integration-test`
+    - `console`
 
-Maven overlays
----------
+WAR overlays
+------------
 
-In a module, Maven will overlay resources from other modules when it builds the WAR. In an overlay,
+In a module, Gradle will overlay resources from `common` when it builds a WAR. In an overlay,
 files that exist aren't overwritten, so you can define a file with the same name to override behaviour
 that would be defined in the overlay.
 
 - `common/.../WEB-INF` -> `WEB-INF` - default `applicationContext.xml` and some includes that can be overridden
-- `home/.../WEB-INF/static-hashes.properties` -> `WEB-INF/static-hashes.properties` - the hashes of static content, for URL construction
+- `web/.../WEB-INF/spring-component-scan-context.xml` -> `WEB-INF/spring-component-scan-context.xml` - overrides the default empty one from common
 
 Database schema changes
 ---------

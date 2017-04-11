@@ -1,0 +1,163 @@
+// Configuration dependencies, e.g. for buildscript plugins
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://maven.eveoh.nl/content/repositories/releases" }
+        maven { url "http://www.terracotta.org/download/reflector/releases" }
+        maven { url "https://plugins.gradle.org/m2/" }
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath group: 'org.zeroturnaround', name: 'gradle-jrebel-plugin', version: '1.1.2'
+    }
+}
+
+plugins {
+    id 'net.saliman.properties' version '1.4.2'
+}
+
+// Some properties that we use to resolve dependencies etc.
+ext {
+    scalaVersion = "2.11.7"
+    scalaMajorVersion = "2.11"
+    springVersion = "4.2.4.RELEASE"
+    hibernateVersion = "4.3.11.Final"
+    jacksonVersion = "2.6.3"
+    elasticsearchVersion = "2.1.1"
+    dispatchVersion = "0.8.10"
+    poiVersion = "3.13"
+    tilesVersion = "3.0.5"
+    jcloudsVersion = "2.0.0"
+    warwickUtilsVersion = "20170217"
+    surefireVersion = "2.19.1"
+}
+
+// Configuration that applies to all subprojects (including common, so nothing war-specific here)
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'scala'
+    apply plugin: 'rebel'
+    apply plugin: 'war'
+
+    // Target Java 8
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    sourceSets {
+        // We want joint Scala/Java compilation, so remove all the Java source directories and have them compiled
+        // by the scala compiler instead
+        main {
+            java.srcDirs = []
+            scala.srcDirs += 'src/main/java'
+
+            // Allow resources to be defined directly in the source directory
+            resources.srcDirs += 'src/main/scala'
+        }
+        test {
+            java.srcDirs = []
+            scala.srcDirs += 'src/test/java'
+
+            // Allow resources to be defined directly in the source directory
+            resources.srcDirs += 'src/test/scala'
+
+            // Same configuration as the WAR classloader
+            resources.srcDirs += 'src/main/webapp'
+        }
+    }
+
+    // In this section you declare where to find the dependencies of your project
+    repositories {
+        mavenCentral()
+        maven {
+            credentials {
+                username nexusUser
+                password nexusPassword
+            }
+            url "https://mvn.elab.warwick.ac.uk/nexus/content/groups/public"
+        }
+        maven { url "http://oauth.googlecode.com/svn/code/maven" }
+        maven { url 'http://repo.spring.io/snapshot' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://repository.apache.org/content/repositories/snapshots" }
+        mavenLocal()
+    }
+
+    configurations {
+        all {
+            exclude group: 'xerces', module: 'xerces'
+            exclude group: 'javax.servlet', module: 'servletapi'
+            exclude group: 'servletapi', module: 'servletapi'
+            exclude group: 'log4j', module: 'log4j'
+            exclude group: 'jboss', module: 'javassist'
+
+            resolutionStrategy {
+                // deal with transitive dep relocation
+                force 'xml-apis:xml-apis:1.4.01'
+            }
+        }
+    }
+
+    dependencies {
+        compile "org.scala-lang:scala-library:${scalaVersion}"
+        compile "com.jsuereth:scala-arm_${scalaMajorVersion}:1.4"
+
+        // 'providedCompile' deps are not included in WAR and also makes it compile within IDEA internally.
+        providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+        compile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
+        compile 'javax.servlet:jstl:1.2'
+
+        /* LOGGING */
+        providedCompile 'ch.qos.logback:logback-classic:1.1.7'
+        providedCompile 'net.logstash.logback:logstash-logback-encoder:4.7'
+        providedCompile 'org.slf4j:slf4j-api:1.7.20'
+        compile 'org.slf4j:log4j-over-slf4j:1.7.20'
+        compile 'org.slf4j:jcl-over-slf4j:1.7.20'
+        // Not actually provided -  it's a ruse to exclude commons-logging from the WAR.
+        // The API at runtime is provided by jcl-over-slf4j.
+        providedCompile 'commons-logging:commons-logging:1.2'
+        /* ******* */
+
+        testCompile 'junit:junit:4.12'
+        testCompile 'org.jmock:jmock-junit4:2.5.1'
+        testCompile 'jmock:jmock-cglib:1.2.0'
+        testCompile "org.specs2:specs2_${scalaMajorVersion}:2.4.15"
+        testCompile "org.scalatest:scalatest_${scalaMajorVersion}:2.2.4"
+        testCompile 'org.mockito:mockito-all:1.10.19'
+    }
+
+    tasks.withType(ScalaCompile) {
+        configure(scalaCompileOptions.forkOptions) {
+            memoryMaximumSize = '2048m'
+        }
+    }
+
+    test {
+        ignoreFailures = true // So we can quarantine in Bamboo
+        maxHeapSize = '2048m'
+        maxParallelForks = Runtime.runtime.availableProcessors() / 2
+        systemProperties = [TestProcessId: "F1"] // FIXME
+        testLogging {
+            // set options for log level LIFECYCLE
+            events "failed"
+            exceptionFormat "short"
+            // set options for log level DEBUG
+            debug {
+                events "started", "skipped", "failed"
+                exceptionFormat "full"
+            }
+        }
+        afterTest { desc, result ->
+            println "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+        }
+    }
+
+    war.dependsOn(generateRebel)
+}
+
+// upgrade to a different version of Gradle by changing this
+// value then running `./gradlew wrapper`. Next time gradlew
+// is run it will fetch and use that version.
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.4.1'
+}
