@@ -1,13 +1,14 @@
 package uk.ac.warwick.tabula.services.cm2
 
-import uk.ac.warwick.tabula.data.model.Assignment
-import uk.ac.warwick.tabula._
-import uk.ac.warwick.spring.Wire
 import org.springframework.stereotype.Service
-import uk.ac.warwick.tabula.data.model.MarkingState.{MarkingCompleted, Rejected}
-import uk.ac.warwick.tabula.data.model.MarkingMethod.{ModeratedMarking, SeenSecondMarking}
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.WorkflowStageHealth._
+import uk.ac.warwick.tabula._
+import uk.ac.warwick.tabula.data.model.Assignment
+import uk.ac.warwick.tabula.data.model.MarkingMethod.{ModeratedMarking, SeenSecondMarking}
+import uk.ac.warwick.tabula.data.model.MarkingState.{MarkingCompleted, Rejected}
 import uk.ac.warwick.tabula.helpers.cm2.WorkflowItems
+
 
 //TODO- This might need further refactoring. Currently just copied  from existing coursework
 /**
@@ -319,10 +320,10 @@ object CM2WorkflowStages {
 	}
 }
 
-trait CM2WorkflowServiceComponent {
-	def cm2WorkflowService: CM2WorkflowProgressService
+trait CM2WorkflowServiceProgressComponent {
+	def cm2WorkflowProgressService: CM2WorkflowProgressService
 }
 
-trait AutowiringCM2WorkflowServiceComponent extends CM2WorkflowServiceComponent {
-	var cm2WorkflowService: CM2WorkflowProgressService = Wire[CM2WorkflowProgressService]
+trait AutowiringCM2WorkflowServiceProgressComponent extends CM2WorkflowServiceProgressComponent {
+	var cm2WorkflowProgressService: CM2WorkflowProgressService = Wire[CM2WorkflowProgressService]
 }

@@ -1,13 +1,13 @@
 package uk.ac.warwick.tabula.commands.cm2.assignments
 
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.data.model.forms.ExtensionState
 import uk.ac.warwick.tabula.data.model.Assignment
+import uk.ac.warwick.tabula.data.model.forms.ExtensionState
 import uk.ac.warwick.tabula.helpers.cm2._
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.cm2.{AutowiringCM2WorkflowServiceComponent, CM2WorkflowServiceComponent}
-import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.services._
+import uk.ac.warwick.tabula.services.cm2.{AutowiringCM2WorkflowServiceProgressComponent, CM2WorkflowServiceProgressComponent}
+import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.userlookup.User
 
 import scala.collection.JavaConverters._
@@ -22,7 +22,7 @@ object AssignmentFeedbackAuditCommand {
 			with AutowiringUserLookupComponent
 			with AutowiringFeedbackForSitsServiceComponent
 			with AutowiringProfileServiceComponent
-			with AutowiringCM2WorkflowServiceComponent
+			with AutowiringCM2WorkflowServiceProgressComponent
 			with Unaudited with ReadOnly
 }
 
@@ -62,7 +62,7 @@ class AssignmentFeedbackAuditCommandInternal(val assignment: Assignment) extends
 		with UserLookupComponent
 		with FeedbackForSitsServiceComponent
 		with ProfileServiceComponent
-		with CM2WorkflowServiceComponent =>
+		with CM2WorkflowServiceProgressComponent =>
 
 	override def applyInternal(): AssignmentFeedbackAuditResults = {
 		//most of the logic copied from cm1
@@ -116,7 +116,7 @@ class AssignmentFeedbackAuditCommandInternal(val assignment: Assignment) extends
 					enhancedExtensionForUniId
 				)
 
-				val progress = cm2WorkflowService.progress(assignment)(coursework)
+				val progress = cm2WorkflowProgressService.progress(assignment)(coursework)
 				WorkFlowStudent(
 					user,
 					Progress(progress.percentage, progress.cssClass, progress.messageCode),
@@ -161,7 +161,7 @@ class AssignmentFeedbackAuditCommandInternal(val assignment: Assignment) extends
 					enhancedExtensionForUniUsercode
 				)
 
-				val progress = cm2WorkflowService.progress(assignment)(coursework)
+				val progress = cm2WorkflowProgressService.progress(assignment)(coursework)
 
 				WorkFlowStudent(
 					user,

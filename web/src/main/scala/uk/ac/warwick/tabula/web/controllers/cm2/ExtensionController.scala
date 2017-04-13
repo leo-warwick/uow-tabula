@@ -21,7 +21,7 @@ import uk.ac.warwick.tabula.services.{ProfileService, RelationshipService, UserL
 import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.views.JSONView
 import uk.ac.warwick.userlookup.User
-
+//FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes
 trait ExtensionServices {
 	var json: ObjectMapper = Wire[ObjectMapper]
 	var userLookup: UserLookupService = Wire[UserLookupService]
@@ -206,6 +206,7 @@ class EditExtensionController extends CourseworkController with ExtensionService
 		}
 		Mav(s"$urlPrefix/admin/extensions/assignmentdetail",
 			"usercode" -> student.getUserId,
+			"universityId" -> student.getWarwickId,
 			"student" -> studentMember,
 			"studentContext" -> studentContext,
 			"detail" -> detail,
