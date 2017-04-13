@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN" "http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+       version="2.0">
+	<tlib-version>1.0</tlib-version>
+	<jsp-version>2.0</jsp-version>
+	<short-name>Utility tag library for Warwick apps</short-name>
+	<description> Custom tags used by the Warwick apps</description>
+
+	<function>
+		<description> Escapes text so you can enter it into a Javascript string literal.
+			</description>
+		<name>js</name>
+		<function-class>uk.ac.warwick.util.web.tags.Functions</function-class>
+		<function-signature>java.lang.String js(java.lang.String)</function-signature>
+		<example> ${warwick:js(someString)} </example>
+	</function>
+
+	<function>
+		<description> Escapes HTML characters. </description>
+		<name>html</name>
+		<function-class>uk.ac.warwick.util.web.tags.Functions</function-class>
+		<function-signature>java.lang.String html(java.lang.String)</function-signature>
+		<example> ${warwick:html(myText)} </example>
+	</function>
+
+	<function>
+    <description> Escapes only special HTML characters. </description>
+    <name>specialHtml</name>
+    <function-class>uk.ac.warwick.util.web.tags.Functions</function-class>
+    <function-signature>java.lang.String specialHtml(java.lang.String)</function-signature>
+    <example> ${warwick:specialHtml(myText)} </example>
+  </function>
+
+	<tag>
+		<name>collectionGrouper</name>
+		<tag-class>uk.ac.warwick.util.web.tags.CollectionGrouperTag</tag-class>
+		<description> Group the specified collection by the result of the specified
+			property. </description>
+		<attribute>
+			<name>objects</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>property</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>var</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>mimeTypeName</name>
+		<tag-class>uk.ac.warwick.util.web.tags.MimeTypeNameTag</tag-class>
+		<description> Render a friendly name for a MIME type if recognised, otherwise
+			fallback to just outputting the MIME type. </description>
+		<attribute>
+			<name>mimeType</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>tabIndex</name>
+		<tag-class>uk.ac.warwick.util.web.tags.TabIndexTab</tag-class>
+		<description> Outputs an incrementing number relative to the current page,
+			intended for use in a "tabindex" attribute on form elements, to specify the order
+			they are cycled through when the Tab keyboard key is pressed. </description>
+	</tag>
+
+	<tag>
+		<name>copyright</name>
+		<tag-class>uk.ac.warwick.util.web.tags.CopyrightTag</tag-class>
+		<description> Outputs a current copyright notice based on the current date in Roman
+			Numerals. </description>
+	</tag>
+
+	<tag>
+		<name>compress</name>
+		<tag-class>uk.ac.warwick.util.web.tags.CompressContentTag</tag-class>
+		<description> Compresses the contents of the tag onto a single line </description>
+		<attribute>
+			<name>removeInterTagSpaces</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>wrappingUrl</name>
+		<tag-class>uk.ac.warwick.util.web.tags.WrappingUrlTag</tag-class>
+		<description> Snips a long URL at each forward slash and puts a barely visible
+			space before the next word, causing the browser to wrap to the next line
+			if necessary. </description>
+		<attribute>
+			<name>url</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			Formats Joda DateTimes to the specified format
+	    </description>
+		<name>formatDate</name>
+		<tag-class>uk.ac.warwick.util.web.tags.DateTimeFormatTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>
+				Date and/or time to be formatted.
+	        </description>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Custom formatting style for dates and times.
+	        </description>
+			<name>pattern</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+  <tag>
+  	<description>List all values in an enum</description>
+  	<name>enumValues</name>
+  	<tag-class>uk.ac.warwick.util.web.tags.EnumValuesTag</tag-class>
+  	<attribute>
+  		<name>var</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>className</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+</taglib>

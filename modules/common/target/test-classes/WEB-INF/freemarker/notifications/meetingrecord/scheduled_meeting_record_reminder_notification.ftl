@@ -1,0 +1,1 @@
+Your ${role} meeting with ${partner.fullName} is on ${dateTimeFormatter.print(meetingRecord.meetingDate)}

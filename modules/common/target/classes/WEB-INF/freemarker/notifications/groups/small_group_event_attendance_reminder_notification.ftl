@@ -1,0 +1,1 @@
+<#if occurrence.event.title?has_content>${occurrence.event.title}, </#if>${occurrence.event.group.groupSet.name} ${occurrence.event.group.name} needs attendance recording for the event at ${dateTimeFormatter.print(occurrence.dateTime)}.

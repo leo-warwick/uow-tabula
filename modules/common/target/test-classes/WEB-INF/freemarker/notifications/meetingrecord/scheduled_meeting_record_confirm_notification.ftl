@@ -1,0 +1,1 @@
+Your ${role} meeting with ${partner.fullName} was scheduled for ${dateTimeFormatter.print(meetingRecord.meetingDate)}.

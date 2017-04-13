@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Wrapper for applicationContext.xml that simply enables lazy initialization for
+beans by default. This relies on applicationContext.xml not setting this default
+itself. This should make tests faster by not creating unused beans.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-lazy-init="true">
+
+	<import resource="applicationContext.xml" />
+
+</beans>

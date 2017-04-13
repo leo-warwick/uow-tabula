@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.2.xsd
+		http://go.warwick.ac.uk/elab-schemas/filterstack http://go.warwick.ac.uk/elab-schemas/filters.xsd">
+
+	<bean id="hibernateLifecycle" class="uk.ac.warwick.tabula.data.HibernateLifecycle"
+		p:sessionFactory-ref="sessionFactory" />
+
+	<import resource="hibernate-packages-context.xml" />
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		p:dataSource-ref="dataSource"
+		p:packagesToScan-ref="hibernatePackages"
+		p:hibernateProperties-ref="hibernateProperties" />
+
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory" />
+
+	<beans profile="console">
+		<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		    <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+		    <property name="url" value="${db.url}"/>
+		    <property name="username" value="${db.username}"/>
+		    <property name="password" value="${db.password}"/>
+		    <property name="connectionProperties">
+		    	<props>
+		    		<prop key="defaultNChar">true</prop>
+		    	</props>
+		    </property>
+		</bean>
+
+		<bean id="sitsDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		    <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+		    <property name="url" value="${sits.db.url}"/>
+		    <property name="username" value="${sits.db.username}"/>
+		    <property name="password" value="${sits.db.password}"/>
+		</bean>
+
+		<bean id="fimDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		    <property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver"/>
+		    <property name="url" value="${fim.db.url}"/>
+		    <property name="username" value="${fim.db.username}"/>
+		    <property name="password" value="${fim.db.password}"/>
+		</bean>
+	</beans>
+
+	<beans profile="dev,sandbox,production,console">
+
+		<bean id="tabulaEncodingChecker" class="uk.ac.warwick.tabula.system.SessionFactoryDatabaseEncodingChecker"
+			c:sessionFactory-ref="sessionFactory"
+		 />
+
+		<util:properties id="jdbcProperties">
+			<prop key="defaultNChar">true</prop>
+		</util:properties>
+		<util:properties id="hibernateProperties">
+			<prop key="hibernate.jdbc.batch_size">20</prop>
+			<prop key="hibernate.dialect">uk.ac.warwick.tabula.data.oracle.Oracle10gDialect</prop>
+			<prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
+			<prop key="defaultNChar">true</prop>
+			<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+		</util:properties>
+
+		<bean id="mainDatabaseDialect" class="uk.ac.warwick.tabula.data.oracle.Oracle10gDialect" />
+
+	</beans>
+
+	<beans profile="dev,sandbox,production">
+
+		<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		   <property name="jndiName" value="java:comp/env/jdbc/TabulaDS"/>
+	    </bean>
+
+	</beans>
+
+	<beans profile="dev,production">
+	    <bean id="sitsDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		   <property name="jndiName" value="java:comp/env/jdbc/SITSDS"/>
+		   <property name="lookupOnStartup" value="false" />
+	       <property name="proxyInterface" value="javax.sql.DataSource" />
+	    </bean>
+
+	    <bean id="fimDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		   <property name="jndiName" value="java:comp/env/jdbc/FIMDS"/>
+		   <property name="lookupOnStartup" value="false" />
+		   <property name="proxyInterface" value="javax.sql.DataSource" />
+	    </bean>
+	</beans>
+
+	<beans profile="sandbox,test">
+		<jdbc:embedded-database id="sitsDataSource" />
+
+		<jdbc:embedded-database id="fimDataSource" />
+	</beans>
+
+	<beans profile="test">
+		<jdbc:embedded-database id="dataSource" />
+
+		<bean id="mainDatabaseDialect" class="org.hibernate.dialect.HSQLDialect" />
+
+		<import resource="hibernate-test-scripts-context.xml" />
+
+		<bean id="dataSourceInitialiser" class="uk.ac.warwick.tabula.system.DatabaseScriptRunner"
+			p:dataSource-ref="dataSource"
+			p:scripts-ref="testScripts" />
+
+		<!-- We have sits.sql to make some tables and data but we just want a blank
+		     datasource here - sits.sql is used by the importer test only -->
+		<bean id="sitsInit" class="uk.ac.warwick.tabula.system.DatabaseScriptRunner"
+			p:dataSource-ref="sitsDataSource" />
+
+		<bean id="membershipInit" class="uk.ac.warwick.tabula.system.DatabaseScriptRunner"
+			p:dataSource-ref="fimDataSource"
+			p:scripts="fim.sql" />
+
+		<util:properties id="hibernateProperties">
+			<prop key="hibernate.jdbc.batch_size">20</prop>
+			<prop key="hibernate.dialect">uk.ac.warwick.tabula.data.hsql.HSQLDialect</prop>
+			<prop key="hibernate.hbm2ddl.auto">create</prop>
+			<!-- <prop key="hibernate.show_sql">true</prop>  -->
+		</util:properties>
+
+	</beans>
+
+</beans>

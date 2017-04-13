@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
+		"http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
+<!--
+    Configuration file for UrlRewriteFilter
+    http://www.tuckey.org/urlrewrite/
+-->
+<urlrewrite>
+
+	<!-- RewriteRule ^/favicon\.ico - [G,L] -->
+	<rule>
+		<note>Redirect away favicon requests</note>
+		<from>^/favicon\.ico$</from>
+		<set type="status">410</set>
+		<to last="true">null</to>
+	</rule>
+
+	<!-- RewriteRule \.php$ [G,L] -->
+	<rule>
+		<note>Redirect away PHP requests</note>
+		<from>\.php$</from>
+		<set type="status">410</set>
+		<to last="true">null</to>
+	</rule>
+
+	<!-- RewriteRule ^(/static/.*?)\.[0-9]{10,16}$ $1$2 [QSA] -->
+	<rule>
+		<note>Static content suffixes</note>
+		<from>^(/static/.*?)\.[0-9]{10,16}$</from>
+		<to qsappend="true">$1</to>
+	</rule>
+
+	<!-- RewriteRule ^/courses(.*)$ /coursework$1 [QSA,L,R=301] -->
+	<rule>
+		<note>TAB-46 Rewrite legacy /courses to /coursework</note>
+		<from>^/courses(.*)$</from>
+		<to last="true" type="permanent-redirect" qsappend="true">/coursework$1</to>
+	</rule>
+
+	<!-- RewriteRule ^/web(.*)$ $1 [QSA,L,R=301] -->
+	<rule>
+		<note>Remove legacy /web context</note>
+		<from casesensitive="true">^/web(.*)$</from>
+		<to last="true" type="permanent-redirect" qsappend="true">$1</to>
+	</rule>
+
+</urlrewrite>

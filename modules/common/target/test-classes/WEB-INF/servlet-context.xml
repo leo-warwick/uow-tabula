@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+>
+
+	<!--
+		This is intentionally left blank. The servlet context is a child context of the main application context
+		and I can't think of any reason, given that we only initialise the application as a web application,
+		that we'd want to put anything in here at the moment, particularly since the web and api modules are
+		separate. By having this blank, we can pass this to the DispatcherServlet and avoid initialising everything
+		twice, which is bad m'kay.
+
+		Basically if you put anything in here, you're going to have to try very hard to justify it.
+	-->
+
+</beans>

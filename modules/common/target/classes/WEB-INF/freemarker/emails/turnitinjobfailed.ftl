@@ -1,0 +1,1 @@
+You recently asked to have the submissions for the assignment ${assignmentTitle} checked for plagiarism. Unfortunately, the check did not successfully complete.
