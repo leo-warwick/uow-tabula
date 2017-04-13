@@ -1,1 +1,0 @@
-${b(now, false, false)}

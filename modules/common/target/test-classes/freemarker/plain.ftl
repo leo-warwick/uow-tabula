@@ -1,1 +1,0 @@
-No frills template #${longnum.getStandardSeconds()}. ${unspecifiedVal?default('Unspecified value')}. ${specifiedValue}

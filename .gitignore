@@ -70,4 +70,11 @@ ${*
 CVS
 
 pom.xml.versionsBackup
-.DS_Store
+.DS_Store.idea
+.idea
+.idea
+modules/web/target/
+.class
+.idea
+modules/web/target/
+.idea

@@ -1,1 +1,0 @@
-${exam.module.code?upper_case} - ${exam.name} is ready for you to mark.

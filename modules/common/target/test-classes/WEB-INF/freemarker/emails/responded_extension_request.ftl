@@ -1,1 +1,0 @@
-The extension request made by ${studentName} for the assignment '${assignment.name}' for ${assignment.module.code?upper_case} ${assignment.module.name} was ${verbed} by ${agentName}.
