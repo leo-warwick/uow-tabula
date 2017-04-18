@@ -1,10 +1,19 @@
-package uk.ac.warwick.tabula.web.controllers.cm2.admin
+package uk.ac.warwick.tabula.web.controllers.cm2.admin.assignments
 
 import java.io.StringWriter
+import javax.validation.Valid
 
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable, RequestMapping}
 import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackCommand
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.helpers.cm2.WorkflowItems
+import uk.ac.warwick.tabula.web.controllers.cm2.CourseworkController
+import uk.ac.warwick.tabula.web.controllers.cm2.admin.{CSVBuilder, ExcelBuilder, XMLBuilder}
 import uk.ac.warwick.tabula.web.views.{CSVView, ExcelView, XmlView}
+import uk.ac.warwick.util.csv.GoodCsvDocument
+
 
 
 @Profile(Array("cm2Enabled")) @Controller
@@ -21,14 +30,15 @@ class SubmissionAndFeedbackExportController extends CourseworkController {
 		val results = command.apply()
 
 		val items = results.students
+		val workflowItems: Seq[WorkflowItems] = for(elem <- items) yield elem.coursework
 
 		val writer = new StringWriter
-		val csvBuilder = new CSVBuilder(items, assignment, module)
+		val csvBuilder = new CSVBuilder(workflowItems, assignment, module)
 		val doc = new GoodCsvDocument(csvBuilder, null)
 
 		doc.setHeaderLine(true)
 		csvBuilder.headers foreach (header => doc.addHeaderField(header))
-		items foreach (item => doc.addLine(item))
+		workflowItems foreach (item => doc.addLine(item))
 		doc.write(writer)
 
 		new CSVView(module.code + "-" + assignment.id + ".csv", writer.toString)
@@ -39,8 +49,9 @@ class SubmissionAndFeedbackExportController extends CourseworkController {
 		val results = command.apply()
 
 		val items = results.students
+		val workflowItems: Seq[WorkflowItems] = for(elem <- items) yield elem.coursework
 
-		new XmlView(new XMLBuilder(items, assignment, assignment.module).toXML, Some(assignment.module.code + "-" + assignment.id + ".xml"))
+		new XmlView(new XMLBuilder(workflowItems, assignment, assignment.module).toXML, Some(assignment.module.code + "-" + assignment.id + ".xml"))
 	}
 
 	@RequestMapping(Array("/export.xlsx"))
@@ -48,8 +59,9 @@ class SubmissionAndFeedbackExportController extends CourseworkController {
 		val results = command.apply()
 
 		val items = results.students
+		val workflowItems: Seq[WorkflowItems] = for(elem <- items) yield elem.coursework
 
-		val workbook = new ExcelBuilder(items, assignment, module).toXLSX
+		val workbook = new ExcelBuilder(workflowItems, assignment, module).toXLSX
 
 		new ExcelView(assignment.name + ".xlsx", workbook)
 	}

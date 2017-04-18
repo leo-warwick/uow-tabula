@@ -1,16 +1,24 @@
 package uk.ac.warwick.tabula.web.controllers.cm2.admin
 
+import org.apache.commons.lang3.text.WordUtils
+import org.apache.poi.hssf.usermodel.HSSFDataFormat
+import org.apache.poi.ss.util.WorkbookUtil
+import org.apache.poi.xssf.usermodel.{XSSFSheet, XSSFWorkbook}
+import org.joda.time.ReadableInstant
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.cm2.web.Routes
-import uk.ac.warwick.tabula.commands.cm2.assignments.ListSubmissionsCommand._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.forms.SavedFormValue
+import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.helpers.cm2.{SubmissionListItem, WorkflowItems}
 import uk.ac.warwick.tabula.{CurrentUser, DateFormats}
+import uk.ac.warwick.util.csv.CSVLineWriter
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.xml._
 
-
-class XMLBuilder(val items: Seq[Student], val assignment: Assignment, override val module: Module) extends SubmissionAndFeedbackExport {
+class XMLBuilder(val items: Seq[WorkflowItems], val assignment: Assignment, override val module: Module) extends SubmissionAndFeedbackExport {
 
 	var topLevelUrl: String = Wire.property("${toplevel.url}")
 
@@ -43,26 +51,26 @@ class XMLBuilder(val items: Seq[Student], val assignment: Assignment, override v
 		</assignment> % assignmentData
 	}
 
-	def studentElement(item: Student): Elem = {
+	def studentElement(item: WorkflowItems): Elem = {
 		<student>
 			{
 				<submission>
 					{
-						item.cm2.enhancedSubmission map { item => item.submission.values.asScala.toSeq map fieldElement(item) } getOrElse Nil
+						item.enhancedSubmission map { item => item.submission.values.asScala.toSeq map fieldElement(item) } getOrElse Nil
 					}
 				</submission> % submissionData(item) % submissionStatusData(item)
 			}
 			{ <marking /> % markerData(item, assignment) % plagiarismData(item) }
 			{
 				<feedback>
-					{ item.cm2.enhancedFeedback.flatMap { _.feedback.comments }.orNull }
+					{ item.enhancedFeedback.flatMap { _.feedback.comments }.orNull }
 				</feedback> % feedbackData(item)
 			}
 			{ <adjustment /> % adjustmentData(item) }
 		</student> % identityData(item)
 	}
 
-	private def markerData(item: Student, assignment: Assignment): Map[String, Any] = {
+	private def markerData(item: WorkflowItems, assignment: Assignment): Map[String, Any] = {
 		if (assignment.markingWorkflow != null) markerData(item)
 		else Map()
 	}
@@ -84,17 +92,17 @@ class XMLBuilder(val items: Seq[Student], val assignment: Assignment, override v
 			Nil //empty Node seq, no element
 }
 
-class CSVBuilder(val items: Seq[Student], val assignment: Assignment, override val module: Module)
-	extends CSVLineWriter[Student] with SubmissionAndFeedbackSpreadsheetExport {
+class CSVBuilder(val items: Seq[WorkflowItems], val assignment: Assignment, override val module: Module)
+	extends CSVLineWriter[WorkflowItems] with SubmissionAndFeedbackSpreadsheetExport {
 
 	var topLevelUrl: String = Wire.property("${toplevel.url}")
 
-	def getNoOfColumns(item:Student): Int = headers.size
+	def getNoOfColumns(item:WorkflowItems): Int = headers.size
 
-	def getColumn(item:Student, i:Int): String = formatData(itemData(item).get(headers(i)))
+	def getColumn(item:WorkflowItems, i:Int): String = formatData(itemData(item).get(headers(i)))
 }
 
-class ExcelBuilder(val items: Seq[Student], val assignment: Assignment, override val module: Module) extends SubmissionAndFeedbackSpreadsheetExport {
+class ExcelBuilder(val items: Seq[WorkflowItems], val assignment: Assignment, override val module: Module) extends SubmissionAndFeedbackSpreadsheetExport {
 
 	var topLevelUrl: String = Wire.property("${toplevel.url}")
 
@@ -109,7 +117,7 @@ class ExcelBuilder(val items: Seq[Student], val assignment: Assignment, override
 	}
 
 	def generateNewSheet(workbook: XSSFWorkbook): XSSFSheet = {
-		val sheet = workbook.createSheet(assignment.module.code.toUpperCase + " - " + safeAssignmentName)
+		val sheet = workbook.createSheet(module.code.toUpperCase + " - " + safeAssignmentName)
 
 		def formatHeader(header: String) =
 			WordUtils.capitalizeFully(header.replace('-', ' '))
@@ -122,7 +130,7 @@ class ExcelBuilder(val items: Seq[Student], val assignment: Assignment, override
 		sheet
 	}
 
-	def addRow(sheet: XSSFSheet)(item: Student) {
+	def addRow(sheet: XSSFSheet)(item: WorkflowItems) {
 		val plainCellStyle = {
 			val cs = sheet.getWorkbook.createCellStyle()
 			cs.setDataFormat(HSSFDataFormat.getBuiltinFormat("@"))
@@ -176,7 +184,7 @@ class ExcelBuilder(val items: Seq[Student], val assignment: Assignment, override
 }
 
 trait SubmissionAndFeedbackSpreadsheetExport extends SubmissionAndFeedbackExport {
-	val items: Seq[Student]
+	val items: Seq[WorkflowItems]
 
 	val csvFormatter = DateFormats.CSVDateTime
 	def csvFormat(i: ReadableInstant): String = csvFormatter print i
@@ -207,7 +215,7 @@ trait SubmissionAndFeedbackSpreadsheetExport extends SubmissionAndFeedbackExport
 		case None => ""
 	}
 
-	protected def itemData(item: Student): Map[String, Any] =
+	protected def itemData(item: WorkflowItems): Map[String, Any] =
 		(
 			prefix(identityData(item), "student") ++
 			prefix(submissionData(item), "submission") ++
@@ -242,7 +250,7 @@ trait SubmissionAndFeedbackExport {
 	// This Seq specifies the core field order
 	val baseFields = Seq("module-code", "id", "open-date", "open-ended", "close-date")
 	val identityFields: Seq[String] =
-		if (assignment.module.adminDepartment.showStudentName) Seq("university-id", "name")
+		if (module.adminDepartment.showStudentName) Seq("university-id", "name")
 		else Seq("university-id")
 
 	val submissionFields = Seq("id", "time", "downloaded")
@@ -253,7 +261,7 @@ trait SubmissionAndFeedbackExport {
 	val adjustmentFields = Seq("mark", "grade", "reason")
 
 	protected def assignmentData: Map[String, Any] = Map(
-		"module-code" -> assignment.module.code,
+		"module-code" -> module.code,
 		"id" -> assignment.id,
 		"open-date" -> assignment.openDate,
 		"open-ended" -> assignment.openEnded,
@@ -261,11 +269,11 @@ trait SubmissionAndFeedbackExport {
 		"submissions-zip-url" -> (topLevelUrl + Routes.admin.assignment.submissionsZip(assignment))
 	)
 
-	protected def identityData(item: Student): Map[String, Any] = Map(
-		"university-id" -> CurrentUser.studentIdentifier(item.user)
-	) ++ (if (assignment.module.adminDepartment.showStudentName) Map("name" -> item.user.getFullName) else Map())
+	protected def identityData(item: WorkflowItems): Map[String, Any] = Map(
+		"university-id" -> CurrentUser.studentIdentifier(item.student)
+	) ++ (if (module.adminDepartment.showStudentName) Map("name" -> item.student.getFullName) else Map())
 
-	protected def submissionData(student: Student): Map[String, Any] = student.cm2.enhancedSubmission match {
+	protected def submissionData(student: WorkflowItems): Map[String, Any] = student.enhancedSubmission match {
 		case Some(item) if item.submission.id.hasText => Map(
 			"submitted" -> true,
 			"id" -> item.submission.id,
@@ -277,13 +285,13 @@ trait SubmissionAndFeedbackExport {
 		)
 	}
 
-	protected def submissionStatusData(student: Student): Map[String, Any] = student.cm2.enhancedSubmission match {
+	protected def submissionStatusData(student: WorkflowItems): Map[String, Any] = student.enhancedSubmission match {
 		case Some(item) => Map(
 			"late" -> item.submission.isLate,
 			"within-extension" -> item.submission.isAuthorisedLate,
 			"markable" -> assignment.isReleasedForMarking(item.submission.usercode)
 		)
-		case _ => student.cm2.enhancedExtension match {
+		case _ => student.enhancedExtension match {
 			case Some(item) =>
 				val assignmentClosed = !assignment.openEnded && assignment.isClosed
 				val late = assignmentClosed && !item.within
@@ -298,15 +306,15 @@ trait SubmissionAndFeedbackExport {
 		}
 	}
 
-	protected def markerData(student: Student): Map[String, Any] = Map(
-		"first-marker" -> assignment.getStudentsFirstMarker(student.user.getUserId).map(_.getFullName).getOrElse(""),
-		"second-marker" -> assignment.getStudentsSecondMarker(student.user.getUserId).map(_.getFullName).getOrElse("")
+	protected def markerData(student: WorkflowItems): Map[String, Any] = Map(
+		"first-marker" -> assignment.getStudentsFirstMarker(student.student.getUserId).map(_.getFullName).getOrElse(""),
+		"second-marker" -> assignment.getStudentsSecondMarker(student.student.getUserId).map(_.getFullName).getOrElse("")
 	)
 
-	protected def extraFieldData(student: Student): Map[String, String] = {
+	protected def extraFieldData(student: WorkflowItems): Map[String, String] = {
 		var fieldDataMap = mutable.ListMap[String, String]()
 
-		student.cm2.enhancedSubmission match {
+		student.enhancedSubmission match {
 			case Some(item) => item.submission.values.asScala foreach ( value =>
 				if (value.hasAttachments) {
 					val attachmentNames = value.attachments.asScala.map { file =>
@@ -330,7 +338,7 @@ trait SubmissionAndFeedbackExport {
 		fieldDataMap.toMap
 	}
 
-	protected def plagiarismData(student: Student): Map[String, Any] = student.cm2.enhancedSubmission match {
+	protected def plagiarismData(student: WorkflowItems): Map[String, Any] = student.enhancedSubmission match {
 		case Some(item) if item.submission.id.hasText =>
 			Map(
 				"suspected-plagiarised" -> item.submission.suspectPlagiarised
@@ -343,7 +351,7 @@ trait SubmissionAndFeedbackExport {
 		case _ => Map()
 	}
 
-	protected def feedbackData(student: Student): Map[String, Any] = student.cm2.enhancedFeedback match {
+	protected def feedbackData(student: WorkflowItems): Map[String, Any] = student.enhancedFeedback match {
 		case Some(item) if item.feedback.id.hasText =>
 			Map(
 				"id" -> item.feedback.id,
@@ -356,8 +364,8 @@ trait SubmissionAndFeedbackExport {
 		case None => Map()
 	}
 
-	protected def adjustmentData(student: Student): Map[String, Any] = {
-		val feedback = student.cm2.enhancedFeedback.map(_.feedback)
+	protected def adjustmentData(student: WorkflowItems): Map[String, Any] = {
+		val feedback = student.enhancedFeedback.map(_.feedback)
 		feedback.filter(_.hasPrivateOrNonPrivateAdjustments).map( feedback => {
 			feedback.latestMark.map("mark" -> _).toMap ++
 			feedback.latestGrade.map("grade" -> _).toMap ++

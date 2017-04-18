@@ -1,5 +1,7 @@
 package uk.ac.warwick.tabula.helpers.cm2
 
+import org.joda.time.DateTime
+import org.springframework.validation.{Errors, ValidationUtils}
 import uk.ac.warwick.tabula.CaseObjectEqualityFixes
 import uk.ac.warwick.tabula.data.convert.JodaDateTimeConverter
 import uk.ac.warwick.tabula.data.model.Assignment
@@ -213,12 +215,14 @@ object Cm2Filters {
 
 	case object NotReleasedForMarking extends ParameterlessCm2Filter {
 		def getDescription = "submissions that have not been released for marking"
+    def predicate(student: WorkflowItems): Boolean = false
 		def predicate(student: WorkFlowStudent): Boolean = !student.assignment.isReleasedForMarking(student.user.getUserId)
 		def applies(assignment: Assignment): Boolean = assignment.collectSubmissions && assignment.markingWorkflow != null
 	}
 
 	case object NotMarked extends ParameterlessCm2Filter {
 		def getDescription = "submissions not marked"
+    def predicate(student: WorkflowItems): Boolean = false
 		def predicate(student: WorkFlowStudent): Boolean = {
 			val releasedForMarking = student.assignment.isReleasedForMarking(student.user.getUserId)
 			val hasFirstMarker = student.assignment.getStudentsFirstMarker(student.user.getUserId).isDefined

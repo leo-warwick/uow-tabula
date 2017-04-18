@@ -27,4 +27,3 @@ case class WorkflowItems (
 	enhancedFeedback: Option[FeedbackListItem],
 	enhancedExtension: Option[ExtensionListItem]
 )
-

@@ -1,5 +1,13 @@
-package uk.ac.warwick.tabula.web.controllers.cm2.admin
+package uk.ac.warwick.tabula.web.controllers.cm2.admin.assignments
 
+import javax.validation.Valid
+
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Controller
+import org.springframework.validation.Errors
+import org.springframework.web.bind.WebDataBinder
+import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable, RequestMapping}
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.Features
 import uk.ac.warwick.tabula.cm2.web.Routes
 import uk.ac.warwick.tabula.commands.SelfValidating
@@ -8,6 +16,8 @@ import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackComman
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.cm2.{Cm2Filter, Cm2Filters}
 import uk.ac.warwick.tabula.web.Mav
+import uk.ac.warwick.tabula.web.controllers.cm2.{CourseworkBreadcrumbs, CourseworkController}
+import uk.ac.warwick.util.web.bind.AbstractPropertyEditor
 
 //FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes
 

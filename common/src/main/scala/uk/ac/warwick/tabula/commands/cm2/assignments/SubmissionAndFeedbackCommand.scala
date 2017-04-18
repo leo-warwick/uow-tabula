@@ -1,16 +1,21 @@
 package uk.ac.warwick.tabula.commands.cm2.assignments
 
+import javax.validation.constraints.NotNull
+
+import org.joda.time._
+import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackCommand._
+import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults
 import uk.ac.warwick.tabula.commands.cm2.feedback.ListFeedbackCommand
 import uk.ac.warwick.tabula.commands.cm2.feedback.ListFeedbackCommand._
 import uk.ac.warwick.tabula.data.model.{Assignment, _}
-import uk.ac.warwick.tabula.helpers.cm2.{ExtensionListItem, FeedbackListItem, Progress, SubmissionListItem, ExtensionListItem => _, FeedbackListItem => _, SubmissionListItem => _, _}
+import uk.ac.warwick.tabula.helpers.cm2.{FeedbackListItem, Progress, SubmissionListItem, _}
 import uk.ac.warwick.tabula.permissions._
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.cm2.{AutowiringCM2WorkflowServiceProgressComponent, CM2WorkflowServiceProgressComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
+import uk.ac.warwick.userlookup.User
 
 import scala.collection.JavaConverters._
 
@@ -65,7 +70,7 @@ self: SubmissionAndFeedbackState =>
 val enhancedSubmissionsCommand = ListSubmissionsCommand(module, assignment)
 val enhancedFeedbacksCommand = ListFeedbackCommand(module, assignment)
 
-override def enhanceSubmissions(): Seq[ListSubmissionsCommand.SubmissionListItem] = enhancedSubmissionsCommand.apply()
+override def enhanceSubmissions(): Seq[SubmissionListItem] = enhancedSubmissionsCommand.apply()
 override def enhanceFeedback(): ListFeedbackResult = enhancedFeedbacksCommand.apply()
 }
 
