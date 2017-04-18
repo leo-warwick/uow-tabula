@@ -1,4 +1,4 @@
-package uk.ac.warwick.tabula.web.controllers.cm2.admin.assignments
+package uk.ac.warwick.tabula.web.controllers.cm2.admin
 
 import java.io.StringWriter
 import javax.validation.Valid
@@ -10,7 +10,6 @@ import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackComman
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.cm2.WorkflowItems
 import uk.ac.warwick.tabula.web.controllers.cm2.CourseworkController
-import uk.ac.warwick.tabula.web.controllers.cm2.admin.{CSVBuilder, ExcelBuilder, XMLBuilder}
 import uk.ac.warwick.tabula.web.views.{CSVView, ExcelView, XmlView}
 import uk.ac.warwick.util.csv.GoodCsvDocument
 

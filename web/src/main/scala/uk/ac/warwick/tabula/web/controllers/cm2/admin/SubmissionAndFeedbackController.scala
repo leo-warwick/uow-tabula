@@ -1,4 +1,4 @@
-package uk.ac.warwick.tabula.web.controllers.cm2.admin.assignments
+package uk.ac.warwick.tabula.web.controllers.cm2.admin
 
 import javax.validation.Valid
 
