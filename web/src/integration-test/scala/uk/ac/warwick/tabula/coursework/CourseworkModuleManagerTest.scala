@@ -1,8 +1,8 @@
 package uk.ac.warwick.tabula.coursework
 
+import org.openqa.selenium.By
 import org.scalatest.GivenWhenThen
 import uk.ac.warwick.tabula.BrowserTest
-import org.openqa.selenium.By
 
 class CourseworkModuleManagerTest extends BrowserTest with CourseworkFixtures with GivenWhenThen {
 
@@ -115,6 +115,11 @@ class CourseworkModuleManagerTest extends BrowserTest with CourseworkFixtures wi
 			changedUsers
 			lastUsers.size should be >= 1
 
+			// PhantomJS doesn't support confirm()
+			ifPhantomJSDriver { _ =>
+				executeScript("window.confirm = function(msg) { return true; };")
+			}
+
 			When("I remove the first entry")
 			({
 				val removable = find(cssSelector(s".modulemanager-table .remove-permissions [name=usercodes][value=${P.ModuleManager1.usercode}]"))
@@ -166,6 +171,11 @@ class CourseworkModuleManagerTest extends BrowserTest with CourseworkFixtures wi
 			When("I should see at least one user that I can remove")
 			changedUsers
 			lastUsers.size should be >= 1
+
+			// PhantomJS doesn't support confirm()
+			ifPhantomJSDriver { _ =>
+				executeScript("window.confirm = function(msg) { return true; };")
+			}
 
 			When("I remove the first entry")
 			({

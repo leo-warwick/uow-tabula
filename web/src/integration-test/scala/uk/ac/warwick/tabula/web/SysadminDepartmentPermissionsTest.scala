@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.web
 
-import uk.ac.warwick.tabula.BrowserTest
 import org.scalatest.GivenWhenThen
+import uk.ac.warwick.tabula.BrowserTest
 
 class SysadminDepartmentPermissionsTest extends BrowserTest with SysadminFixtures with GivenWhenThen {
 
@@ -73,6 +73,11 @@ class SysadminDepartmentPermissionsTest extends BrowserTest with SysadminFixture
 				usercodes.size should be (fixtureAdmins.size + 1)
 				normalAdmins()
 				usercodes should contain (permittedUser)
+
+			// PhantomJS doesn't support confirm()
+			ifPhantomJSDriver { _ =>
+				executeScript("window.confirm = function(msg) { return true; };")
+			}
 
 			When("I remove the new entry")
 				val removable = find(cssSelector(s"$parentElement .remove-permissions [name=usercodes][value=$permittedUser]"))

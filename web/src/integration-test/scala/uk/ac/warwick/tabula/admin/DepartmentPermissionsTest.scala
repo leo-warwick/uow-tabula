@@ -1,8 +1,8 @@
 package uk.ac.warwick.tabula.admin
 
-import uk.ac.warwick.tabula.{LoginDetails, BrowserTest}
 import org.openqa.selenium.By
 import org.scalatest.GivenWhenThen
+import uk.ac.warwick.tabula.{BrowserTest, LoginDetails}
 
 // n.b. this test doesn't work with the FirefoxDriver because the UI pops up modal dialogs which the
 // test isn't expecting. HTMLUnit ignores them.
@@ -95,10 +95,15 @@ class  DepartmentPermissionsTest extends BrowserTest with AdminFixtures with Giv
 			And("I should not see anyone else with any other roles")
 			nowhereElse(parentElement)
 
+      // PhantomJS doesn't support confirm()
+      ifPhantomJSDriver { _ =>
+        executeScript("window.confirm = function(msg) { return true; };")
+      }
+
 			When("I remove the new entry")
 			val removable = find(cssSelector(s"$parentElement .remove-permissions [name=usercodes][value=${permittedUser.usercode}]"))
 			removable should not be None
-			removable.get.underlying.submit()
+      removable.get.underlying.findElement(By.xpath("../button[@type='submit']")).click()
 
 			Then("There should be no users listed")
 			noNewUsersListed(parentElement, preExistingCount)

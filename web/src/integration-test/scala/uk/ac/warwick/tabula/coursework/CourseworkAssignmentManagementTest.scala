@@ -1,9 +1,9 @@
 package uk.ac.warwick.tabula.coursework
 
-import uk.ac.warwick.tabula.BrowserTest
-import org.openqa.selenium.By
 import org.joda.time.DateTime
+import org.openqa.selenium.By
 import org.scalatest.GivenWhenThen
+import uk.ac.warwick.tabula.BrowserTest
 
 class CourseworkAssignmentManagementTest extends BrowserTest with CourseworkFixtures with GivenWhenThen {
 
@@ -158,27 +158,29 @@ class CourseworkAssignmentManagementTest extends BrowserTest with CourseworkFixt
 		withAssignment("xxx01", "Fully featured assignment for archiving") { assignmentId =>
 			val assInfo = getAssignmentInfo("xxx01", "Fully featured assignment for archiving")
 
-			click on (assInfo.findElement(By.partialLinkText("Actions")))
+			click on assInfo.findElement(By.partialLinkText("Actions"))
 			val archiveAssignment = assInfo.findElement(By.partialLinkText("Archive assignment"))
 			eventually {
 				archiveAssignment.isDisplayed should be (true)
 			}
 
-			click on (archiveAssignment)
+			click on archiveAssignment
 
 			// Wait for our Ajax popup to load
 			eventuallyAjax {
-				id("command").webElement.findElement(By.className("btn")).isDisplayed() should be (true)
+				id("command").webElement.findElement(By.className("btn")).isDisplayed should be (true)
 			}
 
-			click on (id("command").webElement.findElement(By.className("btn")))
+			click on id("command").webElement.findElement(By.className("btn"))
 
-			// This works, but it doesn't reload the page automatically properly. Do it manually
-			eventuallyAjax {
-				find(className("ajax-response")) map { _.underlying.isDisplayed() } should be (Some(true))
+			ifHtmlUnitDriver { _ =>
+				// This works, but it doesn't reload the page automatically properly. Do it manually
+				eventuallyAjax {
+					find(className("ajax-response")).map(_.underlying.isDisplayed) should be(Some(true))
+				}
+
+				reloadPage
 			}
-
-			reloadPage
 
 			// Wait for the page reload...
 			eventuallyAjax {
@@ -186,16 +188,16 @@ class CourseworkAssignmentManagementTest extends BrowserTest with CourseworkFixt
 				click on linkText("Show") // Modules with no non-archived assignments are hidden
 
 				val minfo = getModuleInfo("xxx01")
-				click on (minfo.findElement(By.partialLinkText("Manage")))
+				click on minfo.findElement(By.partialLinkText("Manage"))
 
 				eventually {
 					minfo.findElement(By.partialLinkText("Show archived assignments")).isDisplayed should be (true)
 				}
 
-				click on (minfo.findElement(By.partialLinkText("Show archived assignments")))
+				click on minfo.findElement(By.partialLinkText("Show archived assignments"))
 			}
 
-			getAssignmentInfo("xxx01", "Fully featured assignment for archiving (Archived)").isDisplayed() should be (true)
+			getAssignmentInfo("xxx01", "Fully featured assignment for archiving (Archived)").isDisplayed should be (true)
 		}
 	}
 }

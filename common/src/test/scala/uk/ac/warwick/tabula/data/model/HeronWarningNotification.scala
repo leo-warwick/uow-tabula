@@ -1,8 +1,9 @@
 package uk.ac.warwick.tabula.data.model
 
-import javax.persistence.{ManyToOne, DiscriminatorValue, Entity}
-import uk.ac.warwick.userlookup.User
+import javax.persistence.{DiscriminatorValue, Entity, ManyToOne}
+
 import org.hibernate.annotations.Type
+import uk.ac.warwick.userlookup.User
 
 object HeronWarningNotification {
 	val templateLocation = "/WEB-INF/freemarker/notifications/i_really_hate_herons.ftl"
@@ -12,7 +13,8 @@ object HeronWarningNotification {
 @Entity
 @DiscriminatorValue(value="HeronWarning")
 class HeronWarningNotification extends Notification[Heron, Unit]
-	with SingleItemNotification[Heron] with SingleRecipientNotification {
+	with SingleItemNotification[Heron] with SingleRecipientNotification
+	with MyWarwickActivity {
 
 	import HeronWarningNotification._
 
@@ -29,7 +31,8 @@ class HeronWarningNotification extends Notification[Heron, Unit]
 @Entity
 @DiscriminatorValue(value="HeronDefeat")
 class HeronDefeatedNotification extends Notification[Heron, Unit]
-with SingleItemNotification[Heron] with SingleRecipientNotification {
+with SingleItemNotification[Heron] with SingleRecipientNotification
+	with MyWarwickActivity {
 
 	import HeronWarningNotification._
 

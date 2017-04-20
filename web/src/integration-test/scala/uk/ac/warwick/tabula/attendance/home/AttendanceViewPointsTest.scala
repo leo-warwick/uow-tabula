@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.attendance.home
 
-import org.scalatest.GivenWhenThen
 import org.openqa.selenium.By
+import org.scalatest.GivenWhenThen
 import uk.ac.warwick.tabula.attendance.AttendanceFixture
 
 class AttendanceViewPointsTest extends AttendanceFixture with GivenWhenThen{
@@ -28,16 +28,20 @@ class AttendanceViewPointsTest extends AttendanceFixture with GivenWhenThen{
 			 id("filter-results").webElement.findElements(By.cssSelector(".monitoring-points .item-info.point")).size should be > 0
 		 }
 
-		 /* For some reason HtmlUnit is blanking the href for each of the Record buttons so the rest of the test fails
-		 When("I choose to record the first point")
-		 click on id("filter-results").webElement.findElement(By.cssSelector(".monitoring-points .item-info.point a.btn-primary"))
+		 // For some reason HtmlUnit is blanking the href for each of the Record buttons so the rest of the test fails
+		 ifHtmlUnitDriver(
+			 operation = _ => {},
+			 otherwise = { _ =>
+				 When("I choose to record the first point")
+				 click on id("filter-results").webElement.findElement(By.cssSelector(".monitoring-points .item-info.point a.btn-primary"))
 
-		 Then("I am redirected to record the grouped point")
-		 eventually(currentUrl should(include("/attendance/view/xxx/points") and include("record")))
-		 pageSource should include("Record attendance")
-		 pageSource should include("Point 1")
-		 id("recordAttendance").webElement.findElements(By.cssSelector("div.item-info")).size() should be > 0
-		 */
+				 Then("I am redirected to record the grouped point")
+				 eventually(currentUrl should(include("/attendance/view/xxx/") and include("/points/") and include("/record")))
+				 pageSource should include("Record attendance")
+				 pageSource should include("Point 1")
+				 id("recordAttendance").webElement.findElements(By.cssSelector("div.item-info")).size() should be > 0
+			 }
+		 )
 	 }
 
  }

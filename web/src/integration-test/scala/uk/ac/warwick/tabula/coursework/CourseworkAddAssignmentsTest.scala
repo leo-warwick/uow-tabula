@@ -3,7 +3,6 @@ package uk.ac.warwick.tabula.coursework
 import org.scalatest.GivenWhenThen
 import uk.ac.warwick.tabula.BrowserTest
 import uk.ac.warwick.tabula.coursework.pages.SetupAssignmentsPage
-import com.gargoylesoftware.htmlunit.BrowserVersion
 
 /**
  * Test the setup-assignments form.
@@ -22,7 +21,7 @@ class CourseworkAddAssignmentsTest extends BrowserTest with CourseworkFixtures w
 		val page = new SetupAssignmentsPage("xxx")
 
 		Given("I am logged in as admin at the setup-assignments page")
-		signIn as(P.Admin1) to (page.url)
+		signIn as P.Admin1 to page.url
 		page.shouldBeCurrentPage()
 
 		Then("I should see one item")
@@ -39,17 +38,30 @@ class CourseworkAddAssignmentsTest extends BrowserTest with CourseworkFixtures w
 		val nextRows = page.itemRows
 		page.setTitleForRow(nextRows.head, "GOOD NEWS")
 
-		/* FIXME This works with Chrome but not with HtmlUnit. */
-//		And("I should be able to set some options")
-//		executeScript("jQuery('.modal').removeClass('fade')"); //haaax
-//
-//		partialLinkText("Set options").webElement.click()
+		ifHtmlUnitDriver(
+      operation = _ => {},
+      otherwise = { _ =>
+        And("I should be able to set some options")
+        partialLinkText("Set options").webElement.click()
 
-//		cssSelector(".modal-footer .btn-primary").webElement.click()
-//
-//		eventually {
-//			page.getOptionIdForRow(page.itemRows.head) should be (Some("A"))
-//		}
+        eventually {
+          cssSelector(".modal-footer .btn-primary").webElement.isDisplayed should be(true)
+        }
+
+        // Enable the button manually because trying to do the scrolling is stressful
+        executeScript("document.getElementsByClassName('btn-primary')[1].disabled = ''") // ew
+
+        eventually {
+          cssSelector(".modal-footer .btn-primary").webElement.isEnabled should be(true)
+        }
+
+        click on cssSelector(".modal-footer .btn-primary")
+
+        eventuallyAjax {
+          page.getOptionIdForRow(page.itemRows.head) should be(Some("A"))
+        }
+      }
+    )
 
 		And("I can click back")
 		page.clickBack()
