@@ -8,7 +8,7 @@
 		 action="${url('/coursework/admin/department/${department.code}/settings/feedback-templates')}"
 		 commandName="bulkFeedbackTemplateCommand">
 	<@form.labelled_row "file.upload" "Upload feedback forms">
-		<input type="file" name="file.upload" multiple />
+		<input type="file" id="file.upload" name="file.upload" multiple />
 		<div id="multifile-column-description" class="help-block">
 			<#include "/WEB-INF/freemarker/multiple_upload_help.ftl" />
 		</div>

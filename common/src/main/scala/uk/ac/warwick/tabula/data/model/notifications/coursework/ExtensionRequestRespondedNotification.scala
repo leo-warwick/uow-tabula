@@ -3,11 +3,12 @@ package uk.ac.warwick.tabula.data.model.notifications.coursework
 import javax.persistence.{DiscriminatorValue, Entity}
 
 import uk.ac.warwick.tabula.coursework.web.Routes
-import uk.ac.warwick.tabula.data.model.FreemarkerModel
+import uk.ac.warwick.tabula.data.model.{FreemarkerModel, MyWarwickActivity}
 import uk.ac.warwick.userlookup.User
 
 
-abstract class ExtensionRequestRespondedNotification(val verbed: String) extends ExtensionNotification {
+abstract class ExtensionRequestRespondedNotification(val verbed: String) extends ExtensionNotification
+	with MyWarwickActivity {
 
 	def verb = "respond"
 

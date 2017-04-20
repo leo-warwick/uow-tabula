@@ -13,7 +13,8 @@ import uk.ac.warwick.userlookup.User
 import scala.util.Try
 
 abstract class CancelledStudentRelationshipChangeNotification
-	extends Notification[StudentRelationship, Unit] with SingleItemNotification[StudentRelationship] {
+	extends Notification[StudentRelationship, Unit] with SingleItemNotification[StudentRelationship]
+	with MyWarwickActivity {
 
 	var profileService: ProfileService = Wire[ProfileService]
 	var relationshipService: RelationshipService = Wire[RelationshipService]

@@ -18,7 +18,8 @@ class StudentFeedbackAdjustmentNotification
 	extends NotificationWithTarget[AssignmentFeedback, Assignment]
 	with SingleItemNotification[AssignmentFeedback]
 	with SingleRecipientNotification
-	with AutowiringUserLookupComponent {
+	with AutowiringUserLookupComponent
+	with MyWarwickActivity {
 
 	def verb = "adjusted"
 	def assignment: Assignment = target.entity

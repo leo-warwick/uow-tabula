@@ -7,7 +7,7 @@
 		<script>
 			jQuery('.use-popover').tabulaPopover({
 				trigger: 'click',
-				container: '#container'
+				container: 'body'
 			});
 		</script>
 	<#else>

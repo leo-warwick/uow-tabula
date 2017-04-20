@@ -31,9 +31,11 @@ task deployToTomcat(dependsOn: 'war') {
 
 rebel {
     web {
+        resource {}
+
         resource {
-            directory = "build/rootContent/WEB-INF"
-            target = "/WEB-INF/"
+            directory = "../common/src/main/webapp"
+            target = "/"
         }
     }
 }

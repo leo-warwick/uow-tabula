@@ -78,7 +78,7 @@
 										<input type="hidden" name="_command" value="remove">
 										<input type="hidden" name="roleDefinition" value="${roleDefinition}">
 										<input type="hidden" name="usercodes" value="${u.userId}">
-										<button class="btn btn-danger btn-xs removeUser">Remove</button>
+										<button type="submit" class="btn btn-danger btn-xs removeUser">Remove</button>
 									</form>
 								<#else>
 									<#local popoverText>

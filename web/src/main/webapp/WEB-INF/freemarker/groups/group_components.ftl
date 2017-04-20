@@ -455,7 +455,7 @@
 			$module.find('.use-tooltip').tooltip();
 			$module.find('.use-popover').tabulaPopover({
 				trigger: 'click',
-				container: '#container'
+				container: 'body'
 			});
 		});
 	</script>

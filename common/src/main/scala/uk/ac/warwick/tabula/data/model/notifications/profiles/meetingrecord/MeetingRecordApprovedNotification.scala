@@ -11,7 +11,8 @@ class MeetingRecordApprovedNotification
 	extends Notification[MeetingRecordApproval, Unit]
 	with MeetingRecordNotificationTrait
 	with SingleItemNotification[MeetingRecordApproval]
-	with AutowiringTermServiceComponent {
+	with AutowiringTermServiceComponent
+	with MyWarwickActivity {
 
 	def approval: MeetingRecordApproval = item.entity
 	def meeting: MeetingRecord = approval.meetingRecord

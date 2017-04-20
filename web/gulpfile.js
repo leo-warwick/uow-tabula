@@ -171,7 +171,6 @@ gulp.task('concat-scripts-id6', [
 ]);
 
 concatScripts('concat-renderjs-id7', 'js/id7/render.js', [
-  'libs/map-set-for-each/map-set-for-each.js', // Needed for functional tests
   'id7/js/id7-bundle.js',
   'libs/jquery-ui-interactions/jquery-ui-1.11.4-custom.js',
   'libs/jquery.delayedObserver.js',

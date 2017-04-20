@@ -58,19 +58,32 @@ class PersonalTutorTest extends BrowserTest with GivenWhenThen with FeaturesDriv
 		cssSelector("a.new-meeting-record").findAllElements.size should be (2)
 
 		Then("They create a new record")
+
 		// Modals don't work in HtmlUnit, so screw them
-		ifHtmlUnitDriver(h=>h.setJavascriptEnabled(false))
+		ifHtmlUnitDriver(
+			operation = { d =>
+				d.setJavascriptEnabled(false)
+				click on linkText("Record meeting")
+				d.setJavascriptEnabled(true)
+			},
+			otherwise = { d =>
+				click on linkText("Record meeting")
+        eventuallyAjax(find(cssSelector(".modal-body iframe")) should be ('defined))
+				switch to frame(find(cssSelector(".modal-body iframe")).get)
+				textField(name("title")).isDisplayed should be (true)
+			}
+		)
 
-		click on linkText("Record meeting")
-
-		ifHtmlUnitDriver(h=>h.setJavascriptEnabled(true))
 		textField("title").value = "Created meeting"
 		val datetime = DateTime.now.minusDays(1).withHourOfDay(11)
 		textField("meetingDateStr").value = dateFormatter.print(datetime)
 		textField("meetingTimeStr").value = timeFormatter.print(datetime)
 		textField("meetingEndTimeStr").value = timeFormatter.print(datetime.plusHours(1))
 		singleSel("format").value = "f2f"
-		cssSelector("button.btn-primary[type=submit]").findElement.get.underlying.click()
+
+		switch to defaultContent
+
+		click on cssSelector("button.btn-primary[type=submit]")
 
 		eventually {
 			currentUrl should endWith ("/tutor")
@@ -96,7 +109,7 @@ class PersonalTutorTest extends BrowserTest with GivenWhenThen with FeaturesDriv
 		cssSelector("form.approval button.btn-primary").findElement.get.underlying.click()
 
 		Then("The meeting is approved")
-		cssSelector("input[name=approved]").findElement.isEmpty
+		eventuallyAjax(cssSelector("input[name=approved]").findElement.isEmpty should be (true))
 	}
 
 }

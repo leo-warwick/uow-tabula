@@ -49,7 +49,7 @@ exports.wireButtons = function(id) {
 		})
 		.tabulaPopover({
 			trigger: 'click',
-			container: '#container'
+			container: 'body'
 		});
 };
 
@@ -171,7 +171,7 @@ $(function(){
             $('#meetings-modal').modal("show");
             $('.use-popover').tabulaPopover({
                 trigger: 'click',
-                container: '#container'
+                container: 'body'
             });
         });
     }).end().find('a.small-groups').on('click', function(e){
@@ -180,7 +180,7 @@ $(function(){
 			$('#small-groups-modal').html(data).modal("show");
 			$('.use-popover').tabulaPopover({
 				trigger: 'click',
-				container: '#container'
+				container: 'body'
 			});
 		});
 	});

@@ -5,7 +5,7 @@ import javax.persistence.{DiscriminatorValue, Entity}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model.groups.DepartmentSmallGroupSet
-import uk.ac.warwick.tabula.data.model.{Department, FreemarkerModel, NotificationWithTarget}
+import uk.ac.warwick.tabula.data.model.{Department, FreemarkerModel, MyWarwickActivity, NotificationWithTarget}
 import uk.ac.warwick.tabula.groups.web.Routes
 import uk.ac.warwick.tabula.services.ModuleAndDepartmentService
 import uk.ac.warwick.userlookup.User
@@ -15,7 +15,8 @@ import scala.collection.mutable
 
 @Entity
 @DiscriminatorValue(value="UnlinkedDepartmentSmallGroupSet")
-class UnlinkedDepartmentSmallGroupSetNotification extends NotificationWithTarget[DepartmentSmallGroupSet, Department] {
+class UnlinkedDepartmentSmallGroupSetNotification extends NotificationWithTarget[DepartmentSmallGroupSet, Department]
+	with MyWarwickActivity {
 
 	@transient
 	lazy val department: Department = target.entity

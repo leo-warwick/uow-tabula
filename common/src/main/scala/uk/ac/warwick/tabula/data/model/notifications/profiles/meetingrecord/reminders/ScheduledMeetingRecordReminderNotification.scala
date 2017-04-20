@@ -2,14 +2,16 @@ package uk.ac.warwick.tabula.data.model.notifications.profiles.meetingrecord.rem
 
 import javax.persistence.{DiscriminatorValue, Entity}
 
-import org.joda.time.{DateTime, Days}
+import org.joda.time.DateTime
 import uk.ac.warwick.tabula.data.model.NotificationPriority.Warning
 import uk.ac.warwick.tabula.data.model.notifications.profiles.meetingrecord.ScheduledMeetingRecordNotification
-import uk.ac.warwick.tabula.data.model.{FreemarkerModel, SingleRecipientNotification}
+import uk.ac.warwick.tabula.data.model.{FreemarkerModel, MyWarwickNotification, SingleRecipientNotification}
 import uk.ac.warwick.tabula.helpers.ConfigurableIntervalFormatter
 import uk.ac.warwick.userlookup.User
 
-abstract class ScheduledMeetingRecordReminderNotification extends ScheduledMeetingRecordNotification with SingleRecipientNotification {
+abstract class ScheduledMeetingRecordReminderNotification extends ScheduledMeetingRecordNotification
+	with SingleRecipientNotification
+	with MyWarwickNotification {
 
 	verbSetting.value = "remind"
 	priority = Warning

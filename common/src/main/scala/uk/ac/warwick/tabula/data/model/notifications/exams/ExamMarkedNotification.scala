@@ -5,16 +5,15 @@ import javax.persistence.{DiscriminatorValue, Entity}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.model.{FreemarkerModel, _}
 import uk.ac.warwick.tabula.exams.web
-import uk.ac.warwick.tabula.services.{AssessmentMembershipService, FeedbackService}
 import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.services.{AssessmentMembershipService, FeedbackService}
 import uk.ac.warwick.userlookup.User
-
-import scala.collection.JavaConverters._
 
 @Entity
 @DiscriminatorValue(value="ExamMarked")
 class ExamMarkedNotification
-	extends NotificationWithTarget[ExamFeedback, Exam] {
+	extends NotificationWithTarget[ExamFeedback, Exam]
+	with MyWarwickActivity {
 
 	@transient
 	final lazy val exam: Exam = target.entity

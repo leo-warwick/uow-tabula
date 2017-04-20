@@ -40,7 +40,7 @@ dependencies {
     cucumber 'org.jruby:jruby-complete:9.1.6.0'
     cucumber 'ch.qos.logback:logback-classic:1.1.7'
 
-    integrationTestCompile 'org.seleniumhq.selenium:selenium-server:3.0.1'
+    integrationTestCompile 'org.seleniumhq.selenium:selenium-server:3.3.1'
 }
 
 task deployToTomcat(dependsOn: 'war') {
@@ -73,7 +73,15 @@ rebel {
 
         resource {
             directory = "build/rootContent/WEB-INF"
+            includes = ["build.properties", "static-hashes.properties"]
             target = "/WEB-INF/"
+        }
+
+        resource {}
+
+        resource {
+            directory = "../common/src/main/webapp"
+            target = "/"
         }
     }
 }
@@ -148,11 +156,8 @@ task integrationTest(type: Test) {
         mkdir 'build/integrationTest-screenshots'
     }
 
-    systemProperty 'phantomjs.binary.path', new File("node_modules/.bin/phantomjs").absolutePath
-    systemProperty 'screenshot.dir', new File("build/integrationTest-screenshots").absolutePath
-
-    // Run integration test classes in parallel
-    maxParallelForks = 2
+    systemProperty 'phantomjs.binary.path', new File(projectDir, "node_modules/.bin/phantomjs").absolutePath
+    systemProperty 'screenshot.dir', new File(projectDir, "build/integrationTest-screenshots").absolutePath
 
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath

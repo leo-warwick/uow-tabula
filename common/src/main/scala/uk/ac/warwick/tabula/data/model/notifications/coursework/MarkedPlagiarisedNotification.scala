@@ -11,7 +11,8 @@ import uk.ac.warwick.userlookup.User
 @Entity
 @DiscriminatorValue(value="MarkedPlagarised")
 class MarkedPlagiarisedNotification extends NotificationWithTarget[Submission, Assignment]
-	with SingleItemNotification[Submission] with AutowiringUserLookupComponent {
+	with SingleItemNotification[Submission] with AutowiringUserLookupComponent
+	with MyWarwickActivity {
 
 	def submission: Submission = item.entity
 	def assignment: Assignment = target.entity

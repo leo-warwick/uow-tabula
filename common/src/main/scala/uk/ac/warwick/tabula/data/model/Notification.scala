@@ -110,6 +110,8 @@ object Notification {
 abstract class Notification[A >: Null <: ToEntityReference, B]
 	extends GeneratedId with Serializable with HasSettings with PermissionsTarget with NotificationPreSaveBehaviour {
 
+	self: MyWarwickDiscriminator =>
+
 	@transient final val dateOnlyFormatter = DateFormats.NotificationDateOnly
 	@transient final val dateTimeFormatter = DateFormats.NotificationDateTime
 
@@ -231,6 +233,9 @@ abstract class Notification[A >: Null <: ToEntityReference, B]
  */
 @Entity
 abstract class NotificationWithTarget[A >: Null <: ToEntityReference, B >: Null <: AnyRef] extends Notification[A,B] {
+
+	self: MyWarwickDiscriminator =>
+
 	@Access(value=AccessType.PROPERTY)
 	@OneToOne(cascade = Array(CascadeType.ALL), targetEntity = classOf[EntityReference[B]], fetch = FetchType.LAZY)
 	@BeanProperty
@@ -345,7 +350,7 @@ trait ConfigurableNotification {
 	def allRecipients: Seq[User]
 }
 
-trait ActionRequiredNotification {
+trait ActionRequiredNotification extends MyWarwickNotification {
 
 	self: Notification[_, _] =>
 
@@ -396,4 +401,19 @@ trait RecipientCompletedActionRequiredNotification extends ActionRequiredNotific
 		completedBy = user.getUserId
 		completedOn = DateTime.now
 	}
+}
+
+/**
+	* Controls whether a notification is sent to My Warwick as an activity or a notification
+	*/
+sealed trait MyWarwickDiscriminator {
+	self: Notification[_, _] =>
+}
+
+trait MyWarwickNotification extends MyWarwickDiscriminator {
+	self: Notification[_, _] =>
+}
+
+trait MyWarwickActivity extends MyWarwickDiscriminator {
+	self: Notification[_, _] =>
 }

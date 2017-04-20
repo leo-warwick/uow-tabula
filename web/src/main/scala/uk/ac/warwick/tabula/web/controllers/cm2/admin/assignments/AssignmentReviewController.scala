@@ -12,7 +12,7 @@ import uk.ac.warwick.tabula.web.controllers.cm2.{CourseworkBreadcrumbs, Coursewo
 
 @Profile(Array("cm2Enabled"))
 @Controller
-@RequestMapping(value = Array("/${cm2.prefix}/admin/assignments/new/{assignment}/review"))
+@RequestMapping(value = Array("/${cm2.prefix}/admin/assignments/{assignment}/review"))
 class AssignmentReviewController extends CourseworkController {
 
 	@ModelAttribute("command")

@@ -81,3 +81,7 @@ modules/web/target/
 .idea
 .idea
 .xml
+node_modules
+package.json
+web/phantomjsdriver.log
+build.gradle

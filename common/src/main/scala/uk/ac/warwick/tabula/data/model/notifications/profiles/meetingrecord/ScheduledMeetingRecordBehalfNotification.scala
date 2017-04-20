@@ -2,14 +2,15 @@ package uk.ac.warwick.tabula.data.model.notifications.profiles.meetingrecord
 
 import javax.persistence.{DiscriminatorValue, Entity}
 
-import uk.ac.warwick.tabula.data.model.{FreemarkerModel, SingleRecipientNotification}
+import uk.ac.warwick.tabula.data.model.{FreemarkerModel, MyWarwickActivity, SingleRecipientNotification}
 import uk.ac.warwick.userlookup.User
 
 @Entity
 @DiscriminatorValue(value="ScheduledMeetingRecordBehalf")
 class ScheduledMeetingRecordBehalfNotification
 	extends ScheduledMeetingRecordNotification with SingleRecipientNotification
-	with AddsIcalAttachmentToScheduledMeetingNotification {
+	with AddsIcalAttachmentToScheduledMeetingNotification
+	with MyWarwickActivity {
 
 	def this(theVerb: String) {
 		this()

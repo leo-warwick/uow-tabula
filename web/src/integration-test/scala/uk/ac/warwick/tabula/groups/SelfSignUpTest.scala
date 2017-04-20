@@ -29,7 +29,7 @@ class SelfSignUpTest  extends SmallGroupsFixture with GivenWhenThen {
 
 		Then("I should see the groupset listed with a radio button beside each group")
 		val groupsPage = new GroupsHomePage
-		groupsPage.isCurrentPage
+		groupsPage should be ('currentPage)
 
 		val groupsetInfo = groupsPage.getGroupsetInfo(TEST_MODULE_CODE, TEST_GROUPSET_NAME).get
 
@@ -49,15 +49,18 @@ class SelfSignUpTest  extends SmallGroupsFixture with GivenWhenThen {
 		groupsetInfo.getSignupButton should be('enabled)
 
 		// Stop HTMLUnit screwing up buttons
-		ifHtmlUnitDriver(h=>h.setJavascriptEnabled(false))
-
+		ifHtmlUnitDriver(_.setJavascriptEnabled(false))
 
 		When("I click the sign up button")
-		groupsetInfo.getSignupButton.click()
+		groupsetInfo.getSignupButton.submit()
+
+    eventuallyAjax {
+      pageSource should include("1 student")
+    }
 
 		Then("The groups home page should be displayed")
 		val updatedGroupsPage = new GroupsHomePage
-		updatedGroupsPage.isCurrentPage
+		updatedGroupsPage should be ('currentPage)
 
 		And("The group I selected should be displayed")
 		val updatedGroupsetInfo = updatedGroupsPage.getGroupsetInfo(TEST_MODULE_CODE, TEST_GROUPSET_NAME).get
@@ -94,11 +97,11 @@ class SelfSignUpTest  extends SmallGroupsFixture with GivenWhenThen {
 		leaveButton should be('enabled)
 
 		When("I click the 'leave' button")
-		leaveButton.click()
+		leaveButton.submit()
 
 		Then("The groups home page should be displayed")
 		val updatedGroupsPage = new GroupsHomePage
-		updatedGroupsPage.isCurrentPage
+		updatedGroupsPage should be ('currentPage)
 
 		And("Both groups should be displayed, with radio buttons for selection")
 		val groupsetInfo = groupsPage.getGroupsetInfo(TEST_MODULE_CODE, TEST_GROUPSET_NAME)
@@ -246,7 +249,7 @@ class SelfSignUpTest  extends SmallGroupsFixture with GivenWhenThen {
 
 		Then("I should see the groupset listed with a radio button beside each group")
 		val groupsPage = new GroupsHomePage
-		groupsPage.isCurrentPage
+		groupsPage should be ('currentPage)
 
 		val groupsetInfo = groupsPage.getGroupsetInfo(TEST_MODULE_CODE, TEST_GROUPSET_NAME).get
 

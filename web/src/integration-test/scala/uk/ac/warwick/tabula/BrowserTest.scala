@@ -1,26 +1,31 @@
 package uk.ac.warwick.tabula
 
+import java.io.{File, FileInputStream, IOException}
+import java.util.{Base64, Properties}
+
+import com.gargoylesoftware.htmlunit.BrowserVersion
+import com.google.common.base.Charsets
+import com.google.common.io.{ByteSource, Files}
+import org.joda.time.DateTime
+import org.junit.runner.RunWith
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import org.openqa.selenium.ie.InternetExplorerDriver
+import org.openqa.selenium.phantomjs.PhantomJSDriver
+import org.openqa.selenium.remote.ScreenshotException
+import org.openqa.selenium.{OutputType, TakesScreenshot, WebDriver}
 import org.scalatest._
+import org.scalatest.concurrent.Eventually
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.junit._
 import org.scalatest.selenium.WebBrowser
-import org.junit.runner.RunWith
-import org.openqa.selenium.htmlunit.HtmlUnitDriver
-import org.openqa.selenium.WebDriver
-import java.util.Properties
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.ie.InternetExplorerDriver
-import org.openqa.selenium.phantomjs.PhantomJSDriver
-import java.io.File
-import java.io.FileInputStream
-import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar
-import com.gargoylesoftware.htmlunit.BrowserVersion
+import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.userlookup.UserLookup
-import scala.util.Try
-import scala.util.Success
-import org.joda.time.DateTime
+import uk.ac.warwick.util.core.ExceptionUtils
+
+import scala.util.{Success, Try}
 
 /** Abstract base class for Selenium tests.
   *
@@ -36,7 +41,9 @@ abstract class BrowserTest
 	with SpanSugar
 	with WebBrowser
 	with WebsignonMethods
-	with UserKnowledge {
+	with UserKnowledge
+	with TestScreenshots
+	with BeforeAndAfterAll {
 
 	// Shorthand to expose properties to test classes
 	val P = FunctionalTestProperties
@@ -46,26 +53,50 @@ abstract class BrowserTest
 	  */
 	def Path(path: String): String = P.SiteRoot + path
 
-	implicit lazy val webDriver: WebDriver = P.Browser match {
-		case "htmlunit" => //new HtmlUnitDriver(true) // JS enabled
-			val driver = new HtmlUnitDriver(htmlUnitBrowserVersion) // JS enabled
-			driver.setJavascriptEnabled(true)
-			driver
-		case "chrome" => new ChromeDriver
-		case "firefox" => new FirefoxDriver
-		case "ie" => new InternetExplorerDriver
-		case "phantomjs" => new PhantomJSDriver
+  val screenshotDirectory = new File(P.ScreenshotDirectory)
+
+	// Run at the end of this Suite (regular after() doesn't work because ScalaTest
+	// reuses an instance for all tests, unlike JUnit which makes a new instance per test)
+	override def afterAll() = {
+		super.afterAll()
+		webDriver.quit()
+	}
+
+	implicit lazy val webDriver: WebDriver = {
+		val driver = P.Browser match {
+			case "htmlunit" =>
+				val d = new HtmlUnitDriver(htmlUnitBrowserVersion) // JS enabled
+				d.setJavascriptEnabled(true)
+				d
+			case "chrome" => new ChromeDriver
+			case "firefox" => new FirefoxDriver
+			case "ie" => new InternetExplorerDriver
+			case "phantomjs" =>
+				if (System.getProperty("phantomjs.binary.path") == null)
+					System.setProperty("phantomjs.binary.path", P.PhantomJSLocation)
+
+				new PhantomJSDriver
+		}
+
+		// Set the most common screen resolution for Tabula
+		driver.manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1080))
+		driver
 	}
 
 	// Can be overridden by a test if necessary.
 	val htmlUnitBrowserVersion = BrowserVersion.BEST_SUPPORTED
 
-	def ifHtmlUnitDriver(operation:HtmlUnitDriver=>Unit): Unit = {
+	def ifHtmlUnitDriver(operation: HtmlUnitDriver => Unit, otherwise: WebDriver => Unit = _ => {}): Unit =
 		webDriver match {
-			case h:HtmlUnitDriver=>operation(h)
-			case _=> // do nothing
+			case h: HtmlUnitDriver => operation(h)
+			case d => otherwise(d)
 		}
-	}
+
+	def ifPhantomJSDriver(operation: PhantomJSDriver => Unit, otherwise: WebDriver => Unit = _ => {}): Unit =
+		webDriver match {
+			case p: PhantomJSDriver => operation(p)
+			case d => otherwise(d)
+		}
 
 	def disableJQueryAnimationsOnHtmlUnit() {
 		ifHtmlUnitDriver { driver =>
@@ -145,6 +176,8 @@ object FunctionalTestProperties {
 
 	val SiteRoot: String = prop("toplevel.url")
 	val Browser: String = prop("browser")
+  val PhantomJSLocation: String = prop("phantomjs.binary.path")
+  val ScreenshotDirectory: String = prop("screenshot.dir")
 
 	/* Test user accounts who can sign in during tests. Populated from properties.
 	 * The tests currently REQUIRE that the user's first name is
@@ -214,4 +247,41 @@ object FunctionalTestProperties {
 
 trait UserKnowledge {
 	var currentUser: LoginDetails = _
+}
+
+trait TestScreenshots extends Logging {
+	self: Suite =>
+
+  implicit val webDriver: WebDriver // let the trait know this will be implemented
+  val screenshotDirectory: File
+
+	override def withFixture(test: NoArgTest): Outcome = {
+		test() match {
+			case failed: Failed =>
+				val e = ExceptionUtils.retrieveException(failed.exception, classOf[ScreenshotException])
+
+				val screenshot =
+					if (e != null)
+						Some(Base64.getDecoder.decode(e.getBase64EncodedScreenshot.getBytes(Charsets.UTF_8)))
+					else
+						webDriver match {
+							case d: TakesScreenshot => Some(d.getScreenshotAs(OutputType.BYTES))
+							case _ => None
+						}
+
+				screenshot.foreach { screenshot =>
+					val outputFile = new File(screenshotDirectory, s"${test.name}.png")
+					try {
+						ByteSource.wrap(screenshot).copyTo(Files.asByteSink(outputFile))
+						logger.info("Screenshot written to " + outputFile.getAbsolutePath)
+					} catch {
+						case ex: IOException =>
+							logger.error("Couldn't write screenshot", ex)
+					}
+				}
+
+				failed
+			case other => other
+		}
+	}
 }

@@ -3,7 +3,7 @@ package uk.ac.warwick.tabula.data.model.notifications.groups
 import javax.persistence.{DiscriminatorValue, Entity}
 
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, SmallGroupSet}
-import uk.ac.warwick.tabula.data.model.{FreemarkerModel, NotificationWithTarget, UserIdRecipientNotification}
+import uk.ac.warwick.tabula.data.model.{FreemarkerModel, MyWarwickActivity, NotificationWithTarget, UserIdRecipientNotification}
 import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
 import uk.ac.warwick.tabula.web.Routes
 
@@ -14,7 +14,8 @@ object SmallGroupSetChangedNotification {
 abstract class SmallGroupSetChangedNotification(recipientRole: UserRoleOnGroup)
 	extends NotificationWithTarget[SmallGroup, SmallGroupSet]
 	with UserIdRecipientNotification
-	with AutowiringUserLookupComponent {
+	with AutowiringUserLookupComponent
+	with MyWarwickActivity {
 
 	def verb = "Modify"
 
@@ -51,7 +52,8 @@ class SmallGroupSetChangedTutorNotification extends SmallGroupSetChangedNotifica
 
 	private def changedGroupInfo = {
 		entities.map { newSmallGroup =>
-			(newSmallGroup, oldSmallGroupSizes.value.get(newSmallGroup.id).getOrElse("0")) }.filter { case (newGroup,oldSize) => newGroup.students.size != oldSize.toInt }
+			(newSmallGroup, oldSmallGroupSizes.value.getOrElse(newSmallGroup.id, "0"))
+		}.filter { case (newGroup,oldSize) => newGroup.students.size != oldSize.toInt }
 	}
 
 	override  def extraModel = Map("groupsWithOldSizeInfo" -> changedGroupInfo)

@@ -105,7 +105,7 @@ var checkForCheckpoints = function(){
 		}
 		$('.use-popover').tabulaPopover({
 			trigger: 'click',
-			container: '#container'
+			container: 'body'
 		});
 	});
 };

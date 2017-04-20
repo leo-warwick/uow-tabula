@@ -11,17 +11,17 @@ class CourseworkAssignmentSubmissionTest extends BrowserTest with CourseworkFixt
 				click on linkText("Fully featured assignment")
 				currentUrl should endWith(assignmentId + "/")
 
-				click on (getInputByLabel("File").orNull)
+				click on getInputByLabel("File").get
 				pressKeys(getClass.getResource("/file1.txt").getFile)
 
-				new TextField(getInputByLabel("Word count").orNull).value = "1000"
+				new TextField(getInputByLabel("Word count").get).value = "1000"
 
 				// Don't click the plagiarism detection button yet
 				submit()
 
 				pageSource contains "Thanks, we've received your submission." should be (false)
 
-				id("plagiarismDeclaration.errors").webElement.isDisplayed() should be (true)
+				id("plagiarismDeclaration.errors").webElement.isDisplayed should be (true)
 				pageSource contains "You must confirm that this submission is all your own work." should be (true)
 
 				// Click the button and submit again
@@ -31,7 +31,7 @@ class CourseworkAssignmentSubmissionTest extends BrowserTest with CourseworkFixt
 
 				pageSource contains "Thanks, we've received your submission." should be (true)
 
-				linkText("file1.txt").webElement.isDisplayed() should be (true)
+				linkText("file1.txt").webElement.isDisplayed should be (true)
 			}
 		}
 	}

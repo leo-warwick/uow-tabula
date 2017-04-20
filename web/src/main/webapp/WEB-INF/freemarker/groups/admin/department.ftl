@@ -429,12 +429,12 @@
 
 						$('.use-wide-popover').tabulaPopover({
 							trigger: 'click',
-							container: '#container',
+							container: 'body',
 							template: '<div class="popover wide"><div class="arrow"></div><div class="popover-inner"><button type="button" class="close" aria-hidden="true">&#215;</button><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
 						});
 
 						$('.use-tooltip').tooltip();
-						AjaxPopup.wireAjaxPopupLinks($('#container'));
+						AjaxPopup.wireAjaxPopupLinks($('body'));
 
 						// callback for hooking in local changes to results
 						$(document).trigger("tabula.filterResultsChanged");

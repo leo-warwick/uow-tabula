@@ -3,9 +3,8 @@ package uk.ac.warwick.tabula.data.model.notifications.groups
 import javax.persistence.{DiscriminatorValue, Entity}
 
 import uk.ac.warwick.tabula.data.model.NotificationPriority.Warning
-import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.StudentSignUp
-import uk.ac.warwick.tabula.data.model.groups.SmallGroupSet
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.data.model.groups.SmallGroupSet
 import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
 
 object OpenSmallGroupSetsNotification {
@@ -15,7 +14,8 @@ object OpenSmallGroupSetsNotification {
 abstract class AbstractOpenSmallGroupSetsNotification
 	extends Notification[SmallGroupSet, Unit]
 	with UserIdRecipientNotification
-	with AutowiringUserLookupComponent {
+	with AutowiringUserLookupComponent
+	with MyWarwickActivity {
 
 	def verb = "Opened"
 

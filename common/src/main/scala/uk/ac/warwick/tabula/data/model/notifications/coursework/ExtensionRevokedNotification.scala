@@ -17,7 +17,8 @@ class ExtensionRevokedNotification extends Notification[Assignment, Unit]
 	with SingleItemNotification[Assignment]
 	with SingleRecipientNotification
 	with UniversityIdOrUserIdRecipientNotification
-	with AutowiringUserLookupComponent {
+	with AutowiringUserLookupComponent
+	with MyWarwickNotification {
 
 	priority = Warning
 

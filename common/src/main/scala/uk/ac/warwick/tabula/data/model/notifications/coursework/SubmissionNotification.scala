@@ -7,7 +7,8 @@ import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
 abstract class SubmissionNotification
 	extends NotificationWithTarget[Submission, Assignment]
 	with SingleItemNotification[Submission]
-	with AutowiringUserLookupComponent {
+	with AutowiringUserLookupComponent
+	with MyWarwickActivity {
 
 	def submission: Submission = item.entity
 	def assignment: Assignment = target.entity

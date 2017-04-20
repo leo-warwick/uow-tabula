@@ -172,7 +172,7 @@
 												<input type="hidden" name="permission" value="${permissionName}">
 												<input type="hidden" name="overrideType" value="<#if grantedPermission.overrideType>true<#else>false</#if>">
 												<input type="hidden" name="usercodes" value="${u.userId}">
-												<button class="btn btn-danger btn-xs removeUser"><i class="fa fa-inverse fa-times"></i></button>
+												<button type="submit" class="btn btn-danger btn-xs removeUser"><i class="fa fa-inverse fa-times"></i></button>
 											</form>
 										<#else>
 											<#assign popoverText>

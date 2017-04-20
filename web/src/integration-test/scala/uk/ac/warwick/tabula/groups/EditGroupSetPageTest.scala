@@ -16,7 +16,7 @@ class EditGroupSetPageTest  extends SmallGroupsFixture  with GivenWhenThen{
 			val editPage = groupsPage.getGroupsetInfo("xxx01", "Test Lab").get.goToEditProperties
 
 		Then("The page is the edit properties page")
-			editPage.isCurrentPage("xxx01")
+			editPage.isCurrentPage("xxx01") should be (true)
 
 	}
 

@@ -11,55 +11,77 @@ import uk.ac.warwick.tabula.commands.cm2.assignments.{ModifyAssignmentFeedbackCo
 import uk.ac.warwick.tabula.commands.{Appliable, PopulateOnForm}
 import uk.ac.warwick.tabula.data.model.Assignment
 import uk.ac.warwick.tabula.web.Mav
-import uk.ac.warwick.tabula.web.controllers.cm2.{CourseworkBreadcrumbs, CourseworkController}
+import uk.ac.warwick.tabula.web.controllers.cm2.CourseworkBreadcrumbs
+
+
+abstract class AbstractAssignmentFeedbackController extends AbstractAssignmentController {
+
+  type ModifyAssignmentFeedbackCommand = Appliable[Assignment] with ModifyAssignmentFeedbackCommandState with PopulateOnForm
+
+  @ModelAttribute("command")
+  def modifyAssignmentFeedbackCommand(@PathVariable assignment: Assignment) =
+    ModifyAssignmentFeedbackCommand(mandatory(assignment))
+
+  def showForm(form: ModifyAssignmentFeedbackCommand, mode: String): Mav = {
+    val module = form.module
+    Mav(s"$urlPrefix/admin/assignments/assignment_feedback",
+      "module" -> module,
+      "department" -> module.adminDepartment,
+      "mode" -> mode
+    ).crumbs(CourseworkBreadcrumbs.Assignment.AssignmentManagement())
+  }
+
+  def submit(cmd: ModifyAssignmentFeedbackCommand, errors: Errors, path: String, mode: String) = {
+    if (errors.hasErrors) {
+      showForm(cmd, mode)
+    } else {
+      cmd.apply()
+      Redirect(path)
+    }
+  }
+
+}
+
 
 @Profile(Array("cm2Enabled"))
 @Controller
-@RequestMapping(value = Array("/${cm2.prefix}/admin/assignments/new/{assignment}/feedback"))
-class ModifyAssignmentFeedbackController extends CourseworkController {
+@RequestMapping(value = Array("/${cm2.prefix}/admin/assignments/{assignment}"))
+class ModifyAssignmentFeedbackController extends AbstractAssignmentFeedbackController {
 
-	type ModifyAssignmentFeedbackCommand = Appliable[Assignment] with ModifyAssignmentFeedbackCommandState with PopulateOnForm
+  @RequestMapping(method = Array(GET), value = Array("/new/feedback"))
+  def form(
+    @PathVariable("assignment") assignment: Assignment,
+    @ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand
+  ): Mav = {
+    cmd.populate()
+    showForm(cmd, createMode)
+  }
 
-	@ModelAttribute("ManageAssignmentMappingParameters")
-	def params = ManageAssignmentMappingParameters
-
-	@ModelAttribute("command")
-	def modifyAssignmentFeedbackCommand(@PathVariable assignment: Assignment) =
-		ModifyAssignmentFeedbackCommand(mandatory(assignment))
-
-	@RequestMapping(method = Array(GET, HEAD))
-	def form(
-		@PathVariable("assignment") assignment: Assignment,
-		@ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand
-	): Mav = {
-		cmd.populate()
-		showForm(cmd)
-	}
-
-	def showForm(form: ModifyAssignmentFeedbackCommand): Mav = {
-		val module = form.module
-		Mav(s"$urlPrefix/admin/assignments/assignment_feedback",
-			"module" -> module,
-			"department" -> module.adminDepartment
-		).crumbs(CourseworkBreadcrumbs.Assignment.AssignmentManagement())
-	}
-
-	@RequestMapping(method = Array(POST), params = Array(ManageAssignmentMappingParameters.createAndAddFeedback, "action!=refresh", "action!=update"))
-	def saveAndExit(@ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand, errors: Errors): Mav = {
-		submit(cmd, errors, { _ => Routes.home })
-	}
+  @RequestMapping(method = Array(GET), value = Array("/edit/feedback"))
+  def formEdit(
+    @PathVariable("assignment") assignment: Assignment,
+    @ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand
+  ): Mav = {
+    cmd.populate()
+    showForm(cmd, editMode)
+  }
 
 
-	@RequestMapping(method = Array(POST), params = Array(ManageAssignmentMappingParameters.createAndAddStudents, "action!=refresh", "action!=update, action=submit"))
-	def submitAndAddStudents(@Valid @ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand, errors: Errors): Mav =
-		submit(cmd, errors, Routes.admin.assignment.createAddStudents)
+  @RequestMapping(method = Array(POST), value = Array("/new/feedback"), params = Array(ManageAssignmentMappingParameters.createAndAddFeedback, "action!=refresh", "action!=update"))
+  def saveAndExit(@ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand, errors: Errors): Mav =
+    submit(cmd, errors, Routes.home, createMode)
 
-	private def submit(cmd: ModifyAssignmentFeedbackCommand, errors: Errors, route: Assignment => String) = {
-		if (errors.hasErrors) {
-			showForm(cmd)
-		} else {
-			val assignment = cmd.apply()
-			RedirectForce(route(assignment))
-		}
-	}
+  @RequestMapping(method = Array(POST), value = Array("/new/feedback"), params = Array(ManageAssignmentMappingParameters.createAndAddStudents, "action!=refresh", "action!=update, action=submit"))
+  def submitAndAddStudents(@Valid @ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand, errors: Errors, @PathVariable assignment: Assignment): Mav =
+    submit(cmd, errors, Routes.admin.assignment.createOrEditStudents(assignment, createMode), createMode)
+
+  @RequestMapping(method = Array(POST), value = Array("/edit/feedback"), params = Array(ManageAssignmentMappingParameters.editAndAddFeedback, "action!=refresh", "action!=update"))
+  def saveAndExitForEdit(@ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand, errors: Errors): Mav =
+    submit(cmd, errors, Routes.home, editMode)
+
+  @RequestMapping(method = Array(POST), value = Array("/edit/feedback"), params = Array(ManageAssignmentMappingParameters.editAndAddStudents, "action!=refresh", "action!=update, action=submit"))
+  def submitAndAddStudentsForEdit(@Valid @ModelAttribute("command") cmd: ModifyAssignmentFeedbackCommand, errors: Errors, @PathVariable assignment: Assignment): Mav =
+    submit(cmd, errors, Routes.admin.assignment.createOrEditStudents(assignment, editMode), editMode)
+
 }
+

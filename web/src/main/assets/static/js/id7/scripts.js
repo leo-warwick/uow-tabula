@@ -656,7 +656,7 @@
 								$target.find('a.ajax-modal').ajaxModalLink();
 								$target.find('.use-popover').tabulaPopover({
 									trigger: 'click',
-									container: '#container'
+									container: 'body'
 								});
 								onComplete();
 								$section.data('loading', false).data('loaded', true).trigger('loaded.collapsible');

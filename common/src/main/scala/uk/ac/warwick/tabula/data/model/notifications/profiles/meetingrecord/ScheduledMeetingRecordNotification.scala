@@ -22,6 +22,8 @@ abstract class ScheduledMeetingRecordNotification
 	with SingleItemNotification[ScheduledMeetingRecord]
 	with AutowiringTermServiceComponent {
 
+	self: MyWarwickDiscriminator =>
+
 	def meeting: ScheduledMeetingRecord = item.entity
 
 	def verbSetting = StringSetting("verb", "")
