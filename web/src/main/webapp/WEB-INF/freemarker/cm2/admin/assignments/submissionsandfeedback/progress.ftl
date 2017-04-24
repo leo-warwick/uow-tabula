@@ -1,7 +1,7 @@
 <#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 <#import "_submission_details.ftl" as sd />
 <#import "/WEB-INF/freemarker/_profile_link.ftl" as pl />
-<#import "*/../../../../../../../../../../modules/web/src/main/webapp/WEB-INF/freemarker/cm2/admin/assignments/submission_components.ftl" as components />
+<#import "/WEB-INF/freemarker/cm2/admin/assignments/submission_components.ftl" as components />
 <#escape x as x?html>
 
 <#macro studentIdentifier user><#compress>
@@ -110,16 +110,16 @@
 				</#macro>
 
 				<#macro workflow student>
-					<#if student.cm2.enhancedSubmission??>
-						<#local enhancedSubmission=student.cm2.enhancedSubmission>
+					<#if student.coursework.enhancedSubmission??>
+						<#local enhancedSubmission=student.coursework.enhancedSubmission>
 						<#local submission=enhancedSubmission.submission>
 					</#if>
-					<#if student.cm2.enhancedFeedback??>
-						<#local enhancedFeedback=student.cm2.enhancedFeedback>
+					<#if student.coursework.enhancedFeedback??>
+						<#local enhancedFeedback=student.coursework.enhancedFeedback>
 						<#local feedback=enhancedFeedback.feedback>
 					</#if>
-					<#if student.cm2.enhancedExtension??>
-						<#local enhancedExtension=student.cm2.enhancedExtension>
+					<#if student.coursework.enhancedExtension??>
+						<#local enhancedExtension=student.coursework.enhancedExtension>
 						<#local extension=enhancedExtension.extension>
 					</#if>
 
@@ -407,7 +407,7 @@
 				</#macro>
 
 				<#macro row student>
-					<tr data-contentid="<@studentIdentifier student.user />" class="itemContainer<#if !student.cm2.enhancedSubmission??> awaiting-submission</#if>"<#if student.cm2.enhancedSubmission?? && student.cm2.enhancedSubmission.submission.suspectPlagiarised> data-plagiarised="true"</#if>>
+					<tr data-contentid="<@studentIdentifier student.user />" class="itemContainer<#if !student.coursework.enhancedSubmission?has_content> awaiting-submission</#if>"<#if student.coursework.enhancedSubmission?has_content && student.coursework.enhancedSubmission.submission.suspectPlagiarised> data-plagiarised="true"</#if>>
 						<td class="check-col"><input type="checkbox" class="collection-checkbox" name="results.students" value="${student.user.userId!}"></td>
 						<#if department.showStudentName>
 							<td class="student-col toggle-cell">
