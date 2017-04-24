@@ -25,14 +25,14 @@ class SubmissionAndFeedbackExportController extends CourseworkController {
 
 
 	@RequestMapping(Array("/export.csv"))
-	def csv(@Valid @ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, module: Module, @PathVariable assignment: Assignment): CSVView = {
+	def csv(@Valid @ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): CSVView = {
 		val results = command.apply()
 
 		val items = results.students
 		val workflowItems: Seq[WorkflowItems] = for(elem <- items) yield elem.coursework
 
 		val writer = new StringWriter
-		val csvBuilder = new CSVBuilder(workflowItems, assignment, module)
+		val csvBuilder = new CSVBuilder(workflowItems, assignment, assignment.module)
 		val doc = new GoodCsvDocument(csvBuilder, null)
 
 		doc.setHeaderLine(true)
@@ -40,7 +40,7 @@ class SubmissionAndFeedbackExportController extends CourseworkController {
 		workflowItems foreach (item => doc.addLine(item))
 		doc.write(writer)
 
-		new CSVView(module.code + "-" + assignment.id + ".csv", writer.toString)
+		new CSVView(assignment.module.code + "-" + assignment.id + ".csv", writer.toString)
 	}
 
 	@RequestMapping(Array("/export.xml"))
@@ -54,13 +54,13 @@ class SubmissionAndFeedbackExportController extends CourseworkController {
 	}
 
 	@RequestMapping(Array("/export.xlsx"))
-	def xlsx(@Valid @ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, module: Module, @PathVariable assignment: Assignment): ExcelView = {
+	def xlsx(@Valid @ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): ExcelView = {
 		val results = command.apply()
 
 		val items = results.students
 		val workflowItems: Seq[WorkflowItems] = for(elem <- items) yield elem.coursework
 
-		val workbook = new ExcelBuilder(workflowItems, assignment, module).toXLSX
+		val workbook = new ExcelBuilder(workflowItems, assignment, assignment.module).toXLSX
 
 		new ExcelView(assignment.name + ".xlsx", workbook)
 	}
