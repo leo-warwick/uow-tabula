@@ -1,5 +1,6 @@
-<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 <#ftl strip_text=true />
+
+<#-- FIXME: implemented as part of CM2 migration but will require further reworking due to CM2 workflow changes -->
 
 <#-- Common template parts for use in other submission/coursework templates. -->
 <#macro originalityReport attachment>
