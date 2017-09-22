@@ -34,7 +34,7 @@ class ExamsOfficeMembershipNotification extends Notification[Department, Unit]
 
 	def departments: Seq[Department] = entities
 
-	def numAssignments: Map[String, String] = getStringMapSetting("summary" , default=Map())
+	def numAssignments: Map[String, String] = getStringMapSetting("numAssignments" , default=Map())
 	def numAssignments_= (numAssignments:Map[String, String]) { settings += ("numAssignments" -> numAssignments) }
 
 	def numSmallGroupSets: Map[String, String] = getStringMapSetting("numSmallGroupSets", default=Map())
@@ -47,7 +47,7 @@ class ExamsOfficeMembershipNotification extends Notification[Department, Unit]
 	def urlTitle = s"Sign in to Tabula"
 
 	def content = FreemarkerModel(ExamsOfficeMembershipNotification.templateLocation, Map (
-		"departments" -> departments,
+		"departments" -> departments.filter(d => numAssignments.contains(d.code) || numSmallGroupSets.contains(d.code)),
 		"numAssignments" -> numAssignments.mapValues(s => Try(s.toInt).getOrElse(0)),
 		"numSmallGroupSets" -> numSmallGroupSets.mapValues(s => Try(s.toInt).getOrElse(0))
 	))
