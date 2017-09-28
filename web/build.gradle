@@ -41,7 +41,7 @@ dependencies {
     cucumber 'org.jruby:jruby-complete:9.1.6.0'
     cucumber 'ch.qos.logback:logback-classic:1.1.7'
 
-    integrationTestCompile 'org.seleniumhq.selenium:selenium-server:3.3.1'
+    integrationTestCompile 'org.seleniumhq.selenium:selenium-server:3.6.0'
 }
 
 task deployToTomcat(dependsOn: 'war') {
