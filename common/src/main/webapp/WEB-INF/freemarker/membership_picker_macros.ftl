@@ -341,8 +341,8 @@ Generates the bulk of the picker HTML, inside a fieldset element
 
 			// TODO this is cribbed out of scripts.js - re-use would be better
 			$enrolment.find('.use-popover').each(function() {
-				if ($(this).attr('data-title')) {
-					$(this).attr('data-original-title', $(this).attr('data-title'));
+				if ($(this).prop('data-title')) {
+					$(this).prop('data-original-title', $(this).prop('data-title'));
 				}
 			});
 
@@ -525,7 +525,7 @@ Generates the bulk of the picker HTML, inside a fieldset element
 		<#-- reset on modal close -->
 		$enrolment.on('hidden', '.modal', function(e) {
 			if (this == e.target) { // ignore 'hidden' events from within the modal
-				$(this).find('input:checked').removeAttr('checked');
+				$(this).find('input:checked').removeProp(('checked');
 				$(this).find('.spinnable').spin(false);
 			}
 		});

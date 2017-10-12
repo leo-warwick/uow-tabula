@@ -139,7 +139,7 @@
 						$reallocateButton.addClass('disabled');
 					}
 					var $checkAll = $currentExpandedDiv.find('.collection-check-all');
-						$checkAll.attr('disabled', true);
+						$checkAll.prop('disabled', true);
 				}
 			});
 		});

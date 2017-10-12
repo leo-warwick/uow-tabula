@@ -334,7 +334,7 @@
         var selection = _getInputRange(input);
 
         var newLength = +(selection.start + text.length + (oldValue.length - selection.end));
-        var maxLength = +$input.attr('maxlength');
+        var maxLength = +$input.prop('maxlength');
 
         if($input.is('[maxlength]') && newLength > maxLength) {
             var delta = text.length - (newLength - maxLength);

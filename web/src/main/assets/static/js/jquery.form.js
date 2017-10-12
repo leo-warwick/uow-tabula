@@ -213,7 +213,7 @@ $.fn.ajaxSubmit = function(options) {
 
     var hasFileInputs = fileInputs.length > 0;
     var mp = 'multipart/form-data';
-    var multipart = ($form.attr('enctype') == mp || $form.attr('encoding') == mp);
+    var multipart = ($form.prop('enctype') == mp || $form.prop('encoding') == mp);
 
     var fileAPI = feature.fileapi && feature.formdata;
     log("fileAPI :" + fileAPI);
@@ -338,7 +338,7 @@ $.fn.ajaxSubmit = function(options) {
                 if ( hasProp )
                     el.prop('disabled', false);
                 else
-                    el.removeAttr('disabled');
+                    el.removeProp(('disabled');
             }
         }
 
@@ -381,7 +381,7 @@ $.fn.ajaxSubmit = function(options) {
                 }
                 catch(ignore) {}
 
-                $io.attr('src', s.iframeSrc); // abort op in progress
+                $io.prop('src', s.iframeSrc); // abort op in progress
                 xhr.error = e;
                 if (s.error)
                     s.error.call(s.context, xhr, e, status);
@@ -465,8 +465,8 @@ $.fn.ajaxSubmit = function(options) {
         }
 
         // Rails CSRF hack (thanks to Yvan Barthelemy)
-        var csrf_token = $('meta[name=csrf-token]').attr('content');
-        var csrf_param = $('meta[name=csrf-param]').attr('content');
+        var csrf_token = $('meta[name=csrf-token]').prop('content');
+        var csrf_param = $('meta[name=csrf-param]').prop('content');
         if (csrf_param && csrf_token) {
             s.extraData = s.extraData || {};
             s.extraData[csrf_param] = csrf_token;
@@ -488,7 +488,7 @@ $.fn.ajaxSubmit = function(options) {
 
             // ie borks in some cases when setting encoding
             if (! s.skipEncodingOverride && (!method || /post/i.test(method))) {
-                $form.attr({
+                $form.prop({
                     encoding: 'multipart/form-data',
                     enctype:  'multipart/form-data'
                 });
@@ -560,7 +560,7 @@ $.fn.ajaxSubmit = function(options) {
                 if(t) {
                     form.setAttribute('target', t);
                 } else {
-                    $form.removeAttr('target');
+                    $form.removeProp(('target');
                 }
                 $(extraInputs).remove();
             }

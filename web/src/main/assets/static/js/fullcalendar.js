@@ -1845,7 +1845,7 @@ function htmlEscape(s) {
 
 function disableTextSelection(element) {
 	element
-		.attr('unselectable', 'on')
+		.prop('unselectable', 'on')
 		.css('MozUserSelect', 'none')
 		.bind('selectstart.ui', function() { return false; });
 }
@@ -1854,7 +1854,7 @@ function disableTextSelection(element) {
 /*
 function enableTextSelection(element) {
 	element
-		.attr('unselectable', 'off')
+		.prop('unselectable', 'off')
 		.css('MozUserSelect', '')
 		.unbind('selectstart.ui');
 }

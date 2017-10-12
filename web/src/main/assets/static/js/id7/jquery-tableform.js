@@ -36,8 +36,8 @@ jQuery.fn.tableForm = function(options) {
             var newRow = $(rowMarkup);
              // add items[index]. to the input names in the new row
             $("input", newRow).each(function(){
-                var name = $(this).attr("name");
-                $(this).attr("name", listVariable+"["+newIndex+"]."+name)
+                var name = $(this).prop("name");
+                $(this).prop("name", listVariable+"["+newIndex+"]."+name)
             });
             $table.append(newRow);
             onAdd.call(newRow);

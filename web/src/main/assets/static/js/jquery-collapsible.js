@@ -36,7 +36,7 @@
 			}
 
 			// Hide content unless there’s an `open` attribute
-			$element.prop('open', typeof $element.attr('open') == 'string');
+			$element.prop('open', typeof $element.prop('open') == 'string');
 			toggleOpen($element);
 
 			// Add `role=button` and set the `tabindex` of the `summary` element to `0` to make it keyboard accessible

@@ -119,7 +119,7 @@
 								action = $this.data('href')
 							}
 
-							var $form = $('<form></form>').attr({method: 'POST', action: action}).hide();
+							var $form = $('<form></form>').prop({method: 'POST', action: action}).hide();
 							var doFormSubmit = false;
 
 							if ($container.data('checked') !== 'none' || $this.closest('.must-have-selected').length === 0) {
@@ -168,7 +168,7 @@
 					.bigList(bigListOptions)
 					.on('show.bs.collapse', function (e) {
 						var $target = $(e.target);
-						var id = $target.attr('id');
+						var id = $target.prop('id');
 
 						// Use history.pushState here if supported as it stops the page jumping
 						if (window.history && window.history.pushState && window.location.hash !== ('#' + id)) {

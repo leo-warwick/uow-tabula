@@ -137,8 +137,8 @@
 								$('#feedback-report-button').on('click', 'a[data-toggle=modal]', function(e){
 									e.preventDefault();
 									var $this = $(this);
-									var target = $this.attr('data-target');
-									var url = $this.attr('href');
+									var target = $this.prop('data-target');
+									var url = $this.prop('href');
 									$(target).load(url);
 								});
 							})(jQuery);

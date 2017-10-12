@@ -21,7 +21,7 @@
 				var mapUrl = '//campus.warwick.ac.uk/?lite=1&search=' + encodeURIComponent($el.text()) + '&slid=' + encodeURIComponent($el.data('lid'));
 
 				var $icon = $('<i />').addClass('fa').addClass('fa-map-marker');
-				var $a = $('<a />').addClass('use-popover').attr('href', '#');
+				var $a = $('<a />').addClass('use-popover').prop('href', '#');
 
 				if (options.expandClickTarget) {
 					$a.insertAfter($el);

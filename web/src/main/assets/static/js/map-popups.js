@@ -12,7 +12,7 @@
 				var $icon =
 					$('<i />').addClass('icon-map-marker');
 
-				var $a = $('<a />').attr('href', '#');
+				var $a = $('<a />').prop('href', '#');
 
 				$el.append('&nbsp;').append($a.append($icon));
 

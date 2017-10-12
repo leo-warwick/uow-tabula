@@ -81,10 +81,10 @@ $('.marking-workflows').on('click', 'a[data-toggle=modal]', function(e){
 	var $this = $(this);
 	var $modal = $($this.data('target'));
 	var $body = $modal.find('.modal-body').empty();
-	$body.load($this.attr('href'), function() {
+	$body.load($this.prop('href'), function() {
 		$body.find('.btn').each(function() {
 			if ($(this).text() == 'Cancel') {
-				$(this).attr('data-dismiss', 'modal');
+				$(this).prop('data-dismiss', 'modal');
 			}
 		});
 	});

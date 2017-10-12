@@ -64,7 +64,7 @@ jQuery.fn.expandingTable = function(options) {
 			// These have to be positioned in the right order, so we loop through content-container rather than
 			// directly on content
 			$table.find(tableContainerSelector).hide().each(function() {
-				var contentID = $(this).attr('data-contentid');
+				var contentID = $(this).prop('data-contentid');
 				var $content = $('#content-' + contentID);
 
 				if ($content.length) {
@@ -107,7 +107,7 @@ jQuery.fn.expandingTable = function(options) {
 			$contentCell.css('padding-bottom', '');
 
 			// Remove any position data from the content div and hide
-			$content.attr('style', 'display:none;');
+			$content.prop('style', 'display:none;');
 
 			// Change the icon to closed
 			$icon.removeClass('icon-chevron-down').addClass('icon-chevron-right');
@@ -154,7 +154,7 @@ jQuery.fn.expandingTable = function(options) {
 						var contentId = "";
 						// data attributes can't contain / so we use __ instead and replace them here
 						// __ is just as arbitrary as _ but is less likely to actually be used in the content ID
-						if(!preventContentIdInUrl) { contentId = '/' + ($row.attr("data-contentid")).replace("__","/"); }
+						if(!preventContentIdInUrl) { contentId = '/' + ($row.prop("data-contentid")).replace("__","/"); }
 						var dataUrl = options.contentUrlFunction($row) + contentId;
 
 						$icon.removeClass('icon-chevron-right').addClass('icon-spinner icon-spin');
@@ -180,7 +180,7 @@ jQuery.fn.expandingTable = function(options) {
 		$('tbody tr', $table).each(function() {
 			var $row = $(this);
 			// get the contentId for this row
-			var contentId = $row.attr("data-contentid");
+			var contentId = $row.prop("data-contentid");
 			var $content = $('#content-' + contentId);
 
 			// add the arrow icon to the row

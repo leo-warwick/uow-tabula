@@ -1557,7 +1557,7 @@ var b=(f!=undefined&&f.length>0);
 if(!b){return a[c].src.replace(/[^/]+\/[^/]+$/,"")+"images/mediaplayers/closebox.png"
 }}return""
 }());
-var shadowboxOptions={overlayOpacity:0.7,overlayColor:"#fff",viewportPadding:40,counterType:"skip",onOpen:function(){(function(a){if(a("#sb-wrapper > :first-child").attr("id")=="sb-title"){a("#sb-info-inner").append(a("#sb-counter"));
+var shadowboxOptions={overlayOpacity:0.7,overlayColor:"#fff",viewportPadding:40,counterType:"skip",onOpen:function(){(function(a){if(a("#sb-wrapper > :first-child").prop("id")=="sb-title"){a("#sb-info-inner").append(a("#sb-counter"));
 a("#sb-info").after(a("#sb-title"));
 a("#sb-nav-close").remove();
 a("#sb-nav a").reverse().each(function(){$a=a(this);
@@ -1878,7 +1878,7 @@ i++){document.createElement(e[i])
 }})();
 (function(a){window.ButtonPlayer=function(c,b){this.$container=a("#"+b);
 this.basename=c.getBasename();
-this.$container.attr("title",this.basename+" | Click to play");
+this.$container.prop("title",this.basename+" | Click to play");
 this.$container.addClass("buttonPlayer");
 this.$playButton=a('<div class="play button"><div class="glyph"></div></div>');
 this.$container.append(this.$playButton);
@@ -1926,7 +1926,7 @@ g=""+v+k+" "+g;
 f=(f-v)/60;
 if(f<=0){return false
 }});
-this.$container.attr("title",this.basename+" | Duration: "+g)
+this.$container.prop("title",this.basename+" | Duration: "+g)
 }},this));
 this.audio.observeTimeupdate(a.proxy(function(g){if(this.duration!=null){var f=(g*100)/this.duration;
 this.$progress.css({width:f+"%"})
@@ -2339,7 +2339,7 @@ u.find("> li").not(".more-link").remove();
 $searchlink='<a title="View more search options" href="//search.warwick.ac.uk/website" rel="nofollow">'+B.data("index-title")+"</a>";
 B.clone().empty().prependTo(u).addClass("active").append($searchlink);
 x=z.parent("form");
-x.attr("action","//search.warwick.ac.uk/"+B.data("index-section"));
+x.prop("action","//search.warwick.ac.uk/"+B.data("index-section"));
 x.find("input[name=source]").remove();
 x.find("input[name=fileFormat]").remove();
 if(B.data("source")){x.prepend(h('<input type="hidden" name="source">').val(B.data("source")))
@@ -2349,7 +2349,7 @@ if(B.data("source")){x.prepend(h('<input type="hidden" name="source">').val(B.da
 if(B.data("url-prefix")){x.prepend(h('<input type="hidden" name="urlPrefix">').val(B.data("url-prefix")))
 }A=B.text();
 if(A.length>28){A=A.substring(0,28)+"\u2026"
-}z.attr("placeholder",A)
+}z.prop("placeholder",A)
 }q(w.find("li.active"));
 w.find("li.active").removeClass("active")
 },setupWarwickLinks:function(){var p=h("#warwick-logo-container.on-hover");
@@ -2373,10 +2373,10 @@ var c=h(window).width();
 var n=new WCookie("ForceTablet");
 var f=h("html").hasClass("force-tablet-in-edit");
 var a=f||(n.value&&n.value=="yes");
-if(c>b){h("#meta-viewport").attr("content","width=device-width");
-h("#meta-mobile-optimized").attr("content",b)
-}else{if(c>=k||(c<k&&a)){h("#meta-viewport").attr("content","width="+b);
-h("#meta-mobile-optimized").attr("content",b)
+if(c>b){h("#meta-viewport").prop("content","width=device-width");
+h("#meta-mobile-optimized").prop("content",b)
+}else{if(c>=k||(c<k&&a)){h("#meta-viewport").prop("content","width="+b);
+h("#meta-mobile-optimized").prop("content",b)
 }}h(function(w){var s=w(document.body),q=w(window),x=w("#masthead"),B=w("#utility-container"),u=w("#search-container"),r=w("#warwick-logo-container"),A=w("#utility-bar"),z;
 if(u.length>0){s.bind("smallscreen",function(C,D){if(D){if(w("#alternate-search").length==0){if(s.is(".site-root")){w("#content-wrapper").prepend(w('<div id="alternate-search"><hr /></div>'))
 }else{w("#content-wrapper").append(w('<div id="alternate-search"><hr /></div>'))
@@ -2437,7 +2437,7 @@ h(function(){SitebuilderInfo.setupSearch();
 SitebuilderInfo.setupWarwickLinks();
 var u=h("#container");
 var q=h("#edit-link");
-if(q.length>0){var p=new NavigableList({linkElement:q,listElement:h("#edit-tool-menu"),containerElement:h("#edit-tool-container"),selectFunction:function(w){if(w.children("a.disabled").length==0){window.location=w.find("a").attr("href")
+if(q.length>0){var p=new NavigableList({linkElement:q,listElement:h("#edit-tool-menu"),containerElement:h("#edit-tool-container"),selectFunction:function(w){if(w.children("a.disabled").length==0){window.location=w.find("a").prop("href")
 }else{return false
 }},transition:"fade"});
 var s=function(w,x){if(x){p.unregisterMouseListeners()
@@ -2458,7 +2458,7 @@ if(!h.browser.msie||parseInt(h.browser.version)>=9){h(window).bind("resize orien
 }if(h.browser.msie&&parseInt(h.browser.version)<=6){h.fx.off=true
 }});
 h(function(){h("#main-content img").load(function(){if(h(this).closest("a").length>0){return
-}if(this.naturalWidth&&this.clientWidth&&this.naturalWidth>(this.clientWidth*1.33)){h(this).wrap(h("<a />").attr({href:this.src,rel:"lightbox"}));
+}if(this.naturalWidth&&this.clientWidth&&this.naturalWidth>(this.clientWidth*1.33)){h(this).wrap(h("<a />").prop({href:this.src,rel:"lightbox"}));
 initLightbox()
 }})
 });
@@ -2472,7 +2472,7 @@ Shadowbox.init(shadowboxOptions)
 }var s=h(this).closest("div").find("div.sb-wide-table-wrapper");
 Shadowbox.open({link:this,content:'<div class="sb-wide-table-wrapper" style="background: white;">'+s.html()+"</div>",player:"html",width:h(window).width(),height:h(window).height()})
 };
-var q=function(){return h("<span/>").addClass("sb-table-wrapper-popout").append("(").append(h("<a/>").attr("href","#").html("Pop-out table").on("click",p)).append(")")
+var q=function(){return h("<span/>").addClass("sb-table-wrapper-popout").append("(").append(h("<a/>").prop("href","#").html("Pop-out table").on("click",p)).append(")")
 };
 h("div.sb-wide-table-wrapper > table").each(function(){var r=h(this);
 if(!r.hasClass('sb-no-wrapper-table-popout')&&Math.floor(r.width())>r.parent().width()){r.parent().parent("div").prepend(q()).append(q())
@@ -2631,7 +2631,7 @@ return false
 }if(z.closest("li").is(".current-page")){A.preventDefault();
 A.stopPropagation();
 return false
-}if(o(this).has(".link-content .title a")){var x=o(this).find(".link-content a").attr("href");
+}if(o(this).has(".link-content .title a")){var x=o(this).find(".link-content a").prop("href");
 if(A.shiftKey||A.ctrlKey||A.which==2){window.open(x)
 }else{window.location=x
 }A.preventDefault();
@@ -2673,7 +2673,7 @@ A.prepend(x);
 if(B.hasClass("current-page")){x.addClass("current")
 }var z=B.find("> a[data-page-url]").data("page-url");
 var C=B.find("div.title").html().trim();
-if(z){x.append(o("<a />").attr("href",z).html(C))
+if(z){x.append(o("<a />").prop("href",z).html(C))
 }else{x.html(C)
 }x.prepend("&raquo; ");
 B=B.parents("li.selected-section,li.breadcrumb")
@@ -2684,7 +2684,7 @@ A.prepend(x);
 if(B.hasClass("current-page")){x.addClass("current")
 }var z=B.find("a[data-page-url]").data("page-url");
 var C=B.find("div.title").html().trim();
-if(z){x.append(o("<a />").attr("href",z).html(C))
+if(z){x.append(o("<a />").prop("href",z).html(C))
 }else{x.html(C)
 }x.find(".breadcrumb-icon").remove();
 x.prepend("&raquo; ");
@@ -2695,19 +2695,19 @@ A.prepend(x);
 if(B.hasClass("current-page")){x.addClass("current")
 }var z=B.find("a[data-page-url]").data("page-url");
 var C=B.find("div.title").html().trim();
-if(z){x.append(o("<a />").attr("href",z).html(C))
+if(z){x.append(o("<a />").prop("href",z).html(C))
 }else{x.html(C)
 }x.prepend("&raquo; ")
 }}
 }var g=function(B,D){if(D){if(o(".alternate-breadcrumbs").length==0){var z=o("<ol />");
 k(z);
-var E=o("#current-site-header").find("a").attr("href");
+var E=o("#current-site-header").find("a").prop("href");
 var C="Home";
 var A=o('#search-container .index-section li[data-index-section="website"][data-url-prefix]').data("index-title");
 if(A){C=A
 }else{var x=o("#current-site-header").find("a,span").text();
 if(x){C=x
-}}z.prepend(o('<li class="home" />').append(o("<a />").attr("href",E).text(C)));
+}}z.prepend(o('<li class="home" />').append(o("<a />").prop("href",E).text(C)));
 o("#content-wrapper").append(o('<div class="alternate-breadcrumbs bottom" />').append(z));
 o("#content-wrapper").prepend(o('<div class="alternate-breadcrumbs top"><hr /></div>').prepend(z.clone()))
 }}};
@@ -2716,7 +2716,7 @@ if(o(document.body).hasClass("is-smallscreen")){g(null,true)
 }}var p=function(A,B){if(B){if(o("#alternate-navigation").length==0){if(id6nav.layout==id6nav.layouts.VERTICAL){var z=o('<select name="mobilesubnav" />');
 var C=o('<option value="" />').html(o("#current-site-header a,#current-site-header span").html());
 z.append(C);
-if(o("#current-site-header a").length>0){C.val(o("#current-site-header a").attr("href"))
+if(o("#current-site-header a").length>0){C.val(o("#current-site-header a").prop("href"))
 }var x=/l(\d+)\s?/;
 o("#navigation.vertical li").each(function(G,D){$li=o(D);
 var I=$li.find(".title.rendered-link-content").html().trim();
@@ -2727,8 +2727,8 @@ for(var G=0;
 G<J;
 G++){I="- "+I
 }}var H=o('<option value="">'+I+"</option>");
-if($li.hasClass("current-page")){H.attr("selected","selected")
-}else{if(F){H.attr("value",F)
+if($li.hasClass("current-page")){H.prop("selected","selected")
+}else{if(F){H.prop("value",F)
 }}z.append(H)
 });
 z.change(function(E){var D=z.val();
@@ -2738,13 +2738,13 @@ o("#content-wrapper").append(o('<div id="alternate-navigation" />').append(o('<f
 }else{var z=o('<select name="mobilesubnav" />');
 var C=o('<option value="" />').html(o("#current-site-header a,#current-site-header span").html());
 z.append(C);
-if(o("#current-site-header a").length>0){C.val(o("#current-site-header a").attr("href"))
+if(o("#current-site-header a").length>0){C.val(o("#current-site-header a").prop("href"))
 }o("#primary-navigation > li").each(function(F,D){$li=o(D);
 var H="- "+$li.find(".title.rendered-link-content").html().trim();
 var E=$li.find("[data-page-url]").data("page-url");
 var G=o('<option value="">'+H+"</option>");
-if($li.hasClass("current-page")){G.attr("selected","selected")
-}else{if(E){G.attr("value",E)
+if($li.hasClass("current-page")){G.prop("selected","selected")
+}else{if(E){G.prop("value",E)
 }}z.append(G);
 if($li.hasClass("selected-section")){var I=1;
 o("#secondary-navigation > li.breadcrumb").each(function(M,J){$li=o(J);
@@ -2759,8 +2759,8 @@ for(var M=0;
 M<I;
 M++){O="- "+O
 }var N=o('<option value="">'+O+"</option>");
-if($li.hasClass("current-page")){N.attr("selected","selected")
-}else{if(L){N.attr("value",L)
+if($li.hasClass("current-page")){N.prop("selected","selected")
+}else{if(L){N.prop("value",L)
 }}z.append(N)
 });
 I++;
@@ -2771,8 +2771,8 @@ for(var L=0;
 L<I;
 L++){N="- "+N
 }var M=o('<option value="">'+N+"</option>");
-if($li.hasClass("current-page")){M.attr("selected","selected")
-}else{if(K){M.attr("value",K)
+if($li.hasClass("current-page")){M.prop("selected","selected")
+}else{if(K){M.prop("value",K)
 }}z.append(M)
 })
 }})

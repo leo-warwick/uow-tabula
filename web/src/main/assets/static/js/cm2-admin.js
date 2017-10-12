@@ -71,8 +71,8 @@
 				var $target = $(this);
 				var $markInput = $content.find('input[name=adjustedMark]');
 				var $commentsTextarea = $content.find('textarea[name=comments]');
-				var mark = $content.find('button').attr("data-mark");
-				var comment =$content.find('button').attr("data-comment");
+				var mark = $content.find('button').prop("data-mark");
+				var comment =$content.find('button').prop("data-comment");
 				$markInput.val(mark);
 				$commentsTextarea.val(comment);
 				// simulate a keyup to trigger and grade validation
@@ -91,7 +91,7 @@
 			}
 			if (($otherInput.val() != "Plagarism penalty") && ($otherInput.val() != "Late submission penalty") && ($otherInput.val() != "") ){
 				$content.find('option[value=Other]').prop('selected', true);
-				$otherInput.removeAttr("disabled");
+				$otherInput.removeProp(("disabled");
 				$otherInput.removeClass("hide");
 			}
 			// show the suggested mark button if late penalty is selected
@@ -107,7 +107,7 @@
 			var $target = $(e.target);
 			var $otherInput = $target.siblings('.other-input');
 			if ($target.find('option:selected').text() === "Other") {
-				$otherInput.removeAttr("disabled");
+				$otherInput.removeProp(("disabled");
 				$otherInput.removeClass("hide");
 				$otherInput.fadeIn(400);
 			} else if ($otherInput.is(':visible')){
@@ -133,8 +133,8 @@
 			var $detailRow = $form.closest('.content-container,.detailrow-container');
 			var formData = $form.serializeArray();
 			var $buttonClicked =  $(document.activeElement);
-			formData.push({ name: $buttonClicked.attr('name'), value: $buttonClicked.val() });
-			$.post($form.attr('action'), formData, function(data) {
+			formData.push({ name: $buttonClicked.prop('name'), value: $buttonClicked.val() });
+			$.post($form.prop('action'), formData, function(data) {
 				if (data.success) {
 					window.location.replace(data.redirect);
 				} else {
@@ -221,11 +221,11 @@
 		$('input#openEnded').change(function(){
 			var $this = $(this);
 			if ($this.is(':checked'))  {
-				$('#open-reminder-dt').removeAttr("disabled");
-				$('#close-dt').attr("disabled", "disabled");
+				$('#open-reminder-dt').removeProp(("disabled");
+				$('#close-dt').prop("disabled", "disabled");
 			}  else {
-				$('#close-dt').removeAttr("disabled");
-				$('#open-reminder-dt').attr("disabled","disabled");
+				$('#close-dt').removeProp(("disabled");
+				$('#open-reminder-dt').prop("disabled","disabled");
 			}
 		});
 		// check that the extension UI elements are present
@@ -233,8 +233,8 @@
 			$('input#allowExtensionRequests').slideMoreOptions($('#request-extension-fields'), true);
 		}
 		var $assignmentpicker = $('.assignment-picker-input');
-		var $assignmentQuery = $assignmentpicker.find('input[name=query]').attr('autocomplete', 'off');
-		var target = $assignmentpicker.attr('data-target');
+		var $assignmentQuery = $assignmentpicker.find('input[name=query]').prop('autocomplete', 'off');
+		var target = $assignmentpicker.prop('data-target');
 		$assignmentQuery.bootstrap3Typeahead({
 			source: function(query, process) {
 				if (self.currentSearch) {
@@ -243,7 +243,7 @@
 				}
 				query = $.trim(query);
 				self.currentSearch = $.ajax({
-					url: $('.assignment-picker-input').attr('data-target'),
+					url: $('.assignment-picker-input').prop('data-target'),
 					data: {query: query},
 					success: function(data) {
 						var assignments = [];
@@ -286,7 +286,7 @@
 			e.preventDefault();
 			var $this = $(this);
 			var $target = $($this.data('target'));
-			var url = $this.attr('href');
+			var url = $this.prop('href');
 			$target.load(url, function(){
 				$target.bindFormHelpers()
 			});
@@ -298,7 +298,7 @@
 			$form.removeClass('dirty');
 			var updateTargetId = $this.data("update-target");
 			var randomNumber = Math.floor(Math.random() * 10000000);
-			jQuery.post($form.attr('action') + "?rand=" + randomNumber, $form.serialize(), function(data){
+			jQuery.post($form.prop('action') + "?rand=" + randomNumber, $form.serialize(), function(data){
 				window.location = data.result;
 			});
 		});
@@ -450,7 +450,7 @@
 
 					var $checkedBoxes = $(".collection-checkbox:checked", $container);
 					if ($container.data('checked') !== 'none') {
-						var $form = $('<form />').attr({method:'POST',action:this.href}).hide();
+						var $form = $('<form />').prop({method:'POST',action:this.href}).hide();
 						$form.append($checkedBoxes.clone());
 						$(document.body).append($form);
 						$form.submit();
@@ -465,7 +465,7 @@
 
 					if ($container.data('checked') !== 'none') {
 
-						var $form = $('<form></form>').attr({method:'POST', action: this.href}).hide();
+						var $form = $('<form></form>').prop({method:'POST', action: this.href}).hide();
 						$form.append($checkedBoxes.clone());
 
 						if ($container.data("all-plagiarised") === true) {
@@ -487,7 +487,7 @@
 							action = $this.data('href')
 						}
 
-						var $form = $('<form />').attr({method: 'POST', action: action}).hide();
+						var $form = $('<form />').prop({method: 'POST', action: action}).hide();
 						var doFormSubmit = false;
 
 						if ($container.data('checked') !== 'none' || $this.closest('.must-have-selected').length === 0) {
@@ -525,7 +525,7 @@
 							action = $this.data('href')
 						}
 
-						var $form = $('<form />').attr({method: 'POST', action: action}).hide();
+						var $form = $('<form />').prop({method: 'POST', action: action}).hide();
 						var doFormSubmit = true;
 
 						var $checkedBoxes = $(".collection-checkbox", $this.closest('itemContainer'));

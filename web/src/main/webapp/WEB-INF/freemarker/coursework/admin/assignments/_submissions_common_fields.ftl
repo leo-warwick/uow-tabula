@@ -304,7 +304,7 @@ jQuery(function($) {
 	$("summary").on("click", "label", function(e){
 		e.stopPropagation();
 		e.preventDefault();
-		$('#collectSubmissions').attr('checked', !$('#collectSubmissions').attr('checked') );
+		$('#collectSubmissions').prop('checked', !$('#collectSubmissions').prop('checked') );
 		$('input[name=collectSubmissions]').triggerHandler("change");
 	});
 

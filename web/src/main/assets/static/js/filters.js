@@ -86,7 +86,7 @@ $.fn.enableFilters = function(options) {
 		function doRequest(eventDriven) {
 			// update the url with the new filter values
 			var serialized = $form.find(':input').filter(function(index, element) { return $(element).val() !== ""; }).serialize();
-			var url = $form.attr('action') + '?' + serialized;
+			var url = $form.prop('action') + '?' + serialized;
 			if (eventDriven && typeof history.pushState !== 'undefined') {
 				history.pushState(null, document.title, url);
 			}
@@ -141,7 +141,7 @@ $.fn.enableFilters = function(options) {
 		function updateRelatedFilters($checkbox) {
 			var related = $checkbox.data('related-filter');
 			if(related) {
-				var name = $checkbox.attr("name");
+				var name = $checkbox.prop("name");
 				var values = $('input[name='+name+']:checked').map(function(){return $(this).val()});
 				var $relatedFilter = $('#'+related+'-filter');
 				if(values.length > 0){
@@ -166,7 +166,7 @@ $.fn.enableFilters = function(options) {
 					$list.find('> ul').prepend(
 						$('<li />').addClass('clear-this-filter')
 							.append(
-								$('<button />').attr('type', 'button')
+								$('<button />').prop('type', 'button')
 									.addClass('btn btn-link')
 									.html('<i class="icon-ban-circle fa fa-ban"></i> Clear selected items')
 									.on('click', function(e) {
@@ -201,7 +201,7 @@ $.fn.enableFilters = function(options) {
 					$li.insertBefore($ul.find('li.check-list-item:first'));
 				}
 			} else {
-				$checkbox = $('<input/>').attr({
+				$checkbox = $('<input/>').prop({
 					'type':'checkbox',
 					'name':name,
 					'value':value,

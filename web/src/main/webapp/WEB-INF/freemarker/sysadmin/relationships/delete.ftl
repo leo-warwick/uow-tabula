@@ -32,9 +32,9 @@
 <script type="text/javascript">
 	jQuery(function($){
 		$('#confirmCheck').change(function(){
-			$('.submit-buttons input[type=submit]').attr('disabled', !this.checked).toggleClass('disabled', !this.checked);
+			$('.submit-buttons input[type=submit]').prop('disabled', !this.checked).toggleClass('disabled', !this.checked);
 		});
-		$('.submit-buttons input[type=submit]').attr('disabled',true).addClass('disabled');
+		$('.submit-buttons input[type=submit]').prop('disabled',true).addClass('disabled');
 	})
 </script>
 

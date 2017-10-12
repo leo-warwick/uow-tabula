@@ -75,7 +75,7 @@
 					var $otherInput = $form.find('.other-input');
 					if($otherInput.val() !== "") {
 						$select.val("Other");
-						$otherInput.removeAttr("disabled");
+						$otherInput.removeProp(("disabled");
 						$otherInput.removeClass("hide");
 					}
 					$row.trigger('tabula.formLoaded');

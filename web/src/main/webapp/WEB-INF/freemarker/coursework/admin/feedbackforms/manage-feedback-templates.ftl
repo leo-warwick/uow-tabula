@@ -27,7 +27,7 @@
 			// modals use ajax to retrieve their contents
 			$('#feedback-template-list').on('click', 'a[data-toggle=modal]', function(e){
 				$this = $(this);
-				target = $this.attr('data-url');
+				target = $this.prop('data-url');
 				$("#feedback-template-model .modal-body").html('<iframe src="'+target+'" onLoad="frameLoad(this)" frameBorder="0" scrolling="no"></iframe>')
 			});
 

@@ -135,7 +135,7 @@
                 	$divHead = $('<div class="fht-thead"><table class="fht-table"></table></div>').prependTo($wrapper);
                     }
 
-                    $divHead.find('table.fht-table').addClass(settings.originalTable.attr('class'));
+                    $divHead.find('table.fht-table').addClass(settings.originalTable.prop('class'));
                     $thead.clone().appendTo($divHead.find('table'));
                 } else {
                     $divHead = $wrapper.find('div.fht-thead');
@@ -290,7 +290,7 @@
                 $wrapper = $self.closest('.fht-table-wrapper');
 
                 $self.insertBefore($wrapper)
-                    .removeAttr('style')
+                    .removeProp(('style')
                     .append($wrapper.find('tfoot'))
                     .removeClass('fht-table fht-table-init')
                     .find('.fht-cell')
@@ -412,9 +412,9 @@
 		fixedBodyHeight		= $fixedBody.find('.fht-tbody').height() - settings.scrollbarOffset,
 		$newRow;
 
-		$thead.find('table.fht-table').addClass(settings.originalTable.attr('class'));
-		$tbody.find('table.fht-table').addClass(settings.originalTable.attr('class'));
-		$tfoot.find('table.fht-table').addClass(settings.originalTable.attr('class'));
+		$thead.find('table.fht-table').addClass(settings.originalTable.prop('class'));
+		$tbody.find('table.fht-table').addClass(settings.originalTable.prop('class'));
+		$tfoot.find('table.fht-table').addClass(settings.originalTable.prop('class'));
 
 		$firstThChildren = $fixedBody.find('.fht-thead thead tr > *:lt(' + settings.fixedColumns + ')');
 		fixedColumnWidth = settings.fixedColumns * tableProps.border;
@@ -523,7 +523,7 @@
             		$divFoot = $('<div class="fht-tfoot"><table class="fht-table"></table></div>').appendTo($wrapper);
             	    }
             	}
-            	$divFoot.find('table.fht-table').addClass(settings.originalTable.attr('class'));
+            	$divFoot.find('table.fht-table').addClass(settings.originalTable.prop('class'));
 
             	switch (true) {
             	case !$tfoot.length && settings.cloneHeadToFoot == true && settings.footer == true:
@@ -630,7 +630,7 @@
             	defaultHeight,
             	newHeight;
 
-            	$obj.addClass(settings.originalTable.attr('class'));
+            	$obj.addClass(settings.originalTable.prop('class'));
             	$obj.appendTo('body');
 
             	defaultHeight = $obj.find('td').height();

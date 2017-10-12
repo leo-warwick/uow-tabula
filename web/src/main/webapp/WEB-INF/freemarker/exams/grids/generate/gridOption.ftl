@@ -368,7 +368,7 @@
 				$('<div/>').addClass('col-md-4').append(
 					newTitle
 				).append(
-					$('<input/>').attr({
+					$('<input/>').prop({
 						'type' : 'hidden',
 						'value' : newTitle
 					})

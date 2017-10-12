@@ -18,8 +18,8 @@ $(function(){
 	window.Groups = jQuery.extend(window.Groups, exports);
 	$('#action-submit').closest('form').on('click', '.update-only', function() {
 		$('#action-submit').val('update');
-		$('#action-submit').closest('form').find('[type=submit]').attr('disabled', true);
-		$(this).attr('disabled', false);
+		$('#action-submit').closest('form').find('[type=submit]').prop('disabled', true);
+		$(this).prop('disabled', false);
 	});
 
     // Zebra striping on lists of modules/groups
@@ -42,11 +42,11 @@ $(function(){
         $('.striped-section.empty').toggle('fast', function() {
         	if($('.module-info.empty').is(":visible")) {
         		hideButton.html('Hide');
-        		hideButton.attr("data-original-title", hideButton.attr("data-title-hide"));
+        		hideButton.prop("data-original-title", hideButton.prop("data-title-hide"));
 
 			} else {
         		hideButton.html('Show');
-        		hideButton.attr("data-original-title", hideButton.attr("data-title-show"));
+        		hideButton.prop("data-original-title", hideButton.prop("data-title-show"));
         	}
         });
 
@@ -70,8 +70,8 @@ $(function() {
 	$('body').on('click', 'a[data-toggle=modal]', function(e){
 		e.preventDefault();
 		var $this = $(this);
-		var $target = $($this.attr('data-target'));
-		var url = $this.attr('href');
+		var $target = $($this.prop('data-target'));
+		var url = $this.prop('href');
 		$target.load(url, function(){
 			$target.find('form.double-submit-protection').tabulaSubmitOnce();
 		});
@@ -86,7 +86,7 @@ $(function() {
 
         var randomNumber = Math.floor(Math.random() * 10000000);
 
-        jQuery.post($form.attr('action') + "?rand=" + randomNumber, $form.serialize(), function(data){
+        jQuery.post($form.prop('action') + "?rand=" + randomNumber, $form.serialize(), function(data){
             $("#modal-container ").modal('hide');
             if (updateTargetId){
                $(updateTargetId).html(data);
@@ -105,9 +105,9 @@ $(function() {
 		var updateCell = function($cell, value) {
 			var groupRunningText = 'Group running on ';
 			if (value) {
-				$cell.attr('data-original-title', groupRunningText + $cell.attr('data-original-title'));
+				$cell.prop('data-original-title', groupRunningText + $cell.prop('data-original-title'));
 			} else {
-				$cell.attr('data-original-title', $cell.attr('data-original-title').replace(groupRunningText, ''));
+				$cell.prop('data-original-title', $cell.prop('data-original-title').replace(groupRunningText, ''));
 			}
 		};
 
@@ -181,7 +181,7 @@ $(function() {
 			}
 
 			if ($section.data('submitparam').length > 0) {
-				$form.append($('<input/>').attr({
+				$form.append($('<input/>').prop({
 					'type': 'hidden',
 					'name': $section.data('submitparam'),
 					'value': true
@@ -194,7 +194,7 @@ $(function() {
 			var $this = $(this), $form = $this.closest('form'), $section = $this.closest('.striped-section');
 			if ($this.data('page').toString.length > 0) {
 				$form.find('input[name="page"]').remove().end()
-					.append($('<input/>').attr({
+					.append($('<input/>').prop({
 						'type': 'hidden',
 						'name': 'page',
 						'value': $this.data('page')
@@ -203,7 +203,7 @@ $(function() {
 			}
 			if ($section.data('submitparam').length > 0) {
 				$form.find('input[name="' + $section.data('submitparam') + '"]').remove().end()
-					.append($('<input/>').attr({
+					.append($('<input/>').prop({
 						'type': 'hidden',
 						'name': $section.data('submitparam'),
 						'value': true
@@ -221,7 +221,7 @@ $(function() {
 					$list.find('> ul').prepend(
 						$('<li />').addClass('clear-this-filter')
 							.append(
-							$('<button />').attr('type', 'button')
+							$('<button />').prop('type', 'button')
 								.addClass('btn btn-link')
 								.html('Clear selected items')
 								.on('click', function(e) {
@@ -264,18 +264,18 @@ $(function() {
 			var $filterList = $el.closest(".student-filter, .small-groups-filter");
 
 			if ($filterList.find(".empty-filter").length == $filterList.find(".btn-group").length) {
-				$('.clear-all-filters').attr("disabled", "disabled");
+				$('.clear-all-filters').prop("disabled", "disabled");
 			} else {
-				$('.clear-all-filters').removeAttr("disabled");
+				$('.clear-all-filters').removeProp(("disabled");
 			}
 		};
 
 		var updateSearchButton = function($el) {
 			var $filter = $el.closest('.student-filter, .small-groups-filter');
 			if ($filter.find('input:checked').length > 0) {
-				$filter.find('button.search').attr('disabled', false);
+				$filter.find('button.search').prop('disabled', false);
 			} else {
-				$filter.find('button.search').attr('disabled', true);
+				$filter.find('button.search').prop('disabled', true);
 			}
 		};
 

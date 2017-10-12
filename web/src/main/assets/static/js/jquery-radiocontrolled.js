@@ -53,12 +53,12 @@ jQuery.fn.radioControlled = function(options) {
 		var eventName = (checked?'enable':'disable') + ".radiocontrolled";
 		if (mode == 'disabled') {
 			$container.find('label,input,select').toggleClass('disabled', !checked);
-			$container.find('input,select').attr({disabled: !checked});
+			$container.find('input,select').prop({disabled: !checked});
 			if (fireEvents) {
 				$container.find('input,select').trigger(eventName);
 			}
 		} else if (mode == 'readonly') {
-			$container.find('input').attr({readonly: !checked});
+			$container.find('input').prop({readonly: !checked});
 			// select not supported yet
 			if (fireEvents) {
 				$container.find('input').trigger(eventName);
@@ -74,7 +74,7 @@ jQuery.fn.radioControlled = function(options) {
 	$controllers.on('change', function() {
 		$.each($items, function(i, item) {
 			var $item = $(item);
-			var selector = $item.data('selector') || $item.attr('selector') || options.selector;
+			var selector = $item.data('selector') || $item.prop('selector') || options.selector;
 
 			var parent = $(document.body);
 			if (options.parentSelector) {

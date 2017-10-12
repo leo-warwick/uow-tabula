@@ -20,11 +20,11 @@ jQuery.fn.copyable = function(options) {
         url = this.href,
         title = this.title,
         text = $this.html();
-    var $container = $('<span class=copyable-url-container></span>').attr('title',title);
+    var $container = $('<span class=copyable-url-container></span>').prop('title',title);
     var $explanation = $('<span class=press-ctrl-c></span>').html(PressCtrlC).hide();
     var $input = $('<input class="copyable-url" rel="tooltip"></span>')
-        .attr('readonly', true)
-        .attr('value',url)
+        .prop('readonly', true)
+        .prop('value',url)
         .click(function(){
           this.select();
           $explanation.slideDown('fast');

@@ -2007,7 +2007,7 @@ jQuery.fn.extend({
 
 	removeAttr: function( name ) {
 		return this.each(function() {
-			jQuery.removeAttr( this, name );
+			jQuery.removeProp(( this, name );
 		});
 	},
 
@@ -2302,7 +2302,7 @@ jQuery.extend({
 		if ( value !== undefined ) {
 
 			if ( value === null ) {
-				jQuery.removeAttr( elem, name );
+				jQuery.removeProp(( elem, name );
 				return;
 
 			} else if ( hooks && "set" in hooks && notxml && (ret = hooks.set( elem, value, name )) !== undefined ) {
@@ -2345,9 +2345,9 @@ jQuery.extend({
 					// See #9699 for explanation of this approach (setting first, then removal)
 					// Do not do this for boolean attributes (see #10870)
 					if ( !isBool ) {
-						jQuery.attr( elem, name, "" );
+						jQuery.prop( elem, name, "" );
 					}
-					elem.removeAttribute( getSetAttribute ? name : propName );
+					elem.removeProp(ibute( getSetAttribute ? name : propName );
 
 					// Set corresponding property to false for boolean attributes
 					if ( isBool && propName in elem ) {
@@ -2480,7 +2480,7 @@ boolHook = {
 		var propName;
 		if ( value === false ) {
 			// Remove boolean attributes when set to false
-			jQuery.removeAttr( elem, name );
+			jQuery.removeProp(( elem, name );
 		} else {
 			// value is true since we know at this point it's type boolean and not false
 			// Set boolean attributes to the same name and set the DOM property
@@ -4266,7 +4266,7 @@ Expr = Sizzle.selectors = {
 
 		"ATTR": function( name, operator, check ) {
 			return function( elem, context ) {
-				var result = Sizzle.attr( elem, name );
+				var result = Sizzle.prop( elem, name );
 
 				if ( result == null ) {
 					return operator === "!=";
@@ -5280,7 +5280,7 @@ if ( document.querySelectorAll ) {
 					} catch(qsaError) {
 					} finally {
 						if ( !old ) {
-							context.removeAttribute("id");
+							context.removeProp(ibute("id");
 						}
 					}
 				}
@@ -6129,7 +6129,7 @@ function cloneFixAttributes( src, dest ) {
 
 	// Event data gets referenced instead of copied if the expando
 	// gets copied too
-	dest.removeAttribute( jQuery.expando );
+	dest.removeProp(ibute( jQuery.expando );
 }
 
 jQuery.buildFragment = function( args, context, scripts ) {
@@ -6458,8 +6458,8 @@ jQuery.extend({
 						if ( deleteExpando ) {
 							delete elem[ internalKey ];
 
-						} else if ( elem.removeAttribute ) {
-							elem.removeAttribute( internalKey );
+						} else if ( elem.removeProp(ibute ) {
+							elem.removeProp(ibute( internalKey );
 
 						} else {
 							elem[ internalKey ] = null;
@@ -7081,12 +7081,12 @@ if ( !jQuery.support.opacity ) {
 
 			// if setting opacity to 1, and no other filters exist - attempt to remove filter attribute #6652
 			if ( value >= 1 && jQuery.trim( filter.replace( ralpha, "" ) ) === "" &&
-				style.removeAttribute ) {
+				style.removeProp(ibute ) {
 
 				// Setting style.filter to null, "" & " " still leave "filter:" in the cssText
 				// if "filter:" is present at all, clearType is disabled, we want to avoid this
-				// style.removeAttribute is IE Only, but so apparently is this code path...
-				style.removeAttribute( "filter" );
+				// style.removeProp(ibute is IE Only, but so apparently is this code path...
+				style.removeProp(ibute( "filter" );
 
 				// if there there is no filter style applied in a css rule, we are done
 				if ( currentStyle && !currentStyle.filter ) {

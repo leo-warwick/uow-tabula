@@ -25,7 +25,7 @@
 	function onViewUpdate(view, weeks, $calendar){
 		updateCalendarTitle(view, weeks);
 		$('.popover').hide();
-		$calendar.find('table').attr('role','presentation');
+		$calendar.find('table').prop('role','presentation');
 	}
 
 	function updateCalendarTitle(view, weeks){
@@ -535,7 +535,7 @@
 				return false;
 			}
 
-			var url = $this.attr('data-url'), $modal = $('#note-modal'), $modalBody = $modal.find('.modal-body');
+			var url = $this.prop('data-url'), $modal = $('#note-modal'), $modalBody = $modal.find('.modal-body');
 
 			$modalBody.html('<iframe src="'+url+'" style="height:100%; width:100%;" frameBorder="0" scrolling="no"></iframe>')
 				.find('iframe').on('load', function(){
@@ -552,7 +552,7 @@
 						});
 					}
 				});
-			$modal.find('.modal-header h3 span').text($this.attr('title')).end()
+			$modal.find('.modal-header h3 span').text($this.prop('title')).end()
 				.modal('show');
 			e.preventDefault();
 			e.stopPropagation();
@@ -570,7 +570,7 @@
 			var $row = $this.closest('tr'),
 				$dropdownItems = $this.closest('ul').find('a'),
 				$loading = $this.closest('td').find('i.fa-spinner'),
-				url = $this.attr('href');
+				url = $this.prop('href');
 
 			$loading.toggleClass('invisible');
 
@@ -669,7 +669,7 @@
 				var iframeMarkup = "<iframe frameBorder='0' scrolling='no' style='height:100%;width:100%;' id='modal-content'></iframe>";
 				$(iframeMarkup)
 					.off('load').on('load', meetingRecordIframeHandler)
-					.attr('src', GlobalScripts.setArgOnUrl(targetUrl, 'iframe', ''))
+					.prop('src', GlobalScripts.setArgOnUrl(targetUrl, 'iframe', ''))
 					.appendTo($mb);
 			}).fail(function() {
 				if (!$('#meeting-modal-failure').length) {
@@ -682,7 +682,7 @@
 
 		$('section.meetings').on('click', '.new-meeting-record, .edit-meeting-record', function(e){
 			var $this = $(this);
-			prepareMeetingModal($this, $this.attr('href'));
+			prepareMeetingModal($this, $this.prop('href'));
 			e.preventDefault();
 		}).on('click', 'ul.dropdown-menu a:not(.edit-meeting-record)', function(e) {
 			// Bind click events for dropdown
@@ -697,7 +697,7 @@
 			var $row = $this.closest('tr'),
 				$dropdownItems = $this.closest('ul').find('a'),
 				$loading = $this.closest('td').find('i.fa-spinner'),
-				url = $this.attr('href');
+				url = $this.prop('href');
 
 			$loading.toggleClass('invisible');
 

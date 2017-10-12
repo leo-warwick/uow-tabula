@@ -4,7 +4,7 @@
 	jQuery.fn.selectDeselectCheckboxes = function(selectAllCheckbox) {
 
 		var selectOrDeselect = $(selectAllCheckbox).prop('checked');
-		var selectAllCheckboxes =  $("." + $(selectAllCheckbox).attr('class'))  ;
+		var selectAllCheckboxes =  $("." + $(selectAllCheckbox).prop('class'))  ;
 		selectAllCheckboxes.prop('checked', selectOrDeselect);
 
 		var allCheckboxes = $(this).find('[type=checkbox]');

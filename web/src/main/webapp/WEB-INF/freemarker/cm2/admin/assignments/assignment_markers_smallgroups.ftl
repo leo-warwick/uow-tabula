@@ -105,7 +105,7 @@
 							$markerInputs.each(function() {
 								var $this = $(this);
 								var stage = $this.data('stage');
-								$this.attr('name', "allocations['"+stage+"']['"+markerId+"'][]");
+								$this.prop('name', "allocations['"+stage+"']['"+markerId+"'][]");
 							});
 						}
 
@@ -126,8 +126,8 @@
 									// horrible selector - all allocations for this marker and stage across all groups
 									$("input[name^=allocations\\[\\'"+s+"\\'\\]\\[\\'"+m+"\\'\\]]").each(function(i){
 										var $this = $(this);
-										var n = $this.attr('name').replace(/\[\d*\]/, "["+i+"]");
-										$this.attr('name', n);
+										var n = $this.prop('name').replace(/\[\d*\]/, "["+i+"]");
+										$this.prop('name', n);
 									});
 								});
 							});

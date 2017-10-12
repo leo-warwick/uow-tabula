@@ -231,7 +231,7 @@
 		}
 
 		var $this = $(this);
-		var name = $this.attr("name");
+		var name = $this.prop("name");
 		var $form = $this.closest('form');
 		var doNothing = function(){};
 
@@ -304,7 +304,7 @@
 		$(this).on('submit', 'form', function(e){
 			e.preventDefault();
 			var $form = $(this);
-			$.post($form.attr('action'), $form.serialize(), function(data){
+			$.post($form.prop('action'), $form.serialize(), function(data){
 				if(data.status == "error") {
 					errorHandler($form, data);
 				} else {
@@ -509,8 +509,8 @@
 
 		// ensure popovers/introductorys override title with data-title attribute where available
 		$items.each(function() {
-			if ($(this).attr('data-title')) {
-				$(this).attr('data-original-title', $(this).attr('data-title'));
+			if ($(this).prop('data-title')) {
+				$(this).prop('data-original-title', $(this).prop('data-title'));
 			}
 		});
 
@@ -1049,12 +1049,12 @@
 				var $tabs = $tabContainer.find('ul');
 				$panes.children('li').each(function() {
 
-					var title = $(this).attr('data-title');
+					var title = $(this).prop('data-title');
 					if (!title) {
 						title = $(this).find('h4').html();
 					}
 
-					var link = '#' + $(this).attr('id');
+					var link = '#' + $(this).prop('id');
 					var $tab = $('<li><a href="' + link + '" data-toggle="tab" data-title="' + title + '"><span class="title">' + title + '</span> <i class="icon-move" title="Click and drag to move"></i> <i class="icon-resize-small" title="Collapse"></i></a></li>');
 					$tabs.append($tab);
 				});
@@ -1075,8 +1075,8 @@
 				$t.append($cols);
 				$panes.children('li').each(function(idx) {
 					var $gadget = $(this).addClass('gadget');
-					var title = $(this).attr('data-title') || $(this).find('h4').first().text();
-					var link = '#' + $(this).attr('id');
+					var title = $(this).prop('data-title') || $(this).find('h4').first().text();
+					var link = '#' + $(this).prop('id');
 					var $tab = $('<li><a href="' + link + '" data-toggle="tab" data-title="' + title + '" title="Click and drag to move"><span class="title">' + title + '</span> <i class="icon-minus-sign-alt" title="Hide ' + title + '"></i></a></li>');
 					var $gadgetHeaderTab = $('<div class="row-fluid tab-container"><ul class="nav nav-tabs"></ul></div>');
 					$(this).find('.agent').removeClass('span4');
@@ -1112,7 +1112,7 @@
 				var $a = $(this).parent();
 				var title = $a.data("title");
 				$(this).prop("title", "Expand " + title);
-				$a.data("href", $a.attr("href")).removeAttr("href").removeAttr("data-toggle").html($a.html().replace(title, "").replace("resize-small", "resize-full")).addClass("disabled");
+				$a.data("href", $a.prop("href")).removeProp("href").removeProp("data-toggle").html($a.html().replace(title, "").replace("resize-small", "resize-full")).addClass("disabled");
 				$t.trigger('tabbablechanged');
 			});
 
@@ -1121,7 +1121,7 @@
 				var $a = $(this).parent();
 				var title = $a.data("title");
 				$(this).prop("title", "Collapse");
-				$a.attr("href", $a.data("href")).removeData("href").attr("data-toggle", "tab").html(title + $a.html().replace("resize-full", "resize-small")).removeClass("disabled");
+				$a.prop("href", $a.data("href")).removeData("href").prop("data-toggle", "tab").html(title + $a.html().replace("resize-full", "resize-small")).removeClass("disabled");
 				$t.trigger('tabbablechanged');
 			});
 
@@ -1131,7 +1131,7 @@
 				$a.closest('.gadget').find('.tab-content').slideUp('fast');
 				var title = $a.data("title");
 				$(this).prop("title", "Show " + title);
-				$a.data("href", $a.attr("href")).removeAttr("href").removeAttr("data-toggle").html($a.html().replace("minus-sign", "plus-sign"));
+				$a.data("href", $a.prop("href")).removeProp(("href").removeProp(("data-toggle").html($a.html().replace("minus-sign", "plus-sign"));
 				$t.trigger('tabbablechanged');
 			});
 
@@ -1141,7 +1141,7 @@
 				$a.closest('.gadget').find('.tab-content').slideDown('fast');
 				var title = $a.data("title");
 				$(this).prop("title", "Hide " + title);
-				$a.attr("href", $a.data("href")).removeData("href").attr("data-toggle", "tab").html($a.html().replace("plus-sign", "minus-sign"));
+				$a.prop("href", $a.data("href")).removeData("href").prop("data-toggle", "tab").html($a.html().replace("plus-sign", "minus-sign"));
 				$t.trigger('tabbablechanged');
 			});
 
@@ -1220,7 +1220,7 @@
 
 					$links.each(function(i, link){
 						var $link = $(link);
-						$link.attr('data-original-title', state + ' attendance note');
+						$link.prop('data-original-title', state + ' attendance note');
 						if (state === 'Edit') {
 							$link.addClass('edit');
 						} else {
@@ -1254,7 +1254,7 @@
 			var attendanceNoteClickHandler = function(href, $target){
 				var $m = $('#attendance-note-modal');
 				if($m.length  === 0) {
-					$m = $('<div />').attr({
+					$m = $('<div />').prop({
 						'id' : 'attendance-note-modal',
 						'class' : 'modal fade'
 					}).appendTo($('body'));
@@ -1280,7 +1280,7 @@
 					var iframeMarkup = "<iframe frameBorder='0' scrolling='no' style='height:100%;width:100%;' id='modal-content'></iframe>";
 					$(iframeMarkup)
 						.on('load', attendanceNoteIframeHandler)
-						.attr('src', addArgToUrl(href, 'isIframe', 'true'))
+						.prop('src', addArgToUrl(href, 'isIframe', 'true'))
 						.appendTo($m.find('.modal-body'));
 					$icon.removeClass("fa-spinner fa-spin").addClass("fa-pencil-square-o");
 				});
@@ -1288,7 +1288,7 @@
 
 			$('.recordCheckpointForm .fix-area').on('click', 'a.btn.attendance-note', function(event){
 				event.preventDefault();
-				attendanceNoteClickHandler($(this).attr('href'), $(this));
+				attendanceNoteClickHandler($(this).prop('href'), $(this));
 			});
 
 			// Popovers are created on click so binding directly to A tags won't work
@@ -1296,18 +1296,18 @@
 				var $this = $(this), $m = $('#attendance-note-modal');
 				event.preventDefault();
 				if($m.length  === 0) {
-					$m = $('<div />').attr({
+					$m = $('<div />').prop({
 						'id' : 'attendance-note-modal',
 						'class' : 'modal fade'
 					}).appendTo($('body'));
 				}
 
-				$.get($this.attr('href'), function(data){
+				$.get($this.prop('href'), function(data){
 					$m.html(data).modal('show');
 					$this.closest('.popover').find('button.close').trigger('click');
 					$m.find('.modal-footer .btn-primary').on('click', function(e){
 						e.preventDefault();
-						var link = $(this).attr('href');
+						var link = $(this).prop('href');
 						$m.modal('hide').on('hidden.bs.modal.attendance-note', function(){
 							$m.off('hidden.bs.modal.attendance-note');
 							attendanceNoteClickHandler(link, $());

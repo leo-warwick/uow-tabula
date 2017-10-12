@@ -244,9 +244,9 @@
 		$inputs.each(function(index) {
 			var newIndex = $markersExistingStudents.size() + index;
 			var $this = $(this);
-			var name = $this.attr("name");
+			var name = $this.prop("name");
 			// update the hidden input that will bind the chosen marker to the student
-			$this.attr("name", name.replace(/(.*\[).*(\]\[.*\])/g, "$1"+newMarker+"]["+newIndex+"]"));
+			$this.prop("name", name.replace(/(.*\[).*(\]\[.*\])/g, "$1"+newMarker+"]["+newIndex+"]"));
 		});
 	});
 

@@ -139,7 +139,7 @@
 						};
 
 						if (window.ReportBuilder.buildHeader().find('th').length > 300) {
-							$('.id7-main-content div.complete a.show-data').attr({
+							$('.id7-main-content div.complete a.show-data').prop({
 								'disabled': true,
 								'title': 'The report is too large to display in the page'
 							});

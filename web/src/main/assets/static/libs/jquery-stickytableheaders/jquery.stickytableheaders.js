@@ -144,7 +144,7 @@
 			$('th', base.$clonedHeader).each(function (index) {
 				var $this = $(this);
 				var $origCell = $('th', base.$originalHeader).eq(index);
-				this.className = $origCell.attr('class') || '';
+				this.className = $origCell.prop('class') || '';
 				$this.css('width', $origCell.width());
 			});
 

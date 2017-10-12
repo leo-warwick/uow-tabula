@@ -19,14 +19,14 @@ exports.createButtonGroup = function(id){
             return $(this).data('state') == selectedValue;
         }).addClass('active');
 
-    if ($this.attr('title') && $this.attr('title').length > 0) {
-        activeButton.attr('title', '<p>' + activeButton.attr('title') +'</p>' + $this.attr('title'));
+    if ($this.prop('title') && $this.prop('title').length > 0) {
+        activeButton.prop('title', '<p>' + activeButton.prop('title') +'</p>' + $this.prop('title'));
     }
 
     clonedButtons.find('button').each(function(){
     	var index = $.inArray($(this).data('state'), disabledOptionValues);
     	if (index > -1) {
-    		$(this).addClass('disabled').attr('title', disabledOptions[index].getAttribute('title'));
+    		$(this).addClass('disabled').prop('title', disabledOptions[index].getAttribute('title'));
     	}
     });
 
@@ -40,10 +40,10 @@ exports.wireButtons = function(id) {
 		.on('shown.bs.popover', function(e) {
 			var $po = $(e.target).popover().data('bs.popover').tip();
 			$po.find('[data-action="remove"]').on('click', function() {
-				var id = $(this).attr('data-student');
+				var id = $(this).prop('data-student');
 				$('form#recordAttendance')
-					.prepend($('<input />').attr({ 'type': 'hidden', 'name': 'removeAdditionalStudent', 'value': id }))
-					.prepend($('<input />').attr({ 'type': 'hidden', 'name': 'action', 'value': 'refresh' }))
+					.prepend($('<input />').prop({ 'type': 'hidden', 'name': 'removeAdditionalStudent', 'value': id }))
+					.prepend($('<input />').prop({ 'type': 'hidden', 'name': 'action', 'value': 'refresh' }))
 					.submit();
 			});
 		})
@@ -64,7 +64,7 @@ var updateAttendanceState = function(e, $this){
 			return $(this).val() == state;
 		}).prop('selected', true);
 		var noteButton = $this.closest('div.pull-right').find('a.attendance-note');
-		noteButton.attr('href', GlobalScripts.setArgOnUrl(noteButton.attr('href'), 'state', $this.data('state')));
+		noteButton.prop('href', GlobalScripts.setArgOnUrl(noteButton.prop('href'), 'state', $this.data('state')));
 	}
 };
 
@@ -81,7 +81,7 @@ var checkForCheckpoints = function(){
 		var states = [], buildState = function(students, state){
 			if (students.length > 0) {
 				states.push($('<span/>').append(
-					$('<a/>').attr({
+					$('<a/>').prop({
 						'class':'use-popover',
 						'data-placement':'top',
 						'data-container':'body',
@@ -173,7 +173,7 @@ $(function(){
 				if (i === 2) {
 					var $bulkNote = $('.bulk-attendance-note');
 					if ($bulkNote.length) {
-						$bulkNote.attr('href', GlobalScripts.setArgOnUrl($bulkNote.attr('href'), 'isAuto', 'true'));
+						$bulkNote.prop('href', GlobalScripts.setArgOnUrl($bulkNote.prop('href'), 'isAuto', 'true'));
 						$bulkNote.click();
 					}
 				}
@@ -182,7 +182,7 @@ $(function(){
 	}).end().find('a.meetings').on('click', function(e){
         e.preventDefault();
 		var $meetingsModal = $('#meetings-modal');
-        $.get($(this).attr('href'), function(data){
+        $.get($(this).prop('href'), function(data){
 			var $modalBody = $meetingsModal.find('.modal-body');
 			$modalBody.html(data);
 			var $customHeader = $modalBody.find('h3.modal-header').remove();
@@ -197,7 +197,7 @@ $(function(){
         });
     }).end().find('a.small-groups').on('click', function(e){
 		e.preventDefault();
-		$.get($(this).attr('href'), function(data){
+		$.get($(this).prop('href'), function(data){
 			$('#small-groups-modal').html(data).modal("show");
 			$('.use-popover').tabulaPopover({
 				trigger: 'click',
@@ -208,7 +208,7 @@ $(function(){
 
 	$('a.upload-attendance').on('click', function(e){
 		e.preventDefault();
-		$.get($(this).attr('href'), function(data){
+		$.get($(this).prop('href'), function(data){
 			$('#upload-attendance-modal').html(data).modal("show");
 		});
 	});
@@ -288,7 +288,7 @@ $(function(){
 					$weekInput.val($opt.data('week'));
 
 					$form.prepend($target.clone()).prepend(
-						$('<input />').attr({
+						$('<input />').prop({
 							'type': 'hidden',
 							'name': 'action',
 							'value': 'refresh'
@@ -318,7 +318,7 @@ $(function(){
 
 				var xhr = null;
 				$input.prop('autocomplete','off').each(function() {
-					var $spinner = $('<div />').addClass('spinner-container').addClass('pull-right').attr('style', 'position: relative; top: 15px; left: 15px;');
+					var $spinner = $('<div />').addClass('spinner-container').addClass('pull-right').prop('style', 'position: relative; top: 15px; left: 15px;');
 					$search.before($spinner);
 
 					$(this).bootstrap3Typeahead({

@@ -358,8 +358,8 @@ Method calls (after initialising):
             // the popover list item
             var $li = $link.closest('li');
 
-            // use .attr() rather than .data() to avoid implicit type conversion
-            var id = $li.attr('data-item-id');
+            // use .prop() rather than .data() to avoid implicit type conversion
+            var id = $li.prop('data-item-id');
 
             // the underlying list item
             var $realLi = $li
@@ -397,7 +397,7 @@ Method calls (after initialising):
                         var $tr = $(e);
                         return {
                             tr : $tr.clone(true),
-                            id : $tr.attr('id')
+                            id : $tr.prop('id')
                         };
                     }).get();
                     $selectedItems.addClass('cloned');
@@ -466,7 +466,7 @@ Method calls (after initialising):
                     // lost their senses during cloning.
                     $.each(first_rows, function(i, item) {
                         $(item.tr)
-                        .removeAttr('style')
+                        .removeProp(('style')
                         .removeClass('ui-draggable')
                         .data('draggable', null)
                         .data('ui-draggable', null)

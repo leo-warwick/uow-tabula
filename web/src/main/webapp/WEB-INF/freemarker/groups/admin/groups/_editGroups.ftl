@@ -150,9 +150,9 @@
 
 					$input.on('change keyup', function() {
 						if ($input.val().length > 0) {
-							$button.removeAttr('disabled');
+							$button.removeProp(('disabled');
 						} else {
-							$button.attr('disabled', 'disabled');
+							$button.prop('disabled', 'disabled');
 						}
 					});
 				}).on('click', function() {
@@ -163,7 +163,7 @@
 
 					var $clone = $group.clone();
 
-					var index = parseInt(/\[(\d+)\]/.exec($clone.find('input[type="text"]').attr('name'))[1]);
+					var index = parseInt(/\[(\d+)\]/.exec($clone.find('input[type="text"]').prop('name'))[1]);
 					$clone.find('.input-group-addon').text((index + offset + 1) + ".");
 
 					$clone.insertBefore($group);
@@ -172,17 +172,17 @@
 
 					var nextIndex = index + 1;
 					var $name = $group.find('input[type="text"]');
-					$name.attr('name', 'newGroups[' + nextIndex + '].name');
-					$name.attr('id', (nextIndex + offset + 1) + '-name');
+					$name.prop('name', 'newGroups[' + nextIndex + '].name');
+					$name.prop('id', (nextIndex + offset + 1) + '-name');
 
 					var $max = $group.find('input[type="number"]');
-					$max.attr('name', 'newGroups[' + nextIndex + '].maxGroupSize');
-					$max.attr('id', (nextIndex + offset + 1) + '-maxGroupSize');
+					$max.prop('name', 'newGroups[' + nextIndex + '].maxGroupSize');
+					$max.prop('id', (nextIndex + offset + 1) + '-maxGroupSize');
 
 					$group.find('.input-group-addon').text((nextIndex + offset + 1) + '.');
 
 					$name.val('').focus();
-					$button.attr('disabled', 'disabled');
+					$button.prop('disabled', 'disabled');
 					$button.closest('form.dirty-check').trigger('rescan.areYouSure');
 				});
 
@@ -199,12 +199,12 @@
 						var $group = $(this);
 
 						var $name = $group.find('input[type="text"]');
-						$name.attr('name', 'newGroups[' + index + '].name');
-						$name.attr('id', (index + offset + 1) + '-name');
+						$name.prop('name', 'newGroups[' + index + '].name');
+						$name.prop('id', (index + offset + 1) + '-name');
 
 						var $max = $group.find('input[type="number"]');
-						$max.attr('name', 'newGroups[' + index + '].maxGroupSize');
-						$max.attr('id', (index + offset + 1) + '-maxGroupSize');
+						$max.prop('name', 'newGroups[' + index + '].maxGroupSize');
+						$max.prop('id', (index + offset + 1) + '-maxGroupSize');
 
 						$group.find('.input-group-addon').text((index + offset + 1) + '.');
 					});

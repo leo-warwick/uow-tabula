@@ -191,7 +191,7 @@
 					$list.find('> ul').prepend(
 						$('<li />').addClass('clear-this-filter')
 							.append(
-								$('<button />').attr('type', 'button')
+								$('<button />').prop('type', 'button')
 									.addClass('btn btn-link')
 									.html('<i class="fa fa-ban"></i> Clear selected items')
 									.on('click', function(e) {
@@ -228,10 +228,10 @@
 			var $filterList = $el.closest(".filters");
 
 			if ($filterList.find(".empty-filter").length == $filterList.find(".btn-group").length) {
-				$('.clear-all-filters').attr("disabled", "disabled");
+				$('.clear-all-filters').prop("disabled", "disabled");
 
 			} else {
-				$('.clear-all-filters').removeAttr("disabled");
+				$('.clear-all-filters').removeProp(("disabled");
 			}
 
 			var course = $('[name=course]:checked');

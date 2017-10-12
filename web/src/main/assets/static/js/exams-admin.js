@@ -11,7 +11,7 @@ examsExports.zebraStripeExams = function($module) {
 
 examsExports.prepareAjaxForm = function($form, callback) {
 	var $container = $form.closest('.content-container');
-	var contentId = $container.attr('data-contentid');
+	var contentId = $container.prop('data-contentid');
 	var $row = $('tr.item-container[data-contentid='+contentId+']');
 	$form.ajaxForm({
 		iframe: true,
@@ -113,7 +113,7 @@ function otherAcademicYearModalHandler($modal, inputName, collectionName) {
 							$('<tr/>').append(
 								$('<th/>')
 							).append(
-								$('<th/>').attr('colspan', yearsOfStudy.length).html('Year of study')
+								$('<th/>').prop('colspan', yearsOfStudy.length).html('Year of study')
 							)
 						).append(
 							$('<tr/>').append(
@@ -245,11 +245,11 @@ $(function(){
 		$('.module-info.empty').toggle('fast', function() {
 			if($('.module-info.empty').is(":visible")) {
 				hideButton.html('<i class="icon-eye-close"></i> Hide');
-				hideButton.attr("data-original-title", hideButton.attr("data-title-hide"));
+				hideButton.prop("data-original-title", hideButton.prop("data-title-hide"));
 
 			} else {
 				hideButton.html('<i class="icon-eye-open"></i> Show');
-				hideButton.attr("data-original-title", hideButton.attr("data-title-show"));
+				hideButton.prop("data-original-title", hideButton.prop("data-title-show"));
 			}
 		});
 

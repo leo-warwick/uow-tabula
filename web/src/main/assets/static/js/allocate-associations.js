@@ -55,18 +55,18 @@ jQuery(function($){
 
 		$table.on('click', 'input', function(){
 			if ($table.find('input:checked').length === 0) {
-				$removeButton.attr({
+				$removeButton.prop({
 					'disabled': true,
 					'title': 'You need to select some personal tutors from which to remove students'
 				});
 			} else {
-				$removeButton.attr({
+				$removeButton.prop({
 					'disabled': false,
 					'title': 'All students will be removed from selected personal tutors'
 				});
 			}
 		});
-		$removeButton.attr('disabled', true);
+		$removeButton.prop('disabled', true);
 
 		this.getTable = function() { return $table; }
 	};
@@ -80,13 +80,13 @@ jQuery(function($){
 	var checkDistributeButton = function(){
 		var result = $studentTable.find('input:checked').length > 0 && entityTable.getTable().find('input:checked').length > 0;
 		if (result) {
-			$distrubuteButton.attr({
+			$distrubuteButton.prop({
 				'disabled': false,
 				'title': 'Selected students will be equally distributed between selected personal tutors'
 			});
 			$distrubuteButton.addClass('btn-primary');
 		} else {
-			$distrubuteButton.attr({
+			$distrubuteButton.prop({
 				'disabled': true,
 				'title': 'You need to select some students and personal tutors to allocate'
 			});
@@ -96,13 +96,13 @@ jQuery(function($){
 	$studentTable.sortableTable().on('click', 'input', checkDistributeButton);
 	$distributeActionSelect.on('change', checkDistributeButton);
 	entityTable.getTable().on('click', 'input', checkDistributeButton);
-	$distrubuteButton.attr('disabled', true);
+	$distrubuteButton.prop('disabled', true);
 
 	var $studentQuery = $('input[name=query]').on('keypress', function(e){
 		if (e.which === 13) {
 			$(this).closest('form').submit();
 		}
-	}).attr('autocomplete', 'off');
+	}).prop('autocomplete', 'off');
 	var $typeahead = $studentQuery.typeahead({
 		source: function(query, process){
 			// Abort any existing search
@@ -111,7 +111,7 @@ jQuery(function($){
 				self.currentSearch = null;
 			}
 			self.currentSearch = $.ajax({
-				url: $fetchForm.attr('action'),
+				url: $fetchForm.prop('action'),
 				data: $fetchForm.serialize(),
 				success: function(data) {
 					process(data.unallocated)
@@ -176,7 +176,7 @@ jQuery(function($){
 				$list.find('> ul').prepend(
 					$('<li />').addClass('clear-this-filter')
 						.append(
-						$('<button />').attr('type', 'button')
+						$('<button />').prop('type', 'button')
 							.addClass('btn btn-link')
 							.html('<i class="icon-ban-circle"></i> Clear selected items')
 							.on('click', function() {
@@ -213,9 +213,9 @@ jQuery(function($){
 		var $filterList = $el.closest(".student-filter");
 
 		if ($filterList.find(".empty-filter").length == $filterList.find(".btn-group").length) {
-			$filterList.find('.clear-all-filters').attr("disabled", "disabled");
+			$filterList.find('.clear-all-filters').prop("disabled", "disabled");
 		} else {
-			$filterList.find('.clear-all-filters').removeAttr("disabled");
+			$filterList.find('.clear-all-filters').removeProp(("disabled");
 		}
 	};
 
@@ -289,7 +289,7 @@ jQuery(function($){
 		} else {
 			$('<li/>').addClass('check-list-item').append(
 				$('<label/>').addClass('checkbox').append(
-					$('<input/>').attr({
+					$('<input/>').prop({
 						'type':'checkbox',
 						'name':name,
 						'value':value,

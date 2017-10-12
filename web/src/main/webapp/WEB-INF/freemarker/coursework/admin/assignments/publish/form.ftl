@@ -9,7 +9,7 @@ jQuery(function($){ "use strict";
 	var submitButton = $('#publish-submit'),
 		checkbox = $('#confirmCheck');
 	function updateCheckbox() {
-	  submitButton.attr('disabled', !checkbox.is(':checked'));
+	  submitButton.prop('disabled', !checkbox.is(':checked'));
 	}
 	checkbox.change(updateCheckbox);
 	updateCheckbox();

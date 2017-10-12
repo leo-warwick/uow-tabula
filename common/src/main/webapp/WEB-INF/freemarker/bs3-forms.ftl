@@ -160,11 +160,11 @@ Macros for customised form elements, containers and more complex pickers.
 					// nothing, already works
 				} else {
 					// Add button which generates more file inputs
-					$addButton = $('<a>').addClass('btn btn-mini').append($('<i class="fa fa-plus"></i>').attr('title','Add another attachment'));
+					$addButton = $('<a>').addClass('btn btn-mini').append($('<i class="fa fa-plus"></i>').prop('title','Add another attachment'));
 					$addButton.click(function(){
 						$addButton
 								.before($('<br/>'))
-								.before($('<input type="file">').attr('name',"${basename}.upload"));
+								.before($('<input type="file">').prop('name',"${basename}.upload"));
 						if ($container.find('input[type=file]').length >= ${max}) {
 							$addButton.hide(); // you've got enough file input thingies now.
 						}

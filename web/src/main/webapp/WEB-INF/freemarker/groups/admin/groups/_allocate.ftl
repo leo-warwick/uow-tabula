@@ -327,7 +327,7 @@
 						}
 						$('.no-clash-info').addClass("hide");
 						$('.clash-info').removeClass("hide");
-						$timtableClashLink.attr('href', $timtableClashLink.data('href') + clashUserIds);
+						$timtableClashLink.prop('href', $timtableClashLink.data('href') + clashUserIds);
 					} else {
 						$('.clash-info').addClass("hide");
 						$('.no-clash-info').removeClass("hide");

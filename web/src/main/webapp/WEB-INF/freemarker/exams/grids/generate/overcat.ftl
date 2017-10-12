@@ -201,7 +201,7 @@
 		$modalBody.on('click', 'button[name=recalculate]', function(){
 			$('.modal button').prop('disabled', true);
 			var $form = $('.modal-body form');
-			$form.append($('<input/>').attr({
+			$form.append($('<input/>').prop({
 				'type': 'hidden',
 				'name': 'recalculate'
 			}));
@@ -211,7 +211,7 @@
 		}).on('click', 'button[name=reset]', function(){
 			$('.modal button').prop('disabled', true);
 			var $form = $('.modal-body form');
-			$form.append($('<input/>').attr({
+			$form.append($('<input/>').prop({
 				'type': 'hidden',
 				'name': 'recalculate'
 			})).find('tr.new-marks input').each(function(){ $(this).val(''); });
@@ -224,7 +224,7 @@
 		}).on('click', 'button[name=${GenerateExamGridMappingParameters.excel}]', function(){
 			$modalFooterButtons.prop('disabled', true);
 			var $form = $('.modal-body form');
-			$form.append($('<input/>').attr({
+			$form.append($('<input/>').prop({
 				'type': 'hidden',
 				'name': '${GenerateExamGridMappingParameters.excel}'
 			}));
@@ -234,13 +234,13 @@
 		}).on('click', 'button[name=continue]', function(){
 			$modalFooterButtons.prop('disabled', true);
 			var $form = $('.modal-body form');
-			$form.append($('<input/>').attr({
+			$form.append($('<input/>').prop({
 				'type': 'hidden',
 				'name': 'continue'
 			}));
 			$.post('<@routes.exams.generateGridOvercatting department academicYear scyd/>', $form.serialize(), function(data){
 				if (!data.errors) {
-					$('form.exam-grid-preview').append($('<input/>').attr({
+					$('form.exam-grid-preview').append($('<input/>').prop({
 						'type': 'hidden',
 						'name': '${GenerateExamGridMappingParameters.previewAndDownload}'
 					})).submit();

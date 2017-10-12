@@ -64,29 +64,29 @@ exports.bindModulePickers = function(){
 				if ($(this).data('moduleid') === undefined || $(this).data('moduleid').length === 0)
 					return;
 
-				$this.closest('.module-choice').find('input.specific[name=isAnySmallGroupEventModules]').attr('checked', true);
+				$this.closest('.module-choice').find('input.specific[name=isAnySmallGroupEventModules]').prop('checked', true);
 				var icon = $('<i/>').addClass('icon-fixed-width');
 				if ($this.hasClass('smallGroup') && $this.data('hasgroups') != true) {
-					icon.addClass('icon-exclamation-sign').attr({
+					icon.addClass('icon-exclamation-sign').prop({
 						'title':'This module has no small groups set up in Tabula'
 					});
 				}
 				if ($this.hasClass('assignment') && $this.data('hasassignments') != true) {
-					icon.addClass('icon-exclamation-sign').attr({
+					icon.addClass('icon-exclamation-sign').prop({
 						'title':'This module has no assignments set up in Tabula'
 					});
 				}
 				$this.closest('.module-choice').find('.modules-list ol').append(
 					$('<li/>').append(
-						$('<input/>').attr({
+						$('<input/>').prop({
 							'type':'hidden',
-							'name':$hiddenInput.attr('name').replace('_',''),
+							'name':$hiddenInput.prop('name').replace('_',''),
 							'value':$this.data('moduleid')
 						})
 					).append(
 						icon
 					).append(
-						$('<span/>').attr('title', $this.val()).html($this.val())
+						$('<span/>').prop('title', $this.val()).html($this.val())
 					).append(
 						$('<button/>').addClass('btn btn-danger btn-mini').append(
 							$('<i/>').addClass('icon-remove')
@@ -121,13 +121,13 @@ exports.bindAssignmentPickers = function(){
 
 				$this.closest('.assignment-choice').find('.assignments-list ol').append(
 					$('<li/>').append(
-						$('<input/>').attr({
+						$('<input/>').prop({
 							'type':'hidden',
-							'name':$hiddenInput.attr('name').replace('_',''),
+							'name':$hiddenInput.prop('name').replace('_',''),
 							'value':$this.data('assignmentid')
 						})
 					).append(
-						$('<span/>').attr('title', $this.val()).html($this.val())
+						$('<span/>').prop('title', $this.val()).html($this.val())
 					).append(
 						$('<button/>').addClass('btn btn-danger btn-mini').append(
 							$('<i/>').addClass('icon-remove')
@@ -218,7 +218,7 @@ $(function(){
 		$form.find('select.template[name=template]').on('change', function() {
 			var $button = $('.monitoring-point-preview-button'),
 			    newHref = $button.data('hreftemplate').replace('_TEMPLATE_ID_', this.value);
-			$button.attr('href', newHref);
+			$button.prop('href', newHref);
 		}).trigger('change');
 
 		// Trigger the above change behaviour for the initial value
@@ -281,7 +281,7 @@ $(function(){
 	}).end().find('tr.years th:gt(0)').each(function(){
 		var $this = $(this), oldHtml = $this.html();
 		$this.empty().append(
-			$('<input/>').attr({
+			$('<input/>').prop({
 				'type':'checkbox',
 				'title':'Select all/none'
 			}).on('click', function(){
@@ -321,7 +321,7 @@ $(function(){
     			});
     			$m.find('.modal-footer button[type=submit]').on('click', function(){
     				$(this).button('loading');
-    				$.post($f.attr('action'), $f.serialize(), function(data){
+    				$.post($f.prop('action'), $f.serialize(), function(data){
     					$(this).button('reset');
     					formLoad(data);
     				})
@@ -333,9 +333,9 @@ $(function(){
     			}).modal("show");
     		};
     		if ($('form#addMonitoringPointSet').length > 0) {
-    			$.post($(this).attr('href'), $('form#addMonitoringPointSet').serialize(), formLoad);
+    			$.post($(this).prop('href'), $('form#addMonitoringPointSet').serialize(), formLoad);
     		} else {
-    			$.get($(this).attr('href'), formLoad);
+    			$.get($(this).prop('href'), formLoad);
     		}
     	});
     };
@@ -378,15 +378,15 @@ $(function(){
 			var checkboxes = $('.manually-added tbody input')
 				, checkedBoxes = checkboxes.filter(function(){ return $(this).is(':checked'); });
 			if (checkedBoxes.length == 0) {
-				$('.manually-added summary input.btn-warning').attr('disabled', true);
+				$('.manually-added summary input.btn-warning').prop('disabled', true);
 			} else {
-				$('.manually-added summary input.btn-warning').attr('disabled', false);
+				$('.manually-added summary input.btn-warning').prop('disabled', false);
 			}
 		};
 		updateButtons();
 		$('.manually-added')
 			.find('.for-check-all').append(
-			$('<input/>').addClass('check-all use-tooltip').attr({
+			$('<input/>').addClass('check-all use-tooltip').prop({
 				type: 'checkbox',
 				title: 'Select all/none'
 			}).on('click', function(){
@@ -461,7 +461,7 @@ $(function(){
 				}
 
 				if ($details.data('submitparam').length > 0) {
-					$form.append($('<input/>').attr({
+					$form.append($('<input/>').prop({
 						'type': 'hidden',
 						'name': $details.data('submitparam'),
 						'value': true
@@ -474,7 +474,7 @@ $(function(){
 				var $this = $(this), $form = $this.closest('form'), $details = $this.closest('details');
 				if ($this.data('page').toString.length > 0) {
 					$form.find('input[name="page"]').remove().end()
-						.append($('<input/>').attr({
+						.append($('<input/>').prop({
 							'type': 'hidden',
 							'name': 'page',
 							'value': $this.data('page')
@@ -483,7 +483,7 @@ $(function(){
 				}
 				if ($details.data('submitparam').length > 0) {
 					$form.find('input[name="' + $details.data('submitparam') + '"]').remove().end()
-						.append($('<input/>').attr({
+						.append($('<input/>').prop({
 							'type': 'hidden',
 							'name': $details.data('submitparam'),
 							'value': true
@@ -501,7 +501,7 @@ $(function(){
 						$list.find('> ul').prepend(
 							$('<li />').addClass('clear-this-filter')
 								.append(
-									$('<button />').attr('type', 'button')
+									$('<button />').prop('type', 'button')
 										.addClass('btn btn-link')
 										.html('<i class="icon-ban-circle"></i> Clear selected items')
 										.on('click', function(e) {
@@ -541,18 +541,18 @@ $(function(){
 				var $filterList = $el.closest(".student-filter");
 
 				if ($filterList.find(".empty-filter").length == $filterList.find(".btn-group").length) {
-					$('.clear-all-filters').attr("disabled", "disabled");
+					$('.clear-all-filters').prop("disabled", "disabled");
 				} else {
-					$('.clear-all-filters').removeAttr("disabled");
+					$('.clear-all-filters').removeProp(("disabled");
 				}
 			};
 
 			var updateSearchButton = function($el) {
 				var $filter = $el.closest('.student-filter');
 				if ($filter.find('input:checked').length > 0) {
-					$filter.find('button.search').attr('disabled', false);
+					$filter.find('button.search').prop('disabled', false);
 				} else {
-					$filter.find('button.search').attr('disabled', true);
+					$filter.find('button.search').prop('disabled', true);
 				}
 			};
 
@@ -620,7 +620,7 @@ $(function(){
 				} else {
 					$li = $('<li/>').addClass('check-list-item').append(
 						$('<label/>').addClass('checkbox').append(
-							$('<input/>').attr({
+							$('<input/>').prop({
 								'type':'checkbox',
 								'name':name,
 								'value':value,
@@ -666,20 +666,20 @@ $(function(){
 				, dateCheckedBoxes = dateCheckboxes.filter(function(){ return $(this).is(':checked'); })
 				;
 			if (weekCheckedBoxes.length === 0 && dateCheckedBoxes.length === 0) {
-				$('.add-points-to-schemes p button').attr('disabled', true);
+				$('.add-points-to-schemes p button').prop('disabled', true);
 				$('.add-points-to-schemes span.alert').hide();
 			} else if (weekCheckedBoxes.length > 0 && dateCheckedBoxes.length > 0) {
-				$('.add-points-to-schemes p button').attr('disabled', true);
+				$('.add-points-to-schemes p button').prop('disabled', true);
 				$('.add-points-to-schemes span.alert').show();
 			} else {
-				$('.add-points-to-schemes p button').attr('disabled', false);
+				$('.add-points-to-schemes p button').prop('disabled', false);
 				$('.add-points-to-schemes span.alert').hide();
 			}
 		};
 		updateButtons();
 		$('.add-points-to-schemes')
 			.find('.for-check-all').append(
-				$('<input/>').addClass('check-all use-tooltip').attr({
+				$('<input/>').addClass('check-all use-tooltip').prop({
 					type: 'checkbox',
 					title: 'Select all/none'
 				}).on('click', function(){
@@ -698,7 +698,7 @@ $(function(){
 			}).end()
 			.find('button').on('click', function(){
 				var $this = $(this), $form = $this.closest('form');
-				$form.attr('action', $this.data('href')).submit();
+				$form.prop('action', $this.data('href')).submit();
 			})
 		;
 	})();

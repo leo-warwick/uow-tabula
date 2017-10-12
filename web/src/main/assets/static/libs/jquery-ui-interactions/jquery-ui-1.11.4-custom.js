@@ -84,7 +84,7 @@
 		removeUniqueId: function() {
 			return this.each(function() {
 				if ( /^ui-id-\d+$/.test( this.id ) ) {
-					$( this ).removeAttr( "id" );
+					$( this ).removeProp(( "id" );
 				}
 			});
 		}
@@ -132,11 +132,11 @@
 			},
 
 		focusable: function( element ) {
-			return focusable( element, !isNaN( $.attr( element, "tabindex" ) ) );
+			return focusable( element, !isNaN( $.prop( element, "tabindex" ) ) );
 		},
 
 		tabbable: function( element ) {
-			var tabIndex = $.attr( element, "tabindex" ),
+			var tabIndex = $.prop( element, "tabindex" ),
 				isTabIndexNaN = isNaN( tabIndex );
 			return ( isTabIndexNaN || tabIndex >= 0 ) && focusable( element, !isTabIndexNaN );
 		}
@@ -603,7 +603,7 @@
 				.removeData( $.camelCase( this.widgetFullName ) );
 			this.widget()
 				.unbind( this.eventNamespace )
-				.removeAttr( "aria-disabled" )
+				.removeProp(( "aria-disabled" )
 				.removeClass(
 				this.widgetFullName + "-disabled " +
 				"ui-state-disabled" );
@@ -1389,7 +1389,7 @@
 				helper = helperIsFunction ?
 					$( o.helper.apply( this.element[ 0 ], [ event ] ) ) :
 					( o.helper === "clone" ?
-						this.element.clone().removeAttr( "id" ) :
+						this.element.clone().removeProp(( "id" ) :
 						this.element );
 
 			if (!helper.parents("body").length) {
@@ -4473,7 +4473,7 @@
 			o = o || {};
 
 			$(items).each(function() {
-				var res = ($(o.item || this).attr(o.attribute || "id") || "").match(o.expression || (/(.+)[\-=_](.+)/));
+				var res = ($(o.item || this).prop(o.attribute || "id") || "").match(o.expression || (/(.+)[\-=_](.+)/));
 				if (res) {
 					str.push((o.key || res[1]+"[]")+"="+(o.key && o.expression ? res[1] : res[2]));
 				}
@@ -4494,7 +4494,7 @@
 
 			o = o || {};
 
-			items.each(function() { ret.push($(o.item || this).attr(o.attribute || "id") || ""); });
+			items.each(function() { ret.push($(o.item || this).prop(o.attribute || "id") || ""); });
 			return ret;
 
 		},
@@ -4748,7 +4748,7 @@
 						} else if ( nodeName === "tr" ) {
 							that._createTrPlaceholder( that.currentItem, element );
 						} else if ( nodeName === "img" ) {
-							element.attr( "src", that.currentItem.attr( "src" ) );
+							element.prop( "src", that.currentItem.prop( "src" ) );
 						}
 
 						if ( !className ) {
@@ -4788,7 +4788,7 @@
 
 			sourceTr.children().each(function() {
 				$( "<td>&#160;</td>", that.document[ 0 ] )
-					.attr( "colspan", $( this ).attr( "colspan" ) || 1 )
+					.prop( "colspan", $( this ).prop( "colspan" ) || 1 )
 					.appendTo( targetTr );
 			});
 		},

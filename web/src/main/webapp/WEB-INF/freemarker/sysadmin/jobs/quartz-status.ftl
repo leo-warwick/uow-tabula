@@ -69,7 +69,7 @@
 
 			$('.progress-bar')
 				.width(percentage + '%')
-				.attr('class', 'progress-bar progress-bar-striped progress-bar-' + state);
+				.prop('class', 'progress-bar progress-bar-striped progress-bar-' + state);
 			$('#job-status .status').html(message);
 		});
 	};

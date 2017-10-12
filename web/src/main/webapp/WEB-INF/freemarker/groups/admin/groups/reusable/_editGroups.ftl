@@ -57,9 +57,9 @@
 
 				$input.on('change keyup', function() {
 					if ($input.val().length > 0) {
-						$button.removeAttr('disabled');
+						$button.removeProp(('disabled');
 					} else {
-						$button.attr('disabled', 'disabled');
+						$button.prop('disabled', 'disabled');
 					}
 				});
 			}).on('click', function() {
@@ -68,7 +68,7 @@
 
 				var $clone = $group.clone();
 
-				var index = parseInt(/\[(\d+)\]/.exec($clone.find('input[type="text"]').attr('name'))[1]);
+				var index = parseInt(/\[(\d+)\]/.exec($clone.find('input[type="text"]').prop('name'))[1]);
 				$clone.find('.input-group-addon').text((index + 1) + ".");
 
 				$clone.insertBefore($group);
@@ -77,13 +77,13 @@
 
 				var nextIndex = index + 1;
 				var $name = $group.find('input[type="text"]');
-				$name.attr('name', 'groupNames[' + nextIndex + ']');
-				$name.attr('id', 'groupNames' + nextIndex);
+				$name.prop('name', 'groupNames[' + nextIndex + ']');
+				$name.prop('id', 'groupNames' + nextIndex);
 
 				$group.find('.input-group-addon').text((nextIndex + 1) + '.');
 
 				$name.val('').focus();
-				$button.attr('disabled', 'disabled');
+				$button.prop('disabled', 'disabled');
 			});
 
 			$(document.body).on('click', 'button[data-toggle="remove"]', function() {
@@ -98,12 +98,12 @@
 					var $group = $(this);
 
 					var $name = $group.find('input[type="text"]');
-					$name.attr('name', 'groupNames[' + index + ']');
-					$name.attr('id', 'groupNames' + index);
+					$name.prop('name', 'groupNames[' + index + ']');
+					$name.prop('id', 'groupNames' + index);
 
 					var $id = $group.find('input[type="hidden"]');
-					$id.attr('name', 'groupIds[' + index + ']');
-					$id.attr('id', 'groupIds' + index);
+					$id.prop('name', 'groupIds[' + index + ']');
+					$id.prop('id', 'groupIds' + index);
 
 					$group.find('.input-group-addon').text((index + 1) + '.');
 				});

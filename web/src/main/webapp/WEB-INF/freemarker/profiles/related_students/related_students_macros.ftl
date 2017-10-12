@@ -88,7 +88,7 @@
 					is: function(s, table, cell, $cell){return false; /*return false so this parser is not auto detected*/},
 					format: function(s, table, cell, cellIndex) {
 						var $cell = $(cell);
-						return $cell.attr('data-datesort') || s;
+						return $cell.prop('data-datesort') || s;
 					},
 					parsed: false,
 					type: 'numeric'

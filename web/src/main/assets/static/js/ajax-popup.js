@@ -29,7 +29,7 @@ jQuery.fn.ajaxModalLink = function(options) {
 		    link = this,
 		    $link = $(link),
 		    $modalElement = $($link.data('target')) || options.target,
-		    href = options.href || $link.attr('href'),
+		    href = options.href || $link.prop('href'),
 		    $modalBody = $modalElement.find('.modal-body'),
 		    wholeContent = $modalBody.length === 0,
 			$tabulaModalContainer = $('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h3>Loading&hellip;</h3></div></div></div>');
@@ -109,8 +109,8 @@ exports.wireAjaxPopupLinks = function($container) {
 
 	            // this line doesn't work in IE8 (IE8 bug) - need to make the URL
 	            // unique using generated random number
-	            //jQuery.post($form.attr('action'), $form.serialize(), function(data){
-	            jQuery.post($form.attr('action') + "?rand=" + $randomNumber, $form.serialize(), function(data){
+	            //jQuery.post($form.prop('action'), $form.serialize(), function(data){
+	            jQuery.post($form.prop('action') + "?rand=" + $randomNumber, $form.serialize(), function(data){
 	                popup.setContent(data);
 	                decorate($(popup.contentElement));
 	            });

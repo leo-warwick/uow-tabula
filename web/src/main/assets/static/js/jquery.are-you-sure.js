@@ -31,8 +31,8 @@
 		var getValue = function($field) {
 			if ($field.hasClass('ays-ignore')
 				|| $field.hasClass('aysIgnore')
-				|| $field.attr('data-ays-ignore')
-				|| $field.attr('name') === undefined) {
+				|| $field.prop('data-ays-ignore')
+				|| $field.prop('name') === undefined) {
 				return null;
 			}
 
@@ -41,7 +41,7 @@
 			}
 
 			var val;
-			var type = $field.attr('type');
+			var type = $field.prop('type');
 			if ($field.is('select')) {
 				type = 'select';
 			}
@@ -106,7 +106,7 @@
 			if (settings.renamedFieldsMarksDirty) {
 				// Check if field names have changed
 				var origNames = $form.data("ays-orig-field-names");
-				if (origNames != $fields.map(function() { return $(this).attr('name'); }).get()) {
+				if (origNames != $fields.map(function() { return $(this).prop('name'); }).get()) {
 					setDirtyStatus($form, true);
 					return;
 				}
@@ -134,7 +134,7 @@
 			$form.data("ays-orig-field-count", $(fields).length);
 
 			// PATCH Mat Mannion 08/10/14 - Dirty check when fields have been renamed (to support jquery-draganddrop)
-			$form.data("ays-orig-field-names", $(fields).map(function() { return $(this).attr('name'); }).get());
+			$form.data("ays-orig-field-names", $(fields).map(function() { return $(this).prop('name'); }).get());
 			// END PATCH
 
 			setDirtyStatus($form, false);

@@ -151,7 +151,7 @@
 
 			$('.show-hide-form input[type="checkbox"]').on('change', function() {
 				console.log('change');
-				var name = $(this).attr('name');
+				var name = $(this).prop('name');
 				if ($(this).is(':checked')) {
 					console.log('showing ' + name);
 					$('.roles-table [data-name="' + name + '"]').show();

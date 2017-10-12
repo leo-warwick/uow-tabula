@@ -92,11 +92,11 @@
 
   Alert.prototype.close = function (e) {
     var $this = $(this)
-      , selector = $this.attr('data-target')
+      , selector = $this.prop('data-target')
       , $parent
 
     if (!selector) {
-      selector = $this.attr('href')
+      selector = $this.prop('href')
       selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
     }
 
@@ -202,8 +202,8 @@
     // push to event loop to allow forms to submit
     setTimeout(function () {
       state == 'loadingText' ?
-        $el.addClass(d).attr(d, d) :
-        $el.removeClass(d).removeAttr(d)
+        $el.addClass(d).prop(d, d) :
+        $el.removeClass(d).removeProp((d)
     }, 0)
   }
 
@@ -452,13 +452,13 @@
 
   $(document).on('click.carousel.data-api', '[data-slide], [data-slide-to]', function (e) {
     var $this = $(this), href
-      , $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
+      , $target = $($this.prop('data-target') || (href = $this.prop('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
       , options = $.extend({}, $target.data(), $this.data())
       , slideIndex
 
     $target.carousel(options)
 
-    if (slideIndex = $this.attr('data-slide-to')) {
+    if (slideIndex = $this.prop('data-slide-to')) {
       $target.data('carousel').pause().to(slideIndex).cycle()
     }
 
@@ -623,9 +623,9 @@
 
   $(document).on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
     var $this = $(this), href
-      , target = $this.attr('data-target')
+      , target = $this.prop('data-target')
         || e.preventDefault()
-        || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') //strip for ie7
+        || (href = $this.prop('href')) && href.replace(/.*(?=#[^\s]+$)/, '') //strip for ie7
       , option = $(target).data('collapse') ? 'toggle' : $this.data()
     $this[$(target).hasClass('in') ? 'addClass' : 'removeClass']('collapsed')
     $(target).collapse(option)
@@ -743,11 +743,11 @@
   }
 
   function getParent($this) {
-    var selector = $this.attr('data-target')
+    var selector = $this.prop('data-target')
       , $parent
 
     if (!selector) {
-      selector = $this.attr('href')
+      selector = $this.prop('href')
       selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
     }
 
@@ -866,7 +866,7 @@
 
           that.$element
             .addClass('in')
-            .attr('aria-hidden', false)
+            .prop('aria-hidden', false)
 
           that.enforceFocus()
 
@@ -896,7 +896,7 @@
 
         this.$element
           .removeClass('in')
-          .attr('aria-hidden', true)
+          .prop('aria-hidden', true)
 
         $.support.transition && this.$element.hasClass('fade') ?
           this.hideWithTransition() :
@@ -1029,8 +1029,8 @@
 
   $(document).on('click.modal.data-api', '[data-toggle="modal"]', function (e) {
     var $this = $(this)
-      , href = $this.attr('href')
-      , $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) //strip for ie7
+      , href = $this.prop('href')
+      , $target = $($this.prop('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) //strip for ie7
       , option = $target.data('modal') ? 'toggle' : $.extend({ remote:!/#/.test(href) && href }, $target.data(), $this.data())
 
     e.preventDefault()
@@ -1297,8 +1297,8 @@
 
   , fixTitle: function () {
       var $e = this.$element
-      if ($e.attr('title') || typeof($e.attr('data-original-title')) != 'string') {
-        $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
+      if ($e.prop('title') || typeof($e.prop('data-original-title')) != 'string') {
+        $e.prop('data-original-title', $e.prop('title') || '').prop('title', '')
       }
     }
 
@@ -1319,7 +1319,7 @@
         , $e = this.$element
         , o = this.options
 
-      title = $e.attr('data-original-title')
+      title = $e.prop('data-original-title')
         || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
 
       return title
@@ -1465,7 +1465,7 @@
         , o = this.options
 
       content = (typeof o.content == 'function' ? o.content.call($e[0]) :  o.content)
-        || $e.attr('data-content')
+        || $e.prop('data-content')
 
       return content
     }
@@ -1553,7 +1553,7 @@
     this.options = $.extend({}, $.fn.scrollspy.defaults, options)
     this.$scrollElement = $element.on('scroll.scroll-spy.data-api', process)
     this.selector = (this.options.target
-      || ((href = $(element).attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
+      || ((href = $(element).prop('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
       || '') + ' .nav li > a'
     this.$body = $('body')
     this.refresh()
@@ -1575,7 +1575,7 @@
           .find(this.selector)
           .map(function () {
             var $el = $(this)
-              , href = $el.data('target') || $el.attr('href')
+              , href = $el.data('target') || $el.prop('href')
               , $href = /^#\w/.test(href) && $(href)
             return ( $href
               && $href.length
@@ -1718,13 +1718,13 @@
   , show: function () {
       var $this = this.element
         , $ul = $this.closest('ul:not(.dropdown-menu)')
-        , selector = $this.attr('data-target')
+        , selector = $this.prop('data-target')
         , previous
         , $target
         , e
 
       if (!selector) {
-        selector = $this.attr('href')
+        selector = $this.prop('href')
         selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
       }
 
@@ -1868,7 +1868,7 @@
     constructor: Typeahead
 
   , select: function () {
-      var val = this.$menu.find('.active').attr('data-value')
+      var val = this.$menu.find('.active').prop('data-value')
       this.$element
         .val(this.updater(val))
         .change()
@@ -1962,7 +1962,7 @@
       var that = this
 
       items = $(items).map(function (i, item) {
-        i = $(that.options.item).attr('data-value', item)
+        i = $(that.options.item).prop('data-value', item)
         i.find('a').html(that.highlighter(item))
         return i[0]
       })

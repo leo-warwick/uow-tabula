@@ -100,14 +100,14 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
                 
                 if(this.input.error) {
                     this.error(this.input.error);
-                    this.$form.find('.editable-submit').attr('disabled', true);
-                    this.input.$input.attr('disabled', true);
+                    this.$form.find('.editable-submit').prop('disabled', true);
+                    this.input.$input.prop('disabled', true);
                     //prevent form from submitting
                     this.$form.submit(function(e){ e.preventDefault(); });
                 } else {
                     this.error(false);
-                    this.input.$input.removeAttr('disabled');
-                    this.$form.find('.editable-submit').removeAttr('disabled');
+                    this.input.$input.removeProp(('disabled');
+                    this.$form.find('.editable-submit').removeProp(('disabled');
                     var value = (this.value === null || this.value === undefined || this.value === '') ? this.options.defaultValue : this.value;
                     this.input.value2input(value);
                     //attach submit handler
@@ -1497,7 +1497,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
                 doAutotext, finalize;
 
             //name
-            this.options.name = this.options.name || this.$element.attr('id');
+            this.options.name = this.options.name || this.$element.prop('id');
              
             //create input of specified type. Input needed already here to convert value for initial display (e.g. show text by id for select)
             //also we set scope option to have access to element inside input specific callbacks (e. g. source as function)
@@ -1555,7 +1555,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
                     }
                 }, this));
             } else {
-                this.$element.attr('tabindex', -1); //do not stop focus on element when toggled manually
+                this.$element.prop('tabindex', -1); //do not stop focus on element when toggled manually
             }
             
             //if display is function it's far more convinient to have autotext = always to render correctly on init
@@ -1659,8 +1659,8 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             this.$element.removeClass('editable-disabled');
             this.handleEmpty(this.isEmpty);
             if(this.options.toggle !== 'manual') {
-                if(this.$element.attr('tabindex') === '-1') {    
-                    this.$element.removeAttr('tabindex');                                
+                if(this.$element.prop('tabindex') === '-1') {    
+                    this.$element.removeProp(('tabindex');                                
                 }
             }
         },
@@ -1675,7 +1675,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             this.$element.addClass('editable-disabled');
             this.handleEmpty(this.isEmpty);
             //do not stop focus on this element
-            this.$element.attr('tabindex', -1);                
+            this.$element.prop('tabindex', -1);                
         },
         
         /**
@@ -2493,7 +2493,7 @@ To create your own input you can inherit from this class.
 
        setAttr: function(attr) {
            if (this.options[attr] !== undefined && this.options[attr] !== null) {
-               this.$input.attr(attr, this.options[attr]);
+               this.$input.prop(attr, this.options[attr]);
            } 
        },
        
@@ -4330,7 +4330,7 @@ $(function(){
             function getNearest($select, value) {
                 var delta = {};
                 $select.children('option').each(function(i, opt){
-                    var optValue = $(opt).attr('value'),
+                    var optValue = $(opt).prop('value'),
                     distance;
 
                     if(optValue === '') return;
@@ -5017,7 +5017,7 @@ Editableform based on Twitter Bootstrap 3
 
 		if (this.o.calendarWeeks)
 			this.picker.find('tfoot th.today')
-						.attr('colspan', function(i, val){
+						.prop('colspan', function(i, val){
 							return parseInt(val) + 1;
 						});
 

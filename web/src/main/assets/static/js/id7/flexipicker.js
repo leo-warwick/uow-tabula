@@ -18,8 +18,8 @@ var RichResultField = function (input) {
 			this.html = this.html + '<a href=# class="clear-field" title="Clear">&times;</a>';
 		}
 		this.$uneditable = $('<span>'+this.html+'</span>');
-		this.$uneditable.attr({
-			'class': 'uneditable-input rich-result-field ' + this.$input.attr('class'),
+		this.$uneditable.prop({
+			'class': 'uneditable-input rich-result-field ' + this.$input.prop('class'),
 			'disabled': true
 		});
 		this.$input.after(this.$uneditable);
@@ -42,21 +42,21 @@ var RichResultField = function (input) {
 RichResultField.prototype.edit = function () {
 	this.resetWidth();
 	this.$input.val('').show().trigger('change').focus();
-	this.$uneditable.hide().find('.val').text('').attr('title', '');
+	this.$uneditable.hide().find('.val').text('').prop('title', '');
 };
 
 /** Hide input field and show the rich `text` instead */
 RichResultField.prototype.storeText = function (text) {
 	this.resetWidth();
 	this.$input.hide();
-	this.$uneditable.show().find('.val').text(text).attr('title', text);
+	this.$uneditable.show().find('.val').text(text).prop('title', text);
 };
 
 /** Set value of input field, hide it and show the rich `text` instead */
 RichResultField.prototype.store = function (value, text) {
 	this.resetWidth();
 	this.$input.val(value).trigger('change').hide();
-	this.$uneditable.show().find('.val').text(text).attr('title', text);
+	this.$uneditable.show().find('.val').text(text).prop('title', text);
 };
 
 /**
@@ -153,7 +153,7 @@ var FlexiPicker = function (options) {
 	}
 
 	// Disable browser autocomplete dropdowns, it gets in the way.
-	$element.attr('autocomplete', 'off');
+	$element.prop('autocomplete', 'off');
 
 	var $spinner = $element.parent().find('.spinner-container');
 	if ($spinner.length === 0) {
@@ -198,9 +198,9 @@ var FlexiPicker = function (options) {
 		items = $(items).map(function (i, item) {
 			if (item != undefined) {
 				i = $(that.options.item);
-				i.attr('data-value', item.value);
-				i.attr('data-type', item.type);
-				i.attr('data-fullname', item.name);
+				i.prop('data-value', item.value);
+				i.prop('data-type', item.type);
+				i.prop('data-fullname', item.name);
 				i.find('span.title').html(that.highlighter(item.title));
 				i.find('span.type').html(item.type);
 				if (useIcons) {
@@ -226,7 +226,7 @@ var FlexiPicker = function (options) {
 
 	// On selecting a value, we can transform it here before it's stored in the field.
 	$typeahead.updater = function(value) {
-		var type = this.$menu.find('.active').attr('data-type');
+		var type = this.$menu.find('.active').prop('data-type');
 		return self.getValue(value, type);
 	};
 
@@ -413,7 +413,7 @@ jQuery(function($){
 		} else {
 			$collection.append(
 				$('<button />')
-					.attr({'type':'button'})
+					.prop({'type':'button'})
 					.addClass('btn btn-xs btn-default')
 					.html('Add another')
 					.on('click', function() {
@@ -442,7 +442,7 @@ var ModulePicker = function (options) {
 	}
 
 	// Disable browser autocomplete dropdowns, it gets in the way.
-	$element.attr('autocomplete', 'off');
+	$element.prop('autocomplete', 'off');
 
 	var $typeahead = new TabulaTypeahead({
 		element: $element,
@@ -476,26 +476,26 @@ var ModulePicker = function (options) {
 		items = $(items).map(function (i, item) {
 			if (item != undefined) {
 				i = $(that.options.item);
-				i.attr('data-moduleid', item.id);
-				i.attr('data-modulecode', item.code);
+				i.prop('data-moduleid', item.id);
+				i.prop('data-modulecode', item.code);
 				i.find('div.name').html(that.highlighter(item.code.toUpperCase() + ' ' + item.name));
 				i.find('div.department').html(item.department);
 				if (options.checkGroups) {
 					if(!item.hasSmallGroups) {
 						i.find('div.no-groups').show();
-						i.attr('data-hasgroups', false);
+						i.prop('data-hasgroups', false);
 					} else {
 						i.find('div.no-groups').hide();
-						i.attr('data-hasgroups', true);
+						i.prop('data-hasgroups', true);
 					}
 				}
 				if (options.checkAssignments) {
 					if(!item.hasAssignments) {
 						i.find('div.no-assignments').show();
-						i.attr('data-hasassignments', false);
+						i.prop('data-hasassignments', false);
 					} else {
 						i.find('div.no-assignments').hide();
-						i.attr('data-hasassignments', true);
+						i.prop('data-hasassignments', true);
 					}
 				}
 				return i[0];
@@ -581,7 +581,7 @@ var AssignmentPicker = function (options) {
 	}
 
 	// Disable browser autocomplete dropdowns, it gets in the way.
-	$element.attr('autocomplete', 'off');
+	$element.prop('autocomplete', 'off');
 
 	var $typeahead = new TabulaTypeahead({
 		element: $element,
@@ -612,7 +612,7 @@ var AssignmentPicker = function (options) {
 		items = $(items).map(function (i, item) {
 			if (item != undefined) {
 				i = $(that.options.item);
-				i.attr('data-assignmentid', item.id);
+				i.prop('data-assignmentid', item.id);
 				i.find('div.name').html(that.highlighter(item.module.toUpperCase() + ' ' + item.name));
 				i.find('div.department').html(item.department);
 				return i[0];
@@ -693,7 +693,7 @@ var RoutePicker = function (options) {
 	}
 
 	// Disable browser autocomplete dropdowns, it gets in the way.
-	$element.attr('autocomplete', 'off');
+	$element.prop('autocomplete', 'off');
 
 	var $typeahead = new TabulaTypeahead({
 		element: $element,
@@ -724,7 +724,7 @@ var RoutePicker = function (options) {
 		items = $(items).map(function (i, item) {
 			if (item != undefined) {
 				i = $(that.options.item);
-				i.attr('data-routecode', item.code);
+				i.prop('data-routecode', item.code);
 				i.find('div.name').html(that.highlighter(item.code.toUpperCase() + ' ' + item.name));
 				i.find('div.department').html(item.department);
 				return i[0];
@@ -805,7 +805,7 @@ var LocationPicker = function (options) {
 	}
 
 	// Disable browser autocomplete dropdowns, it gets in the way.
-	$element.attr('autocomplete', 'off');
+	$element.prop('autocomplete', 'off');
 
 	var $typeahead = new TabulaTypeahead({
 		element: $element,
@@ -841,7 +841,7 @@ var LocationPicker = function (options) {
 		items = $(items).map(function (i, item) {
 			if (item != undefined) {
 				i = $(that.options.item);
-				i.attr('data-lid', item.lid);
+				i.prop('data-lid', item.lid);
 				i.find('div.name').html(that.highlighter(item.name));
 				i.find('div.department').html(item.sub || '&nbsp;');
 				return i[0];

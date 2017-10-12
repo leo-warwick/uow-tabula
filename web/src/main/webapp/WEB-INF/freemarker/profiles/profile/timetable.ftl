@@ -165,7 +165,7 @@
 					'${startDate.toString("YYYY-MM-dd")}' // This is here for FullCalendar 2 support or if it's ever backported to 1.6.x
 				</#if>
 			);
-			$calendar.find('table').attr('role', 'presentation');
+			$calendar.find('table').prop('role', 'presentation');
 		} else {
 			Profiles.createSmallScreenCalender(
 				$('.calendar-smallscreen'),

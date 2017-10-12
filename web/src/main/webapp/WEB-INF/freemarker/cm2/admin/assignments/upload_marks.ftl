@@ -127,8 +127,8 @@
 				var numExistingRows = $('.marks-web-form div.row').size();
 				var $newRow = $rowTemplate.clone();
 				$newRow.find('input,textarea').each(function(i, field){
-					var newName = 'marks['+ numExistingRows +'].' + $(field).attr('name');
-					$(field).attr('name', newName);
+					var newName = 'marks['+ numExistingRows +'].' + $(field).prop('name');
+					$(field).prop('name', newName);
 				});
 				$(this).before($newRow);
 			});

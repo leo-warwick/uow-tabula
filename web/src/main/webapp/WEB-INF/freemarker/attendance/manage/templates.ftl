@@ -73,7 +73,7 @@
 		$select.on('change', function(){
 			var templateSchemeId = $(this).val();
 
-			$('.fix-footer').removeAttr('style').attr('class', 'submit-buttons fix-footer');
+			$('.fix-footer').removeProp(('style').prop('class', 'submit-buttons fix-footer');
 			$('.footer-shadow').remove();
 
 			loadTemplatePoints(templateSchemeId);

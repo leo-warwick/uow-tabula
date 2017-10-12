@@ -268,7 +268,7 @@
 					'${startDate.toString("YYYY-MM-dd")}' // This is here for FullCalendar 2 support or if it's ever backported to 1.6.x
 				</#if>
 			);
-			$calendar.find('table').attr('role', 'presentation');
+			$calendar.find('table').prop('role', 'presentation');
 		} else {
 			Profiles.createSmallScreenCalender(
 				$('.calendar-smallscreen'),
@@ -291,7 +291,7 @@
 					$list.find('> ul').prepend(
 						$('<li />').addClass('clear-this-filter')
 							.append(
-								$('<button />').attr('type', 'button')
+								$('<button />').prop('type', 'button')
 									.addClass('btn btn-link')
 									.html('<i class="fa fa-ban"></i> Clear selected items')
 									.on('click', function(e) {
@@ -329,15 +329,15 @@
 			var $filterList = $el.closest(".student-filter");
 
 			if ($filterList.find(".empty-filter").length == $filterList.find(".btn-group").length) {
-				$('.clear-all-filters').attr("disabled", "disabled");
+				$('.clear-all-filters').prop("disabled", "disabled");
 			} else {
-				$('.clear-all-filters').removeAttr("disabled");
+				$('.clear-all-filters').removeProp(("disabled");
 			}
 		};
 
 		var doRequest = function() {
 			if (typeof history.pushState !== 'undefined')
-				history.pushState(null, null, $form.attr('action') + '?' + $form.serialize());
+				history.pushState(null, null, $form.prop('action') + '?' + $form.serialize());
 
 			if ($calendar.is(':visible')) {
 				$calendar.fullCalendar('refetchEvents');
@@ -419,7 +419,7 @@
 			} else {
 				var $newLI = $('<li/>').addClass('check-list-item').append(
 						$('<label/>').addClass('checkbox').append(
-								$('<input/>').attr({
+								$('<input/>').prop({
 									'type':'checkbox',
 									'name':name,
 									'value':value,

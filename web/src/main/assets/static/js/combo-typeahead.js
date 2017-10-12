@@ -31,11 +31,11 @@
 			// Create the typeahead element
 			var $input = $('<input />', {
 				'type': 'text',
-				'class': $this.attr('class'),
-				'style': $this.attr('style'),
-				'placeholder': $this.attr('placeholder'),
+				'class': $this.prop('class'),
+				'style': $this.prop('style'),
+				'placeholder': $this.prop('placeholder'),
 				'value': currentValue
-			}).attr("autocomplete", "off").on('keyup', function(e) {
+			}).prop("autocomplete", "off").on('keyup', function(e) {
 				if ($.inArray(e.keyCode, [40,38,16,17,18,9,13,27]) == -1) {
 					$this.find(':selected').prop('selected', false);
 					$this.trigger('change');

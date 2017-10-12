@@ -28,9 +28,9 @@
 	<script type="text/javascript">
 		jQuery(function($){
 			$('#confirmCheck').change(function(){
-				$('input[type=submit].btn-danger').attr('disabled', !this.checked).toggleClass('disabled', !this.checked);
+				$('input[type=submit].btn-danger').prop('disabled', !this.checked).toggleClass('disabled', !this.checked);
 			});
-			$('input[type=submit].btn-danger').attr('disabled',true).addClass('disabled');
+			$('input[type=submit].btn-danger').prop('disabled',true).addClass('disabled');
 		})
 	</script>
 

@@ -22,7 +22,7 @@
 					var $this = $(this);
 
 					if ($this.is(':checked')) {
-						var $form = $('<form></form>').attr({method:'POST',action:$this.data('href')}).hide();
+						var $form = $('<form></form>').prop({method:'POST',action:$this.data('href')}).hide();
 
 						var $inputs = $this.closest(".btn-toolbar").parent().find(".filter-form :input");
 						$form.append($inputs.clone());

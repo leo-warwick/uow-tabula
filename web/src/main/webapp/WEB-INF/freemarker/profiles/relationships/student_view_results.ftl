@@ -38,7 +38,7 @@
 					}
 				});
 				var baseLink = $meetingRecordLink.data("href");
-				$meetingRecordLink.attr("href", baseLink + course);
+				$meetingRecordLink.prop("href", baseLink + course);
 			} else if (!($( "a.new-meeting-record" ).hasClass( "disabled" ))){
 				$meetingRecordLink.addClass('disabled');
 			}

@@ -44,11 +44,11 @@ $(function(){
 		$('.module-info.empty').toggle('fast', function() {
 			if($('.module-info.empty').is(":visible")) {
 				hideButton.html('<i class="icon-eye-close"></i> Hide');
-				hideButton.attr("data-original-title", hideButton.attr("data-title-hide"));
+				hideButton.prop("data-original-title", hideButton.prop("data-title-hide"));
 
 			} else {
 				hideButton.html('<i class="icon-eye-open"></i> Show');
-				hideButton.attr("data-original-title", hideButton.attr("data-title-show"));
+				hideButton.prop("data-original-title", hideButton.prop("data-title-show"));
 			}
 		});
 
@@ -95,7 +95,7 @@ $(function(){
 
 				var $checkedBoxes = $(".collection-checkbox:checked", $container);
 				if ($container.data('checked') != 'none') {
-					var $form = $('<form></form>').attr({method:'POST',action:this.href}).hide();
+					var $form = $('<form></form>').prop({method:'POST',action:this.href}).hide();
 					$form.append($checkedBoxes.clone());
 					$(document.body).append($form);
 					$form.submit();
@@ -110,7 +110,7 @@ $(function(){
 
 				if ($container.data('checked') != 'none') {
 
-					var $form = $('<form></form>').attr({method:'POST',action:this.href}).hide();
+					var $form = $('<form></form>').prop({method:'POST',action:this.href}).hide();
 					$form.append($checkedBoxes.clone());
 
 					if ($container.data("all-plagiarised") === true) {
@@ -132,7 +132,7 @@ $(function(){
 						action = $this.data('href')
 					}
 
-					var $form = $('<form></form>').attr({method: 'POST', action: action}).hide();
+					var $form = $('<form></form>').prop({method: 'POST', action: action}).hide();
 					var doFormSubmit = false;
 
 					if ($container.data('checked') != 'none' || $this.closest('.must-have-selected').length === 0) {
@@ -241,7 +241,7 @@ $.fn.shiftSelectable = function() {
 			var start = $boxes.index(this),
 				end = $boxes.index(lastChecked);
 			$boxes.slice(Math.min(start, end), Math.max(start, end) + 1)
-				.attr('checked', lastChecked.checked)
+				.prop('checked', lastChecked.checked)
 				.trigger('change');
 		}
 
@@ -316,8 +316,8 @@ $(function(){
 	$('#feedback-report-button').on('click', 'a[data-toggle=modal]', function(e){
 		e.preventDefault();
 		var $this = $(this);
-		var target = $this.attr('data-target');
-		var url = $this.attr('href');
+		var target = $this.prop('data-target');
+		var url = $this.prop('href');
 		$(target).load(url);
 	});
 
@@ -384,7 +384,7 @@ $(function() {
 			$('.expanding-table').trigger('tabula.expandingTable.repositionContent');
 		});
 
-		var contentId = $container.attr('data-contentid');
+		var contentId = $container.prop('data-contentid');
 		var $row = $('tr.item-container[data-contentid='+contentId+'], tr.itemContainer[data-contentid='+contentId+']');
 
 		var $expiryDateField = $form.find('.date-time-picker');
@@ -488,7 +488,7 @@ $(function() {
 				$summaryAttachments.each(function(){
 					var $this = $(this);
 					attachments += 	'<li id="attachment-' + $this.val() +'" class="attachment"><i class="icon-file-alt"></i>' +
-						' <span>' + $this.attr("name") +' </span>&nbsp;<i class="icon-remove-sign remove-attachment"></i>' +
+						' <span>' + $this.prop("name") +' </span>&nbsp;<i class="icon-remove-sign remove-attachment"></i>' +
 						'<input id="attachedFiles" name="attachedFiles" value="'+  $this.val() +'" type="hidden"></li>'
 				});
 				$targetFormSection.append(attachments);
@@ -720,7 +720,7 @@ $(function() {
 			$modal.modal('hide');
 			var $form = $modal.data('form');
 			// Dislike literals, but can't see Routes from here
-			$form.attr('action', $form.attr('action').replace('detail/', 'revoke/'));
+			$form.prop('action', $form.prop('action').replace('detail/', 'revoke/'));
 			$form.submit();
 		});
 	});
@@ -728,7 +728,7 @@ $(function() {
 
 	$('#main-content').on('tabula.expandingTable.parentRowCollapsed', '.content-container', function(e) {
 		var $this = $(this);
-		var contentId = $this.attr('data-contentid');
+		var contentId = $this.prop('data-contentid');
 		var $row = $('tr.itemContainer[data-contentid='+contentId+']');
 		var $statusContainer = $row.find('.status-col dt');
 		if(hasChanges($this)) {
@@ -839,7 +839,7 @@ $(function() {
 		var $form = $(e.target).closest('form');
 		$.ajax({
 			type: "POST",
-			url: $form.attr('action'),
+			url: $form.prop('action'),
 			data: $form.serialize(),
 			success: function( response ) {
 				$('.saving').hide();

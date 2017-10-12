@@ -7,22 +7,22 @@ var $rateFeedback;
 var decorateFeedbackForm = function() {
     $rateFeedback = $('#feedback-rating');
     var $form = $rateFeedback.find('form'),
-        action = $form.attr('action');
+        action = $form.prop('action');
 
     if ($form.length > 0) {
         $form.find('.rating-question').button().each(function(){
             var $question = $(this);
-            var $group = $('<div>').attr({'class':'btn-group',"data-toggle":"buttons-radio"});
+            var $group = $('<div>').prop({'class':'btn-group',"data-toggle":"buttons-radio"});
             var $radios = $question.find('input[type=radio]');
             var $unsetter = $question.find('input[type=checkbox]');
             $radios.each(function(){
                 var radio = this;
                 var text = $(radio).parent('label').text();
-                var $button = $('<a>').attr({'class':'btn'}).html(text);
+                var $button = $('<a>').prop({'class':'btn'}).html(text);
                 if (radio.checked) $button.addClass('active');
                 $button.click(function(ev){
                     radio.checked = true;
-                    $unsetter.attr('checked',false);
+                    $unsetter.prop('checked',false);
                 });
                 $group.append($button);
             });
@@ -52,14 +52,14 @@ $(function(){
     decorateFeedbackForm();    decorateFeedbackForm();
     $('#feedback-rating-container').each(function(){
         var $this = $(this);
-        var action = $this.find('a').attr('href');
+        var action = $this.find('a').prop('href');
         $this.html('').load(action, function(){
             decorateFeedbackForm();
         });
     });
     $('#feedback-rating-container').each(function(){
         var $this = $(this);
-        var action = $this.find('a').attr('href');
+        var action = $this.find('a').prop('href');
         $this.html('').load(action, function(){
             decorateFeedbackForm();
         });

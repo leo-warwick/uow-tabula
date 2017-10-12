@@ -380,10 +380,10 @@
 			e.stopPropagation();
 			var $this = $(this);
 			$form.find('input.download-option').remove();
-			$form.append($('<input/>').attr({
+			$form.append($('<input/>').prop({
 				'type' : 'hidden',
 				'class' : 'download-option',
-				'name' : $this.attr('name'),
+				'name' : $this.prop('name'),
 				'value' : true
 			}));
 			$confirmModal.modal('show');
@@ -403,7 +403,7 @@
 		});
 
 		$('button.edit-overcatting').each(function(){
-			$(this).attr('href', '<@routes.exams.generateGrid department academicYear />/overcatting/' + $(this).data('student'))
+			$(this).prop('href', '<@routes.exams.generateGrid department academicYear />/overcatting/' + $(this).data('student'))
 				.data('target', '#edit-overcatting-modal');
 
 		}).ajaxModalLink();

@@ -362,7 +362,7 @@
 							$list.find('> ul').prepend(
 									$('<li />').addClass('clear-this-filter')
 											.append(
-												$('<button />').attr('type', 'button')
+												$('<button />').prop('type', 'button')
 													.addClass('btn btn-link')
 													.html('<i class="icon-ban-circle"></i> Clear selected items')
 													.on('click', function(e) {
@@ -401,15 +401,15 @@
 					var $filterList = $el.closest(".student-filter");
 
 					if ($filterList.find(".empty-filter").length == $filterList.find(".btn-group").length) {
-						$('.clear-all-filters').attr("disabled", "disabled");
+						$('.clear-all-filters').prop("disabled", "disabled");
 					} else {
-						$('.clear-all-filters').removeAttr("disabled");
+						$('.clear-all-filters').removeProp(("disabled");
 					}
 				};
 
 				var doRequest = function($form, preventPageReset) {
 					if (typeof history.pushState !== 'undefined')
-						history.pushState(null, null, $form.attr('action') + '?' + $form.serialize());
+						history.pushState(null, null, $form.prop('action') + '?' + $form.serialize());
 
 					if ($form.data('request')) {
 						$form.data('request').abort();
@@ -421,7 +421,7 @@
 					}
 
 					$('#filter-results').addClass('loading');
-					$form.data('request', $.post($form.attr('action'), $form.serialize(), function(data) {
+					$form.data('request', $.post($form.prop('action'), $form.serialize(), function(data) {
 						$('#filter-results').html(data);
 
 						$form.data('request', null);

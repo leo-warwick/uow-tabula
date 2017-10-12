@@ -89,14 +89,14 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
 
                 if(this.input.error) {
                     this.error(this.input.error);
-                    this.$form.find('.editable-submit').attr('disabled', true);
-                    this.input.$input.attr('disabled', true);
+                    this.$form.find('.editable-submit').prop('disabled', true);
+                    this.input.$input.prop('disabled', true);
                     //prevent form from submitting
                     this.$form.submit(function(e){ e.preventDefault(); });
                 } else {
                     this.error(false);
-                    this.input.$input.removeAttr('disabled');
-                    this.$form.find('.editable-submit').removeAttr('disabled');
+                    this.input.$input.removeProp(('disabled');
+                    this.$form.find('.editable-submit').removeProp(('disabled');
                     this.input.value2input(this.value);
                     //attach submit handler
                     this.$form.submit($.proxy(this.submit, this));
@@ -1286,7 +1286,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
                 doAutotext, finalize;
 
             //name
-            this.options.name = this.options.name || this.$element.attr('id');
+            this.options.name = this.options.name || this.$element.prop('id');
 
             //create input of specified type. Input will be used for converting value, not in form
             this.input = $.fn.editableutils.createInput(this.options);
@@ -1333,7 +1333,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
                     }
                 }, this));
             } else {
-                this.$element.attr('tabindex', -1); //do not stop focus on element when toggled manually
+                this.$element.prop('tabindex', -1); //do not stop focus on element when toggled manually
             }
 
             //check conditions for autotext:
@@ -1396,8 +1396,8 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             this.$element.removeClass('editable-disabled');
             this.handleEmpty();
             if(this.options.toggle !== 'manual') {
-                if(this.$element.attr('tabindex') === '-1') {
-                    this.$element.removeAttr('tabindex');
+                if(this.$element.prop('tabindex') === '-1') {
+                    this.$element.removeProp(('tabindex');
                 }
             }
         },
@@ -1412,7 +1412,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             this.$element.addClass('editable-disabled');
             this.handleEmpty();
             //do not stop focus on this element
-            this.$element.attr('tabindex', -1);
+            this.$element.prop('tabindex', -1);
         },
 
         /**
@@ -2027,7 +2027,7 @@ To create your own input you can inherit from this class.
 
        setAttr: function(attr) {
            if (this.options[attr]) {
-               this.$input.attr(attr, this.options[attr]);
+               this.$input.prop(attr, this.options[attr]);
            }
        },
 
@@ -2744,7 +2744,7 @@ $(function(){
 
        //set checked on required checkboxes
        value2input: function(value) {
-            this.$input.removeAttr('checked');
+            this.$input.removeProp(('checked');
             if($.isArray(value) && value.length) {
                this.$input.each(function(i, el) {
                    var $el = $(el);
@@ -2753,7 +2753,7 @@ $(function(){
                        /*jslint eqeq: true*/
                        if($el.val() == val) {
                        /*jslint eqeq: false*/
-                           $el.attr('checked', 'checked');
+                           $el.prop('checked', 'checked');
                        }
                    });
                });

@@ -110,7 +110,7 @@ jQuery(function($){
 		if (e.which === 13) {
 			$(this).closest('form').submit();
 		}
-	}).attr('autocomplete', 'off');
+	}).prop('autocomplete', 'off');
 	var $typeahead = $studentQuery.bootstrap3Typeahead({
 		source: function(query, process){
 			// Abort any existing search
@@ -119,7 +119,7 @@ jQuery(function($){
 				self.currentSearch = null;
 			}
 			self.currentSearch = $.ajax({
-				url: $fetchForm.attr('action'),
+				url: $fetchForm.prop('action'),
 				data: $fetchForm.serialize(),
 				success: function(data) {
 					process(data.unallocated)
@@ -184,7 +184,7 @@ jQuery(function($){
 				$list.find('> ul').prepend(
 					$('<li />').addClass('clear-this-filter')
 						.append(
-						$('<button />').attr('type', 'button')
+						$('<button />').prop('type', 'button')
 							.addClass('btn btn-link')
 							.html('<i class="fa fa-ban"></i> Clear selected items')
 							.on('click', function() {
@@ -221,9 +221,9 @@ jQuery(function($){
 		var $filterList = $el.closest(".student-filter");
 
 		if ($filterList.find(".empty-filter").length == $filterList.find(".btn-group").length) {
-			$filterList.find('.clear-all-filters').attr("disabled", "disabled");
+			$filterList.find('.clear-all-filters').prop("disabled", "disabled");
 		} else {
-			$filterList.find('.clear-all-filters').removeAttr("disabled");
+			$filterList.find('.clear-all-filters').removeProp(("disabled");
 		}
 	};
 
@@ -297,7 +297,7 @@ jQuery(function($){
 		} else {
 			$('<li/>').addClass('check-list-item').append(
 				$('<label/>').addClass('checkbox').append(
-					$('<input/>').attr({
+					$('<input/>').prop({
 						'type':'checkbox',
 						'name':name,
 						'value':value,

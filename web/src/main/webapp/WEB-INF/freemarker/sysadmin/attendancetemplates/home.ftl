@@ -56,7 +56,7 @@
 				update: function() {
 					$('.striped-section-contents div.item-info').each(function(i){
 						$(this).find('span.count').html(i + 1)
-								.end().find('input').attr('name', 'templates[' + i + ']');
+								.end().find('input').prop('name', 'templates[' + i + ']');
 					});
 				}
 			});

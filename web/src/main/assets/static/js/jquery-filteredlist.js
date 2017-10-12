@@ -83,7 +83,7 @@ Options: (all of these options can be set as data- attributes)
 
         switch ($control.prop('tagName').toLowerCase()) {
         	case 'input':
-        		switch ($control.attr('type').toLowerCase()) {
+        		switch ($control.prop('type').toLowerCase()) {
         			case 'checkbox':
 								if ( ! $control.is(":checked")) { // unchecked means we will hide any items with this attribute
         					var hideThis = {};
@@ -92,7 +92,7 @@ Options: (all of these options can be set as data- attributes)
         				}
         				break;
         			default:
-        				console.error('Unsupported filter control: input[type=' + $control.attr('type') + ']');
+        				console.error('Unsupported filter control: input[type=' + $control.prop('type') + ']');
         		}
         		break;
         	case 'select':

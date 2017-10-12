@@ -40,7 +40,7 @@
 
 		$(document).on("tabula.filterResultsChanged", function() {
 			var sitsUrl = $('div.studentResults').data('sits-url');
-			$('.send-to-sits a').attr('href', sitsUrl).removeClass('disabled');
+			$('.send-to-sits a').prop('href', sitsUrl).removeClass('disabled');
 		});
 	});
 </script>
