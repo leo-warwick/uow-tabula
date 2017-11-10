@@ -86,13 +86,13 @@ object MarkingWorkflowStage {
 
 	// double blind workflow
 	case object DblBlndInitialMarkerA extends MarkingWorkflowStage("dbl-blnd-marker-a", 1) {
-		override def roleName: String = "First independent marker"
+		override def roleName: String = "Independent marker"
 		override def nextStages: Seq[MarkingWorkflowStage] = Seq(DblBlndFinalMarker)
 		override def allocationName = "First independent marker"
 		override def stageAllocation = true
 	}
 	case object DblBlndInitialMarkerB extends MarkingWorkflowStage("dbl-blnd-marker-b", 1) {
-		override def roleName: String = "Second independent marker"
+		override def roleName: String = "Independent marker"
 		override def nextStages: Seq[MarkingWorkflowStage] = Seq(DblBlndFinalMarker)
 		override def allocationName = "Second independent marker"
 		override def stageAllocation = true
