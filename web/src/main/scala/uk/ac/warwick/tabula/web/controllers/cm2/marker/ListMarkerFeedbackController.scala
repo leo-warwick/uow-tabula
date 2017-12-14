@@ -7,9 +7,6 @@ import uk.ac.warwick.tabula.CurrentUser
 import uk.ac.warwick.tabula.commands.Appliable
 import uk.ac.warwick.tabula.commands.cm2.assignments.markers.ListMarkerFeedbackCommand.EnhancedFeedbackForOrderAndStage
 import uk.ac.warwick.tabula.commands.cm2.assignments.markers.{ListMarkerFeedbackCommand, ListMarkerFeedbackState}
-import uk.ac.warwick.tabula.data.HibernateHelpers
-import uk.ac.warwick.tabula.data.model.markingworkflow.ModeratedWorkflow
-import uk.ac.warwick.tabula.data.model.markingworkflow.ModerationSampler.Marker
 import uk.ac.warwick.tabula.data.model.{Assignment, AssignmentAnonymity}
 import uk.ac.warwick.tabula.helpers.cm2.SubmissionAndFeedbackInfoFilters.SubmissionStates._
 import uk.ac.warwick.tabula.helpers.cm2.SubmissionAndFeedbackInfoFilters.PlagiarismStatuses._

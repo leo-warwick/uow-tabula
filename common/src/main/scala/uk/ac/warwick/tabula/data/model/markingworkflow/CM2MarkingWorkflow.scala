@@ -83,7 +83,7 @@ abstract class CM2MarkingWorkflow extends GeneratedId with PermissionsTarget wit
 	// sometimes we show roles to users when assigning markers and sometimes we show stages
 	// this is a sorted list of either role names or stage allocationNames
 	def allocationOrder: List[String] = {
-		val stagesByRole = allStages.groupBy(_.roleName)
+		val stagesByRole = markerStages.groupBy(_.roleName)
 		if(workflowType.rolesShareAllocations) {
 			stagesByRole.keys.toList.sortBy(r => stagesByRole(r).map(_.order).min) // sort roles by their earliest stages
 		} else {
@@ -92,6 +92,7 @@ abstract class CM2MarkingWorkflow extends GeneratedId with PermissionsTarget wit
 	}
 
 	def allStages: Seq[MarkingWorkflowStage] = workflowType.allStages
+	def markerStages: Seq[MarkingWorkflowStage] = workflowType.allStages.filter(_.hasMarkers)
 	def initialStages: Seq[MarkingWorkflowStage] = workflowType.initialStages
 
 	def permissionsParents: Stream[Department] = Option(department).toStream

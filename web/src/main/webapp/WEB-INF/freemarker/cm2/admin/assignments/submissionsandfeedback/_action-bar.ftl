@@ -244,6 +244,21 @@
 									Return selected for marking
 								</@fmt.permission_button>
 							</li>
+							<#if assignment.cm2MarkingWorkflow?? && assignment.cm2MarkingWorkflow.workflowType.name == "SelectedModerated">
+								<#assign allocateToModerators_url><@routes.cm2.moderationSampling assignment /></#assign>
+								<li class="must-have-selected">
+									<@fmt.permission_button
+											permission='Assignment.Update'
+											scope=assignment
+											action_descr='allocate to moderators'
+											classes='form-post'
+											href=allocateToModerators_url
+											id="allocate-moderator-button"
+											data_attr='data-container=body'>
+										Choose moderation sample
+									</@fmt.permission_button>
+								</li>
+							</#if>
 						</ul>
 					</div>
 				<#else>

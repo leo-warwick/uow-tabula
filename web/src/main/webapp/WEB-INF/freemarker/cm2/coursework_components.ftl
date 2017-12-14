@@ -980,7 +980,7 @@
 							<#if can.do("Assignment.MarkOnBehalf", assignment)>
 								<@uniIdSafeCM2MarkerLink markingStage marker student.user />
 							</#if>
-						<#else>
+						<#elseif stage_name != "CM2MarkingWorkflowStage(admin-moderation-admin)">
 							Not assigned
 						</#if>
 					</#if>
@@ -1084,79 +1084,87 @@
 
 <#macro marker_feedback_summary feedback stage currentStage=[] currentFeedback=[]>
 	<h4>${stage.description} <#if feedback.marker??>- ${feedback.marker.fullName}</#if></h4>
-
-	<#if feedback.customFormValues?has_content>
-		<#list feedback.customFormValues as formValue>
-			<#if formValue.value?has_content>
-				<@bs3form.form_group><textarea class="form-control feedback-comments" readonly="readonly">${formValue.value!""}</textarea></@bs3form.form_group>
-			<#else>
-				<p>No feedback comments added.</p>
-			</#if>
-		</#list>
+	<#if feedback.hasContent && !feedback.hasBeenModified>
+		Approved by the moderator
+	<#elseif !feedback.hasContent>
+		Not moderated
 	<#else>
-		<p>No feedback comments added.</p>
-	</#if>
-
-	<div class="row form-inline">
-		<#if feedback.mark?has_content || feedback.grade?has_content>
-			<div class="col-xs-3">
-				<label>Mark</label>
-				<div class="input-group">
-					<input type="text" class="form-control" readonly="readonly" value="${feedback.mark!""}">
-					<div class="input-group-addon">%</div>
-				</div>
-			</div>
-
-			<div class="col-xs-3">
-				<label>Grade</label>
-				<input type="text" class="form-control" readonly="readonly" value="${feedback.grade!""}">
-			</div>
+		<#if feedback.customFormValues?has_content>
+			<#list feedback.customFormValues as formValue>
+				<#if formValue.value?has_content>
+					<@bs3form.form_group><textarea class="form-control feedback-comments" readonly="readonly">${formValue.value!""}</textarea></@bs3form.form_group>
+				<#else>
+				<p>No feedback comments added.</p>
+				</#if>
+			</#list>
 		<#else>
-			<div class="col-xs-6"><span>No mark or grade added.</span></div>
+			<p>No feedback comments added.</p>
 		</#if>
 
-		<div class="col-xs-3">
-		<#-- Download a zip of all feedback or just a single file if there is only one -->
-			<#if feedback.attachments?has_content >
-				<#local attachment = "" />
-				<#if !feedback.attachments?is_enumerable>
-				<#-- assume it's a FileAttachment -->
-					<#local attachment = feedback.attachments />
-				<#elseif feedback.attachments?size == 1>
-				<#-- take the first and continue as above -->
-					<#local attachment = feedback.attachments?first />
-				</#if>
-				<#if attachment?has_content>
-					<#local downloadUrl><@routes.cm2.downloadMarkerFeedbackOne assignment feedback.marker feedback attachment /></#local>
-				<#elseif feedback.attachments?size gt 1>
-					<#local downloadUrl><@routes.cm2.downloadMarkerFeedbackAll assignment feedback.marker feedback stage.description+" feedback" /></#local>
-				</#if>
-				<a class="btn btn-default long-running use-tooltip" href="${downloadUrl}">Download feedback</a>
-				<ul class="feedback-attachments hide">
-					<#list feedback.attachments as attachment>
-						<li id="attachment-${attachment.id}" class="attachment">
-							<span>${attachment.name}</span>&nbsp;<a href="#" class="remove-attachment">Remove</a>
-							<input type="hidden" name="attachedFiles" value="${attachment.id}" />
-						</li>
-					</#list>
-				</ul>
-			</#if>
-		</div>
-		<div class="col-xs-3">
-			<#if currentFeedback?? && currentFeedback?has_content>
-				<#if currentStage?? && currentStage.populateWithPreviousFeedback>
-					<div class="form-group">
-						<form>
-							<label class="radio-inline"><input type="radio" name="changesState" <#if !currentFeedback.hasBeenModified>checked</#if> value="approve" />Approve</label>
-							<label class="radio-inline"><input type="radio" name="changesState" <#if currentFeedback.hasBeenModified>checked</#if> value="make-changes" >Make changes</label>
-						</form>
+		<div class="row form-inline">
+			<#if feedback.mark?has_content || feedback.grade?has_content>
+				<div class="col-xs-3">
+					<label>Mark</label>
+					<div class="input-group">
+						<input type="text" class="form-control" readonly="readonly" value="${feedback.mark!""}">
+						<div class="input-group-addon">%</div>
 					</div>
-				<#else>
-					<a class="copy-feedback btn btn-default long-running use-tooltip" href="#">Copy comments and files</a>
-				</#if>
+				</div>
+
+				<div class="col-xs-3">
+					<label>Grade</label>
+					<input type="text" class="form-control" readonly="readonly" value="${feedback.grade!""}">
+				</div>
+			<#else>
+				<div class="col-xs-6"><span>No mark or grade added.</span></div>
 			</#if>
+
+			<div class="col-xs-3">
+			<#-- Download a zip of all feedback or just a single file if there is only one -->
+				<#if feedback.attachments?has_content >
+					<#local attachment = "" />
+					<#if !feedback.attachments?is_enumerable>
+					<#-- assume it's a FileAttachment -->
+						<#local attachment = feedback.attachments />
+					<#elseif feedback.attachments?size == 1>
+					<#-- take the first and continue as above -->
+						<#local attachment = feedback.attachments?first />
+					</#if>
+					<#if attachment?has_content>
+						<#local downloadUrl><@routes.cm2.downloadMarkerFeedbackOne assignment feedback.marker feedback attachment /></#local>
+					<#elseif feedback.attachments?size gt 1>
+						<#local downloadUrl><@routes.cm2.downloadMarkerFeedbackAll assignment feedback.marker feedback stage.description+" feedback" /></#local>
+					</#if>
+					<a class="btn btn-default long-running use-tooltip" href="${downloadUrl}">Download feedback</a>
+					<ul class="feedback-attachments hide">
+						<#list feedback.attachments as attachment>
+							<li id="attachment-${attachment.id}" class="attachment">
+								<span>${attachment.name}</span>&nbsp;<a href="#" class="remove-attachment">Remove</a>
+								<input type="hidden" name="attachedFiles" value="${attachment.id}" />
+							</li>
+						</#list>
+					</ul>
+				</#if>
+			</div>
+			<div class="col-xs-3">
+				<#if currentFeedback?? && currentFeedback?has_content>
+					<#if currentStage?? && currentStage.populateWithPreviousFeedback>
+						<div class="form-group">
+							<form>
+								<label class="radio-inline"><input type="radio" name="changesState" <#if !currentFeedback.hasBeenModified>checked</#if> value="approve" />Approve</label>
+								<label class="radio-inline"><input type="radio" name="changesState" <#if currentFeedback.hasBeenModified>checked</#if> value="make-changes" >Make changes</label>
+							</form>
+						</div>
+					<#else>
+						<a class="copy-feedback btn btn-default long-running use-tooltip" href="#">Copy comments and files</a>
+					</#if>
+				</#if>
+			</div>
 		</div>
-	</div>
+	</#if>
+
+
+
 </#macro>
 
 <#macro lateness submission="" assignment="" user=""><#compress>

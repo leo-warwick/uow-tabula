@@ -13,12 +13,12 @@ import uk.ac.warwick.tabula.commands.cm2.assignments.{ReleaseForMarkingCommand, 
 import uk.ac.warwick.tabula.commands.{Appliable, SelfValidating}
 import uk.ac.warwick.tabula.data.model.{Assignment, AssignmentFeedback}
 import uk.ac.warwick.tabula.web.Mav
-import uk.ac.warwick.tabula.web.controllers.cm2.CourseworkController
+import uk.ac.warwick.tabula.web.controllers.cm2.{AdminSelectionAction, CourseworkController}
 
 @Profile(Array("cm2Enabled"))
 @Controller
 @RequestMapping(value = Array("/${cm2.prefix}/admin/assignments/{assignment}/stop-marking"))
-class StopMarkingController extends CourseworkController {
+class StopMarkingController extends CourseworkController with AdminSelectionAction {
 
 	validatesSelf[SelfValidating]
 	type Command = Appliable[Seq[AssignmentFeedback]] with StopMarkingRequest
@@ -28,12 +28,6 @@ class StopMarkingController extends CourseworkController {
 		mandatory(Option(assignment.cm2MarkingWorkflow))
 		StopMarkingMarkingCommand(mandatory(assignment), user)
 	}
-
-	def RedirectBack(assignment: Assignment) = Redirect(Routes.admin.assignment.submissionsandfeedback(assignment))
-
-	// shouldn't ever be called as a GET - if it is, just redirect back to the submission list
-	@RequestMapping
-	def get(@PathVariable assignment: Assignment) = RedirectBack(assignment)
 
 	@RequestMapping(method = Array(POST), params = Array("!confirmScreen"))
 	def showForm(@PathVariable assignment: Assignment, @ModelAttribute("command") cmd: Command, errors: Errors): Mav = {

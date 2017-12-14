@@ -6,7 +6,6 @@ import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.{AutowiringFeedbackServiceComponent, FeedbackServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
-import uk.ac.warwick.userlookup.User
 
 import scala.collection.JavaConverters._
 
@@ -14,8 +13,8 @@ import scala.collection.JavaConverters._
  * Copies the previous MarkerFeedback item to these marker feedbacks
  */
 object PopulateMarkerFeedbackCommand {
-	def apply(assignment: Assignment, markerFeedback: Seq[MarkerFeedback], user: User) =
-		new PopulateMarkerFeedbackCommandInternal(assignment, markerFeedback, user)
+	def apply(assignment: Assignment, markerFeedback: Seq[MarkerFeedback]) =
+		new PopulateMarkerFeedbackCommandInternal(assignment, markerFeedback)
 			with ComposableCommand[Seq[MarkerFeedback]]
 			with PopulateMarkerFeedbackPermissions
 			with PopulateMarkerFeedbackDescription
@@ -27,8 +26,8 @@ trait PopulateMarkerFeedbackCommandState {
 	def markerFeedback: Seq[MarkerFeedback]
 }
 
-abstract class PopulateMarkerFeedbackCommandInternal(val assignment: Assignment, val markerFeedback: Seq[MarkerFeedback], val user: User)
-	extends CommandInternal[Seq[MarkerFeedback]] with PopulateMarkerFeedbackCommandState with UserAware {
+abstract class PopulateMarkerFeedbackCommandInternal(val assignment: Assignment, val markerFeedback: Seq[MarkerFeedback])
+	extends CommandInternal[Seq[MarkerFeedback]] with PopulateMarkerFeedbackCommandState {
 
 	this: FeedbackServiceComponent =>
 
@@ -60,13 +59,11 @@ abstract class PopulateMarkerFeedbackCommandInternal(val assignment: Assignment,
 
 		// erase any existing attachments - these will be replaced
 		markerFeedback.clearAttachments()
-
 		val newAttachments = previous.attachments.asScala.map(fa => {
 			val newAttachment = fa.duplicate()
 			newAttachment.markerFeedback = markerFeedback
 			newAttachment
 		})
-
 		newAttachments.foreach(markerFeedback.addAttachment)
 		feedbackService.save(markerFeedback)
 		markerFeedback
@@ -99,10 +96,8 @@ trait PopulateMarkerFeedbackComponent {
 
 trait PopulateMarkerFeedbackComponentImpl extends PopulateMarkerFeedbackComponent {
 
-	val marker: User
-
 	def populateMarkerFeedback(assignment: Assignment, markerFeedback: Seq[MarkerFeedback]) {
-		val populateMarkerFeedbackCommand = PopulateMarkerFeedbackCommand(assignment, markerFeedback, marker)
+		val populateMarkerFeedbackCommand = PopulateMarkerFeedbackCommand(assignment, markerFeedback)
 		populateMarkerFeedbackCommand.apply()
 	}
 }

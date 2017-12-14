@@ -7,7 +7,6 @@ import uk.ac.warwick.tabula.JavaImports.JList
 import uk.ac.warwick.tabula.data.model.Department
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.data.model.markingworkflow.ModerationSampler.Moderator
 import uk.ac.warwick.tabula.data.model.markingworkflow._
 import uk.ac.warwick.tabula.helpers.StringUtils
 import uk.ac.warwick.tabula.services.{UserLookupComponent, _}

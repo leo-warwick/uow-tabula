@@ -79,6 +79,7 @@ class MarkerFeedback extends GeneratedId with FeedbackAttachments with ToEntityR
 	@Type(`type` = "uk.ac.warwick.tabula.data.model.MarkingStateUserType")
 	var state : MarkingState = _
 
+	@Deprecated
 	var rejectionComments: String = _
 
 	@OneToMany(mappedBy = "markerFeedback", fetch = FetchType.LAZY, cascade=Array(ALL))

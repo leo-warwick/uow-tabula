@@ -28,7 +28,7 @@ trait FetchMarkerAllocations {
 
 	def fetchAllocations(assignment: Assignment): MarkerAllocations = {
 		val workflow = assignment.cm2MarkingWorkflow
-		val stagesByRole = workflow.allStages.groupBy(_.roleName)
+		val stagesByRole = workflow.markerStages.groupBy(_.roleName)
 		val allStudents = SortedSet(assessmentMembershipService.determineMembershipUsers(assignment): _*)
 
 		val allocations = mutable.Map[String, Map[Marker, SortedSet[Student]]]()

@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.data.model.markingworkflow
 
 import uk.ac.warwick.tabula.data.model.AbstractStringUserType
-import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage.{DblBlndFinalMarker, DblBlndInitialMarkerA, DblBlndInitialMarkerB, DblFinalMarker, DblFirstMarker, DblSecondMarker, ModerationMarker, ModerationModerator, SingleMarker}
+import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage.{DblBlndFinalMarker, DblBlndInitialMarkerA, DblBlndInitialMarkerB, DblFinalMarker, DblFirstMarker, DblSecondMarker, ModerationMarker, ModerationModerator, SelectedModerationAdmin, SelectedModerationMarker, SelectedModerationModerator, SingleMarker}
 import uk.ac.warwick.tabula.system.TwoWayConverter
 import uk.ac.warwick.tabula.helpers.StringUtils._
 
@@ -61,12 +61,21 @@ object MarkingWorkflowType {
 		rolesShareAllocations = false
 	)
 
+	case object SelectedModeratedMarking extends MarkingWorkflowType(
+		name = "SelectedModerated",
+		description = "Moderated marking",
+		allStages =  Seq(SelectedModerationMarker, SelectedModerationAdmin, SelectedModerationModerator),
+		initialStages = Seq(SelectedModerationMarker),
+		order = 4
+	)
+
 	// Don't change this to a val https://warwick.slack.com/archives/C029QTGBN/p1493995125972397
 	def values: Seq[MarkingWorkflowType] = Seq(
 		SingleMarking,
 		DoubleMarking,
 		ModeratedMarking,
 		DoubleBlindMarking
+		// Don't include - SelectedModeratedMarking in this list (It's not to be selected directly)
 	)
 
 	def allPossibleStages: Map[MarkingWorkflowType, Seq[MarkingWorkflowStage]] = values.map(t => t -> t.allStages).toMap

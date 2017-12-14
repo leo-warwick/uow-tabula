@@ -43,7 +43,8 @@ trait CreatesMarkingWorkflow {
 			case DoubleBlindMarking => DoubleBlindWorkflow(data.workflowName, data.department, data.markersAUsers, data.markersBUsers)
 			case ModeratedMarking =>
 				val sampler = data.moderationSampler.getOrElse(ModerationSampler.Moderator)
-				ModeratedWorkflow(data.workflowName, data.department, sampler, data.markersAUsers, data.markersBUsers)
+				if (sampler == ModerationSampler.Admin) SelectedModeratedWorkflow(data.workflowName, data.department, sampler, data.markersAUsers, data.markersBUsers)
+				else ModeratedWorkflow(data.workflowName, data.department, sampler, data.markersAUsers, data.markersBUsers)
 			case _ => throw new UnsupportedOperationException(data.workflowType + " not specified")
 		}
 	}

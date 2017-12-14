@@ -4,8 +4,8 @@ import javax.persistence.{DiscriminatorValue, Entity}
 
 import uk.ac.warwick.tabula.JavaImports.JList
 import uk.ac.warwick.tabula.data.model.Department
-import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage.{ModerationMarker, ModerationModerator}
-import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowType.ModeratedMarking
+import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage.{ModerationMarker, ModerationModerator, SelectedModerationMarker, SelectedModerationModerator}
+import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowType.{ModeratedMarking, SelectedModeratedMarking}
 import uk.ac.warwick.tabula.data.model.markingworkflow.ModeratedWorkflow.Settings
 import uk.ac.warwick.tabula.data.model.markingworkflow.ModerationSampler.Moderator
 import uk.ac.warwick.tabula.system.TwoWayConverter
@@ -14,7 +14,7 @@ import uk.ac.warwick.tabula.helpers.StringUtils._
 
 @Entity @DiscriminatorValue("Moderated")
 class ModeratedWorkflow extends CM2MarkingWorkflow {
-	def workflowType = ModeratedMarking
+	def workflowType:MarkingWorkflowType = ModeratedMarking
 
 	override def replaceMarkers(markers: Seq[Marker]*): Unit = {
 		val (firstMarkers, moderators) = markers.toList match {
@@ -48,6 +48,37 @@ object ModeratedWorkflow {
 
 		val moderatorStage = new StageMarkers
 		moderatorStage.stage = ModerationModerator
+		moderatorStage.workflow = workflow
+		moderators.foreach(moderatorStage.markers.add)
+
+		workflow.stageMarkers = JList(markersStage, moderatorStage)
+		workflow
+	}
+
+	object Settings {
+		val ModerationSampler = "moderationSampler"
+	}
+}
+
+@Entity @DiscriminatorValue("SelectedModerated")
+class SelectedModeratedWorkflow extends ModeratedWorkflow {
+	override def workflowType:MarkingWorkflowType = SelectedModeratedMarking
+}
+
+object SelectedModeratedWorkflow {
+	def apply(name: String, department: Department, sampler: ModerationSampler, markers: Seq[User], moderators: Seq[User]): ModeratedWorkflow = {
+		val workflow = new SelectedModeratedWorkflow
+		workflow.name = name
+		workflow.department = department
+		workflow.moderationSampler = sampler
+
+		val markersStage = new StageMarkers
+		markersStage.stage = SelectedModerationMarker
+		markersStage.workflow = workflow
+		markers.foreach(markersStage.markers.add)
+
+		val moderatorStage = new StageMarkers
+		moderatorStage.stage = SelectedModerationModerator
 		moderatorStage.workflow = workflow
 		moderators.foreach(moderatorStage.markers.add)
 

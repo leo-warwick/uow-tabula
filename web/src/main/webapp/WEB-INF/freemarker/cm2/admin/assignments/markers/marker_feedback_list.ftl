@@ -11,7 +11,6 @@
 			<#if order.headerStage.nextStagesDescription?has_content>
 				<a class="btn btn-primary must-have-selected must-have-ready-next-stage form-post" href="${markingCompleted}">Confirm selected and send to ${order.headerStage.nextStagesDescription?lower_case}</a>
 			</#if>
-			<#-- TODO - only if this is a moderated workflow with markers doing the admin selection and this user is a marker -->
 			<#if order.headerStage.canFinish(assignment.cm2MarkingWorkflow)>
 				<a class="btn btn-primary must-have-selected must-have-ready-next-stage form-post" href="${finishMarking}">Confirm selected and send to admin</a>
 			</#if>

@@ -2,6 +2,7 @@ package uk.ac.warwick.tabula.cm2.web
 
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.cm2.web.Routes.admin.assignment
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.forms.Extension
 import uk.ac.warwick.tabula.data.model.markingworkflow.{CM2MarkingWorkflow, MarkingWorkflowStage}
@@ -127,6 +128,12 @@ object Routes {
 				def list(assignment: Assignment): String = assignmentroot(assignment) + "/list"
 			}
 
+			object moderationSampling {
+				def apply(assignment: Assignment): String = assignmentroot(assignment) + "/moderator-sampling"
+				def allocate(assignment: Assignment): String = apply(assignment) + "/allocate"
+				def finalise(assignment: Assignment): String = apply(assignment) + "/finalise-feedback"
+			}
+
 			private def markerroot(assignment: Assignment, marker: User) = assignmentroot(assignment) + s"/marker/${marker.getUserId}"
 
 			object markerFeedback {
@@ -184,7 +191,10 @@ object Routes {
 					}
 				}
 				object returnsubmissions {
-					def apply(assignment: Assignment): String = assignmentroot(assignment) + "/submissionsandfeedback/return-submissions"
+					def apply(assignment: Assignment): String = assignmentroot(assignment) + "/return-submissions"
+				}
+				object moderationSampling {
+					def apply(assignment: Assignment): String = assignmentroot(assignment) + "/moderator-sampling"
 				}
 			}
 

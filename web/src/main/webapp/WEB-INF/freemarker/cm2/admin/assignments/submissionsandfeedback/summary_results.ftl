@@ -57,7 +57,7 @@
 
 								<#-- One tab for each stage in the workflow; previous stages are active, incomplete stages are not -->
 								<#if assignment.cm2MarkingWorkflow??>
-									<#list assignment.cm2MarkingWorkflow.allStages as markingStage>
+									<#list assignment.cm2MarkingWorkflow.markerStages as markingStage>
 										<#local incomplete = feedback?? && (feedback.notReleasedToMarkers || !feedback.isMarkedByStage(markingStage)) />
 										<li role="presentation"<#if incomplete> class="disabled"</#if>>
 											<a<#if !incomplete> href="#${identifier}-${markingStage.name}" aria-controls="${identifier}-${markingStage.name}" role="tab" data-toggle="tab"</#if>>
@@ -74,7 +74,7 @@
 
 								<#-- One tab for each stage in the workflow; previous stages are active, incomplete stages are not -->
 								<#if assignment.cm2MarkingWorkflow?? && feedback??>
-									<#list assignment.cm2MarkingWorkflow.allStages as markingStage>
+									<#list assignment.cm2MarkingWorkflow.markerStages as markingStage>
 										<#local incomplete = feedback.notReleasedToMarkers || !feedback.isMarkedByStage(markingStage) />
 										<div role="tabpanel" class="tab-pane" id="${identifier}-${markingStage.name}">
 											<#if mapGet(feedback.feedbackByStage, markingStage)??>

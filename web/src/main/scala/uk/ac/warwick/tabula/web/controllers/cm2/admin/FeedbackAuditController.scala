@@ -28,7 +28,7 @@ class FeedbackAuditController extends CourseworkController {
 			"command" -> auditCommand,
 			"auditData" -> auditData,
 			"assignment" -> assignment,
-			"isModerated" -> Option(assignment.markingWorkflow).exists(_.markingMethod == MarkingMethod.ModeratedMarking),
+			"isModerated" -> Option(assignment.markingWorkflow).exists(_.markingMethod == MarkingMethod.ModeratedMarking), // only needed for CM1 macros
 			"student" -> student
 		).crumbsList(Breadcrumbs.assignment(assignment))
 

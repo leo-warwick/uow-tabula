@@ -1,11 +1,12 @@
 package uk.ac.warwick.tabula.data.model.markingworkflow
 
-import org.hibernate.`type`.StandardBasicTypes
+import org.hibernate.`type`.{StandardBasicTypes, StringType}
 import java.sql.Types
 
 import uk.ac.warwick.tabula.CaseObjectEqualityFixes
+import uk.ac.warwick.tabula.cm2.web.Routes
 import uk.ac.warwick.tabula.data.HibernateHelpers
-import uk.ac.warwick.tabula.data.model.AbstractBasicUserType
+import uk.ac.warwick.tabula.data.model.{AbstractBasicUserType, Assignment, Feedback, MarkerFeedback}
 import uk.ac.warwick.tabula.data.model.markingworkflow.ModerationSampler.Marker
 import uk.ac.warwick.tabula.helpers.StringUtils
 import uk.ac.warwick.tabula.system.TwoWayConverter
@@ -42,6 +43,15 @@ sealed abstract class MarkingWorkflowStage(val name: String, val order: Int) ext
 	// by default allocation is based by role rather than by stage
 	def stageAllocation: Boolean = false
 	override def toString: String = name
+
+	// allows you to specify a custom URL to show on the department homepage when viewing this assignments workflow progress
+	def url(assignment: Assignment): Option[String] = None
+
+	// if this is false this stage won't show up on the allocate markers screen
+	def hasMarkers = true
+
+	// allows the message key used to label this stages completion to vary
+	def actionCompletedKey(feedback: Option[Feedback]): String = MarkingWorkflowStage.DefaultCompletionKey
 }
 
 abstract class FinalStage(n: String) extends MarkingWorkflowStage(name = n, order = Int.MaxValue) {
@@ -56,6 +66,7 @@ object MarkingWorkflowStage {
 
 	val DefaultRole: String = "Marker"
 	val DefaultVerb: String = "mark"
+	val DefaultCompletionKey: String = "complete"
 
 	// single marker workflow
 	case object SingleMarker extends MarkingWorkflowStage("single-marker", 1) {
@@ -130,13 +141,67 @@ object MarkingWorkflowStage {
 		override def previousStages: Seq[MarkingWorkflowStage] = Seq(ModerationModerator)
 	}
 
+	// moderated workflow with admin selection
+	case object SelectedModerationMarker extends MarkingWorkflowStage("admin-moderation-marker", 1) {
+		override def nextStages: Seq[MarkingWorkflowStage] = Seq(SelectedModerationAdmin)
+	}
+
+	// moderated workflow with admin selection
+	case object SelectedModerationAdmin extends MarkingWorkflowStage("admin-moderation-admin", 2) {
+		override def roleName = "Admin"
+		override def verb: String = "select"
+		override def nextStages: Seq[MarkingWorkflowStage] = Seq(SelectedModerationModerator)
+		override def previousStages: Seq[MarkingWorkflowStage] = Seq(SelectedModerationMarker)
+		override def canFinish(workflow: CM2MarkingWorkflow): Boolean = true
+		override def populateWithPreviousFeedback: Boolean = true
+		override def summariseCurrentFeedback: Boolean = true
+		override def url(assignment: Assignment): Option[String] = Some(Routes.admin.assignment.submissionsandfeedback(assignment))
+		override def hasMarkers = false
+
+		val NotModeratedKey: String  = "notModerated"
+
+		override def actionCompletedKey(feedback: Option[Feedback]): String = {
+			val markerFeedback = feedback.flatMap(_.allMarkerFeedback.find(_.stage == SelectedModerationModerator))
+			markerFeedback match {
+				case Some(mf) if !mf.hasContent => NotModeratedKey
+				case _ => MarkingWorkflowStage.DefaultCompletionKey
+			}
+		}
+	}
+
+	case object SelectedModerationModerator extends MarkingWorkflowStage("admin-moderation-moderator", 3) {
+		override def roleName: String = "Moderator"
+		override def verb: String = "moderate"
+		override def nextStages: Seq[MarkingWorkflowStage] = Seq(SelectedModerationCompleted)
+		override def previousStages: Seq[MarkingWorkflowStage] = Seq(SelectedModerationMarker)
+		override def populateWithPreviousFeedback: Boolean = true
+		override def summarisePreviousFeedback: Boolean = true
+
+		val NotModeratedKey: String  = "notModerated"
+		val ApprovedKey: String  = "approved"
+
+		override def actionCompletedKey(feedback: Option[Feedback]): String = {
+			val markerFeedback = feedback.flatMap(_.allMarkerFeedback.find(_.stage == SelectedModerationModerator))
+			markerFeedback match {
+				case Some(mf) if mf.hasContent && !mf.hasBeenModified => ApprovedKey
+				case Some(mf) if !mf.hasContent => NotModeratedKey
+				case _ => MarkingWorkflowStage.DefaultCompletionKey
+			}
+		}
+	}
+
+	case object SelectedModerationCompleted extends FinalStage("admin-moderation-completed") {
+		override def previousStages: Seq[MarkingWorkflowStage] = Seq(SelectedModerationModerator)
+	}
+
 	// lame manual collection. Keep in sync with the case objects above
 	// Don't change this to a val https://warwick.slack.com/archives/C029QTGBN/p1493995125972397
 	def values: Set[MarkingWorkflowStage] = Set(
 		SingleMarker, SingleMarkingCompleted,
 		DblFirstMarker, DblSecondMarker, DblFinalMarker, DblCompleted,
 		DblBlndInitialMarkerA, DblBlndInitialMarkerB, DblBlndFinalMarker, DblBlndCompleted,
-		ModerationMarker, ModerationModerator, ModerationCompleted
+		ModerationMarker, ModerationModerator, ModerationCompleted,
+		SelectedModerationMarker, SelectedModerationAdmin, SelectedModerationModerator, SelectedModerationCompleted
 	)
 
 	def unapply(code: String): Option[MarkingWorkflowStage] =
@@ -150,7 +215,9 @@ object MarkingWorkflowStage {
 		case _ => throw new IllegalArgumentException(s"Invalid marking stage: $code")
 	}
 
-	implicit val defaultOrdering = new Ordering[MarkingWorkflowStage] {
+	implicit val defaultOrdering: Ordering[MarkingWorkflowStage] {
+		def compare(a: MarkingWorkflowStage, b: MarkingWorkflowStage): Int
+	} = new Ordering[MarkingWorkflowStage] {
 		def compare(a: MarkingWorkflowStage, b: MarkingWorkflowStage): Int = {
 			val orderCompare = a.order compare b.order
 			if (orderCompare != 0) orderCompare else StringUtils.AlphaNumericStringOrdering.compare(a.name, b.name)
@@ -160,7 +227,7 @@ object MarkingWorkflowStage {
 
 class MarkingWorkflowStageUserType extends AbstractBasicUserType[MarkingWorkflowStage, String]{
 
-	val basicType = StandardBasicTypes.STRING
+	val basicType: StringType = StandardBasicTypes.STRING
 	override def sqlTypes = Array(Types.VARCHAR)
 
 	val nullValue = null

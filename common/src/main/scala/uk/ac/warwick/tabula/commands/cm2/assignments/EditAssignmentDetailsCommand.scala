@@ -11,7 +11,9 @@ import uk.ac.warwick.tabula.services.{AssessmentServiceComponent, UserLookupComp
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.HibernateHelpers
+import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowType.{ModeratedMarking, SelectedModeratedMarking}
 import uk.ac.warwick.tabula.data.model.WorkflowCategory.NoneUse
+
 
 object EditAssignmentDetailsCommand {
 	def apply(assignment: Assignment) =
@@ -37,11 +39,15 @@ class EditAssignmentDetailsCommandInternal(override val assignment: Assignment) 
 
 	override def applyInternal(): Assignment = {
 
+		lazy val moderatedWorkflow = workflow.map(HibernateHelpers.initialiseAndUnproxy).collect{case w: ModeratedWorkflow => w}
+
+		def moderationSelectorChanged: Boolean = moderatedWorkflow.exists(w => w.moderationSampler != sampler)
+
 		if(workflowCategory == WorkflowCategory.SingleUse) {
 			workflow.filterNot(_.isReusable) match {
 				// update any existing single use workflows
 				case Some(w) =>
-					if(workflowType != null && w.workflowType != workflowType){
+					if(workflowType != null && (w.workflowType != workflowType || moderationSelectorChanged)){
 						// delete the old workflow and make a new one with the new type
 						cm2MarkingWorkflowService.delete(w)
 						createAndSaveSingleUseWorkflow(assignment)
@@ -49,7 +55,7 @@ class EditAssignmentDetailsCommandInternal(override val assignment: Assignment) 
 						assignment.resetMarkerFeedback()
 					} else {
 						w.replaceMarkers(markersAUsers, markersBUsers)
-						workflow.map(HibernateHelpers.initialiseAndUnproxy).collect{case w: ModeratedWorkflow => w}.foreach(w => w.moderationSampler = sampler)
+						moderatedWorkflow.foreach(w => w.moderationSampler = sampler)
 						cm2MarkingWorkflowService.save(w)
 					}
 				// persist any new workflow
@@ -86,7 +92,10 @@ class EditAssignmentDetailsCommandInternal(override val assignment: Assignment) 
 		workflowCategory = assignment.workflowCategory.getOrElse(WorkflowCategory.NotDecided)
 		reusableWorkflow = Option(assignment.cm2MarkingWorkflow).filter(_.isReusable).orNull
 		anonymity = assignment._anonymity
-		workflow.foreach(w => workflowType = w.workflowType)
+		workflow.foreach(w =>
+			if (w.workflowType == SelectedModeratedMarking) workflowType = ModeratedMarking // we don't show admin moderation as a separate option in the UI
+			else workflowType = w.workflowType
+		)
 		workflow.map(HibernateHelpers.initialiseAndUnproxy).collect{case w: ModeratedWorkflow => w}.foreach(w =>
 			sampler = w.moderationSampler
 		)

@@ -381,11 +381,12 @@ object CM2WorkflowStages {
 					)
 				}
 			} else {
+				val completedKey = markingStage.actionCompletedKey(coursework.enhancedFeedback.map(_.feedback))
 				// This is a past stage
 				StageProgress(
 					workflowStage,
 					started = true,
-					messageCode = s"workflow.cm2.${markingStage.name}.complete",
+					messageCode = s"workflow.cm2.${markingStage.name}.$completedKey",
 					health = Good,
 					completed = true
 				)
@@ -398,7 +399,7 @@ object CM2WorkflowStages {
 			previousStage.preconditions.flatten :+ previousStage
 		})
 
-		override def route(assignment: Assignment): Option[Route] = None
+		override def route(assignment: Assignment): Option[Route] = markingStage.url(assignment).map(Route("", _))
 		val markingRelated = true
 	}
 

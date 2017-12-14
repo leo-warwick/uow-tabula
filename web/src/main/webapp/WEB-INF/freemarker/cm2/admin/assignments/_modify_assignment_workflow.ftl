@@ -10,7 +10,7 @@
 
 <div class="reusable-workflow-picker workflow-fields">
 	<@bs3form.labelled_form_group path="reusableWorkflow" labelText="Marking workflow name">
-		<@f.select path="reusableWorkflow" class="form-control" >
+		<@f.select path="reusableWorkflow" class="form-control workflow-modification" >
 			<option value="" <#if !status.value??>selected</#if> disabled></option>
 			<@f.options items=reusableWorkflows itemValue="id" itemLabel="name" />
 		</@f.select>

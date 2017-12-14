@@ -99,7 +99,7 @@ class ModuleRegistration() extends GeneratedId	with PermissionsTarget with CanBe
 			.build()
 
 	def toSITSCode: String = "%s-%s".format(module.code.toUpperCase, cats.stripTrailingZeros().toPlainString)
-
+StudentCourseDetails
 }
 
 /**
