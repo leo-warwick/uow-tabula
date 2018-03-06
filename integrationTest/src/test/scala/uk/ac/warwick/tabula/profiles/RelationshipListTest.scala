@@ -1,5 +1,7 @@
 package uk.ac.warwick.tabula.profiles
 
+import org.openqa.selenium.By
+
 /**
  * Tests for the pages that list students with and without tutors and supervisors for a given department
  *
@@ -31,8 +33,8 @@ class RelationshipListTest extends SubDepartmentFixture{
 		When("The departmental administrator goes to the profiles home page")
 		signIn as P.Admin1 to Path("/profiles")
 
-		Then("There is a link to administer department xxx")
-		find(cssSelector("#profile-dept-admin h5")).get.underlying.getText should be("Test Services")
+		Then("Page contains Test services")
+		pageSource should include("Test Services")
 
 		And("The tutor page shows one student with a tutor")
 		// too lazy to write the code to drive the drop-down "Manage" button on the profiles page.
@@ -48,8 +50,8 @@ class RelationshipListTest extends SubDepartmentFixture{
 		When("The sub-departmental administrator goes to the profiles home page")
 		signIn as P.Admin3 to Path("/profiles")
 
-		Then("There is a link to administer department xxx-ug")
-		find(cssSelector("#profile-dept-admin h5")).get.underlying.getText should be("Test Services - UG")
+		Then("Page contains Test services - ug ")
+		pageSource should include("Test Services - UG")
 
 		And("The tutor page shows one student with a tutor")
 		go to Path("/profiles/department/xxx-ug/tutor")

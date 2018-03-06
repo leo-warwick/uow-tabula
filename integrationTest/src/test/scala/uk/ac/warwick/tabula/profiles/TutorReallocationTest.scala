@@ -72,8 +72,8 @@ class TutorReallocationTest extends BrowserTest with GivenWhenThen with Features
 		When("The departmental administrator goes to the profiles home page")
 		signIn as P.Admin1 to Path("/profiles")
 
-		Then("There is a link to administer department xxx")
-		find(cssSelector("#profile-dept-admin h5")).get.underlying.getText should be("Test Services")
+		Then("Page contains Test services")
+		pageSource should include("Test Services")
 
 		When("They view the unallocated students")
 		go to Path("/profiles/department/xxx/tutor")
