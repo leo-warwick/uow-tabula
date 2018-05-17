@@ -257,14 +257,14 @@ abstract class AbstractProgressionService extends ProgressionService {
 
 					if (groupByLevel) {
 						allScyds.groupBy(_.level.orNull)
-							.map{ case (level, scyds) => level.toYearOfStudy -> StudentCourseYearDetails.toExamGridEntityYearGrouped(level.toYearOfStudy, scyds:_ *)}
+							.map{ case (level, scyds) => level.toYearOfStudy -> Some(StudentCourseYearDetails.toExamGridEntityYearGrouped(level.toYearOfStudy, scyds:_ *))}
 					} else {
 						(1 to finalYearOfStudy).map(block => {
 							val latestSCYDForThisYear = allScyds.filter(_.yearOfStudy.toInt == block).lastOption
-							block -> latestSCYDForThisYear.map(_.toExamGridEntityYear).orNull
+							block -> latestSCYDForThisYear.map(_.toExamGridEntityYear)
 						}).toMap
 					}
-				}
+				}.collect{ case (k, Some(v)) => k -> v}
 
 				lazy val markPerYear: Map[Int, Either[String, BigDecimal]] = getMarkPerYear(entityPerYear, finalYearOfStudy, normalLoad, routeRulesPerYear, calculateYearMarks)
 				lazy val yearWeightings: Map[Int, Option[CourseYearWeighting]] = markPerYear.map { case (year, _) =>
