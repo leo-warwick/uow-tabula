@@ -35,13 +35,14 @@ class GenerateExamGridSelectCourseCommandInternal(val department: Department, va
 	self: StudentCourseYearDetailsDaoComponent with GenerateExamGridSelectCourseCommandRequest =>
 
 	override def applyInternal(): Seq[ExamGridEntity] = {
+		System.out.println("reduced to 20 coursecommand")
 		val scyds = benchmarkTask("findByCourseRoutesYear") {
 			if(yearOfStudy != null){
 				studentCourseYearDetailsDao.findByCourseRoutesYear(academicYear, courses.asScala, routes.asScala, yearOfStudy, includeTempWithdrawn, eagerLoad = true, disableFreshFilter = true)
 			} else {
 				studentCourseYearDetailsDao.findByCourseRoutesLevel(academicYear, courses.asScala, routes.asScala, levelCode, includeTempWithdrawn, eagerLoad = true, disableFreshFilter = true)
 			}.filter(scyd => department.includesMember(scyd.studentCourseDetails.student, Some(department)))
-		}
+		}.take(20)
 		val sorted = benchmarkTask("sorting") {
 			scyds.sortBy(_.studentCourseDetails.scjCode)
 		}

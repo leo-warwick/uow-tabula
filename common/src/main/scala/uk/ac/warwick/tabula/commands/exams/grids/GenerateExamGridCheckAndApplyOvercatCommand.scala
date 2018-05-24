@@ -45,6 +45,7 @@ class GenerateExamGridCheckAndApplyOvercatCommandInternal(val department: Depart
 	with StudentCourseYearDetailsDaoComponent =>
 
 	override def applyInternal(): Result = {
+		System.out.println("GenerateExamGridCheckAndApplyOvercatCommandInternal:start")
 		val updatedEntities = filteredEntities.map { entity =>
 			val years = entity.validYears
 				.filter{case (year, _) => overcatSubsets(entity).get(year).isDefined && overcatSubsets(entity)(year).nonEmpty}
@@ -62,6 +63,7 @@ class GenerateExamGridCheckAndApplyOvercatCommandInternal(val department: Depart
 
 			entity -> years
 		}
+		System.out.println("GenerateExamGridCheckAndApplyOvercatCommandInternal:finish")
 
 		// Re-fetch the entities to account for the newly chosen subset
 		GenerateExamGridCheckAndApplyOvercatCommand.Result(fetchEntities, updatedEntities.toMap)
@@ -125,8 +127,9 @@ trait GenerateExamGridCheckAndApplyOvercatCommandState {
 
 	var selectCourseCommand: SelectCourseCommand = _
 
-	def fetchEntities: Seq[ExamGridEntity] = selectCourseCommand.apply()
+	def fetchEntities: Seq[ExamGridEntity] = selectCourseCommand.apply().take(20)
 	lazy val entities: Seq[ExamGridEntity] =  {
+		System.out.println("fetching..............................")
 		val courseYears = selectCourseCommand.courseYearsToShow
 		if (courseYears.size == selectCourseCommand.studyYearByLevelOrBlock) {
 			fetchEntities // all years
