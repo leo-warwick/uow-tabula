@@ -3,19 +3,17 @@ package uk.ac.warwick.tabula.data.model
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
 import javax.persistence._
-
 import org.hibernate.annotations.{BatchSize, Fetch, FetchMode, Type}
 import javax.persistence.CascadeType._
-
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.model.forms.{FormField, SavedFormValue}
 import javax.persistence.Entity
-
-import uk.ac.warwick.userlookup.User
+import uk.ac.warwick.userlookup.{AnonymousUser, User}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.HibernateHelpers
 import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage
 import uk.ac.warwick.tabula.services.UserLookupService
+
 import scala.collection.JavaConverters._
 
 @Entity @Access(AccessType.FIELD)
@@ -53,8 +51,11 @@ class MarkerFeedback extends GeneratedId with FeedbackAttachments with ToEntityR
 
 	def student: User = {
 		val student = userLookup.getUserByUserId(feedback.usercode)
-		if (!student.isFoundUser) throw new IllegalStateException(s"Student ${feedback.usercode} is not a valid user")
-		student
+		if (student.isFoundUser) {
+			student
+		} else {
+			new AnonymousUser
+		}
 	}
 
 	@Basic
