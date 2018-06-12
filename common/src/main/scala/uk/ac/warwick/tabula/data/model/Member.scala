@@ -39,7 +39,7 @@ object Member {
 	*/
 @FilterDefs(Array(
 	new FilterDef(name = Member.StudentsOnlyFilter, defaultCondition = "usertype = 'S'"),
-	new FilterDef(name = Member.ActiveOnlyFilter, defaultCondition = "(inuseflag = 'Active' or inuseflag like 'Inactive - Starts %')"),
+	new FilterDef(name = Member.ActiveOnlyFilter, defaultCondition = "((inuseflag = 'Active' or inuseflag like 'Inactive - Starts %') and (inactivationDate is null or inactivationDate > sysdate))"),
 	new FilterDef(name = Member.FreshOnlyFilter, defaultCondition = "missingFromImportSince is null")
 ))
 @Filters(Array(
