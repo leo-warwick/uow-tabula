@@ -51,7 +51,7 @@
 
 	<#macro pagination currentPage totalPages>
 		<#if totalPages gt 1>
-			<ul class="pagination pagination-sm pull-right">
+			<ul class="pagination pagination-sm pull-right" style="cursor: pointer;">
 			<#if currentPage lte 1>
 				<li class="disabled"><span>&laquo;</span></li>
 			<#else>
