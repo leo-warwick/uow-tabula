@@ -1,7 +1,7 @@
 <#import "/WEB-INF/freemarker/_profile_link.ftl" as pl />
 <#import "*/cm2_macros.ftl" as cm2 />
 <#assign currentPage = command.page />
-<#assign totalPages = results.total/command.extensionsPerPage?ceiling />
+<#assign totalPages = (results.total / command.extensionsPerPage)?ceiling />
 
 <div id="profile-modal" class="modal fade profile-subset"></div>
 
