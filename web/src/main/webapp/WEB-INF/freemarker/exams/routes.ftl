@@ -68,3 +68,4 @@ TODO grab values from the Routes object in code, as that's pretty equivalent and
 <#macro uploadYearMarks department academicYear><@_u page="/grids/${department.code}/${academicYear.startYear?c}/upload"/></#macro>
 <#macro manageNormalLoads department academicYear><@_u page="/grids/${department.code}/${academicYear.startYear?c}/normalload"/></#macro>
 <#macro manageWeightings department academicYear><@_u page="/grids/${department.code}/${academicYear.startYear?c}/weightings"/></#macro>
+<#macro downloadGridDocument department academicYear jobInstance><@_u page="/grids/${department.code}/${academicYear.startYear?c}/generate/documents/${jobInstance.id}/download" /></#macro>

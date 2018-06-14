@@ -31,8 +31,8 @@ object StudentCourseYearDetails {
 	// makes an ExamGridEntityYear that is really multiple study years that contribute to a single level or block (groups related StudentCourseYearDetails together)
 	def toExamGridEntityYearGrouped(yearOfStudy: YearOfStudy, scyds: StudentCourseYearDetails *): ExamGridEntityYear = {
 
-		if(scyds.map(_.studyLevel).distinct.size > 1 ) throw new IllegalArgumentException("Cannot group StudentCourseYearDetails from different levels")
-		val moduleRegistrations = scyds.flatMap(_.moduleRegistrations)
+		if (scyds.map(_.studyLevel).distinct.size > 1) throw new IllegalArgumentException("Cannot group StudentCourseYearDetails from different levels")
+		val moduleRegistrations = scyds.flatMap(_.moduleRegistrations).sortBy { mr => (mr.module.code, -mr.academicYear.startYear) }
 		val route = {
 			val allRoutes = scyds.sorted.flatMap(scyd => Option(scyd.route)).toSet // ignore any nulls
 			allRoutes.lastOption.getOrElse(scyds.head.studentCourseDetails.currentRoute)
@@ -73,7 +73,7 @@ class StudentCourseYearDetails extends StudentCourseYearProperties
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="scjCode", referencedColumnName="scjCode")
+	@JoinColumn(name = "scjCode", referencedColumnName = "scjCode")
 	var studentCourseDetails: StudentCourseDetails = _
 
 	def toStringProps = Seq("studentCourseDetails" -> studentCourseDetails, "sceSequenceNumber" -> sceSequenceNumber, "academicYear" -> academicYear)
@@ -127,29 +127,29 @@ class StudentCourseYearDetails extends StudentCourseYearProperties
 			studentCourseDetails.allRelationshipsOfType(relationshipType)
 				.filter(r => r.endDate == null || r.startDate.isBefore(r.endDate))
 				.filter(relationship => {
-				// For the most recent YoS, only show current relationships
-				if (studentCourseDetails.freshStudentCourseYearDetails.nonEmpty && studentCourseDetails.freshStudentCourseYearDetails.max == this) {
-					relationship.isCurrent
-				} else {
-					// Otherwise return the relationship if it lasted for at least 6 months in this academic year
-					val relationshipEndDate = if (relationship.endDate == null) academicYearEndDate.toDateTimeAtStartOfDay else relationship.endDate
-					if (relationshipEndDate.isBefore(academicYearStartDate.toDateTimeAtStartOfDay) || relationship.startDate.isAfter(academicYearEndDate.toDateTimeAtStartOfDay)) {
-						false
+					// For the most recent YoS, only show current relationships
+					if (studentCourseDetails.freshStudentCourseYearDetails.nonEmpty && studentCourseDetails.freshStudentCourseYearDetails.max == this) {
+						relationship.isCurrent
 					} else {
-						val inYearStartDate =
-							if (relationship.startDate.isBefore(academicYearStartDate.toDateTimeAtStartOfDay))
-								academicYearStartDate.toDateTimeAtStartOfDay
-							else
-								relationship.startDate
-						val inYearEndDate =
-							if (relationshipEndDate.isAfter(academicYearEndDate.toDateTimeAtStartOfDay))
-								academicYearEndDate.toDateTimeAtStartOfDay
-							else
-								relationshipEndDate
-						new Duration(inYearStartDate, inYearEndDate).getStandardDays > twoMonthsInDays
+						// Otherwise return the relationship if it lasted for at least 6 months in this academic year
+						val relationshipEndDate = if (relationship.endDate == null) academicYearEndDate.toDateTimeAtStartOfDay else relationship.endDate
+						if (relationshipEndDate.isBefore(academicYearStartDate.toDateTimeAtStartOfDay) || relationship.startDate.isAfter(academicYearEndDate.toDateTimeAtStartOfDay)) {
+							false
+						} else {
+							val inYearStartDate =
+								if (relationship.startDate.isBefore(academicYearStartDate.toDateTimeAtStartOfDay))
+									academicYearStartDate.toDateTimeAtStartOfDay
+								else
+									relationship.startDate
+							val inYearEndDate =
+								if (relationshipEndDate.isAfter(academicYearEndDate.toDateTimeAtStartOfDay))
+									academicYearEndDate.toDateTimeAtStartOfDay
+								else
+									relationshipEndDate
+							new Duration(inYearStartDate, inYearEndDate).getStandardDays > twoMonthsInDays
+						}
 					}
-				}
-			})
+				})
 		} catch {
 			case _: IllegalStateException => Seq()
 		}
@@ -191,11 +191,11 @@ class StudentCourseYearDetails extends StudentCourseYearProperties
 
 	final var agreedMarkUploadedDate: DateTime = _
 
-	@Type(`type`="uk.ac.warwick.tabula.data.model.SSOUserType")
+	@Type(`type` = "uk.ac.warwick.tabula.data.model.SSOUserType")
 	final var agreedMarkUploadedBy: User = _
 
 	def toExamGridEntityYear: ExamGridEntityYear = ExamGridEntityYear(
-		moduleRegistrations = moduleRegistrations,//ones that are not deleted
+		moduleRegistrations = moduleRegistrations, //ones that are not deleted
 		cats = moduleRegistrations.map(mr => BigDecimal(mr.cats)).sum,
 		route = route match {
 			case _: Route => route
@@ -234,11 +234,11 @@ trait BasicStudentCourseYearProperties {
 	def level: Option[Level] = levelService.levelFromCode(studyLevel)
 
 
-	@Column(name="cas_used")
+	@Column(name = "cas_used")
 	@Restricted(Array("Profiles.Read.Tier4VisaRequirement"))
 	var casUsed: JBoolean = _
 
-	@Column(name="tier4visa")
+	@Column(name = "tier4visa")
 	@Restricted(Array("Profiles.Read.Tier4VisaRequirement"))
 	var tier4Visa: JBoolean = _
 
@@ -259,12 +259,12 @@ trait StudentCourseYearProperties extends BasicStudentCourseYearProperties {
 	var academicYear: AcademicYear = _
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "routeCode", referencedColumnName="code")
+	@JoinColumn(name = "routeCode", referencedColumnName = "code")
 	@Restricted(Array("Profiles.Read.StudentCourseDetails.Core"))
 	var route: Route = _
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="enrolmentStatusCode", referencedColumnName="code")
+	@JoinColumn(name = "enrolmentStatusCode", referencedColumnName = "code")
 	@Restricted(Array("Profiles.Read.StudentCourseDetails.Status"))
 	var enrolmentStatus: SitsStatus = _
 
@@ -277,7 +277,7 @@ trait StudentCourseYearProperties extends BasicStudentCourseYearProperties {
 	var enrolmentDepartment: Department = _
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="modeOfAttendanceCode", referencedColumnName="code")
+	@JoinColumn(name = "modeOfAttendanceCode", referencedColumnName = "code")
 	@Restricted(Array("Profiles.Read.StudentCourseDetails.Status"))
 	var modeOfAttendance: ModeOfAttendance = _
 
@@ -316,8 +316,8 @@ class StudentCourseYearKey {
 
 	override final def hashCode: Int =
 		new HashCodeBuilder()
-				.append(scjCode)
-				.append(sceSequenceNumber)
+			.append(scjCode)
+			.append(sceSequenceNumber)
 			.build()
 }
 

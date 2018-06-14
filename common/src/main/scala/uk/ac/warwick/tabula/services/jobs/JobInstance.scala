@@ -15,7 +15,7 @@ import scala.collection.JavaConverters._
 trait JobInstance {
 	type JsonMap = Map[String, Any]
 
-	protected var propsMap: Map[String, Any]
+	var propsMap: Map[String, Any]
 
 	def jobType: String
 

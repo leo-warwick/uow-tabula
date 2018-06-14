@@ -1,7 +1,6 @@
 <#escape x as x?html>
-
+<#include "*/exams_macros.ftl" />
 <#assign years = perYearColumns?keys?sort />
-
 <#macro showMarksShort entity markType>
 	<#list years as year>
 		<#if gridOptionsCommand.showComponentMarks>
@@ -10,10 +9,9 @@
 
 		<#assign colsUsed = 0 />
 		<#list mapGet(perYearModuleMarkColumns, year) as column>
-			<#if !column.isEmpty(entity, year) && mapGet(perYearColumnValues, column)?? && mapGet(mapGet(perYearColumnValues, column), entity)??>
-				<#assign columnValue = mapGet(mapGet(mapGet(perYearColumnValues, column), entity), year) />
-			<#else>
-				<#assign columnValue = "" />
+			<#assign columnValue = "" />
+			<#if !column.isEmpty(entity, year)>
+				<#assign columnValue = generateColumnValue(perYearColumnValues, entity, year, column) />
 			</#if>
 			<#if columnValue?has_content>
 				<td>
@@ -30,11 +28,7 @@
 
 		<#list reportCols as column>
 		<td>
-			<#if mapGet(perYearColumnValues, column)?? && mapGet(mapGet(perYearColumnValues, column), entity)??>
-				<#assign columnValue = mapGet(mapGet(mapGet(perYearColumnValues, column), entity), year) />
-			<#else>
-				<#assign columnValue = "" />
-			</#if>
+			<#assign columnValue = generateColumnValue(perYearColumnValues, entity, year, column) />
 			<#if columnValue?has_content>
 				<#assign values = mapGet(columnValue, markType) />
 				<#list values as value><#noescape>${value.toHTML}</#noescape><#if value_has_next>,</#if></#list>

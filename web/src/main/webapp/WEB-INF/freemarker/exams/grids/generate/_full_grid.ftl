@@ -1,4 +1,5 @@
 <#escape x as x?html>
+	<#include "*/exams_macros.ftl" />
 
 <#macro showMarks entity markType>
 	<#list perYearColumns?keys?sort as year>
@@ -6,17 +7,13 @@
 		<th><span class="use-tooltip" title="${markType.description}">${markType.label}</span></th>
 		</#if>
 		<#list mapGet(perYearColumns, year) as column>
-		<td>
-			<#if mapGet(perYearColumnValues, column)?? && mapGet(mapGet(perYearColumnValues, column), entity)??>
-				<#assign columnValue = mapGet(mapGet(mapGet(perYearColumnValues, column), entity), year) />
-			<#else>
-				<#assign columnValue = "" />
-			</#if>
-			<#if columnValue?has_content>
-				<#assign values = mapGet(columnValue, markType) />
-				<#list values as value><#noescape>${value.toHTML}</#noescape><#if value_has_next>,</#if></#list>
-			</#if>
-		</td>
+			<td>
+				<#assign columnValue = generateColumnValue(perYearColumnValues, entity, year, column) />
+				<#if columnValue?has_content>
+					<#assign values = mapGet(columnValue, markType) />
+					<#list values as value><#noescape>${value.toHTML}</#noescape><#if value_has_next>,</#if></#list>
+				</#if>
+			</td>
 		</#list>
 		<#if !mapGet(perYearColumns, year)?has_content><td class="spacer">&nbsp;</td></#if>
 		<#if !year_has_next><td class="spacer">&nbsp;</td></#if>

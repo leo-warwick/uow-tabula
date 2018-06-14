@@ -184,4 +184,17 @@ trait GenerateExamGridGridOptionsCommandRequest {
 	lazy val predefinedColumnDescriptions: Seq[String] = {
 		predefinedColumnOptions.filter(_.label.nonEmpty).map(_.label)
 	}
+
+	def toMap: Map[String, Any] = Map(
+		"predefinedColumnIdentifiers" -> predefinedColumnIdentifiers,
+		"nameToShow" -> nameToShow.value,
+		"marksToShow" -> marksToShow,
+		"componentsToShow" -> componentsToShow,
+		"componentSequenceToShow" -> componentSequenceToShow,
+		"moduleNameToShow" -> moduleNameToShow.value,
+		"layout" -> layout,
+		"yearMarksToUse" -> yearMarksToUse,
+		"mandatoryModulesAndYearMarkColumns" -> mandatoryModulesAndYearMarkColumns,
+		"customColumnTitles" -> customColumnTitles
+	)
 }

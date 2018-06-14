@@ -3,17 +3,17 @@ package uk.ac.warwick.tabula.web.controllers.exams.grids.generate
 import javax.validation.Valid
 import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
-import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable, RequestParam}
-import org.springframework.web.servlet.View
+import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
-import uk.ac.warwick.tabula.commands.exams.grids._
-import uk.ac.warwick.tabula.data.model.{CoreRequiredModuleLookup, Department, UpstreamRouteRuleLookup}
-import uk.ac.warwick.tabula.exams.grids.columns.modules.{ModuleExamGridColumn, ModuleReportsColumn}
+import uk.ac.warwick.tabula.data.model.{CoreRequiredModuleLookup, Department}
+import uk.ac.warwick.tabula.exams.grids.documents._
+import uk.ac.warwick.tabula.exams.web.Routes
+import uk.ac.warwick.tabula.jobs.exams.GenerateExamGridDocumentJob
 import uk.ac.warwick.tabula.services.AutowiringProgressionServiceComponent
-import uk.ac.warwick.tabula.services.exams.grids.{AutowiringNormalCATSLoadServiceComponent, AutowiringUpstreamRouteRuleServiceComponent, NormalLoadLookup}
+import uk.ac.warwick.tabula.services.exams.grids.{AutowiringNormalCATSLoadServiceComponent, AutowiringUpstreamRouteRuleServiceComponent}
+import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.controllers.exams.ExamsController
-import uk.ac.warwick.tabula.web.views.{ExcelView, WordView}
 
 import scala.collection.JavaConverters._
 
@@ -36,7 +36,7 @@ trait ExamGridDocumentsController extends ExamsController
 		@ModelAttribute("coreRequiredModuleLookup") coreRequiredModuleLookup: CoreRequiredModuleLookup,
 		@PathVariable department: Department,
 		@PathVariable academicYear: AcademicYear
-	): View = excel(
+	): Mav = excel(
 		selectCourseCommand,
 		selectCourseCommandErrors,
 		gridOptionsCommand,
@@ -58,7 +58,7 @@ trait ExamGridDocumentsController extends ExamsController
 		@ModelAttribute("coreRequiredModuleLookup") coreRequiredModuleLookup: CoreRequiredModuleLookup,
 		@PathVariable department: Department,
 		@PathVariable academicYear: AcademicYear
-	): View = excel(
+	): Mav = excel(
 		selectCourseCommand,
 		selectCourseCommandErrors,
 		gridOptionsCommand,
@@ -80,270 +80,146 @@ trait ExamGridDocumentsController extends ExamsController
 		department: Department,
 		academicYear: AcademicYear,
 		mergedCells: Boolean
-	): View = {
+	): Mav = {
 		if (selectCourseCommandErrors.hasErrors || gridOptionsCommandErrors.hasErrors) {
 			throw new IllegalArgumentException
 		}
 
-		val GridData(entities, studentInformationColumns, perYearColumns, summaryColumns, weightings, normalLoadLookup, _) = benchmarkTask("GridData") { checkAndApplyOvercatAndGetGridData(
-			selectCourseCommand,
-			gridOptionsCommand,
-			checkOvercatCommand,
-			coreRequiredModuleLookup
-		)}
-
-		val chosenYearColumnValues = benchmarkTask("chosenYearColumnValues") { Seq(studentInformationColumns, summaryColumns).flatten.map(c => c -> c.values).toMap }
-		val perYearColumnValues = benchmarkTask("perYearColumnValues") { perYearColumns.values.flatten.toSeq.map(c => c -> c.values).toMap }
-
-		val workbook = if(gridOptionsCommand.showFullLayout) {
-			GenerateExamGridExporter(
-				department = department,
-				academicYear = academicYear,
-				courses = selectCourseCommand.courses.asScala,
-				routes = selectCourseCommand.routes.asScala,
-				yearOfStudy = selectCourseCommand.yearOfStudy,
-				yearWeightings = weightings,
-				normalLoadLookup = normalLoadLookup,
-				entities = entities,
-				leftColumns = studentInformationColumns,
-				perYearColumns = perYearColumns,
-				rightColumns = summaryColumns,
-				chosenYearColumnValues = chosenYearColumnValues,
-				perYearColumnValues = perYearColumnValues,
-				showComponentMarks = gridOptionsCommand.showComponentMarks,
-				mergedCells = mergedCells
-			)
-		} else {
-			val perYearModuleMarkColumns = benchmarkTask("perYearModuleMarkColumns"){ perYearColumns.map{ case (year, columns) => year -> columns.collect{ case marks: ModuleExamGridColumn => marks}} }
-			val perYearModuleReportColumns  = benchmarkTask("perYearModuleReportColumns"){ perYearColumns.map{ case (year, columns) => year -> columns.collect{ case marks: ModuleReportsColumn => marks}} }
-
-			val maxYearColumnSize =  benchmarkTask("maxYearColumnSize") { perYearModuleMarkColumns.map{ case (year, columns) =>
-				val maxModuleColumns = (entities.map(entity => columns.count(c => !c.isEmpty(entity, year))) ++ Seq(1)).max
-				year -> maxModuleColumns
-			} }
-
-			// for each entity have a list of all modules with marks and padding at the end for empty cells
-			val moduleColumnsPerEntity = benchmarkTask("moduleColumnsPerEntity"){ entities.map(entity => {
-				entity -> perYearModuleMarkColumns.map{ case(year, modules) =>
-					val hasValue: Seq[Option[ModuleExamGridColumn]] = modules.filter(m => !m.isEmpty(entity, year)).map(Some.apply)
-					val padding: Seq[Option[ModuleExamGridColumn]] = (1 to maxYearColumnSize(year) - hasValue.size).map(_ => None)
-					year -> (hasValue ++ padding)
-				}
-			}).toMap }
-
-			GenerateExamGridShortFormExporter(
-				department = department,
-				academicYear = academicYear,
-				courses = selectCourseCommand.courses.asScala,
-				routes = selectCourseCommand.routes.asScala,
-				yearOfStudy = selectCourseCommand.yearOfStudy,
-				yearWeightings = weightings,
-				normalLoadLookup = normalLoadLookup,
-				entities = entities,
-				leftColumns = studentInformationColumns,
-				perYearColumns = perYearColumns,
-				rightColumns = summaryColumns,
-				chosenYearColumnValues = chosenYearColumnValues,
-				perYearColumnValues = perYearColumnValues,
-				moduleColumnsPerEntity = moduleColumnsPerEntity,
-				perYearModuleMarkColumns = perYearModuleMarkColumns,
-				perYearModuleReportColumns = perYearModuleReportColumns,
-				maxYearColumnSize,
-				showComponentMarks = gridOptionsCommand.showComponentMarks,
-				mergedCells = mergedCells
-			)
-		}
-
-		new ExcelView(
-			"Exam grid for %s %s %s %s.xlsx".format(
-				department.name,
-				selectCourseCommand.courses.size match {
-					case 1 => selectCourseCommand.courses.get(0).code
-					case n => s"$n courses"
-				},
-				selectCourseCommand.routes.size match {
-					case 0 => "All routes"
-					case 1 => selectCourseCommand.routes.get(0).code.toUpperCase
-					case n => s"$n routes"
-				},
-				academicYear.toString.replace("/","-")
-			),
-			workbook
-		)
+		createJobAndRedirect(ExcelGridDocument, ExcelGridDocument.options(mergedCells), department, academicYear, selectCourseCommand, gridOptionsCommand)
 	}
 
-	private def marksRecordRender(selectCourseCommand: SelectCourseCommand, gridOptionsCommand: GridOptionsCommand, isConfidential: Boolean): View = {
-		val entities = selectCourseCommand.apply()
-		new WordView(
-			"%sMarks record for %s %s %s %s.docx".format(
-				if (isConfidential) "Confidential " else "",
-				selectCourseCommand.department.name,
-				selectCourseCommand.courses.size match {
-					case 1 => selectCourseCommand.courses.get(0).code
-					case n => s"$n courses"
-				},
-				selectCourseCommand.routes.size match {
-					case 0 => "All routes"
-					case 1 => selectCourseCommand.routes.get(0).code.toUpperCase
-					case n => s"$n routes"
-				},
-				selectCourseCommand.academicYear.toString.replace("/","-")
-			),
-			ExamGridMarksRecordExporter(
-				entities,
-				progressionService,
-				new NormalLoadLookup(selectCourseCommand.academicYear, selectCourseCommand.yearOfStudy, normalCATSLoadService),
-				new UpstreamRouteRuleLookup(selectCourseCommand.academicYear, upstreamRouteRuleService),
-				isConfidential = isConfidential,
-				calculateYearMarks = gridOptionsCommand.calculateYearMarks,
-				selectCourseCommand.isLevelGrid
-			)
-		)
+	private def marksRecordRender(department: Department, academicYear: AcademicYear, selectCourseCommand: SelectCourseCommand, gridOptionsCommand: GridOptionsCommand, isConfidential: Boolean): Mav = {
+		createJobAndRedirect(MarksRecordDocument, MarksRecordDocument.options(isConfidential), department, academicYear, selectCourseCommand, gridOptionsCommand)
 	}
 
 	@RequestMapping(method = Array(POST), params = Array(GenerateExamGridMappingParameters.marksRecord))
 	def marksRecord(
 		@Valid @ModelAttribute("selectCourseCommand") selectCourseCommand: SelectCourseCommand,
+		selectCourseCommandErrors: Errors,
 		@Valid @ModelAttribute("gridOptionsCommand") gridOptionsCommand: GridOptionsCommand,
-		selectCourseCommandErrors: Errors
-	): View = {
+		@PathVariable department: Department,
+		@PathVariable academicYear: AcademicYear
+	): Mav = {
 		if (selectCourseCommandErrors.hasErrors) {
 			throw new IllegalArgumentException(selectCourseCommandErrors.getAllErrors.asScala.map(e =>
 				messageSource.getMessage(e.getCode, e.getArguments, null)).mkString(", ")
 			)
 		} else {
-			marksRecordRender(selectCourseCommand, gridOptionsCommand, isConfidential = false)
+			marksRecordRender(department, academicYear, selectCourseCommand, gridOptionsCommand, isConfidential = false)
 		}
 	}
 
 	@RequestMapping(method = Array(POST), params = Array(GenerateExamGridMappingParameters.marksRecordConfidential))
 	def marksRecordConfidential(
 		@Valid @ModelAttribute("selectCourseCommand") selectCourseCommand: SelectCourseCommand,
+		selectCourseCommandErrors: Errors,
 		@Valid @ModelAttribute("gridOptionsCommand") gridOptionsCommand: GridOptionsCommand,
-		selectCourseCommandErrors: Errors
-	): View = {
+		@PathVariable department: Department,
+		@PathVariable academicYear: AcademicYear
+	): Mav = {
 		if (selectCourseCommandErrors.hasErrors) {
 			throw new IllegalArgumentException(selectCourseCommandErrors.getAllErrors.asScala.map(e =>
 				messageSource.getMessage(e.getCode, e.getArguments, null)).mkString(", ")
 			)
 		} else {
-			marksRecordRender(selectCourseCommand, gridOptionsCommand, isConfidential = true)
+			marksRecordRender(department, academicYear, selectCourseCommand, gridOptionsCommand, isConfidential = true)
 		}
 	}
 
-	private def passListRender(selectCourseCommand: SelectCourseCommand, gridOptionsCommand: GridOptionsCommand, isConfidential: Boolean): View = {
-		val entities = selectCourseCommand.apply()
-		new WordView(
-			"%sPass list for %s %s %s %s.docx".format(
-				if (isConfidential) "Confidential " else "",
-				selectCourseCommand.department.name,
-				selectCourseCommand.courses.size match {
-					case 1 => selectCourseCommand.courses.get(0).code
-					case n => s"$n courses"
-				},
-				selectCourseCommand.routes.size match {
-					case 0 => "All routes"
-					case 1 => selectCourseCommand.routes.get(0).code.toUpperCase
-					case n => s"$n routes"
-				},
-				selectCourseCommand.academicYear.toString.replace("/","-")
-			),
-			ExamGridPassListExporter(
-				entities,
-				selectCourseCommand.department,
-				selectCourseCommand.courses.asScala,
-				selectCourseCommand.yearOfStudy,
-				selectCourseCommand.academicYear,
-				progressionService,
-				new NormalLoadLookup(selectCourseCommand.academicYear, selectCourseCommand.yearOfStudy, normalCATSLoadService),
-				new UpstreamRouteRuleLookup(selectCourseCommand.academicYear, upstreamRouteRuleService),
-				isConfidential,
-				calculateYearMarks = gridOptionsCommand.calculateYearMarks,
-				selectCourseCommand.isLevelGrid
-			)
-		)
+	private def passListRender(department: Department, academicYear: AcademicYear, selectCourseCommand: SelectCourseCommand, gridOptionsCommand: GridOptionsCommand, isConfidential: Boolean): Mav = {
+		createJobAndRedirect(PassListDocument, PassListDocument.options(isConfidential), department, academicYear, selectCourseCommand, gridOptionsCommand)
 	}
 
 	@RequestMapping(method = Array(POST), params = Array(GenerateExamGridMappingParameters.passList))
 	def passList(
 		@Valid @ModelAttribute("selectCourseCommand") selectCourseCommand: SelectCourseCommand,
+		selectCourseCommandErrors: Errors,
 		@Valid @ModelAttribute("gridOptionsCommand") gridOptionsCommand: GridOptionsCommand,
-		selectCourseCommandErrors: Errors
-	): View = {
+		@PathVariable department: Department,
+		@PathVariable academicYear: AcademicYear
+	): Mav = {
 		if (selectCourseCommandErrors.hasErrors) {
 			throw new IllegalArgumentException(selectCourseCommandErrors.getAllErrors.asScala.map(e =>
 				messageSource.getMessage(e.getCode, e.getArguments, null)).mkString(", ")
 			)
 		} else {
-			passListRender(selectCourseCommand, gridOptionsCommand, isConfidential = false)
+			passListRender(department, academicYear, selectCourseCommand, gridOptionsCommand, isConfidential = false)
 		}
 	}
 
 	@RequestMapping(method = Array(POST), params = Array(GenerateExamGridMappingParameters.passListConfidential))
 	def passListConfidential(
 		@Valid @ModelAttribute("selectCourseCommand") selectCourseCommand: SelectCourseCommand,
+		selectCourseCommandErrors: Errors,
 		@Valid @ModelAttribute("gridOptionsCommand") gridOptionsCommand: GridOptionsCommand,
-		selectCourseCommandErrors: Errors
-	): View = {
+		@PathVariable department: Department,
+		@PathVariable academicYear: AcademicYear
+	): Mav = {
 		if (selectCourseCommandErrors.hasErrors) {
 			throw new IllegalArgumentException(selectCourseCommandErrors.getAllErrors.asScala.map(e =>
 				messageSource.getMessage(e.getCode, e.getArguments, null)).mkString(", ")
 			)
 		} else {
-			passListRender(selectCourseCommand, gridOptionsCommand, isConfidential = true)
+			passListRender(department, academicYear, selectCourseCommand, gridOptionsCommand, isConfidential = true)
 		}
 	}
 
-	private def transcriptRender(selectCourseCommand: SelectCourseCommand, isConfidential: Boolean): View = {
-		val entities = selectCourseCommand.apply()
-		new WordView(
-			"%sTranscript for %s %s %s %s.docx".format(
-				if (isConfidential) "Confidential " else "",
-				selectCourseCommand.department.name,
-				selectCourseCommand.courses.size match {
-					case 1 => selectCourseCommand.courses.get(0).code
-					case n => s"$n courses"
-				},
-				selectCourseCommand.routes.size match {
-					case 0 => "All routes"
-					case 1 => selectCourseCommand.routes.get(0).code.toUpperCase
-					case n => s"$n routes"
-				},
-				selectCourseCommand.academicYear.toString.replace("/","-")
-			),
-			ExamGridTranscriptExporter(
-				entities,
-				isConfidential = isConfidential
-			)
-		)
+	private def transcriptRender(department: Department, academicYear: AcademicYear, selectCourseCommand: SelectCourseCommand, gridOptionsCommand: GridOptionsCommand, isConfidential: Boolean): Mav = {
+		createJobAndRedirect(TranscriptDocument, TranscriptDocument.options(isConfidential), department, academicYear, selectCourseCommand, gridOptionsCommand)
 	}
 
 	@RequestMapping(method = Array(POST), params = Array(GenerateExamGridMappingParameters.transcript))
 	def transcript(
 		@Valid @ModelAttribute("selectCourseCommand") selectCourseCommand: SelectCourseCommand,
-		selectCourseCommandErrors: Errors
-	): View = {
+		selectCourseCommandErrors: Errors,
+		@Valid @ModelAttribute("gridOptionsCommand") gridOptionsCommand: GridOptionsCommand,
+		@PathVariable department: Department,
+		@PathVariable academicYear: AcademicYear,
+	): Mav = {
 		if (selectCourseCommandErrors.hasErrors) {
 			throw new IllegalArgumentException(selectCourseCommandErrors.getAllErrors.asScala.map(e =>
 				messageSource.getMessage(e.getCode, e.getArguments, null)).mkString(", ")
 			)
 		} else {
-			transcriptRender(selectCourseCommand, isConfidential = false)
+			transcriptRender(department, academicYear, selectCourseCommand, gridOptionsCommand, isConfidential = false)
 		}
 	}
 
 	@RequestMapping(method = Array(POST), params = Array(GenerateExamGridMappingParameters.transcriptConfidential))
 	def transcriptConfidential(
 		@Valid @ModelAttribute("selectCourseCommand") selectCourseCommand: SelectCourseCommand,
-		selectCourseCommandErrors: Errors
-	): View = {
+		selectCourseCommandErrors: Errors,
+		@Valid @ModelAttribute("gridOptionsCommand") gridOptionsCommand: GridOptionsCommand,
+		@PathVariable department: Department,
+		@PathVariable academicYear: AcademicYear
+	): Mav = {
 		if (selectCourseCommandErrors.hasErrors) {
 			throw new IllegalArgumentException(selectCourseCommandErrors.getAllErrors.asScala.map(e =>
 				messageSource.getMessage(e.getCode, e.getArguments, null)).mkString(", ")
 			)
 		} else {
-			transcriptRender(selectCourseCommand, isConfidential = true)
+			transcriptRender(department, academicYear, selectCourseCommand, gridOptionsCommand, isConfidential = true)
 		}
+	}
+
+	private def createJobAndRedirect(
+		document: ExamGridDocumentPrototype,
+		options: Map[String, Any] = Map.empty,
+		department: Department,
+		academicYear: AcademicYear,
+		selectCourseCommand: SelectCourseCommand,
+		gridOptionsCommand: GridOptionsCommand
+	): Mav = {
+		val job = jobService.add(Option(user), GenerateExamGridDocumentJob(
+			document = document,
+			options = options,
+			department = department,
+			academicYear = academicYear,
+			selectCourseCommand = selectCourseCommand,
+			gridOptionsCommand = gridOptionsCommand
+		))
+
+		Redirect(Routes.Grids.documentProgress(department, academicYear, job))
 	}
 
 }

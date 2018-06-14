@@ -272,7 +272,7 @@
 			</#if>
 		</div>
 
-		<form action="<@routes.exams.generateGrid department academicYear />" id="examGridDocuments" class="dirty-check" method="post">
+		<form action="<@routes.exams.generateGrid department academicYear />" id="examGridDocuments" class="dirty-check" method="post" target="_blank">
 			<@form_fields.select_course_fields />
 			<@form_fields.grid_options_fields />
 

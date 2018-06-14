@@ -340,6 +340,28 @@
 			});
 		});
 	});
+
+	function setUpPaginationButtons() {
+		$(function(){
+			$('.pagination a').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				var pageNumber = $(this).data('page');
+				if (location.search) {
+					if (location.search.indexOf('page=') != -1) {
+						location.search = location.search.replace(/page=\d+/, 'page=' + pageNumber)
+					} else {
+						location.search = location.search + '&page=' + pageNumber;
+					}
+				} else {
+					location.search = '?page=' + pageNumber;
+				}
+			});
+		});
+	}
+	setUpPaginationButtons();
+	$(document).on('tabula.filterResultsChanged', setUpPaginationButtons);
+
 	// code for bulk copy assignments
 	$(function(){
 		$('.copy-assignments').bigList({

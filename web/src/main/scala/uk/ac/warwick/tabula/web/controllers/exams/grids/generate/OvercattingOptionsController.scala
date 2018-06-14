@@ -10,6 +10,7 @@ import uk.ac.warwick.tabula.commands.exams.grids._
 import uk.ac.warwick.tabula.commands.{Appliable, PopulateOnForm, SelfValidating}
 import uk.ac.warwick.tabula.data.model.StudentCourseYearDetails.YearOfStudy
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.exams.grids.NullStatusAdapter
 import uk.ac.warwick.tabula.exams.grids.columns._
 import uk.ac.warwick.tabula.exams.grids.columns.marking.OvercattedYearMarkColumnOption
 import uk.ac.warwick.tabula.exams.grids.columns.modules.{CoreModulesColumnOption, CoreOptionalModulesColumnOption, CoreRequiredModulesColumnOption, OptionalModulesColumnOption}
@@ -102,7 +103,8 @@ class OvercattingOptionsController extends ExamsController
 				chosenYearColumnValues = overcatView.optionsColumnValues,
 				perYearColumnValues = overcatView.perYearColumnValues,
 				showComponentMarks = false,
-				yearOrder = Ordering.Int.reverse
+				yearOrder = Ordering.Int.reverse,
+				status = NullStatusAdapter
 			)
 		)
 	}

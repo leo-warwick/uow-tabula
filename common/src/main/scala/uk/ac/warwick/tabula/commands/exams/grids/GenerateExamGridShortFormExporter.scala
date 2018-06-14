@@ -8,6 +8,7 @@ import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands.TaskBenchmarking
 import uk.ac.warwick.tabula.data.model.StudentCourseYearDetails.YearOfStudy
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.exams.grids.StatusAdapter
 import uk.ac.warwick.tabula.exams.grids.columns._
 import uk.ac.warwick.tabula.exams.grids.columns.modules.{ModuleExamGridColumn, ModuleReportsColumn}
 import uk.ac.warwick.tabula.services.exams.grids.NormalLoadLookup
@@ -36,7 +37,8 @@ object GenerateExamGridShortFormExporter extends TaskBenchmarking {
 		maxYearColumnSize: Map[YearOfStudy, Int],
 		showComponentMarks: Boolean,
 		yearOrder: Ordering[Int] = Ordering.Int,
-		mergedCells: Boolean = true
+		mergedCells: Boolean = true,
+		status: StatusAdapter
 	): Workbook = {
 		// Allow randomly accessing rows at any point during generation, don't flush
 		val workbook = new SXSSFWorkbook(null, -1)

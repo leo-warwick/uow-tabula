@@ -13,7 +13,6 @@ import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, Permissions
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Range.Inclusive
-import scala.util.Try
 
 object GenerateExamGridSelectCourseCommand {
 	def apply(department: Department, academicYear: AcademicYear, permitRoutesFromRootDepartment: Boolean = false) =
@@ -121,4 +120,12 @@ trait GenerateExamGridSelectCourseCommandRequest {
 		JInteger(Option(yearOfStudy).map(_.toInt).orElse(Option(levelCode).map(Level.toYearOfStudy)))
 	}
 
+	def toMap: Map[String, Any] = Map(
+		"courses" -> courses.asScala.map(_.code),
+		"routes" -> routes.asScala.map(_.code),
+		"yearOfStudy" -> yearOfStudy,
+		"levelCode" -> levelCode,
+		"courseYearsToShow" -> courseYearsToShow,
+		"includeTempWithdrawn" -> includeTempWithdrawn
+	)
 }

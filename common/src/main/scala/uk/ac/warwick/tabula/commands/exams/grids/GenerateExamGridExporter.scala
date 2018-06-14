@@ -10,6 +10,7 @@ import org.joda.time.DateTime
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands.TaskBenchmarking
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.exams.grids.StatusAdapter
 import uk.ac.warwick.tabula.exams.grids.columns._
 import uk.ac.warwick.tabula.services.exams.grids.NormalLoadLookup
 
@@ -33,8 +34,16 @@ object GenerateExamGridExporter extends TaskBenchmarking {
 		perYearColumnValues: Map[PerYearExamGridColumn, Map[ExamGridEntity, Map[StudentCourseYearDetails.YearOfStudy, Map[ExamGridColumnValueType, Seq[ExamGridColumnValue]]]]],
 		showComponentMarks: Boolean,
 		yearOrder: Ordering[Int] = Ordering.Int,
-		mergedCells: Boolean = true
+		mergedCells: Boolean = true,
+		status: StatusAdapter
 	): Workbook = {
+		var progress = 0
+		val progressMax = entities.size * (leftColumns.size + perYearColumns.size * perYearColumns.values.map(_.size).sum + rightColumns.size)
+		def stepProgress(): Unit = {
+			progress = progress + 1
+			status.setProgress(progress, progressMax)
+		}
+
 		// Allow randomly accessing rows at any point during generation, don't flush
 		val workbook = new SXSSFWorkbook(null, -1)
 
@@ -83,12 +92,12 @@ object GenerateExamGridExporter extends TaskBenchmarking {
 				}
 				// Nothing in secondary value row
 				// Entity rows
-				entities.foreach(entity =>
+				entities.foreach(entity => {
 					if (chosenYearColumnValues.get(leftColumn).exists(_.get(entity).isDefined)) {
 						val entityCell = entityRows(entity)(ExamGridColumnValueType.Overall).createCell(currentColumnIndex)
 						chosenYearColumnValues(leftColumn)(entity).populateCell(entityCell, cellStyleMap)
 						if (showComponentMarks) {
-							if(mergedCells) {
+							if (mergedCells) {
 								sheet.addMergedRegion(new CellRangeAddress(entityCell.getRowIndex, entityCell.getRowIndex + 2, entityCell.getColumnIndex, entityCell.getColumnIndex))
 							} else {
 								entityRows(entity).filterKeys(_ != ExamGridColumnValueType.Overall).values.foreach(row => {
@@ -98,7 +107,8 @@ object GenerateExamGridExporter extends TaskBenchmarking {
 							}
 						}
 					}
-				)
+					stepProgress()
+				})
 				// And finally...
 				sheet.setColumnWidth(currentColumnIndex, leftColumn.excelColumnWidth)
 				currentColumnIndex = currentColumnIndex + 1
@@ -176,7 +186,7 @@ object GenerateExamGridExporter extends TaskBenchmarking {
 						case _ =>
 					}
 					// Entity rows
-					entities.foreach(entity =>
+					entities.foreach(entity => {
 						if (perYearColumnValues.get(perYearColumn).exists(_.get(entity).exists(_.get(year).isDefined))) {
 							if (showComponentMarks) {
 								val overallCell = entityRows(entity)(ExamGridColumnValueType.Overall).createCell(currentColumnIndex)
@@ -190,7 +200,8 @@ object GenerateExamGridExporter extends TaskBenchmarking {
 								perYearColumnValues(perYearColumn)(entity)(year)(ExamGridColumnValueType.Overall).head.populateCell(entityCell, cellStyleMap)
 							}
 						}
-					)
+						stepProgress()
+					})
 					// And finally...
 					sheet.setColumnWidth(currentColumnIndex, perYearColumn.excelColumnWidth)
 					currentColumnIndex = currentColumnIndex + 1
@@ -252,12 +263,12 @@ object GenerateExamGridExporter extends TaskBenchmarking {
 					case _ =>
 				}
 				// Entity rows
-				entities.foreach(entity =>
+				entities.foreach(entity => {
 					if (chosenYearColumnValues.get(rightColumn).exists(_.get(entity).isDefined)) {
 						val entityCell = entityRows(entity)(ExamGridColumnValueType.Overall).createCell(currentColumnIndex)
 						chosenYearColumnValues(rightColumn)(entity).populateCell(entityCell, cellStyleMap)
 						if (showComponentMarks) {
-							if(mergedCells) {
+							if (mergedCells) {
 								sheet.addMergedRegion(new CellRangeAddress(entityCell.getRowIndex, entityCell.getRowIndex + 2, entityCell.getColumnIndex, entityCell.getColumnIndex))
 							} else {
 								entityRows(entity).filterKeys(_ != ExamGridColumnValueType.Overall).values.foreach(row => {
@@ -267,7 +278,8 @@ object GenerateExamGridExporter extends TaskBenchmarking {
 							}
 						}
 					}
-				)
+					stepProgress()
+				})
 				// And finally...
 				sheet.setColumnWidth(currentColumnIndex, rightColumn.excelColumnWidth)
 				currentColumnIndex = currentColumnIndex + 1

@@ -2,6 +2,7 @@ package uk.ac.warwick.tabula.exams.web
 
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.services.jobs.JobInstance
 import uk.ac.warwick.userlookup.User
 
 /**
@@ -98,6 +99,12 @@ object Routes {
 
 		def moduleJobProgress(department: Department, academicYear: AcademicYear): String =
 			s"$context/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/module/generate/import"
+
+		def documentProgress(department: Department, academicYear: AcademicYear, jobInstance: JobInstance): String =
+			s"$context/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/generate/documents/${jobInstance.id}/progress?clearModel=true"
+
+		def document(department: Department, academicYear: AcademicYear, jobInstance: JobInstance): String =
+			s"$context/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/generate/documents/${jobInstance.id}/download"
 
 		def moduleJobSkip(department: Department, academicYear: AcademicYear): String =
 			s"$context/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/module/generate/import/skip"

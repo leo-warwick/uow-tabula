@@ -1,8 +1,8 @@
 <#import "*/cm2_macros.ftl" as cm2 />
 <#include "../_filters.ftl" />
+
 <#escape x as x?html><#compress>
 	<h1>Extensions</h1>
-
 	<div class="filters btn-group-group well well-small well-sm">
 		<#assign formAction><@routes.cm2.filterExtensions academicYear /></#assign>
 		<@f.form
@@ -80,6 +80,7 @@
 			</button>
 		</@f.form>
 	</div>
+
 	<div class="filter-results">
 		<#include "_filter_results.ftl" />
 	</div>
