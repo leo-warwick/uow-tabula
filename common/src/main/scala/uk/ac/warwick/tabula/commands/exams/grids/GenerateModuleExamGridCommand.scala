@@ -69,7 +69,7 @@ class GenerateModuleExamGridCommandInternal(val department: Department, val acad
 			records.map { mr =>
 				val componentInfo = mr.upstreamAssessmentGroupMembers.flatMap { uagm =>
 					val aComponent = assessmentMembershipService.getAssessmentComponent(uagm.upstreamAssessmentGroup)
-					aComponent.map { comp =>
+					aComponent.filter(_.inUse).map { comp =>
 						val mark = uagm.agreedMark.getOrElse(uagm.actualMark.getOrElse(null))
 						val grade = uagm.agreedGrade.getOrElse(uagm.actualGrade.getOrElse(null))
 						val resitMark = uagm.resitAgreedMark.getOrElse(uagm.resitActualMark.getOrElse(null))
