@@ -252,7 +252,7 @@ object AssignmentImporter {
 			from $sitsSchema.cam_mab mab -- Module Assessment Body, containing assessment components
 				join $sitsSchema.cam_mav mav -- Module Availability which indicates which modules are avaiable in the year
 					on mab.map_code = mav.mod_code and
-		         mab.mab_udf1 = 'Y' and -- in use
+						 mab.mab_udf1 = 'Y' and -- in use
 						 mav.psl_code = 'Y' and -- "Period Slot" code - Y indicates year
 						 mav.ayr_code in (:academic_year_code)
 				join $sitsSchema.ins_mod mod
