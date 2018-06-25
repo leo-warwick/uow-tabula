@@ -16,9 +16,8 @@ object UAMAuditNotification {
 }
 
 @Entity
-@DiscriminatorValue("UAMNotification")
+@DiscriminatorValue("UAMAuditNotification")
 class UAMAuditNotification extends Notification[Department, Unit]
-	with SingleItemNotification[Department]
 	with AutowiringUserLookupComponent
 	with MyWarwickNotification {
 
@@ -28,16 +27,19 @@ class UAMAuditNotification extends Notification[Department, Unit]
 	@transient
 	var permissionsService: PermissionsService = Wire[PermissionsService]
 
-	def department: Department = item.entity
+	// these departments have the same UAM
+	def departments: Seq[Department] = entities
 
-	def userAccessMangers: Seq[User] = this.department.grantedRoles.asScala.flatMap(_.users.users).distinct
+	// there is only one recipient, which is the uam
+	def userAccessManger: User = departments.head.grantedRoles.asScala.head.users.users.head
 
 	def verb: String = "view"
 
 	def title: String = "some good title regarding"
 
 	def content: FreemarkerModel = FreemarkerModel(UAMAuditNotification.templateLocation, Map(
-		"department" -> this.department,
+		"departments" -> this.departments,
+		"userAccessManger" -> this.userAccessManger,
 		"deadline" -> DateTime.parse(DateTime.now().year() + "-08-31T00:00")
 	))
 
@@ -45,5 +47,6 @@ class UAMAuditNotification extends Notification[Department, Unit]
 
 	def urlTitle: String = "???"
 
-	def recipients: Seq[User] = userAccessMangers
+	@transient
+	def recipients: Seq[User] = Seq(userAccessManger)
 }

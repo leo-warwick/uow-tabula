@@ -1,6 +1,6 @@
-Dear User Access Manager of ${department.name},
+Dear ${userAccessManger.getFullName},
 
-We are contacting you because you are currently assigned to the User Access Manager role for ${department.name} in Tabula (the University's tool to support administration of teaching and learning in academic departments).
+We are contacting you because you are currently assigned to the User Access Manager role for <#list departments as department>${department.fullName}<#sep>, </#list> in Tabula (the University's tool to support administration of teaching and learning in academic departments).
 
 This is what the role entails:
 
