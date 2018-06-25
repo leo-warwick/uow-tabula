@@ -15,9 +15,6 @@ class UAMAuditNotification extends Notification[Department, Unit]
 
 	val templateLocation = "/WEB-INF/freemarker/emails/uam_audit_email.ftl"
 
-	@transient
-	var profileService: ProfileService = Wire[ProfileService]
-
 	def departments: Seq[Department] = entities
 
 	def verb: String = "view"
