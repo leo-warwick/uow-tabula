@@ -24,23 +24,15 @@ class UAMAuditNotification extends Notification[Department, Unit]
 	@transient
 	var profileService: ProfileService = Wire[ProfileService]
 
-	@transient
-	var permissionsService: PermissionsService = Wire[PermissionsService]
-
 	def departments: Seq[Department] = entities
-
-	def userAccessMangers: Seq[User] = departments
-		.flatMap(_.grantedRoles.asScala.toSeq)
-		.filter(_ == UserAccessMgrRoleDefinition)
-		.flatMap(_.users.users)
-  	.distinct
 
 	def verb: String = "view"
 
 	def title: String = "some good title regarding"
 
 	def content: FreemarkerModel = FreemarkerModel(UAMAuditNotification.templateLocation, Map(
-		"departments" -> this.departments,
+		"departments" -> departments,
+		"userAccessManager" -> agent,
 		"deadline" -> DateTime.parse(DateTime.now().year() + "-08-31T00:00")
 	))
 
@@ -49,5 +41,5 @@ class UAMAuditNotification extends Notification[Department, Unit]
 	def urlTitle: String = "???"
 
 	@transient
-	def recipients: Seq[User] = userAccessMangers
+	def recipients: Seq[User] = Seq(agent)
 }
