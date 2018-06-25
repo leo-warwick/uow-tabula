@@ -27,16 +27,15 @@ class UAMNotification extends Notification[User, Unit]
 
 	def user: User = item.entity
 
-	def getUAMs: Seq[User] = {
-		profileService.getMemberByUser(this.user)
-			.get
-			.affiliatedDepartments
-			.flatMap { dept =>
-				permissionsService.getAllGrantedRolesFor(dept)
-					.filter(_.roleDefinition == UserAccessMgrRoleDefinition)
-					.flatMap(_.users.users)
-			}
-	}
+//	def getUAMs: Seq[User] = profileService
+//		.getMemberByUser(this.user)
+//		.get
+//		.affiliatedDepartments
+//		.flatMap { dept =>
+//			permissionsService.getAllGrantedRolesFor(dept)
+//				.filter(_.roleDefinition == UserAccessMgrRoleDefinition)
+//				.flatMap(_.users.users)
+//		}
 
 	def verb: String = ???
 
