@@ -296,6 +296,8 @@ abstract class Description {
 	def studentUsercodes(usercode: String): Description = studentUsercodes(Seq(usercode))
 	def studentUsercodes(usercodes: Seq[String]): Description = property("studentUsercodes" -> usercodes)
 
+	def users(users: Seq[User]): Description = property("users" -> users.map(_.getUserId))
+
 	/**
 	 * List of Submissions IDs
 	 */
