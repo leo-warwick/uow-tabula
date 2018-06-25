@@ -19,17 +19,17 @@ class UAMAuditNotification extends Notification[Department, Unit]
 
 	def verb: String = "view"
 
-	def title: String = "Tabula, now with"
+	def title: String = s"Tabula Users Audit ${DateTime.now().year()}"
 
 	def content: FreemarkerModel = FreemarkerModel(templateLocation, Map(
 		"departments" -> departments,
 		"userAccessManager" -> agent,
-		"deadline" -> DateTime.parse(DateTime.now().year() + "-08-31T00:00")
+		"deadline" -> DateTime.parse(s"${DateTime.now().year()}-08-31T00:00")
 	))
 
 	def url: String = "url to sitebuilder form"
 
-	def urlTitle: String = "???"
+	def urlTitle: String = "Tabula User Access Manager Confirmation Form"
 
 	@transient
 	def recipients: Seq[User] = Seq(agent)
