@@ -24,9 +24,6 @@ class UAMAuditNotification extends Notification[Department, Unit]
 	@transient
 	var profileService: ProfileService = Wire[ProfileService]
 
-	@transient
-	var permissionsService: PermissionsService = Wire[PermissionsService]
-
 	// these departments have the same UAM
 	def departments: Seq[Department] = entities
 
