@@ -10,5 +10,7 @@ import uk.ac.warwick.userlookup.User
 @Entity
 @DiscriminatorValue("UAMAuditChaserNotification")
 class UAMAuditChaserNotification extends UAMAuditNotification {
+
+	@transient
 	override val templateLocation = "/WEB-INF/freemarker/emails/uam_audit_chaser_email.ftl"
 }

@@ -2,15 +2,14 @@ package uk.ac.warwick.tabula.data.model.notifications
 
 import javax.persistence.{DiscriminatorValue, Entity}
 import org.joda.time.DateTime
-import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, ProfileService}
 import uk.ac.warwick.userlookup.User
 
 @Entity
 @DiscriminatorValue("UAMAuditNotification")
 class UAMAuditNotification extends Notification[Department, Unit] with MyWarwickNotification {
 
+	@transient
 	val templateLocation = "/WEB-INF/freemarker/emails/uam_audit_email.ftl"
 
 	def departments: Seq[Department] = entities
