@@ -9,9 +9,7 @@ import uk.ac.warwick.userlookup.User
 
 @Entity
 @DiscriminatorValue("UAMAuditNotification")
-class UAMAuditNotification extends Notification[Department, Unit]
-	with AutowiringUserLookupComponent
-	with MyWarwickNotification {
+class UAMAuditNotification extends Notification[Department, Unit] with MyWarwickNotification {
 
 	val templateLocation = "/WEB-INF/freemarker/emails/uam_audit_email.ftl"
 
