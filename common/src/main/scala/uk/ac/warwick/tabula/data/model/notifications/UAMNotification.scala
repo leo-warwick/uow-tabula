@@ -1,27 +1,50 @@
 package uk.ac.warwick.tabula.data.model.notifications
 
-import javax.persistence.DiscriminatorValue
+import javax.persistence.{DiscriminatorValue, Entity}
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
+import uk.ac.warwick.tabula.roles.UserAccessMgrRoleDefinition
+import uk.ac.warwick.tabula.services.permissions.PermissionsService
+import uk.ac.warwick.tabula.services.{AutowiringUserLookupComponent, ProfileService}
 import uk.ac.warwick.userlookup.User
 
 object UAMNotification {
 	val templateLocation = "/WEB-INF/freemarker/emails/uam_email.ftl"
 }
 
+@Entity
 @DiscriminatorValue("UAMNotification")
 class UAMNotification extends Notification[User, Unit]
 	with SingleItemNotification[User]
 	with AutowiringUserLookupComponent
 	with MyWarwickNotification {
 
-	override def verb: String = ???
+	@transient
+	var profileService: ProfileService = Wire[ProfileService]
 
-	override def title: String = ???
+	@transient
+	var permissionsService: PermissionsService = Wire[PermissionsService]
 
-	override def content: FreemarkerModel = ???
+	def user: User = item.entity
 
-	override def url: String = ???
+	def getUAMs: Seq[User] = {
+		profileService.getMemberByUser(this.user)
+			.get
+			.affiliatedDepartments
+			.flatMap { dept =>
+				permissionsService.getAllGrantedRolesFor(dept)
+					.filter(_.roleDefinition == UserAccessMgrRoleDefinition)
+					.flatMap(_.users.users)
+			}
+	}
+
+	def verb: String = ???
+
+	def title: String = ???
+
+	def content: FreemarkerModel = ???
+
+	def url: String = ???
 
 	/**
 		* URL title will be used to generate the links in notifications
@@ -29,7 +52,7 @@ class UAMNotification extends Notification[User, Unit]
 		* Activities will use - <a href=${url}>${urlTitle}</a>  (first letter of url title will be converted to upper case)
 		* Emails will use - Please visit [${url}] to ${urlTitle}
 		*/
-	override def urlTitle: String = ???
+	def urlTitle: String = ???
 
-	override def recipients: Seq[User] = ???
+	def recipients: Seq[User] = ???
 }
