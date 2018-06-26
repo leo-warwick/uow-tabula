@@ -19,16 +19,18 @@ class UserAccessManagerAuditController extends BaseSysadminController {
 
 	def error: Mav = home.addObjects("error" -> true)
 
+	def sendNotification(notification: UAMAuditNotification): Mav = {
+		UserAccessManagerAuditCommand(notification).apply()
+		success
+	}
+
 	@PostMapping
 	def onSubmit(@RequestParam(value = "notification", required = false) choice: String): Mav = {
 		(choice match {
 			case "first" => Some(new UAMAuditNotification)
 			case "second" => Some(new UAMAuditChaserNotification)
 			case _ => None
-		}).map { notification =>
-			UserAccessManagerAuditCommand.apply(notification).apply()
-			success
-		}.getOrElse(error)
+		}).map(sendNotification).getOrElse(error)
 	}
 
 }
