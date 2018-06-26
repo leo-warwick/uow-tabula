@@ -33,7 +33,12 @@ class EmailNotificationListener extends RecipientNotificationListener with Unico
 	val replyWarning = "\n\nThis email was sent from an automated system and replies to it will not reach a real person."
 
 	def link(n: Notification[_, _], recipient: User): String = {
-		val url = topLevelUrl + n.urlFor(recipient)
+		val urlFromNotification = n.urlFor(recipient)
+		val url = if (urlFromNotification.startsWith("https://")) {
+			urlFromNotification
+		} else {
+			topLevelUrl + urlFromNotification
+		}
 
 		if (n.isInstanceOf[ActionRequiredNotification]) {
 			s"\n\nYou need to ${n.urlTitle}. Please visit $url"
