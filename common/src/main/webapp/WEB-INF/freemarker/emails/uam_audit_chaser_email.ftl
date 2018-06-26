@@ -14,8 +14,4 @@ Please be aware that, should we not receive a response, due to the audit implica
 
 Thanks for your assistance in this matter.
 
-Many thanks,
-
-ITS Web Team
-
 <#include "uam_audit_email.ftl" />

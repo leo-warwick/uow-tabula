@@ -11,6 +11,3 @@ ${url}
 - In accepting the UAM role, you accept that you are responsible for the accuracy of these permissions - and will monitor permissions periodically. If you are unable to monitor permissions in the future, you should request that the UAM role be assigned to another person within your department.
 
 Please respond to confirm that you have checked your permissions by ${permissionConfirmation}. If you have any questions or wish to discuss this further, please contact the Web Team via tabula@warwick.ac.uk.
-
-Many thanks,
-ITS Web Team
