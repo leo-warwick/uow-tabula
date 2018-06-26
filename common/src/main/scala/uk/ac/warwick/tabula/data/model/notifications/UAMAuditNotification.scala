@@ -1,13 +1,20 @@
 package uk.ac.warwick.tabula.data.model.notifications
 
 import javax.persistence.{DiscriminatorValue, Entity}
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalDate}
+import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.userlookup.User
 
 @Entity
 @DiscriminatorValue("UAMAuditNotification")
 class UAMAuditNotification extends Notification[Department, Unit] with MyWarwickNotification {
+
+	@transient
+	object Deadline {
+		val permissionConfirmation: LocalDate = AcademicYear.forDate(new DateTime()).firstDay.minusWeeks(1)
+		val roleConfirmation: LocalDate = permissionConfirmation.minusWeeks(4)
+	}
 
 	@transient
 	val templateLocation = "/WEB-INF/freemarker/emails/uam_audit_email.ftl"
@@ -18,15 +25,18 @@ class UAMAuditNotification extends Notification[Department, Unit] with MyWarwick
 
 	def title: String = s"Tabula Users Audit ${DateTime.now().year()}"
 
+	def url: String = "https://warwick.ac.uk/services/its/servicessupport/web/tabula/uamconfirmation/"
+
+	def urlTitle: String = "Tabula Users Audit 2018"
+
 	def content: FreemarkerModel = FreemarkerModel(templateLocation, Map(
 		"departments" -> departments,
 		"userAccessManager" -> agent,
-		"deadline" -> DateTime.parse(s"${DateTime.now().year()}-08-31T00:00")
+		"permissionConfirmation" -> Deadline.permissionConfirmation,
+		"roleConfirmation" -> Deadline.roleConfirmation,
+		"url" -> url,
+		"urlTitle" -> urlTitle
 	))
-
-	def url: String = "url to sitebuilder form"
-
-	def urlTitle: String = "Tabula User Access Manager Confirmation Form"
 
 	@transient
 	def recipients: Seq[User] = Seq(agent)

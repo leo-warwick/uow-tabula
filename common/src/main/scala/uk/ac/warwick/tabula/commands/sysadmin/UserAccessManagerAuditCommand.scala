@@ -2,7 +2,7 @@ package uk.ac.warwick.tabula.commands.sysadmin
 
 import uk.ac.warwick.tabula.CurrentUser
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.commands.sysadmin.UserAccessManagerAuditCommand.UAMAuditNotification
+import uk.ac.warwick.tabula.data.model.notifications.UAMAuditNotification
 import uk.ac.warwick.tabula.data.model.{Department, Notification}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.roles.UserAccessMgrRoleDefinition
@@ -11,7 +11,6 @@ import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, Permissions
 import uk.ac.warwick.userlookup.User
 
 object UserAccessManagerAuditCommand {
-	type UAMAuditNotification = Notification[Department, Unit]
 
 	def apply[A <: UAMAuditNotification](notification: A): Appliable[Seq[UserAccessManagerWithDepartments]] =
 		new UserAccessManagerAuditCommandInternal(notification)
