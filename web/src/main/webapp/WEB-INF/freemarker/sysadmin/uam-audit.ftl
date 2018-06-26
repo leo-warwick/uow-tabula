@@ -9,6 +9,12 @@
 		</div>
 	</#if>
 
+	<#if error!false>
+		<div class="alert alert-danger">
+			Please check selection
+		</div>
+	</#if>
+
 	<div class="form-group">
 		<div class="radio">
 			<label>
