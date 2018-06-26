@@ -14,13 +14,13 @@ class UserAccessManagerAuditController extends BaseSysadminController {
 
 	@PostMapping(params = Array("notification=first"))
 	def sendFirstNotification(): Mav = {
-		UserAccessManagerAuditCommand.apply(new UAMAuditNotification)
+		UserAccessManagerAuditCommand.apply(new UAMAuditNotification).apply()
 		home.addObjects("success" -> true)
 	}
 
 	@PostMapping(params = Array("notification=second"))
 	def sendSecondNotification(): Mav = {
-		UserAccessManagerAuditCommand.apply(new UAMAuditChaserNotification)
+		UserAccessManagerAuditCommand.apply(new UAMAuditChaserNotification).apply()
 
 		home.addObjects("success" -> true)
 	}
