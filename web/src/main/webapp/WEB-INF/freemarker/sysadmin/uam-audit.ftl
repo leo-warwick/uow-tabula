@@ -35,4 +35,12 @@
 		<a class="btn btn-default" href="${url('/sysadmin')}">Cancel</a>
 	</div>
 </@f.form>
-
+<hr />
+<h4>List of all UAMs:</h4>
+<ul>
+	<#list uamUsercodes as usercode>
+		<li>
+			${usercode}
+		</li>
+	</#list>
+</ul>

@@ -4,16 +4,22 @@ import javax.validation.Valid
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation._
+import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.commands.sysadmin.UserAccessManagerAuditCommand
 import uk.ac.warwick.tabula.data.model.notifications.{UAMAuditChaserNotification, UAMAuditNotification}
+import uk.ac.warwick.tabula.roles.UserAccessMgrRoleDefinition
+import uk.ac.warwick.tabula.services.permissions.{PermissionsService, PermissionsServiceComponent}
 import uk.ac.warwick.tabula.web.Mav
+import uk.ac.warwick.userlookup.User
 
 @Controller
 @RequestMapping(Array("/sysadmin/uam-audit"))
-class UserAccessManagerAuditController extends BaseSysadminController {
+class UserAccessManagerAuditController extends BaseSysadminController with PermissionsServiceComponent {
+
+	override def permissionsService: PermissionsService = Wire[PermissionsService]
 
 	@GetMapping
-	def home: Mav = Mav("sysadmin/uam-audit")
+	def home: Mav = Mav("sysadmin/uam-audit").addObjects("uamUsercodes" -> uams.map(_.getUserId))
 
 	def success: Mav = home.addObjects("success" -> true)
 
@@ -22,6 +28,13 @@ class UserAccessManagerAuditController extends BaseSysadminController {
 	def sendNotification(notification: UAMAuditNotification): Mav = {
 		UserAccessManagerAuditCommand(notification).apply()
 		success
+	}
+
+	def uams: Seq[User] = {
+		permissionsService
+			.getAllGrantedRolesForDefinition(UserAccessMgrRoleDefinition)
+			.flatMap(_.users.users)
+			.distinct
 	}
 
 	@PostMapping
