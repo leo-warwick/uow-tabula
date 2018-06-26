@@ -6,15 +6,16 @@ import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.userlookup.User
 
-@Entity
-@DiscriminatorValue("UAMAuditNotification")
-class UAMAuditNotification extends Notification[Department, Unit] with MyWarwickNotification {
-
-	@transient
+object UAMAuditNotification {
 	object Deadline {
 		val permissionConfirmation: LocalDate = AcademicYear.forDate(new DateTime()).firstDay.minusWeeks(1)
 		val roleConfirmation: LocalDate = permissionConfirmation.minusWeeks(4)
 	}
+}
+
+@Entity
+@DiscriminatorValue("UAMAuditNotification")
+class UAMAuditNotification extends Notification[Department, Unit] with MyWarwickNotification {
 
 	@transient
 	val templateLocation = "/WEB-INF/freemarker/emails/uam_audit_email.ftl"
@@ -32,8 +33,8 @@ class UAMAuditNotification extends Notification[Department, Unit] with MyWarwick
 	def content: FreemarkerModel = FreemarkerModel(templateLocation, Map(
 		"departments" -> departments,
 		"userAccessManager" -> agent,
-		"permissionConfirmation" -> Deadline.permissionConfirmation,
-		"roleConfirmation" -> Deadline.roleConfirmation,
+		"permissionConfirmation" -> UAMAuditNotification.Deadline.permissionConfirmation,
+		"roleConfirmation" -> UAMAuditNotification.Deadline.roleConfirmation,
 		"url" -> url,
 		"urlTitle" -> urlTitle
 	))

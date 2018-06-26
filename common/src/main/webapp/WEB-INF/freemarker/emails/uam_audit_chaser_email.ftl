@@ -4,9 +4,9 @@ You received an email (copied below) from the ITS Web Team because you have User
 
 In the email below we asked you to do two things to satisfy the University's data audit requirements:
 
-Confirm by <@fmt.date date=deadline /> that you continue to be the nominated User Access Manager and that you are in a position to oversee the administration of permissions in Tabula.
+Confirm by <@fmt.date date=roleConfirmation /> that you continue to be the nominated User Access Manager and that you are in a position to oversee the administration of permissions in Tabula.
 
-To ensure by <@fmt.date date=deadline.plusMonths(1) /> that permission levels for staff in your department are accurate and appropriate.
+To ensure by <@fmt.date date=permissionConfirmation /> that permission levels for staff in your department are accurate and appropriate.
 
 We provided you with a list of URLs to help you to do that.
 
