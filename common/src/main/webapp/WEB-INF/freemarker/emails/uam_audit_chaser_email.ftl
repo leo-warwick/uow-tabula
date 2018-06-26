@@ -6,7 +6,7 @@ Confirm by ${roleConfirmation} that you continue to be the nominated User Access
 
 To ensure by ${permissionConfirmation} that permission levels for staff in your department are accurate and appropriate.
 
-We provided you with a list of URLs to help you to do that.
+We provided you with a URL to help you to do that.
 
 We have not received your response to the email below and would be grateful if you could contact us to confirm the requests.
 
@@ -14,4 +14,9 @@ Please be aware that, should we not receive a response, due to the audit implica
 
 Thanks for your assistance in this matter.
 
+--- original message ---
+
 <#include "uam_audit_email.ftl" />
+
+
+--- end of original message ---
