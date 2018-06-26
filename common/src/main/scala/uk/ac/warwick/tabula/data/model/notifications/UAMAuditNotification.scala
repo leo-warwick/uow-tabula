@@ -24,7 +24,7 @@ class UAMAuditNotification extends Notification[Department, Unit] with MyWarwick
 
 	def verb: String = "view"
 
-	def title: String = s"Tabula Users Audit ${DateTime.now().year()}"
+	def title: String = s"Tabula Users Audit ${DateTime.now().getYear}"
 
 	def url: String = "https://warwick.ac.uk/services/its/servicessupport/web/tabula/uamconfirmation/"
 
@@ -32,7 +32,7 @@ class UAMAuditNotification extends Notification[Department, Unit] with MyWarwick
 
 	def content: FreemarkerModel = FreemarkerModel(templateLocation, Map(
 		"departments" -> departments,
-		"userAccessManager" -> agent,
+		"userAccessManager" -> agent.getFullName,
 		"permissionConfirmation" -> UAMAuditNotification.Deadline.permissionConfirmation,
 		"roleConfirmation" -> UAMAuditNotification.Deadline.roleConfirmation,
 		"url" -> url,
