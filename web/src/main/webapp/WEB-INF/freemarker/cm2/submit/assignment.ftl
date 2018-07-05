@@ -4,7 +4,7 @@
 
 <@cm2.assignmentHeader "Submit assignment" assignment "for" />
 
-<#if can.do("Assignment.Update", assignment)>
+<#if can.do("Module.Administer", assignment.module)>
 	<div class="alert alert-info">
 		<button type="button" class="close" data-dismiss="alert">×</button>
 		<h4>Information for module managers</h4>
