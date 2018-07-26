@@ -107,7 +107,7 @@ object SchedulingConfiguration {
 	val scheduledJobs: Seq[ScheduledJob[_, _ <: Trigger]] = Seq(
 		// Imports
 		CronTriggerJob[ImportAcademicDataJob](cronExpression = "0 0 7,14 * * ?"), // 7am and 2pm
-		CronTriggerJob[ImportProfilesJob](cronExpression = "0 40 11 * * ?"), // 11:40am
+		CronTriggerJob[ImportProfilesJob](cronExpression = "0 15 12 * * ?"), // 12:15pm
 		CronTriggerJob[StampMissingRowsJob](cronExpression = "23 0 0 * * ?"), // 11:00pm
 		CronTriggerJob[ImportAssignmentsJob](cronExpression = "0 0 7 * * ?"), // 7am
 		CronTriggerJob[ManualMembershipWarningJob](cronExpression = "0 0 9 ? 1/1 MON#1 *"), // first Monday of the month at 9am
