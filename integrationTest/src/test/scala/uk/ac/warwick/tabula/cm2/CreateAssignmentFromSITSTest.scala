@@ -1,6 +1,7 @@
 package uk.ac.warwick.tabula.cm2
 import org.openqa.selenium.By
-import uk.ac.warwick.tabula.BrowserTest
+import uk.ac.warwick.tabula.{AcademicYear, BrowserTest}
+
 import scala.collection.JavaConverters._
 class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
 	private def openAssignmentsScreen(): Unit = {
@@ -20,7 +21,7 @@ class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
 		click on createAssignmentsLink
 		eventually(timeout(45.seconds), interval(300.millis)) ({
 			Then("I should reach the create assignments from previous page")
-			currentUrl should include("/2017/setup-assignments")
+			currentUrl should include("/"+ AcademicYear.now().startYear.toString +"/setup-assignments")
 		})
 	}
 	private def createSITSAssignment(): Unit = {
