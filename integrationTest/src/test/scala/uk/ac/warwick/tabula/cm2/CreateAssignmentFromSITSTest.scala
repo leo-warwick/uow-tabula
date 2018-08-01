@@ -22,12 +22,7 @@ class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
 		click on createAssignmentsLink
 		eventually(timeout(45.seconds), interval(300.millis)) ({
 			Then("I should reach the create assignments from previous page")
-			if (DateTime.now.getMonthOfYear > 6) {
-				// we have added the next academic year in tabula
-				currentUrl should include("/"+ DateTime.now.getYear +"/setup-assignments")
-			} else {
-				currentUrl should include("/"+ DateTime.now.getYear - 1 +"/setup-assignments")
-			}
+			currentUrl should include("/2018/setup-assignments")
 		})
 	}
 	private def createSITSAssignment(): Unit = {
