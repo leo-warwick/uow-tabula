@@ -13,8 +13,8 @@ class AttendanceEditStudentsTest extends AttendanceFixture with GivenWhenThen {
 		Given("I am logged in as Admin1")
 		signIn as P.Admin1 to Path("/")
 
-		When(s"I go to /attendance/manage/xxx/$nextAcademicYearString")
-		go to Path(s"/attendance/manage/xxx/$nextAcademicYearString")
+		When(s"I go to /attendance/manage/xxx/$thisAcademicYearString")
+		go to Path(s"/attendance/manage/xxx/$thisAcademicYearString")
 
 		And("I choose to edit the students on a scheme")
 		click on linkText("1 student")

@@ -12,7 +12,6 @@ class AttendanceFixture extends BrowserTest with FeaturesDriver with FixturesDri
 	val TEST_POSTGRAD_COURSE_CODE="Px123"
 
 	val thisAcademicYearString: String = AcademicYear.now().startYear.toString
-	val nextAcademicYearString: String = AcademicYear.now().endYear.toString
 
 	before {
 		go to Path("/fixtures/setup")
