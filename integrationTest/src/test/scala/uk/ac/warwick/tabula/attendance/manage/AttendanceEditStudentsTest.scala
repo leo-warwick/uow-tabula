@@ -7,8 +7,6 @@ import uk.ac.warwick.tabula.attendance.AttendanceFixture
 
 class AttendanceEditStudentsTest extends AttendanceFixture with GivenWhenThen {
 
-	val isSitsInFlux: Boolean = DateTime.now.getMonthOfYear >= DateTimeConstants.JUNE && DateTime.now.getMonthOfYear < DateTimeConstants.OCTOBER
-
 	"A Member of staff" should "be able to edit students on a scheme" in {
 		Given("I am logged in as Admin1")
 		signIn as P.Admin1 to Path("/")
@@ -64,7 +62,7 @@ class AttendanceEditStudentsTest extends AttendanceFixture with GivenWhenThen {
 		pageSource should include("(1 from SITS, plus 2 added manually)")
 
 		// No linking to SITS between June and October
-		if (!isSitsInFlux) {
+		if (!AcademicYear.now().isSITSInFlux(DateTime.now().toLocalDate)) {
 
 			When("I choose to link to SITS")
 			click on cssSelector("input[name=linkToSits]")
@@ -89,7 +87,7 @@ class AttendanceEditStudentsTest extends AttendanceFixture with GivenWhenThen {
 		eventually(currentUrl should endWith(s"students"))
 		pageSource should include("3 students on this scheme")
 
-		if (!isSitsInFlux) {
+		if (!AcademicYear.now().isSITSInFlux(DateTime.now().toLocalDate)) {
 
 			When("I reset both manually added students")
 			click on cssSelector(".manually-added .section-title")
