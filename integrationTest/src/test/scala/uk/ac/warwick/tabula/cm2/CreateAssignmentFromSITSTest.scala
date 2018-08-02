@@ -1,8 +1,6 @@
 package uk.ac.warwick.tabula.cm2
-import org.joda.time.DateTime
 import org.openqa.selenium.By
-import uk.ac.warwick.tabula.{AcademicYear, BrowserTest}
-
+import uk.ac.warwick.tabula.BrowserTest
 import scala.collection.JavaConverters._
 class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
 	private def openAssignmentsScreen(): Unit = {
