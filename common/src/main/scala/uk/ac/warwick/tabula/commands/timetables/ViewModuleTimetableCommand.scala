@@ -58,7 +58,7 @@ abstract class ViewModuleTimetableCommandInternal(val module: Module, user: Curr
 	def applyInternal(): ReturnType = {
 		Try(Await.result(moduleTimetableEventSource.eventsFor(module, academicYear, user, sourcesToShow), ViewModuleEventsCommand.Timeout))
 			.recover { case _: TimeoutException | _: TimetableEmptyException => EventList.empty }
-			.map { events => events.filter { event => event.year == academicYear }}
+			.map(events => events.filter(_.year.startYear == academicYear.startYear))
 	}
 }
 
