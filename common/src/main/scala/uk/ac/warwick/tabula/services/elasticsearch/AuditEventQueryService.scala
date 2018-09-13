@@ -239,33 +239,64 @@ trait AuditEventQueryMethodsImpl extends AuditEventQueryMethods {
 	private def afterFeedbackPublishedRestriction(assignment: Assignment): QueryDefinition =
 		assignmentRangeRestriction(assignment, assignment.feedbacks.asScala.flatMap { f => Option(f.releasedDate) }.sorted.headOption.orElse { Option(assignment.createdDate )})
 
-	def feedbackDownloads(assignment: Assignment): Future[Seq[(User, DateTime)]] =
-		eventsOfType("DownloadFeedback", afterFeedbackPublishedRestriction(assignment)).map {
-			_.filterNot { _.hadError }
-			.map { event => userLookup.getUserByUserId(event.masqueradeUserId) -> event.eventDate }
+	def feedbackDownloads(assignment: Assignment): Future[Seq[(User, DateTime)]] = {
+		for {
+			events <- eventsOfType("DownloadFeedback", afterFeedbackPublishedRestriction(assignment))
+				.map(_.filterNot(_.hadError).map(event => (event.masqueradeUserId, event)).toMap)
+		} yield {
+			val usersInEvents = userLookup.getUsersByUserIds(events.toIndexedSeq.map(_._1)).values
+			mapToLatest(usersInEvents.map(user => (user, events(user.getUserId).eventDate)).toSeq).toSeq
 		}
+
+//		eventsOfType("DownloadFeedback", afterFeedbackPublishedRestriction(assignment)).map {
+//			_.filterNot {
+//				_.hadError
+//			}
+//				.map { event => userLookup.getUserByUserId(event.masqueradeUserId) -> event.eventDate }
+//		}
+	}
 
 	private def mapToLatest(in: Seq[(User, DateTime)]): Map[User, DateTime] =
 		// We take warwick ID as the key to match first, to try and cope with users using multiple IDs for the same uni ID
 		in.groupBy { case (user, _) => user.getWarwickId.maybeText.getOrElse(user.getUserId) }
 			.map { case (_, eventDates) => eventDates.maxBy { case (_, eventDate) => eventDate } }
 
-	def latestOnlineFeedbackViews(assignment: Assignment): Future[Map[User, DateTime]] = // User ID to DateTime
-		eventsOfType("ViewOnlineFeedback", afterFeedbackPublishedRestriction(assignment)).map {
-			_.filterNot { _.hadError }
-			.map { event => userLookup.getUserByUserId(event.masqueradeUserId) -> event.eventDate }
-		}.map(mapToLatest)
+	def latestOnlineFeedbackViews(assignment: Assignment): Future[Map[User, DateTime]] = { // User ID to DateTime
+		(for {
+			events <- eventsOfType("ViewOnlineFeedback", afterFeedbackPublishedRestriction(assignment))
+				.map(_.filterNot(_.hadError).map(event => (event.masqueradeUserId, event)).toMap)
+		} yield {
+			val usersInEvents = userLookup.getUsersByUserIds(events.toIndexedSeq.map(_._1)).values
+			mapToLatest(usersInEvents.map(user => (user, events(user.getUserId).eventDate)).toSeq)
+		}).map(_.toMap)
 
-	def latestOnlineFeedbackAdded(assignment: Assignment): Future[Map[User, DateTime]] =
-		parsedEventsOfType("OnlineFeedback", assignmentRangeRestriction(assignment, Option(assignment.createdDate))).map {
-			_.filterNot(_.hadError)
-			.flatMap { event =>
-				val usersById = event.students.map(userLookup.getUserByUserId)
-				val usersByUsercode = event.studentUsercodes.map(userLookup.getUserByWarwickUniId)
-				val allUsers = (usersById ++ usersByUsercode).toSet
-				allUsers.map { u => u -> event.eventDate }.toSeq
-			}
-		}.map(mapToLatest)
+//		eventsOfType("ViewOnlineFeedback", afterFeedbackPublishedRestriction(assignment)).map {
+//			_.filterNot { _.hadError }
+//				.map { event => userLookup.getUserByUserId(event.masqueradeUserId) -> event.eventDate }
+//		}.map(mapToLatest)
+	}
+
+
+	def latestOnlineFeedbackAdded(assignment: Assignment): Future[Map[User, DateTime]] = {
+		(for {
+			events <- parsedEventsOfType("OnlineFeedback", assignmentRangeRestriction(assignment, Option(assignment.createdDate)))
+				.map(_.filterNot(_.hadError).map(event => (event.masqueradeUserId, event)).toMap)
+		} yield {
+			val usersInEvents = userLookup.getUsersByUserIds(events.toIndexedSeq.map(_._1)).values
+			mapToLatest(usersInEvents.map(user => (user, events(user.getUserId).eventDate)).toSeq)
+		}).map(_.toMap)
+
+//		parsedEventsOfType("OnlineFeedback", assignmentRangeRestriction(assignment, Option(assignment.createdDate))).map {
+//			_.filterNot(_.hadError)
+//				.flatMap { event =>
+//					val usersById = event.students.map(userLookup.getUserByUserId)
+//					val usersByUsercode = event.studentUsercodes.map(userLookup.getUserByWarwickUniId)
+//					val allUsers = (usersById ++ usersByUsercode).toSet
+//					allUsers.map { u => u -> event.eventDate }.toSeq
+//				}
+//		}.map(mapToLatest)
+
+	}
 
 	def latestGenericFeedbackAdded(assignment: Assignment): Future[Option[DateTime]] =
 		eventsOfType("GenericFeedback", assignmentRangeRestriction(assignment, Option(assignment.createdDate))).map {
