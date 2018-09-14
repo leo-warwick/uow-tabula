@@ -70,33 +70,32 @@ trait SubmissionAndFeedbackEnhancer {
 trait CommandSubmissionAndFeedbackEnhancer extends SubmissionAndFeedbackEnhancer {
 	self: SubmissionAndFeedbackState with Logging =>
 
-	val enhancedSubmissionsCommand = ListSubmissionsCommand(assignment)
-	val enhancedFeedbacksCommand = ListFeedbackCommand(assignment)
-
-	val timeout = 5.seconds
-
-	override def enhanceSubmissions(): Seq[SubmissionListItem] = try {
-		Await.result(enhancedSubmissionsCommand.apply(), 5.seconds)
-	} catch {
-		case _: TimeoutException => {
-			logger.info(s"enhancedSubmissionsCommand is taking more than $timeout to process ${assignment.id}, skipping.")
-			Seq.empty
+	def skipIfTakingTooLong[T](expectedFuture: Future[T], backup: T): T = {
+		val timeout: FiniteDuration = 5.seconds
+		try {
+			Await.result(expectedFuture, timeout)
+		} catch {
+			case e: TimeoutException => {
+				logger.info(s"taking more than $timeout to process, skipping.", e)
+				backup
+			}
 		}
 	}
 
-	override def enhanceFeedback(): ListFeedbackResult = try {
-		Await.result(enhancedFeedbacksCommand.apply(), 5.seconds)
-	} catch {
-		case _: TimeoutException => {
-			logger.info(s"enhancedFeedbacksCommand is taking more than $timeout to process ${assignment.id}, skipping.")
-			ListFeedbackResult(
-				Seq.empty,
-				Map.empty,
-				Map.empty,
-				None
-			)
-		}
-	}
+	override def enhanceSubmissions(): Seq[SubmissionListItem] = skipIfTakingTooLong(
+		ListSubmissionsCommand(assignment).apply(),
+		Seq.empty
+	)
+
+	override def enhanceFeedback(): ListFeedbackResult = skipIfTakingTooLong(
+		ListFeedbackCommand(assignment).apply(),
+		ListFeedbackResult(
+			Seq.empty,
+			Map.empty,
+			Map.empty,
+			None
+		)
+	)
 }
 
 
