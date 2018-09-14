@@ -11,15 +11,15 @@ import uk.ac.warwick.tabula.services.elasticsearch.{AuditEventQueryServiceCompon
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.Future
+import uk.ac.warwick.tabula.helpers.ExecutionContexts.global
 
 object ListSubmissionsCommand {
-	type CommandType = Appliable[Seq[SubmissionListItem]] with ListSubmissionsRequest
+	type CommandType = Appliable[Future[Seq[SubmissionListItem]]] with ListSubmissionsRequest
 
 	def apply(assignment: Assignment) =
 		new ListSubmissionsCommandInternal(assignment)
-			with ComposableCommand[Seq[SubmissionListItem]]
+			with ComposableCommand[Future[Seq[SubmissionListItem]]]
 			with ListSubmissionsRequest
 			with ListSubmissionsPermissions
 			with AutowiringAuditEventQueryServiceComponent
@@ -35,20 +35,19 @@ trait ListSubmissionsRequest extends ListSubmissionsState {
 }
 
 abstract class ListSubmissionsCommandInternal(val assignment: Assignment)
-	extends CommandInternal[Seq[SubmissionListItem]]
+	extends CommandInternal[Future[Seq[SubmissionListItem]]]
 		with ListSubmissionsState {
 	self: ListSubmissionsRequest with AuditEventQueryServiceComponent =>
 
-	override def applyInternal(): Seq[SubmissionListItem] = {
-		val submissions = assignment.submissions.asScala.sortBy(_.submittedDate).reverse
-		val downloads =
-			if (checkIndex) try {
-				Await.result(auditEventQueryService.adminDownloadedSubmissions(assignment), 15.seconds)
-			} catch { case timeout: TimeoutException => Nil }
-			else Nil
-
-		submissions.map { submission =>
-			SubmissionListItem(submission, downloads.contains(submission))
+	override def applyInternal(): Future[Seq[SubmissionListItem]] = {
+		for {
+			downloads <- if (checkIndex) {
+				auditEventQueryService.adminDownloadedSubmissions(assignment)
+			} else Future(Seq.empty)
+		} yield {
+			assignment.submissions.asScala.sortBy(_.submittedDate).reverse.map { submission =>
+				SubmissionListItem(submission, downloads.contains(submission))
+			}
 		}
 	}
 }

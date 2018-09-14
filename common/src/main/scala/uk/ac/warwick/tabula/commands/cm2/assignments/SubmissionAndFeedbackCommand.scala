@@ -7,6 +7,7 @@ import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackComman
 import uk.ac.warwick.tabula.commands.cm2.feedback.ListFeedbackCommand
 import uk.ac.warwick.tabula.commands.cm2.feedback.ListFeedbackCommand._
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.helpers.{Futures, Logging}
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.helpers.cm2.SubmissionAndFeedbackInfoFilters.OverlapPlagiarismFilter
 import uk.ac.warwick.tabula.helpers.cm2._
@@ -17,6 +18,8 @@ import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, Permissions
 import uk.ac.warwick.userlookup.User
 
 import scala.collection.JavaConverters._
+import scala.concurrent.{Await, Future, TimeoutException}
+import scala.concurrent.duration._
 
 object SubmissionAndFeedbackCommand {
 	type CommandType = Appliable[SubmissionAndFeedbackResults]
@@ -65,14 +68,35 @@ trait SubmissionAndFeedbackEnhancer {
 }
 
 trait CommandSubmissionAndFeedbackEnhancer extends SubmissionAndFeedbackEnhancer {
-	self: SubmissionAndFeedbackState =>
+	self: SubmissionAndFeedbackState with Logging =>
 
 	val enhancedSubmissionsCommand = ListSubmissionsCommand(assignment)
 	val enhancedFeedbacksCommand = ListFeedbackCommand(assignment)
 
-	override def enhanceSubmissions(): Seq[SubmissionListItem] = enhancedSubmissionsCommand.apply()
+	val timeout = 5.seconds
 
-	override def enhanceFeedback(): ListFeedbackResult = enhancedFeedbacksCommand.apply()
+	override def enhanceSubmissions(): Seq[SubmissionListItem] = try {
+		Await.result(enhancedSubmissionsCommand.apply(), 5.seconds)
+	} catch {
+		case _: TimeoutException => {
+			logger.info(s"enhancedSubmissionsCommand is taking more than $timeout to process ${assignment.id}, skipping.")
+			Seq.empty
+		}
+	}
+
+	override def enhanceFeedback(): ListFeedbackResult = try {
+		Await.result(enhancedFeedbacksCommand.apply(), 5.seconds)
+	} catch {
+		case _: TimeoutException => {
+			logger.info(s"enhancedFeedbacksCommand is taking more than $timeout to process ${assignment.id}, skipping.")
+			ListFeedbackResult(
+				Seq.empty,
+				Map.empty,
+				Map.empty,
+				None
+			)
+		}
+	}
 }
 
 
