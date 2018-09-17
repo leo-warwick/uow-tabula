@@ -12,8 +12,6 @@ import uk.ac.warwick.tabula.services.elasticsearch.{AuditEventQueryServiceCompon
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object ListSubmissionsCommand {
@@ -43,24 +41,18 @@ abstract class ListSubmissionsCommandInternal(val assignment: Assignment)
 	self: ListSubmissionsRequest with AuditEventQueryServiceComponent with ListSubmissionsCommandResultCacheComponent =>
 
 	override def applyInternal(): Seq[SubmissionListItem] = {
-		listSubmissionsCommandResultCache.getValueForKey(assignment, auditEventQueryService.adminDownloadedSubmissions(assignment).map { downloads =>
-			assignment.submissions
-				.asScala
-				.sortBy(_.submittedDate)
-				.reverse
-				.map(submission => SubmissionListItem(submission, downloads.contains(submission)))
-		})
-
-//
-//		val downloads =
-//			if (checkIndex) try {
-//				Await.result(auditEventQueryService.adminDownloadedSubmissions(assignment), 15.seconds)
-//			} catch { case timeout: TimeoutException => Nil }
-//			else Nil
-//
-//		submissions.map { submission =>
-//			SubmissionListItem(submission, downloads.contains(submission))
-//		}
+		listSubmissionsCommandResultCache.getValueForKey(
+			key = assignment,
+			futureValue = auditEventQueryService.adminDownloadedSubmissions(assignment)
+				.map { downloads =>
+					assignment
+						.submissions
+						.asScala
+						.sortBy(_.submittedDate)
+						.reverse
+						.map(submission => SubmissionListItem(submission, downloads.contains(submission)))
+				}
+		)
 	}
 }
 

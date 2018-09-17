@@ -11,21 +11,25 @@ import scala.concurrent.{Await, Future}
 
 trait BaseCacheService[K, V] extends Logging {
 
-	val cacheMap: mutable.HashMap[K, V] = mutable.HashMap.empty
+	case class CacheResult(value: V, validUntil: LocalDateTime)
 
-	private var lastUpdated: LocalDateTime = LocalDateTime.now().minusHours(2)
+	private val cacheMap: mutable.HashMap[K, CacheResult] = mutable.HashMap.empty
 
 	def futureTimeout: FiniteDuration
 
 	def defaultValue: V
 
-	def cacheDurationInHour: Int = 1
+	def validUntil(key: K): Option[LocalDateTime] = cacheMap.get(key).map(_.validUntil)
 
-	def updateAndReturn(futureResult: Future[V], key: K): V = {
+	def validDuration: Int = 1
+
+	private def updateAndReturn(futureResult: Future[V], key: K): V = {
 		try {
 			val result = Await.result(futureResult, futureTimeout)
-			lastUpdated = LocalDateTime.now()
-			cacheMap.put(key, result)
+			cacheMap.put(
+				key,
+				CacheResult(result, LocalDateTime.now().plusHours(validDuration))
+			)
 			result
 		} catch {
 			case e: TimeoutException =>
@@ -40,10 +44,10 @@ trait BaseCacheService[K, V] extends Logging {
 	def getValueForKey(key: K, futureValue: Future[V]): V = {
 		cacheMap
 			.get(key)
-			.map { value =>
-				if (LocalDateTime.now().minusHours(cacheDurationInHour).isBefore(lastUpdated)) {
+			.map { cacheResult =>
+				if (LocalDateTime.now().isBefore(cacheResult.validUntil)) {
 					logger.info("returning cached result")
-					return value
+					return cacheResult.value
 				} else {
 					logger.info("updating with fresh value")
 					updateAndReturn(futureValue, key)
@@ -51,7 +55,6 @@ trait BaseCacheService[K, V] extends Logging {
 			}.getOrElse {
 			updateAndReturn(futureValue, key)
 		}
-
 	}
 
 }

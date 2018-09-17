@@ -13,7 +13,6 @@ import uk.ac.warwick.tabula.services.elasticsearch.{AuditEventQueryServiceCompon
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.userlookup.User
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object ListFeedbackCommand {
@@ -66,29 +65,23 @@ abstract class ListFeedbackCommandInternal(val assignment: Assignment)
 		with ListFeedbackCommandResultCacheComponent =>
 
 	override def applyInternal(): ListFeedbackResult = {
-
 		listFeedbackCommandResultCache.getValueForKey(
-			assignment,
-			{
+			key = assignment,
+			futureValue = {
 				// The time to wait for a query to complete
 				val timeout = 15.seconds
 
 				// Wrap each future in Future.optionalTimeout, which will return None if it times out early
-				val downloads = Futures.optionalTimeout(auditEventQueryService.feedbackDownloads(assignment), timeout)
-				val latestOnlineViews = Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackViews(assignment), timeout)
-				val latestOnlineAdded = Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackAdded(assignment), timeout)
-				val latestGenericFeedback = Futures.optionalTimeout(auditEventQueryService.latestGenericFeedbackAdded(assignment), timeout)
-
 				for {
-					downloads <- downloads
-					latestOnlineViews <- latestOnlineViews
-					latestOnlineAdded <- latestOnlineAdded
-					latestGenericFeedback <- latestGenericFeedback
+					downloads <- Futures.optionalTimeout(auditEventQueryService.feedbackDownloads(assignment), timeout)
+					latestOnlineViews <- Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackViews(assignment), timeout)
+					latestOnlineAdded <- Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackAdded(assignment), timeout)
+					latestGenericFeedback <- Futures.optionalTimeout(auditEventQueryService.latestGenericFeedbackAdded(assignment), timeout)
 				} yield ListFeedbackResult(
 					downloads.getOrElse(Nil),
 					latestOnlineViews.getOrElse(Map.empty),
 					latestOnlineAdded.getOrElse(Map.empty),
-					latestGenericFeedback.getOrElse(None)
+					latestGenericFeedback.flatten
 				)
 			}
 		)
