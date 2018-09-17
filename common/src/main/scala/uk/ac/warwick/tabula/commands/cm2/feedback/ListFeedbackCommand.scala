@@ -8,6 +8,7 @@ import uk.ac.warwick.tabula.helpers.ExecutionContexts.global
 import uk.ac.warwick.tabula.helpers.Futures
 import uk.ac.warwick.tabula.permissions._
 import uk.ac.warwick.tabula.services._
+import uk.ac.warwick.tabula.services.cm2.{AutowiringListFeedbackCommandResultCache, ListFeedbackCommandResultCacheComponent}
 import uk.ac.warwick.tabula.services.elasticsearch.{AuditEventQueryServiceComponent, AutowiringAuditEventQueryServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.userlookup.User
@@ -32,6 +33,7 @@ object ListFeedbackCommand {
 			with AutowiringAuditEventQueryServiceComponent
 			with AutowiringUserLookupComponent
 			with AutowiringTaskSchedulerServiceComponent
+			with AutowiringListFeedbackCommandResultCache
 			with Unaudited with ReadOnly
 }
 
@@ -60,33 +62,36 @@ abstract class ListFeedbackCommandInternal(val assignment: Assignment)
 		with ListFeedbackState {
 	self: ListFeedbackRequest with UserConversion
 		with AuditEventQueryServiceComponent
-		with TaskSchedulerServiceComponent =>
+		with TaskSchedulerServiceComponent
+		with ListFeedbackCommandResultCacheComponent =>
 
 	override def applyInternal(): ListFeedbackResult = {
-		// The time to wait for a query to complete
-		val timeout = 15.seconds
 
-		// Wrap each future in Future.optionalTimeout, which will return None if it times out early
-		val downloads = Futures.optionalTimeout(auditEventQueryService.feedbackDownloads(assignment), timeout)
-		val latestOnlineViews = Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackViews(assignment), timeout)
-		val latestOnlineAdded = Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackAdded(assignment), timeout)
-		val latestGenericFeedback = Futures.optionalTimeout(auditEventQueryService.latestGenericFeedbackAdded(assignment), timeout)
+		listFeedbackCommandResultCache.getListFeedbackResultOrUpdate(
+			assignment,
+			{
+				// The time to wait for a query to complete
+				val timeout = 15.seconds
 
-		val result = for {
-			downloads <- downloads
-			latestOnlineViews <- latestOnlineViews
-			latestOnlineAdded <- latestOnlineAdded
-			latestGenericFeedback <- latestGenericFeedback
-		} yield ListFeedbackResult(
-			downloads.getOrElse(Nil),
-			latestOnlineViews.getOrElse(Map.empty),
-			latestOnlineAdded.getOrElse(Map.empty),
-			latestGenericFeedback.getOrElse(None)
+				// Wrap each future in Future.optionalTimeout, which will return None if it times out early
+				val downloads = Futures.optionalTimeout(auditEventQueryService.feedbackDownloads(assignment), timeout)
+				val latestOnlineViews = Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackViews(assignment), timeout)
+				val latestOnlineAdded = Futures.optionalTimeout(auditEventQueryService.latestOnlineFeedbackAdded(assignment), timeout)
+				val latestGenericFeedback = Futures.optionalTimeout(auditEventQueryService.latestGenericFeedbackAdded(assignment), timeout)
+
+				for {
+					downloads <- downloads
+					latestOnlineViews <- latestOnlineViews
+					latestOnlineAdded <- latestOnlineAdded
+					latestGenericFeedback <- latestGenericFeedback
+				} yield ListFeedbackResult(
+					downloads.getOrElse(Nil),
+					latestOnlineViews.getOrElse(Map.empty),
+					latestOnlineAdded.getOrElse(Map.empty),
+					latestGenericFeedback.getOrElse(None)
+				)
+			}
 		)
-
-		// We arbitrarily wait a longer time for the result, safe in the knowledge that if they don't return in a reasonable
-		// time then we've messed up.
-		Await.result(result, timeout * 2)
 	}
 }
 
