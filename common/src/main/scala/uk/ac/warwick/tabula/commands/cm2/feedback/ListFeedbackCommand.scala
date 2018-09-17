@@ -67,7 +67,7 @@ abstract class ListFeedbackCommandInternal(val assignment: Assignment)
 
 	override def applyInternal(): ListFeedbackResult = {
 
-		listFeedbackCommandResultCache.getListFeedbackResultOrUpdate(
+		listFeedbackCommandResultCache.getValueForKey(
 			assignment,
 			{
 				// The time to wait for a query to complete

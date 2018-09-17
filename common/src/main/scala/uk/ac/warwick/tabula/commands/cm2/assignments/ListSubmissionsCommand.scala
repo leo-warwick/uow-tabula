@@ -43,7 +43,7 @@ abstract class ListSubmissionsCommandInternal(val assignment: Assignment)
 	self: ListSubmissionsRequest with AuditEventQueryServiceComponent with ListSubmissionsCommandResultCacheComponent =>
 
 	override def applyInternal(): Seq[SubmissionListItem] = {
-		listSubmissionsCommandResultCache.getSubmissionListItemsOrUpdate(assignment, auditEventQueryService.adminDownloadedSubmissions(assignment).map { downloads =>
+		listSubmissionsCommandResultCache.getValueForKey(assignment, auditEventQueryService.adminDownloadedSubmissions(assignment).map { downloads =>
 			assignment.submissions
 				.asScala
 				.sortBy(_.submittedDate)
