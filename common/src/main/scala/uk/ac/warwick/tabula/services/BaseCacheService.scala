@@ -3,13 +3,14 @@ package uk.ac.warwick.tabula.services
 import java.time.LocalDateTime
 import java.util.concurrent.TimeoutException
 
-import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.helpers.{Futures, Logging}
 
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-trait BaseCacheService[K, V] extends Logging {
+trait BaseCacheService[K, V] extends Logging with AutowiringTaskSchedulerServiceComponent {
 
 	case class CacheResult(value: V, validUntil: LocalDateTime)
 
@@ -38,6 +39,19 @@ trait BaseCacheService[K, V] extends Logging {
 			case _ =>
 				logger.error(s"unknown exception")
 				defaultValue
+		}
+	}
+
+	private def update(futureResult: Future[V], key: K) = {
+		val futureResultWithTimeout = Futures.withTimeout(futureResult, futureTimeout)
+		
+		futureResultWithTimeout.onComplete { possibleResult =>
+			possibleResult.map { result =>
+				cacheMap.put(
+					key,
+					CacheResult(result, LocalDateTime.now().plusHours(validDuration))
+				)
+			}
 		}
 	}
 
