@@ -24,7 +24,7 @@ trait BaseCacheService[K, V] extends Logging with AutowiringTaskSchedulerService
 
 	def validDuration: Int = 1
 
-	private def updateAndReturn(futureResult: Future[V], key: K): V = {
+	private def updateAndReturnFresh(futureResult: Future[V], key: K): V = {
 		try {
 			val result = Await.result(futureResult, futureTimeout)
 			cacheMap.put(
@@ -42,32 +42,25 @@ trait BaseCacheService[K, V] extends Logging with AutowiringTaskSchedulerService
 		}
 	}
 
-	private def update(futureResult: Future[V], key: K) = {
+	private def update(futureResult: Future[V], key: K): Future[CacheResult] = {
 		val futureResultWithTimeout = Futures.withTimeout(futureResult, futureTimeout)
-		
-		futureResultWithTimeout.onComplete { possibleResult =>
-			possibleResult.map { result =>
-				cacheMap.put(
-					key,
-					CacheResult(result, LocalDateTime.now().plusHours(validDuration))
-				)
-			}
+		futureResultWithTimeout.map { result =>
+			val value = CacheResult(result, LocalDateTime.now().plusHours(validDuration))
+			cacheMap.put(key, value)
+			value
 		}
 	}
 
 	def getValueForKey(key: K, futureValue: Future[V]): V = {
-		cacheMap
-			.get(key)
+		cacheMap.get(key)
 			.map { cacheResult =>
-				if (LocalDateTime.now().isBefore(cacheResult.validUntil)) {
-					logger.info("returning cached result")
-					return cacheResult.value
-				} else {
-					logger.info("updating with fresh value")
-					updateAndReturn(futureValue, key)
+				if (cacheResult.validUntil.isBefore(LocalDateTime.now())) {
+					logger.info(s"updating cached value for $key")
+					update(futureValue, key)
 				}
+				cacheResult.value // return previously cached result
 			}.getOrElse {
-			updateAndReturn(futureValue, key)
+			updateAndReturnFresh(futureValue, key)
 		}
 	}
 
