@@ -357,7 +357,9 @@
 				</#if>
 				<#if canCreateMeetings>
 					<a class="btn btn-default new-meeting-record" href="<@routes.profiles.create_meeting_record studentCourseDetails thisAcademicYear relationshipType />">Record meeting</a>
-					<a class="btn btn-default new-meeting-record" href="<@routes.profiles.create_missed_meeting_record studentCourseDetails thisAcademicYear relationshipType />">Record missed meeting</a>
+					<#if !isSelf>
+						<a class="btn btn-default new-meeting-record" href="<@routes.profiles.create_missed_meeting_record studentCourseDetails thisAcademicYear relationshipType />">Record missed meeting</a>
+					</#if>
 				</#if>
 			</p>
 		</#if>
