@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.api.web.controllers.coursework.assignments
 
 import javax.servlet.http.HttpServletResponse
-
 import org.joda.time.DateTime
 import org.springframework.http.{HttpStatus, MediaType}
 import org.springframework.stereotype.Controller
@@ -15,6 +14,7 @@ import uk.ac.warwick.tabula.api.web.helpers.{AssessmentMembershipInfoToJsonConve
 import uk.ac.warwick.tabula.commands.coursework.assignments.{AddAssignmentCommand, ModifyAssignmentCommand}
 import uk.ac.warwick.tabula.commands.{UpstreamGroup, UpstreamGroupPropertyEditor, ViewViewableCommand}
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.data.model.markingworkflow.CM2MarkingWorkflow
 import uk.ac.warwick.tabula.helpers.XmlUtils._
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.web.views.{JSONErrorView, JSONView, XmlErrorView, XmlView}
@@ -84,8 +84,11 @@ class ListAssignmentsForModuleController extends ModuleAssignmentsController {
 class CreateAssignmentController extends ModuleAssignmentsController {
 
 	@ModelAttribute("createCommand")
-	def command(@PathVariable module: Module): AddAssignmentCommand =
-		new AddAssignmentCommand(module)
+	def command(@PathVariable module: Module): AddAssignmentCommand = {
+		val cmd = new AddAssignmentCommand(module)
+		cmd.cm2Assignment = true
+		cmd
+	}
 
 	@InitBinder(Array("createCommand"))
 	def upstreamGroupBinder(binder: WebDataBinder) {
@@ -125,7 +128,7 @@ trait AssignmentPropertiesRequest[A <: ModifyAssignmentCommand] extends JsonApiR
 	@BeanProperty var closeDate: DateTime = null
 	@BeanProperty var academicYear: AcademicYear = null
 	@BeanProperty var feedbackTemplate: FeedbackTemplate = null
-	@BeanProperty var markingWorkflow: MarkingWorkflow = null
+	@BeanProperty var markingWorkflow: CM2MarkingWorkflow = null
 	@BeanProperty var includeUsers: JList[String] = null
 	@BeanProperty var upstreamGroups: JList[UpstreamGroup] = null
 	@BeanProperty var fileAttachmentLimit: JInteger = null

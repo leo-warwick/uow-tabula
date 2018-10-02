@@ -28,7 +28,7 @@ trait ExtensionService {
 	def countUnapprovedExtensions(assignment: Assignment): Int
 	def hasUnapprovedExtensions(assignment: Assignment): Boolean
 	def getUnapprovedExtensions(assignment: Assignment): Seq[Extension]
-	def getPreviousExtensions(user: User): Seq[Extension]
+	def getAllExtensionRequests(user: User): Seq[Extension]
 	def filterExtensions(restrictions: Seq[ScalaRestriction], orders: Seq[ScalaOrder], maxResults: Int, startResult: Int ): Seq[Extension]
 	def countFilteredExtensions(restrictions: Seq[ScalaRestriction]): Int
 }
@@ -45,8 +45,8 @@ abstract class AbstractExtensionService extends ExtensionService {
 
 	def hasExtensions(assignment: Assignment): Boolean = countExtensions(assignment) > 0
 	def hasUnapprovedExtensions(assignment: Assignment): Boolean = countUnapprovedExtensions(assignment) > 0
-	def getPreviousExtensions(user: User): Seq[Extension] = transactional(readOnly = true) {
-		extensionDao.getPreviousExtensions(user)
+	def getAllExtensionRequests(user: User): Seq[Extension] = transactional(readOnly = true) {
+		extensionDao.getAllExtensionRequests(user)
 	}
 
 	def filterExtensions(restrictions: Seq[ScalaRestriction], orders: Seq[ScalaOrder] = Seq(),

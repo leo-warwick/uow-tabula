@@ -178,6 +178,9 @@ class Extension extends GeneratedId with PermissionsTarget with ToEntityReferenc
 	// Extensions can become irrelevant if the assignment close date is moved back
 	// after an extension has been approved.  See expiryDate for actual implementation.
 	def relevant: Boolean = expiryDate.nonEmpty
+
+	// Whether the approved expiry date is different from the requested expiry date
+	def expiryDateAdjusted: Boolean = expiryDate.exists(date => !requestedExpiryDate.contains(date))
 }
 
 

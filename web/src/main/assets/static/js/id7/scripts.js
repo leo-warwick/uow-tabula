@@ -313,6 +313,14 @@
 					$field.last().after('<div class="error help-block">' + message + '</div>');
 				}
 			}
+
+			// Handle global errors
+			$(scopeSelector).find('.alert-danger').remove();
+			for (error in data.errors) {
+				if (data.errors.hasOwnProperty(error)) {
+					$(scopeSelector).prepend($('<div class="alert alert-danger" />').text(data.errors[error].message));
+				}
+			}
 		};
 
 		$(this).on('submit', 'form', function(e) {

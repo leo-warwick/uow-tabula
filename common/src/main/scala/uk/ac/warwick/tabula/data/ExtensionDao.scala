@@ -22,7 +22,7 @@ trait ExtensionDao {
 	def countExtensions(assignment: Assignment): Int
 	def countUnapprovedExtensions(assignment: Assignment): Int
 	def getUnapprovedExtensions(assignment: Assignment): Seq[Extension]
-	def getPreviousExtensions(user: User): Seq[Extension]
+	def getAllExtensionRequests(user: User): Seq[Extension]
 	def filterExtensions(restrictions: Seq[ScalaRestriction], orders: Seq[ScalaOrder], maxResults: Int, startResult: Int): Seq[Extension]
 	def countFilteredExtensions(restrictions: Seq[ScalaRestriction]): Int
 }
@@ -57,7 +57,7 @@ class ExtensionDaoImpl extends ExtensionDao with Daoisms {
 		unapprovedExtensionsCriteria(assignment).seq
 	}
 
-	def getPreviousExtensions(user: User): Seq[Extension] = {
+	def getAllExtensionRequests(user: User): Seq[Extension] = {
 		session.newCriteria[Extension]
 			.add(is("usercode", user.getUserId))
 			.seq

@@ -27,7 +27,7 @@ class CelcatTimetableFetchingServiceTest extends TestBase with Mockito {
 			credentials = new UsernamePasswordCredentials(Wire.property("username"), "password")
 		)
 		val cacheEnabled = false
-	}) with UserLookupComponent with ProfileServiceComponent with CacheStrategyComponent with LocationFetchingServiceComponent with ModuleAndDepartmentServiceComponent with ApacheHttpClientComponent {
+	}) with UserLookupComponent with ProfileServiceComponent with CacheStrategyComponent with LocationFetchingServiceComponent with ModuleAndDepartmentServiceComponent with ApacheHttpClientComponent with FeaturesComponent {
 		val userLookup = new MockUserLookup
 		val profileService = mock[ProfileService]
 		val cacheStrategy = CacheStrategy.InMemoryOnly
@@ -38,6 +38,7 @@ class CelcatTimetableFetchingServiceTest extends TestBase with Mockito {
 		}
 
 		override val httpClient: CloseableHttpClient = CelcatTimetableFetchingServiceTest.this.httpClient
+		val features = new FeaturesImpl
 	}
 
 	@Test def parseJSON() {

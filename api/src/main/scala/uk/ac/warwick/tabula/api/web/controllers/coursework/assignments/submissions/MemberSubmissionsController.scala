@@ -12,11 +12,16 @@ import uk.ac.warwick.tabula.api.web.helpers.{SubmissionInfoToJsonConverter, Subm
 import uk.ac.warwick.tabula.commands.{Appliable, SelfValidating}
 import uk.ac.warwick.tabula.commands.cm2.assignments.{ListMemberSubmissionsCommand, ListSubmissionsResult}
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.services.{AutowiringExtensionServiceComponent, AutowiringSubmissionServiceComponent, AutowiringUserLookupComponent}
 import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.views.{JSONErrorView, JSONView}
 
 abstract class MemberSubmissionsController extends ApiController
-	with SubmissionToJsonConverter with SubmissionInfoToJsonConverter
+	with SubmissionToJsonConverter
+	with SubmissionInfoToJsonConverter
+	with AutowiringExtensionServiceComponent
+	with AutowiringUserLookupComponent
+	with AutowiringSubmissionServiceComponent
 
 object MemberSubmissionsController {
 	type ViewMemberSubmissionsCommand = Appliable[ListSubmissionsResult]

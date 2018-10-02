@@ -24,7 +24,7 @@ import uk.ac.warwick.tabula.services.permissions.{AutowiringCacheStrategyCompone
 import uk.ac.warwick.tabula.services.timetables.CelcatHttpTimetableFetchingService._
 import uk.ac.warwick.tabula.services.timetables.TimetableFetchingService.EventList
 import uk.ac.warwick.tabula.timetables.{TimetableEvent, TimetableEventType}
-import uk.ac.warwick.tabula.{AcademicYear, AutowiringFeaturesComponent, DateFormats}
+import uk.ac.warwick.tabula.{AcademicYear, AutowiringFeaturesComponent, DateFormats, FeaturesComponent}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -82,6 +82,7 @@ object CelcatHttpTimetableFetchingService {
 				with AutowiringWAI2GoConfigurationComponent
 				with AutowiringModuleAndDepartmentServiceComponent
 				with AutowiringApacheHttpClientComponent
+				with AutowiringFeaturesComponent
 
 		if (celcatConfiguration.cacheEnabled) {
 			new CachedStaffAndStudentTimetableFetchingService(delegate, cacheName)
@@ -210,7 +211,8 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
 		with LocationFetchingServiceComponent
 		with CacheStrategyComponent
 		with ModuleAndDepartmentServiceComponent
-		with ApacheHttpClientComponent =>
+		with ApacheHttpClientComponent
+		with FeaturesComponent =>
 
 	lazy val wbsConfig: CelcatDepartmentConfiguration = celcatConfiguration.wbsConfiguration
 
@@ -302,7 +304,7 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
 			case Some(jsonData: List[Map[String, Any]]@unchecked) =>
 				EventList.fresh(jsonData.filterNot { event =>
 					// TAB-4754 These lectures are already in Syllabus+ so we don't include them again
-					filterLectures && event("contactType") == "L" && event("lectureStreamCount") == 1
+					filterLectures && event("contactType") == "L" && event("lectureStreamCount") == 1 && !features.timetableIncludeLectureFeedWBS
 				}.flatMap { event =>
 					val start = DateFormats.IsoDateTime.parseDateTime(event.getOrElse("start", "").toString)
 					val end = DateFormats.IsoDateTime.parseDateTime(event.getOrElse("end", "").toString)

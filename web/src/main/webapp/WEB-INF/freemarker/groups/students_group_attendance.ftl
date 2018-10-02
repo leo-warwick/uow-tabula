@@ -148,7 +148,7 @@
 						<#if mapGet(seminarAttendanceCommandResult.missedCountByTerm, term) != 0>
 							<div class="missed">
 								<span class="fa-stack fa-stack-original-size fa-stack-right fa-fw">
-									<i class="fa fa-fw fa-stack-2x fa-warning"></i>
+									<i class="fa fa-fw fa-stack-2x fa-times"></i>
 								</span>
 								<#if isSelf>
 									You have

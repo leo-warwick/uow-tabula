@@ -39,9 +39,9 @@ class DisplayExtensionCommandInternal(val student: User, val assignment: Assignm
 
 		val extension: Option[Extension] = assignment.findExtension(student.getUserId)
 
-		val previousExtensions = extensionService.getPreviousExtensions(student)
+		val previousExtensions = extensionService.getAllExtensionRequests(student)
 
-		val previousSubmissions = submissionService.getPreviousSubmissions(student)
+		val previousSubmissions = submissionService.getAllSubmissions(student)
 
 		DisplayExtensionDetail(extension, student, previousExtensions, previousSubmissions)
 

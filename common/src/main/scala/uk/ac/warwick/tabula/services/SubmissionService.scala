@@ -18,7 +18,7 @@ trait SubmissionService {
 	def getSubmissionByUsercode(assignment: Assignment, usercode: String): Option[Submission]
 	def getSubmissionsByAssignment(assignment: Assignment): Seq[Submission]
 	def getSubmission(id: String): Option[Submission]
-	def getPreviousSubmissions(user: User): Seq[Submission]
+	def getAllSubmissions(user: User): Seq[Submission]
 	def getSubmissionsBetweenDates(usercode: String, startInclusive: DateTime, endExclusive: DateTime): Seq[Submission]
 	def delete(submission: Submission): Unit
 }
@@ -54,7 +54,7 @@ abstract class AbstractSubmissionService extends SubmissionService with Daoisms 
 
 	def getSubmission(id: String): Option[Submission] = getById[Submission](id)
 
-	def getPreviousSubmissions(user: User): Seq[Submission] = {
+	def getAllSubmissions(user: User): Seq[Submission] = {
 		session.newCriteria[Submission]
 			.add(is("usercode", user.getUserId))
 			.seq

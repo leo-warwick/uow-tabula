@@ -46,7 +46,11 @@ class ExtensionGrantedNotification extends ExtensionStudentNotification with MyW
 @DiscriminatorValue("ExtensionRequestApproved")
 class ExtensionRequestApprovedNotification extends ExtensionStudentNotification with MyWarwickActivity {
 	def verb = "approve"
-	def title: String = titlePrefix + "Your extension request for \"%s\" has been approved".format(assignment.name)
+	def title: String = {
+		val verbed = if (extension.expiryDateAdjusted) "adjusted and approved" else "approved"
+
+		titlePrefix + "Your extension request for \"%s\" has been %s".format(assignment.name, verbed)
+	}
 	def template = "/WEB-INF/freemarker/emails/extension_request_approved.ftl"
 	def urlTitle = "view your extension"
 }

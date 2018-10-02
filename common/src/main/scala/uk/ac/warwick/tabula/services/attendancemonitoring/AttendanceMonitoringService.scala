@@ -77,6 +77,7 @@ trait AttendanceMonitoringService {
 	): Seq[AttendanceMonitoringCheckpoint]
 	def hasRecordedCheckpoints(points: Seq[AttendanceMonitoringPoint]): Boolean
 	def getAllAttendance(studentId: String): Seq[AttendanceMonitoringCheckpoint]
+	def getAllAttendanceInAcademicYear(student: StudentMember, academicYear: AcademicYear): Seq[AttendanceMonitoringCheckpoint]
 	def getAttendanceNote(student: StudentMember, point: AttendanceMonitoringPoint): Option[AttendanceMonitoringNote]
 	def getAttendanceNoteMap(student: StudentMember): Map[AttendanceMonitoringPoint, AttendanceMonitoringNote]
 	def setAttendance(
@@ -310,6 +311,9 @@ abstract class AbstractAttendanceMonitoringService extends AttendanceMonitoringS
 
 	def getAllAttendance(studentId: String): Seq[AttendanceMonitoringCheckpoint] =
 		attendanceMonitoringDao.getAllAttendance(studentId)
+
+	override def getAllAttendanceInAcademicYear(student: StudentMember, academicYear: AcademicYear): Seq[AttendanceMonitoringCheckpoint] =
+		attendanceMonitoringDao.getAllAttendanceInAcademicYear(student, academicYear)
 
 	def getAttendanceNote(student: StudentMember, point: AttendanceMonitoringPoint): Option[AttendanceMonitoringNote] = {
 		attendanceMonitoringDao.getAttendanceNote(student, point)

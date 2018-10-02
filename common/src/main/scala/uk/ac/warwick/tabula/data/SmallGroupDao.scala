@@ -81,6 +81,7 @@ trait SmallGroupDao {
 	def findSmallGroupsWithAttendanceRecorded(studentId: String): Seq[SmallGroup]
 	def findManuallyAddedAttendance(studentId: String): Seq[SmallGroupEventAttendance]
 	def findAttendanceForStudentInModulesInWeeks(student: StudentMember, startWeek: Int, endWeek: Int, modules: Seq[Module]): Seq[SmallGroupEventAttendance]
+	def findAllAttendanceForStudentInAcademicYear(student: StudentMember, academicYear: AcademicYear): Seq[SmallGroupEventAttendance]
 	def findOccurrencesInModulesInWeeks(startWeek: Int, endWeek: Int, modules: Seq[Module], academicYear: AcademicYear): Seq[SmallGroupEventOccurrence]
 	def findOccurrencesInWeeks(startWeek: Int, endWeek: Int, academicYear: AcademicYear): Seq[SmallGroupEventOccurrence]
 	def findStudentAttendanceInEvents(universityId: String, events: Seq[SmallGroupEvent]): Seq[SmallGroupEventAttendance]
@@ -294,8 +295,17 @@ class SmallGroupDaoImpl extends SmallGroupDao
 			}
 			safeInSeq(c, "groupSet.module", modules)
 		}
-
 	}
+
+	override def findAllAttendanceForStudentInAcademicYear(student: StudentMember, academicYear: AcademicYear): Seq[SmallGroupEventAttendance] =
+		session.newCriteria[SmallGroupEventAttendance]
+			.createAlias("occurrence", "occurrence")
+			.createAlias("occurrence.event", "event")
+			.createAlias("event.group", "group")
+			.createAlias("group.groupSet", "groupSet")
+			.add(is("universityId", student.universityId))
+			.add(is("groupSet.academicYear", academicYear))
+			.seq
 
 	def findOccurrencesInModulesInWeeks(startWeek: Int, endWeek: Int, modules: Seq[Module], academicYear: AcademicYear): Seq[SmallGroupEventOccurrence] = {
 		if (modules.isEmpty) {

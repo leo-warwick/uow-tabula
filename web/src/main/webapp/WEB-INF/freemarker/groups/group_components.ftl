@@ -237,7 +237,7 @@
 										</a>
 									</li>
 
-									<li<#if set.releasedToStudents || set.releasedToTutors> class="disabled use-tooltip" data-container="body" title="Can't delete small groups that have been published to students or tutors"</#if>>
+									<li<#if !set.canBeDeleted> class="disabled use-tooltip" data-container="body" title="Can't delete smallgroups that have been published to <#if set.allocationMethod.dbValue != 'StudentSignUp'>students or </#if>tutors"</#if>>
 										<#local delete_url><@routes.groups.deleteset set /></#local>
 										<@fmt.permission_button
 											permission='SmallGroups.Delete'

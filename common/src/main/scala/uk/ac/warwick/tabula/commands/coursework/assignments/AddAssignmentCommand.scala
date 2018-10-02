@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.commands.coursework.assignments
 
-import uk.ac.warwick.tabula.data.model.Assignment
-import uk.ac.warwick.tabula.data.model.Module
+import uk.ac.warwick.tabula.data.model.{Assignment, Module, WorkflowCategory}
 import uk.ac.warwick.tabula.commands._
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.data.Transactions._
@@ -18,6 +17,11 @@ class AddAssignmentCommand(module: Module = null) extends ModifyAssignmentComman
 		val assignment = new Assignment(module)
 		assignment.addDefaultFields()
 		copyTo(assignment)
+		if (assignment.cm2MarkingWorkflow != null) {
+			assignment.workflowCategory = Option(WorkflowCategory.Reusable)
+		} else {
+			assignment.workflowCategory = Option(WorkflowCategory.NoneUse)
+		}
 		service.save(assignment)
 		assignment
 	}

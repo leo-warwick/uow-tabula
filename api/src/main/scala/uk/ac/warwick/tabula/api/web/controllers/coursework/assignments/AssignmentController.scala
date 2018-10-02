@@ -135,8 +135,12 @@ trait EditAssignmentApi {
 	self: AssignmentController with AssignmentToJsonConverter with AssignmentStudentToJsonConverter =>
 
 	@ModelAttribute("editCommand")
-	def editCommand(@PathVariable module: Module, @PathVariable assignment: Assignment, user: CurrentUser): EditAssignmentCommand =
-		new EditAssignmentCommand(module, assignment, user)
+	def editCommand(@PathVariable module: Module, @PathVariable assignment: Assignment, user: CurrentUser): EditAssignmentCommand = {
+		val cmd =	new EditAssignmentCommand(module, assignment, user)
+		cmd.cm2Assignment = assignment.cm2Assignment
+		cmd
+	}
+
 
 	@RequestMapping(method = Array(PUT), consumes = Array(MediaType.APPLICATION_JSON_VALUE), produces = Array("application/json"))
 	def edit(@RequestBody request: EditAssignmentRequest, @ModelAttribute("editCommand") command: EditAssignmentCommand, errors: Errors): Mav = {

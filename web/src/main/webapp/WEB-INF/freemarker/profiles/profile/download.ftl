@@ -4,7 +4,7 @@
 <h1>Download my info</h1>
 
 <p>
-	You can download a zip file and pdf report(s) of your Tabula data for ${academicYear.toString}, including:
+	You can download a zip file and pdf report(s) of your Tabula data for the academic year <strong>${academicYear.toString}</strong>, including:
 </p>
 
 <ul>
@@ -15,6 +15,7 @@
 	<li>Coursework submissions and files</li>
 	<li>Marks, online feedback and feedback files</li>
 	<li>Small group teaching attendance</li>
+	<li>Monitoring point attendance</li>
 </ul>
 
 <form method="post" action="<@routes.profiles.download studentCourseDetails academicYear/>">

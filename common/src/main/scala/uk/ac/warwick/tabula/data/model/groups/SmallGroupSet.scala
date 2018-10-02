@@ -96,6 +96,14 @@ class SmallGroupSet
 		_releasedToStudents = releasedToStudents
 	}
 
+	def canBeDeleted: Boolean = {
+		allocationMethod match {
+			case StudentSignUp => !releasedToTutors
+			case _ =>
+				!_releasedToStudents && !releasedToTutors
+		}
+	}
+
 	@Column(name = "released_to_tutors")
 	var releasedToTutors: JBoolean = false
 

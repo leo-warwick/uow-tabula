@@ -35,7 +35,10 @@ object OnlineMarkerFeedbackCommand {
 			with AutowiringFeedbackServiceComponent {
 				override lazy val eventName = "OnlineMarkerFeedback"
 			}
+
 }
+
+class IllegalMarkingStateException(message: String) extends IllegalStateException(message)
 
 class OnlineMarkerFeedbackCommandInternal(
 		val assignment: Assignment,
@@ -49,15 +52,14 @@ class OnlineMarkerFeedbackCommandInternal(
 	self: ProfileServiceComponent with CM2MarkingWorkflowServiceComponent with FileAttachmentServiceComponent with SavedFormValueDaoComponent
 		with FeedbackServiceComponent =>
 
-	currentMarkerFeedback.foreach(copyFrom)
+	private val markerFeedback = currentMarkerFeedback.getOrElse(
+		// this should be impossible - we don't show the form if there is no current marker feedback for this marker
+		throw new IllegalMarkingStateException("There is no outstanding feedback for this marker and stage")
+	)
+
+	copyFrom(markerFeedback)
 
 	def applyInternal(): MarkerFeedback = {
-
-		val markerFeedback = currentMarkerFeedback.getOrElse(
-			// this should be impossible - we don't show the form if there is no current marker feedback for this marker
-			throw new IllegalArgumentException(s"No MarkerFeedback to save for ${marker.getUserId} - ${student.getUserId}")
-		)
-
 		copyTo(markerFeedback)
 		markerFeedback.updatedOn = DateTime.now
 		feedbackService.save(markerFeedback)

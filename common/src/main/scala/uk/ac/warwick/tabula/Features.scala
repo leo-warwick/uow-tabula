@@ -50,6 +50,7 @@ abstract class Features {
 	@Value("${features.academicYear.2018:true}") var academicYear2018: Boolean = defaults.academicYear2018
 	@Value("${features.academicYear.2019:false}") var academicYear2019: Boolean = defaults.academicYear2019
 	@Value("${features.timetableFeedCurrentAcademicYear:true}") var timetableFeedCurrentAcademicYear: Boolean = defaults.timetableFeedCurrentAcademicYear
+	@Value("${features.timetableIncludeLectureFeedWBS:false}") var timetableIncludeLectureFeedWBS: Boolean = defaults.timetableIncludeLectureFeedWBS
 
 	@Value("${features.emailStudents:false}") var emailStudents: Boolean = defaults.emailStudents
 	@Value("${features.collectRatings:true}") var collectRatings: Boolean = defaults.collectRatings
@@ -195,6 +196,7 @@ class FeaturesMessage {
 	@BeanProperty var academicYear2018 = true
 	@BeanProperty var academicYear2019 = false
 	@BeanProperty var timetableFeedCurrentAcademicYear = true
+	@BeanProperty var timetableIncludeLectureFeedWBS = false
 
 	@BeanProperty var emailStudents = false
 	@BeanProperty var activityStreams = true

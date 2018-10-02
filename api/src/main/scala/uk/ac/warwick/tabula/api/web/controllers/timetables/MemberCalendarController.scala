@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.api.web.controllers.timetables
 
 import javax.validation.Valid
-
 import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.component.VEvent
 import net.fortuna.ical4j.model.property._
@@ -45,6 +44,18 @@ class MemberCalendarController extends ApiController
 @RequestMapping(Array("/v1/timetable/calendar/{timetableHash}.ics"))
 class MemberTimetableHashCalendarController extends ApiController
 	with GetMemberCalendarIcalApi
+	with PathVariableTimetableHashMemberCalendarApi
+	with GeneratesTimetableIcalFeed
+	with AutowiringUserLookupComponent
+	with AutowiringTermBasedEventOccurrenceServiceComponent
+	with AutowiringProfileServiceComponent {
+	validatesSelf[SelfValidating]
+}
+
+@Controller
+@RequestMapping(Array("/v1/timetable/calendar/{academicYear}/{timetableHash}.ics"))
+class MemberAcademicYearTimetableHashCalendarController extends ApiController
+	with GetMemberAcademicYearCalendarIcalApi
 	with PathVariableTimetableHashMemberCalendarApi
 	with GeneratesTimetableIcalFeed
 	with AutowiringUserLookupComponent
@@ -109,19 +120,18 @@ trait GetMemberCalendarJsonApi {
 	}
 }
 
-trait GetMemberCalendarIcalApi {
+trait GetMemberCalendarIcalFeed {
 	self: ApiController
 		with MemberCalendarApi
 		with UserLookupComponent
 		with GeneratesTimetableIcalFeed =>
 
-	@RequestMapping(method = Array(GET), produces = Array("text/calendar"))
-	def icalMemberTimetable(@Valid @ModelAttribute("getTimetableCommand") command: TimetableCommand): Mav = {
+	def icalFeed(command: TimetableCommand, academicYear: AcademicYear): Mav = {
 		val member = command.member
 
-		val year = AcademicYear.now()
+		val year = academicYear
 
-		// Start from either 1 week ago, or the start of the current academic year, whichever is earlier
+		// Start from either 1 week ago, or the start of the academic year, whichever is earlier
 		val start = {
 			val startOfYear = year.firstDay
 			val oneWeekAgo = LocalDate.now.minusWeeks(1)
@@ -129,16 +139,8 @@ trait GetMemberCalendarIcalApi {
 			if (startOfYear.isBefore(oneWeekAgo)) startOfYear else oneWeekAgo
 		}
 
-		// End either at the end of the current academic year, or in 15 weeks time, whichever is later
-		val end = {
-			val endOfYear = (year + 1).lastDay
-			val fifteenWeeksTime = LocalDate.now.plusWeeks(15)
-
-			if (endOfYear.isAfter(fifteenWeeksTime)) endOfYear else fifteenWeeksTime
-		}
-
 		command.from = start.toDateTimeAtStartOfDay.getMillis
-		command.to = end.toDateTimeAtStartOfDay.getMillis
+		command.to = year.lastDay.toDateTimeAtStartOfDay.getMillis
 
 		command.apply() match {
 			case Success(result) =>
@@ -148,6 +150,33 @@ trait GetMemberCalendarIcalApi {
 				throw new RequestFailedException("The timetabling service could not be reached", t)
 		}
 
+	}
+
+}
+
+trait GetMemberCalendarIcalApi extends GetMemberCalendarIcalFeed {
+	self: ApiController
+		with MemberCalendarApi
+		with UserLookupComponent
+		with GeneratesTimetableIcalFeed =>
+
+	@RequestMapping(method = Array(GET), produces = Array("text/calendar"))
+	def icalMemberTimetable(@Valid @ModelAttribute("getTimetableCommand") command: TimetableCommand): Mav = {
+		icalFeed(command, AcademicYear.now())
+	}
+
+}
+
+trait GetMemberAcademicYearCalendarIcalApi extends GetMemberCalendarIcalFeed {
+	self: ApiController
+		with MemberCalendarApi
+		with UserLookupComponent
+		with GeneratesTimetableIcalFeed =>
+
+
+	@RequestMapping(method = Array(GET), produces = Array("text/calendar"))
+	def icalMemberAcademicYearTimetable(@Valid @ModelAttribute("getTimetableCommand") command: TimetableCommand, @PathVariable academicYear: AcademicYear): Mav = {
+		icalFeed(command, academicYear)
 	}
 
 }

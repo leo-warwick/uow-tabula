@@ -134,4 +134,24 @@ class ExtensionTest extends PersistenceTestBase {
 
 	  extension.awaitingReview should be (false)
   }
+
+	@Test def expiryDateAdjustment(): Unit = {
+		val assignment = new Assignment
+		assignment.setDefaultBooleanProperties()
+		assignment.closeDate = DateTime.now().plusHours(1)
+
+		val extension = new Extension
+		extension.assignment = assignment
+
+		extension.requestedExpiryDate = DateTime.now().plusHours(3)
+
+		extension.expiryDate = DateTime.now().plusHours(3)
+		extension.approve(null)
+
+		extension should not be 'expiryDateAdjusted
+
+		extension.expiryDate = DateTime.now().plusHours(2)
+
+		extension shouldBe 'expiryDateAdjusted
+	}
 }

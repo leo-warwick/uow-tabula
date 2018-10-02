@@ -118,7 +118,7 @@ abstract class AbstractViewProfileController extends ProfilesController
 	}
 
 	@ModelAttribute("activeAcademicYear")
-	override def activeAcademicYear: Option[AcademicYear] = retrieveActiveAcademicYear(None)
+	override def activeAcademicYear(@PathVariable(required = false) academicYear: AcademicYear): Option[AcademicYear] = retrieveActiveAcademicYear(Option(academicYear))
 
 	@Autowired var conversionService: ConversionService = _
 

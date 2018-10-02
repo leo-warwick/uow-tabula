@@ -305,7 +305,7 @@
 					$('.sits-picker .btn').addClass('disabled');
 					<#-- get current list of values and remove and/or add changes -->
 					var current = $('.upstreamGroups').map(function(i, input) { return input.value }).toArray();
-					var changes = $assessment.find('td input:checked').map(function(i, input) { return input.value }).toArray();
+					var changes = $assessment.find('td input:checked:not(:disabled)').map(function(i, input) { return input.value }).toArray();
 					// always remove even when adding, to dedupe
 					var data = $(current).not(changes).toArray();
 					if ($linkUnlink.is('.link-sits')) {
@@ -320,14 +320,14 @@
 					$.ajax({
 						type: 'POST',
 						url: '${enrolment_url}',
-						data: $('#assignmentEnrolmentFields').find('input, textarea, select').add('#academicYear').serialize(),
+						data: $('#assignmentEnrolmentFields').find('input, textarea, select').filter(':not(:disabled)').add('#academicYear').serialize(),
 						success: function(data, status) {
 							$enrolment.find('.assignmentEnrolmentInner').html($(data).find('.assignmentEnrolmentInner').contents());
 							$enrolment.find('.enrolledCount').html($(data).find('.enrolledCount').contents());
 							initEnrolment();
 							// display message when user links/unlinks
 							alertPending();
-							$assessment.find('td input:checked').each( function() {
+							$assessment.find('td input:checked:not(:disabled)').each( function() {
 								var $tr = $(this).closest('tr');
 								if ($linkUnlink.is('.link-sits')) {
 									$tr.find('.linked').removeClass('hidden');

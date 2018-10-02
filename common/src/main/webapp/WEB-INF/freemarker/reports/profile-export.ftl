@@ -34,7 +34,7 @@
 	</style>
 </head>
 <body>
-	<#assign terms = ["Autumn", "Christmas vacation", "Spring", "Easter vacation", "Summer", "Summer vacation"] />
+	<#assign terms = ["Pre-term vacation", "Autumn", "Christmas vacation", "Spring", "Easter vacation", "Summer", "Summer vacation"] />
 
 	<#-- COVER SHEET -->
 	<div class="cover">
@@ -77,7 +77,7 @@
 						</td>
 					</tr>
 				</#if>
-				<#if student.disability.reportable!false>
+				<#if student.disability?? && student.disability.reportable!false>
 					<tr>
 						<td>Disability</td>
 						<td>${student.disability.definition}</td>
@@ -127,7 +127,7 @@
 						<td>${student.userId}</td>
 					</tr>
 				</#if>
-				<#if student.homeDeaprtment??>
+				<#if student.homeDepartment??>
 					<tr>
 						<td>Home department</td>
 						<td>${student.homeDepartment.name}</td>
@@ -138,95 +138,94 @@
 
 		<h2>Course</h2>
 
-		<#list studentCourseDetails as scd>
-			<#assign scyd = scd.latestStudentCourseYearDetails>
+		<#list courseData as course>
 			<table>
 				<tbody>
 					<tr>
 						<td>Course</td>
 						<td>
-							${scd.course.name}, ${scd.course.code}
-							(${(scd.beginYear?string("0000"))!} - ${(scd.endYear?string("0000"))!})
+							${course.courseName} ${course.courseCode}
+							${course.beginYear} - ${course.endYear}
 						</td>
 					</tr>
-					<#if scd.department??>
+					<#if course.departmentName??>
 						<tr>
 							<td>Department</td>
 							<td>
-								${scd.department.name!""}
-								(${(scd.department.code!"")?upper_case})
+								${course.departmentName}
+								(${course.departmentCode})
 							</td>
 						</tr>
 					</#if>
-					<#if scd.currentRoute?? && scd.currentRoute.degreeType??>
+					<#if course.degreeType??>
 						<tr>
 							<td>UG/PG</td>
-							<td>${scd.currentRoute.degreeType.toString!""}</td>
+							<td>${course.degreeType}</td>
 						</tr>
 					</#if>
-					<#if scd.award??>
+					<#if course.awardName??>
 						<tr>
 							<td>Intended award</td>
-							<td>${scd.award.name!""}</td>
+							<td>${course.awardName}</td>
 						</tr>
 					</#if>
-					<#if scyd.modeOfAttendance??>
+					<#if course.modeOfAttendance??>
 						<tr>
 							<td>Attendance</td>
-							<td>${scyd.modeOfAttendance.fullNameAliased}</td>
+							<td>${course.modeOfAttendance}</td>
 						</tr>
 					</#if>
-					<#if scd.statusOnCourse??>
+					<#if course.statusOnCourse??>
 						<tr>
 							<td>Status on course</td>
-							<td><@fmt.status_on_course scd /></td>
+							<td>${course.statusOnCourse}</td>
 						</tr>
 					</#if>
-					<#if scd.endDate??>
+					<#if course.endDate??>
 						<tr>
 							<td>End date</td>
-							<td><@fmt.date date=scd.endDate includeTime=false /></td>
+							<td>${course.endDate}</td>
 						</tr>
 					</#if>
-					<#if scd.expectedEndDate??>
+					<#if course.expectedEndDate??>
 						<tr>
 							<td>Expected end date</td>
-							<td><@fmt.date date=scd.expectedEndDate includeTime=false /></td>
+							<td>${course.expectedEndDate}</td>
 						</tr>
 					</#if>
-					<#if scyd.route??>
+					<#if course.routeName??>
 						<tr>
 							<td>Route</td>
 							<td>
-								${scyd.route.name!""}
-								(${(scyd.route.code!"")?upper_case})
+								${course.routeName}
+								(${course.routeCode})
 							</td>
 						</tr>
 					</#if>
-					<#if scyd.yearOfStudy??>
+					<#if course.yearOfStudy??>
 						<tr>
 							<td>Study block or year</td>
-							<td>${scyd.yearOfStudy}</td>
+							<td>${course.yearOfStudy}</td>
 						</tr>
 					</#if>
-					<#if scd.hasCurrentEnrolment && scd.level?? && scyd.latest>
+					<#if course.hasCurrentEnrolment && course.levelCode??>
 						<tr>
 							<td>Current course level</td>
 							<td>
-								${scd.level.code} (${scd.level.name?lower_case?cap_first})
+								${course.levelCode} (${course.levelName})
 							</td>
 						</tr>
 					</#if>
-					<#if scd.sprCode??>
+					<#if course.sprCode??>
 						<tr>
 							<td>Programme route code</td>
-							<td>${scd.sprCode}</td>
+							<td>${course.sprCode}</td>
 						</tr>
 					</#if>
-					<#if scd.scjCode??>
+					<#if course.scjCode??>
 						<tr>
 							<td>Course join code</td>
-							<td>${scd.scjCode}</td>
+							<td>${course.scjCode}</td>
 						</tr>
 					</#if>
 				</tbody>
@@ -634,6 +633,20 @@
 						<tr>
 							<td>Description</td>
 							<td><#noescape>${meeting.description!""}</#noescape></td>
+						</tr>
+						<tr>
+							<td>File attachments</td>
+							<td>
+								<#if meeting.attachments?has_content>
+									<ul>
+										<#list meeting.attachments as attachment>
+											<li>${attachment.id}-${attachment.name}</li>
+										</#list>
+									</ul>
+								<#else>
+									No files attached.
+								</#if>
+							</td>
 						</tr>
 					</tbody>
 				</table>

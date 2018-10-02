@@ -1,13 +1,13 @@
 package uk.ac.warwick.tabula.commands.coursework.assignments
 
 import javax.validation.constraints.{Max, Min}
-
 import org.hibernate.validator.constraints.Length
 import org.springframework.validation.Errors
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.forms.{CommentField, FileField, MarkerSelectField, WordCountField}
+import uk.ac.warwick.tabula.data.model.markingworkflow.CM2MarkingWorkflow
 import uk.ac.warwick.tabula.services.ZipService
 
 import scala.collection.JavaConverters._
@@ -45,7 +45,7 @@ trait SharedAssignmentProperties extends BooleanAssignmentProperties with FindAs
 	// if we change a feedback template we may need to invalidate existing zips
 	var zipService: ZipService = Wire.auto[ZipService]
 
-	var markingWorkflow: MarkingWorkflow = _
+	var markingWorkflow: CM2MarkingWorkflow = _
 
 	@Min(1)
 	@Max(Assignment.MaximumFileAttachments)
@@ -88,8 +88,7 @@ trait SharedAssignmentProperties extends BooleanAssignmentProperties with FindAs
 		assignment.feedbackTemplate = feedbackTemplate
 		if (assignment.id != null) // this is an edit
 			zipService.invalidateSubmissionZip(assignment)
-		assignment.markingWorkflow = markingWorkflow
-		manageMarkerField(assignment)
+		assignment.cm2MarkingWorkflow = markingWorkflow
 
 		for (field <- findCommentField(assignment)) field.value = comment
 		for (file <- findFileField(assignment)) {
@@ -131,7 +130,7 @@ trait SharedAssignmentProperties extends BooleanAssignmentProperties with FindAs
 		dissertation = assignment.dissertation
 		publishFeedback = assignment.publishFeedback
 		feedbackTemplate = assignment.feedbackTemplate
-		markingWorkflow = assignment.markingWorkflow
+		markingWorkflow = assignment.cm2MarkingWorkflow
 		includeInFeedbackReportWithoutSubmissions = assignment.includeInFeedbackReportWithoutSubmissions
 		automaticallyReleaseToMarkers = assignment.automaticallyReleaseToMarkers
 		automaticallySubmitToTurnitin = assignment.automaticallySubmitToTurnitin
@@ -150,25 +149,7 @@ trait SharedAssignmentProperties extends BooleanAssignmentProperties with FindAs
 		}
 	}
 
-	/**
-	 * add/remove marker field as appropriate
-	 */
-	def manageMarkerField(assignment:Assignment) {
-		val markerField = findMarkerSelectField(assignment)
-		if (markingWorkflow != null && markingWorkflow.studentsChooseMarker){
-			// we now need a marker field for this assignment. create one
-			if (markerField.isEmpty) {
-				val markerSelect = new MarkerSelectField()
-				markerSelect.name = Assignment.defaultMarkerSelectorName
-				assignment.addFields(markerSelect)
-			}
-		} else {
-			// if a marking workflow has been removed or changed we need to remove redundant marker fields
-			if (markerField.isDefined) {
-				assignment.removeField(markerField.get)
-			}
-		}
-	}
+
 }
 
 

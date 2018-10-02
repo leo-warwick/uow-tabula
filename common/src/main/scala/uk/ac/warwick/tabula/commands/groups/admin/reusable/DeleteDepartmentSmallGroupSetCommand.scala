@@ -3,7 +3,7 @@ package uk.ac.warwick.tabula.commands.groups.admin.reusable
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.model.Department
-import uk.ac.warwick.tabula.data.model.groups.DepartmentSmallGroupSet
+import uk.ac.warwick.tabula.data.model.groups.{DepartmentSmallGroupSet, SmallGroupAllocationMethod}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, SmallGroupServiceComponent}
 import uk.ac.warwick.tabula.data.Transactions._
@@ -52,7 +52,9 @@ trait DeleteDepartmentSmallGroupSetValidation extends SelfValidating {
 	def validateCanDelete(errors: Errors) {
 		if (set.deleted) {
 			errors.reject("smallGroupSet.delete.deleted")
-		} else if (set.linkedSets.asScala.exists { set => set.releasedToStudents || set.releasedToTutors }) {
+		} else if (set.linkedSets.asScala.exists { set => set.allocationMethod ==  SmallGroupAllocationMethod.StudentSignUp  &&  !set.canBeDeleted }) {
+			errors.reject("smallGroupSet.delete.studentSignUpReleased")
+		} else if (set.linkedSets.asScala.exists { set => set.allocationMethod !=  SmallGroupAllocationMethod.StudentSignUp &&  !set.canBeDeleted }) {
 			errors.reject("smallGroupSet.delete.released")
 		}
 	}

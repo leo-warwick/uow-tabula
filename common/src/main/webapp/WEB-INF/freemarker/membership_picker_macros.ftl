@@ -442,7 +442,7 @@ Generates the bulk of the picker HTML, inside a fieldset element
 
 		<#-- manage check-all state -->
 		var updateCheckboxes = function($table) {
-			var checked = $table.find('td input:checked').length;
+			var checked = $table.find('td input:checked:not(:disabled)').length;
 			if (checked == $table.find('td input').length) $table.find('.check-all').prop('checked', true);
 			if (checked == 0) $table.find('.check-all').prop('checked', false);
 		}
@@ -490,7 +490,7 @@ Generates the bulk of the picker HTML, inside a fieldset element
 
 				<#-- get current list of values and remove and/or add changes -->
 				var current = $('.upstreamGroups').map(function(i, input) { return input.value }).toArray();
-				var changes = $m.find('td input:checked').map(function(i, input) { return input.value }).toArray();
+				var changes = $m.find('td input:checked:not(:disabled)').map(function(i, input) { return input.value }).toArray();
 				// always remove even when adding, to dedupe
 				var data = $(current).not(changes).toArray();
 				if ($(this).is('.link-sits')) {
@@ -506,7 +506,7 @@ Generates the bulk of the picker HTML, inside a fieldset element
 				$.ajax({
 					type: 'POST',
 					url: '${enrolment_url}',
-					data: $('#${classifier}EnrolmentFields').find('input, textarea, select').add('#academicYear').serialize(),
+					data: $('#${classifier}EnrolmentFields').find('input, textarea, select').filter(':not(:disabled)').add('#academicYear').serialize(),
 					error: function() {
 						$m.modal('hide');
 					},
@@ -534,7 +534,7 @@ Generates the bulk of the picker HTML, inside a fieldset element
 				$.ajax({
 					type: 'POST',
 					url: '${enrolment_url}',
-					data: $('#${classifier}EnrolmentFields').find('input, textarea, select').add('#academicYear').serialize(),
+					data: $('#${classifier}EnrolmentFields').find('input, textarea, select').filter(':not(:disabled)').add('#academicYear').serialize(),
 					error: function() {
 						$m.modal('hide');
 					},

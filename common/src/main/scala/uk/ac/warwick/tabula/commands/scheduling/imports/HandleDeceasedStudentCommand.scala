@@ -40,7 +40,7 @@ class HandleDeceasedStudentCommandInternal(student: StudentMember) extends Comma
 	}
 
 	private def handlePendingExtensions(): Seq[Extension] = {
-		val extensions = extensionService.getPreviousExtensions(MemberOrUser(student).asUser).filter(_.awaitingReview)
+		val extensions = extensionService.getAllExtensionRequests(MemberOrUser(student).asUser).filter(_.awaitingReview)
 		extensions.foreach(_.reject("Automatically removing request from deceased student"))
 		extensions.foreach(extensionService.saveOrUpdate)
 		extensions

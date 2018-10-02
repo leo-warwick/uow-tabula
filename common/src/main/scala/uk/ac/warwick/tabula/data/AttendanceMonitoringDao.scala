@@ -101,6 +101,7 @@ trait AttendanceMonitoringDao {
 	def removeCheckpoints(checkpoints: Seq[AttendanceMonitoringCheckpoint]): Unit
 	def saveOrUpdateCheckpoints(checkpoints: Seq[AttendanceMonitoringCheckpoint]): Unit
 	def getAllAttendance(studentId: String): Seq[AttendanceMonitoringCheckpoint]
+	def getAllAttendanceInAcademicYear(student: StudentMember, academicYear: AcademicYear): Seq[AttendanceMonitoringCheckpoint]
 	def getAttendanceNote(student: StudentMember, point: AttendanceMonitoringPoint): Option[AttendanceMonitoringNote]
 	def getAttendanceNoteMap(student: StudentMember): Map[AttendanceMonitoringPoint, AttendanceMonitoringNote]
 	def getCheckpointTotal(student: StudentMember, departmentOption: Option[Department], academicYear: AcademicYear, withFlush: Boolean = false): Option[AttendanceMonitoringCheckpointTotal]
@@ -408,6 +409,17 @@ class AttendanceMonitoringDaoImpl extends AttendanceMonitoringDao with Attendanc
 			.setFetchMode("point", FetchMode.JOIN) // Eagerly get the point
 			.setFetchMode("point.scheme", FetchMode.JOIN) // Eagerly get the scheme
 			.add(is("student.universityId", studentId))
+			.seq
+	}
+
+	def getAllAttendanceInAcademicYear(student: StudentMember, academicYear: AcademicYear): Seq[AttendanceMonitoringCheckpoint] = {
+		session.newCriteria[AttendanceMonitoringCheckpoint]
+			.createAlias("point", "point")
+			.createAlias("point.scheme", "scheme")
+			.setFetchMode("point", FetchMode.JOIN) // Eagerly get the point
+			.setFetchMode("point.scheme", FetchMode.JOIN) // Eagerly get the scheme
+			.add(is("student.universityId", student.universityId))
+  		.add(is("scheme.academicYear", academicYear))
 			.seq
 	}
 

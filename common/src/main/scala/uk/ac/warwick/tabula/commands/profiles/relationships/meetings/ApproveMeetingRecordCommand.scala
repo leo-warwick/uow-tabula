@@ -78,6 +78,9 @@ trait ApproveMeetingRecordValidation extends SelfValidating {
 		if (meeting.deleted){
 			errors.reject("meetingRecordApproval.meetingRecord.deleted")
 		}
+		if (meeting.isRejected) {
+			errors.reject("meetingRecordApproval.meetingRecord.rejected")
+		}
 		if (approved == null) {
 			errors.rejectValue("approved", "meetingRecordApproval.approved.isNull")
 		} else if (!approved && !rejectionComments.hasText) {

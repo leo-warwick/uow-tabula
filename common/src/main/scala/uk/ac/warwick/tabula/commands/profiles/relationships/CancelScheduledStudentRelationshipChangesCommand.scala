@@ -84,16 +84,16 @@ trait CancelScheduledStudentRelationshipChangesCommandNotifications extends Noti
 				// Cancelled replace
 				notification.cancelledRemovalsIds.value = previouslyReplacedRelationships(relationship).map(_.agent).toSeq
 				notification.cancelledAdditionsIds.value = Seq(relationship.agent)
-				notification.scheduledDate = relationship.startDate
+				notification.scheduledDate = scheduledDate.get
 			} else {
 				// Cancelled add
 				notification.cancelledAdditionsIds.value = Seq(relationship.agent)
-				notification.scheduledDate = relationship.startDate
+				notification.scheduledDate = scheduledDate.get
 			}
 		} else {
 			// Cancelled remove
 			notification.cancelledRemovalsIds.value = Seq(relationship.agent)
-			notification.scheduledDate = relationship.endDate
+			notification.scheduledDate = scheduledDate.get
 		}
 	}
 

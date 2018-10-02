@@ -1,13 +1,14 @@
 package uk.ac.warwick.tabula.commands.groups.admin
 
-import uk.ac.warwick.tabula.commands.{SchedulesNotifications, SelfValidating, Command, Description}
+import uk.ac.warwick.tabula.commands.{Command, Description, SchedulesNotifications, SelfValidating}
 import org.springframework.validation.Errors
-import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEventOccurrence, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.groups.{SmallGroupAllocationMethod, SmallGroupEventOccurrence, SmallGroupSet}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.services.SmallGroupService
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.model.{ScheduledNotification, Module}
+import uk.ac.warwick.tabula.data.model.{Module, ScheduledNotification}
+
 import collection.JavaConverters._
 
 class DeleteSmallGroupSetCommand(val module: Module, val set: SmallGroupSet)
@@ -35,7 +36,9 @@ class DeleteSmallGroupSetCommand(val module: Module, val set: SmallGroupSet)
 	def validateCanDelete(errors: Errors) {
 		if (set.deleted) {
 			errors.reject("smallGroupSet.delete.deleted")
-		} else if (set.releasedToStudents || set.releasedToTutors) {
+		} else if (set.allocationMethod ==  SmallGroupAllocationMethod.StudentSignUp  && !set.canBeDeleted) {
+			errors.reject("smallGroupSet.delete.studentSignUpReleased")
+		} else if (set.allocationMethod !=  SmallGroupAllocationMethod.StudentSignUp && !set.canBeDeleted) {
 			errors.reject("smallGroupSet.delete.released")
 		}
 	}

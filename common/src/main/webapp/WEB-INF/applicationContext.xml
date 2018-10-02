@@ -87,6 +87,7 @@
 				<entry key="uk.ac.warwick.tabula.services.ZipRequestTooLargeError" value="errors/zipTooBig" />
 				<entry key="uk.ac.warwick.tabula.api.web.filters.APILoginMethodMissingException" value="errors/apiLoginMethodMissing" />
 				<entry key="uk.ac.warwick.tabula.SubmitPermissionDeniedException" value="errors/assignment_permissionDenied" />
+				<entry key="uk.ac.warwick.tabula.commands.cm2.assignments.markers.IllegalMarkingStateException" value="errors/marker_online_feedback_illegal_state" />
 			</map>
 		</property>
 	</bean>

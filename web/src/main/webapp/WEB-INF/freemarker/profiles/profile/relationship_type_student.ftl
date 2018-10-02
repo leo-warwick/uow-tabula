@@ -397,10 +397,29 @@
 </#macro>
 
 <#macro meetingState meeting>
-	<#if meeting.pendingApproval && !meeting.pendingApprovalBy(user)>
+	<#if meeting.pendingRevisionBy(user)>
 		<p class="very-subtle">Pending approval. Submitted by ${meeting.creator.fullName}, <@fmt.date meeting.creationDate /></p>
 		<div class="alert alert-info">
-			This meeting record needs to be approved by ${meeting.pendingApprovalsDescription}.
+			<#list meeting.rejectedApprovals as rejectedApproval>
+				<p>This record has been returned with comments by ${rejectedApproval.approver.fullName} because:</p>
+				<blockquote>${rejectedApproval.comments}</blockquote>
+				<p>Please edit the record and submit it for approval again.</p>
+			</#list>
+			<a class="edit-meeting-record btn btn-primary" href="<@routes.profiles.edit_meeting_record studentCourseDetails thisAcademicYear meeting/>">Edit</a>
+		</div>
+	<#elseif meeting.rejectedBy(currentMember)>
+		<p class="very-subtle">Pending revision. Submitted by ${meeting.creator.fullName}, <@fmt.date meeting.creationDate /></p>
+		<div class="alert alert-info">
+			<p>You sent this record back to the other party, who will review the record and submit it for approval again.</p>
+		</div>
+	<#elseif meeting.rejected>
+		<p class="very-subtle">Pending revision. Submitted by ${meeting.creator.fullName}, <@fmt.date meeting.creationDate /></p>
+		<div class="alert alert-info">
+			<#list meeting.rejectedApprovals as rejectedApproval>
+				<p>This record has been returned to ${meeting.creator.fullName} with comments by ${rejectedApproval.approver.fullName}.</p>
+				<blockquote>${rejectedApproval.comments}</blockquote>
+				<p>${meeting.creator.fullName} needs to edit the record and submit it for approval again.</p>
+			</#list>
 		</div>
 	<#elseif meeting.pendingApprovalBy(user)>
 		<p class="very-subtle">Pending approval. Submitted by ${meeting.creator.fullName}, <@fmt.date meeting.creationDate /></p>
@@ -432,29 +451,10 @@
 				<button type="submit" class="btn btn-primary spinnable spinner-auto">Submit</button>
 			</div>
 		</form>
-	<#elseif meeting.rejectedBy(currentMember)>
-		<p class="very-subtle">Pending revision. Submitted by ${meeting.creator.fullName}, <@fmt.date meeting.creationDate /></p>
-		<div class="alert alert-info">
-			<p>You sent this record back to the other party, who will review the record and submit it for approval again.</p>
-		</div>
-	<#elseif meeting.pendingRevisionBy(user)>
+	<#elseif meeting.pendingApproval>
 		<p class="very-subtle">Pending approval. Submitted by ${meeting.creator.fullName}, <@fmt.date meeting.creationDate /></p>
 		<div class="alert alert-info">
-			<#list meeting.rejectedApprovals as rejectedApproval>
-				<p>This record has been returned with comments by ${rejectedApproval.approver.fullName} because:</p>
-				<blockquote>${rejectedApproval.comments}</blockquote>
-				<p>Please edit the record and submit it for approval again.</p>
-			</#list>
-			<a class="edit-meeting-record btn btn-primary" href="<@routes.profiles.edit_meeting_record studentCourseDetails thisAcademicYear meeting/>">Edit</a>
-		</div>
-	<#elseif meeting.rejected>
-		<p class="very-subtle">Pending revision. Submitted by ${meeting.creator.fullName}, <@fmt.date meeting.creationDate /></p>
-		<div class="alert alert-info">
-			<#list meeting.rejectedApprovals as rejectedApproval>
-				<p>This record has been returned to ${meeting.creator.fullName} with comments by ${rejectedApproval.approver.fullName}.</p>
-				<blockquote>${rejectedApproval.comments}</blockquote>
-				<p>${meeting.creator.fullName} needs to edit the record and submit it for approval again.</p>
-			</#list>
+			This meeting record needs to be approved by ${meeting.pendingApprovalsDescription}.
 		</div>
 	<#else>
 		<p class="very-subtle">
