@@ -7,7 +7,6 @@ import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage
 import uk.ac.warwick.tabula.data.model.{FreemarkerModel, _}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
-import uk.ac.warwick.tabula.services.coursework.{AutowiringCourseworkWorkflowServiceComponent, CourseworkWorkflowService, CourseworkWorkflowStage}
 import uk.ac.warwick.userlookup.User
 
 import scala.collection.JavaConverters._
@@ -24,11 +23,7 @@ class ReleaseToMarkerNotification
 	with UserIdRecipientNotification
 	with AutowiringUserLookupComponent
 	with Logging
-	with AutowiringCourseworkWorkflowServiceComponent
 	with AllCompletedActionRequiredNotification {
-
-	@Transient
-	override var courseworkWorkflowService: CourseworkWorkflowService = _
 
 	def workflowVerb: String = items.asScala.headOption.map(_.entity.stage.verb).getOrElse(MarkingWorkflowStage.DefaultVerb)
 
@@ -50,44 +45,17 @@ class ReleaseToMarkerNotification
 		assignment.markingWorkflow.getMarkersStudents(assignment, recipient).distinct.size
 	}
 
-	def allocatedAsFirstMarker = {
+	def allocatedFirstMarker: Seq[User] = assignment.cm2MarkerAllocations.map(_.marker).filter(assignment.firstMarkers.asScala.contains(_))
 
-
-//		val workflow: Seq[CourseworkWorkflowStage] = courseworkWorkflowService
-//			.getStagesFor(assignment)
-//  		.map{
-//				cased
-//			}
-
-		val markers: Seq[User] = assignment.cm2MarkerAllocations.map{allocation =>
-			allocation.marker
-		}
-
-
-
-
-		val s: Seq[Assignment.MarkerAllocation] = assignment.cm2MarkerAllocations
-			.filter(_.marker == recipient)
-			.distinct
-  			.map{student =>
-
-					student.coursework.enhancedSubmission
-						.flatMap { s => Option(s.submission) }
-						.flatMap { _.firstMarker }
-						.map { _.getWarwickId }
-						.getOrElse("first marker")
-				}
-
-		???
-	}
+	def allocatedSecondMarker: Seq[User] = assignment.cm2MarkerAllocations.map(_.marker).filter(assignment.secondMarkers.asScala.contains(_))
 
 	def content = FreemarkerModel(ReleaseToMarkerNotification.templateLocation,
 		if(assignment.collectSubmissions) {
 			Map(
 				"assignment" -> assignment,
 				"numAllocated" -> allocatedStudents,
-				"numAllocatedAsFirstMarker" -> ???,
-				"numAllocatedAsFinalMarker" -> ???,
+				"numAllocatedAsFirstMarker" -> allocatedFirstMarker.size,
+				"numAllocatedAsSecondMarker" -> allocatedSecondMarker.size,
 				"numReleasedFeedbacks" -> items.size,
 				"numReleasedSubmissionsFeedbacks" -> submissionsCnt,
 				"numReleasedNoSubmissionsFeedbacks" -> (allocatedStudents - submissionsCnt),
