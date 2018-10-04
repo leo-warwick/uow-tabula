@@ -45,7 +45,7 @@ class ReleaseToMarkerNotificationTest extends TestBase with Mockito {
 
 		val notification = Notification.init(new ReleaseToMarkerNotification, currentUser.apparentUser, markerFeedback, assignment)
 
-		notification.allocatedStudents should be (11)
+		notification.allocatedStudents should be (1)
 		notification.allocatedFirstMarker.size should be (1)
 
 	}
