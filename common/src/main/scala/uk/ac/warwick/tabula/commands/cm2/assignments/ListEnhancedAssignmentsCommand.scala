@@ -8,7 +8,7 @@ import uk.ac.warwick.tabula.WorkflowStages.StageProgress
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.cm2.MarkerWorkflowCache.Json
 import uk.ac.warwick.tabula.commands.cm2.assignments.AssignmentInfoFilters.DueDateFilter
-import uk.ac.warwick.tabula.commands.cm2.assignments.ListAssignmentsCommand._
+import uk.ac.warwick.tabula.commands.cm2.assignments.ListEnhancedAssignmentsCommand._
 import uk.ac.warwick.tabula.data.model
 import uk.ac.warwick.tabula.data.model.markingworkflow.{FinalStage, MarkingWorkflowStage, MarkingWorkflowType}
 import uk.ac.warwick.tabula.data.model.{Assignment, Department, MarkingMethod, Module}
@@ -25,7 +25,7 @@ import uk.ac.warwick.util.collections.Pair
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-object ListAssignmentsCommand {
+object ListEnhancedAssignmentsCommand {
 	trait AssignmentInfo {
 		def assignment: Assignment
 	}
@@ -72,6 +72,9 @@ object ListAssignmentsCommand {
 	type ModuleResult = ModuleAssignmentsInfo
 	type ModuleCommand = Appliable[ModuleResult] with ListModuleAssignmentsCommandState
 
+	type AssignmentResult = EnhancedAssignmentInfo
+	type AssignmentCommand = Appliable[AssignmentResult] with ListEnhancedAssignmentCommandState
+
 	val AdminPermission = Permissions.Module.ManageAssignments
 
 	def department(department: Department, academicYear: AcademicYear, user: CurrentUser): DepartmentCommand =
@@ -95,6 +98,35 @@ object ListAssignmentsCommand {
 			with ComposableCommand[ModuleResult]
 			with Unaudited with ReadOnly
 
+	def moduleSkeleton(module: Module, academicYear: AcademicYear, user: CurrentUser): ModuleCommand =
+		new ListModuleSkeletonAssignmentsCommandInternal(module, academicYear, user)
+			with ListModuleAssignmentsPermissions
+			with AutowiringModuleAndDepartmentServiceComponent
+			with AutowiringSecurityServiceComponent
+			with CachedAssignmentProgress
+			with AutowiringAssessmentServiceComponent
+			with AutowiringCM2WorkflowProgressServiceComponent
+			with AutowiringCacheStrategyComponent
+			with ComposableCommand[ModuleResult]
+			with Unaudited with ReadOnly
+
+
+	def assignment(assignment: Assignment, academicYear: AcademicYear, user: CurrentUser): AssignmentCommand =
+		new ListEnhancedAssignmentCommandInternal(assignment, academicYear, user)
+			with ListEnhancedAssignmentPermissions
+			with AutowiringModuleAndDepartmentServiceComponent
+			with AutowiringSecurityServiceComponent
+			with CachedAssignmentProgress
+			with AutowiringAssessmentServiceComponent
+			with AutowiringCM2WorkflowProgressServiceComponent
+			with AutowiringCacheStrategyComponent
+			with ComposableCommand[AssignmentResult]
+			with Unaudited with ReadOnly
+
+	def sortedModuleAssignments(module: Module, academicYear: AcademicYear) = {
+		module.assignments.asScala.filterNot(_.deleted).filter(_.academicYear == academicYear).sortBy { a => (a.openDate, a.name) }
+	}
+
 }
 
 trait ListAssignmentsCommandState {
@@ -108,6 +140,10 @@ trait ListDepartmentAssignmentsCommandState extends ListAssignmentsCommandState 
 
 trait ListModuleAssignmentsCommandState extends ListAssignmentsCommandState {
 	def module: Module
+}
+
+trait ListEnhancedAssignmentCommandState extends ListAssignmentsCommandState {
+	def assignment: Assignment
 }
 
 trait ListAssignmentsCommandRequest {
@@ -125,7 +161,7 @@ abstract class ListAssignmentsCommandInternal(val academicYear: AcademicYear, va
 
 	protected def moduleInfo(module: Module) = ModuleAssignmentsInfo(
 		module,
-		module.assignments.asScala.filterNot(_.deleted).filter(_.academicYear == academicYear).sortBy { a => (a.openDate, a.name) }.map { assignment =>
+		sortedModuleAssignments(module, academicYear).map { assignment =>
 			BasicAssignmentInfo(assignment)
 		}.filter { info =>
 			(moduleFilters.asScala.isEmpty || moduleFilters.asScala.exists(_(info))) &&
@@ -134,7 +170,6 @@ abstract class ListAssignmentsCommandInternal(val academicYear: AcademicYear, va
 			dueDateFilter(info)
 		}
 	)
-
 }
 
 class ListDepartmentAssignmentsCommandInternal(val department: Department, academicYear: AcademicYear, user: CurrentUser)
@@ -161,6 +196,35 @@ class ListModuleAssignmentsCommandInternal(val module: Module, academicYear: Aca
 		val info = moduleInfo(module)
 
 		info.copy(assignments = info.assignments.map { a => enhance(a.assignment) })
+	}
+
+}
+
+class ListModuleSkeletonAssignmentsCommandInternal(val module: Module, academicYear: AcademicYear, user: CurrentUser)
+	extends ListAssignmentsCommandInternal(academicYear, user)
+		with CommandInternal[ModuleResult]
+		with ListModuleAssignmentsCommandState {
+	self: AssignmentProgress
+		with CM2WorkflowProgressServiceComponent =>
+
+	override def applyInternal(): ModuleResult = {
+		ModuleAssignmentsInfo(
+			module,
+			sortedModuleAssignments(module, academicYear).map { assignment =>
+				BasicAssignmentInfo(assignment)
+			})
+	}
+}
+
+class ListEnhancedAssignmentCommandInternal(val assignment: Assignment, academicYear: AcademicYear, user: CurrentUser)
+	extends ListAssignmentsCommandInternal(academicYear, user)
+		with CommandInternal[AssignmentResult]
+		with ListEnhancedAssignmentCommandState {
+	self: AssignmentProgress
+		with CM2WorkflowProgressServiceComponent =>
+
+	override def applyInternal(): AssignmentResult = {
+		enhance(assignment)
 	}
 
 }
@@ -382,6 +446,14 @@ trait ListModuleAssignmentsPermissions extends RequiresPermissionsChecking with 
 
 	override def permissionsCheck(p: PermissionsChecking): Unit =
 		p.PermissionCheck(AdminPermission, mandatory(module))
+
+}
+
+trait ListEnhancedAssignmentPermissions extends RequiresPermissionsChecking with PermissionsCheckingMethods {
+	self: ListEnhancedAssignmentCommandState =>
+
+	override def permissionsCheck(p: PermissionsChecking): Unit =
+		p.PermissionCheck(AdminPermission, mandatory(assignment))
 
 }
 

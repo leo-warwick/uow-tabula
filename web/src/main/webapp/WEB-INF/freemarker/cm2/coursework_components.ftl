@@ -581,7 +581,7 @@
 		<div id="${id}" class="striped-section admin-assignment-list<#if has_assignments> collapsible<#if expand_by_default> expanded</#if><#else> empty</#if>" data-name="${id}"
 			<#if has_assignments && !expand_by_default>
 				 data-populate=".striped-section-contents"
-				 data-href="<@routes.cm2.modulehome module academicYear />?${info.requestedUri.query!}"
+				 data-href="<@routes.cm2.modulehome module academicYear />?${info.requestedUri.query!}&skeleton"
 				 data-name="${id}"
 			</#if>
 		>
@@ -629,7 +629,7 @@
 						<#if expand_by_default>
 							<#list assignments as info>
 								<span id="admin-assignment-container-${info.assignment.id}">
-									<@admin_assignment_info info />
+									<@admin_assignment_info info skeleton />
 								</span>
 							</#list>
 						</#if>
@@ -647,11 +647,12 @@
 	</#if>
 </#macro>
 
-<#macro admin_assignment_info info>
+<#macro admin_assignment_info info skeleton=false>
 	<#local assignment = info.assignment />
 	<#local studentCount = (assignment.membershipInfo.totalCount + assignment.submissionsFromUnenrolledStudents?size) />
 
-	<div class="item-info admin-assignment-${assignment.id}">
+	<div class="item-info admin-assignment-${assignment.id}" data-detailurl="<@routes.cm2.enhancedAssignmentDetails info.assignment />" >
+
 		<div class="clearfix">
 			<div class="pull-right">
 				<#if assignment.cm2Assignment>
@@ -758,72 +759,75 @@
 					<li><a href="<@routes.cm2.assignment assignment />">Link for students</a></li>
 				</ul>
 			</div>
-			<#if info.stages??>
-				<div class="col-md-4">
-					<h6>Progress</h6>
+			<#if skeleton><p class="hint"><i class="fa fa-spinner fa-spin"></i><em> Loading&hellip;</em></p>
+			<#else>
+				<#if info.stages??>
+					<div class="col-md-4">
+						<h6>Progress</h6>
 
-					<ul class="list-unstyled">
-						<li><strong>Created:</strong> <span class="use-tooltip" title="<@fmt.dateToWeek assignment.createdDate />" data-html="true"><@fmt.date date=assignment.createdDate /></span></li>
+						<ul class="list-unstyled">
+							<li><strong>Created:</strong> <span class="use-tooltip" title="<@fmt.dateToWeek assignment.createdDate />" data-html="true"><@fmt.date date=assignment.createdDate /></span></li>
 
-						<#if assignment.opened>
-							<li><strong>Opened:</strong> <span class="use-tooltip" title="<@fmt.dateToWeek assignment.openDate />" data-html="true"><@fmt.date date=assignment.openDate /></span></li>
-						</#if>
-
-						<#if !assignment.openEnded && assignment.closed>
-							<li><strong>Closed:</strong> <span class="use-tooltip" title="<@fmt.dateToWeek assignment.closeDate />" data-html="true"><@fmt.date date=assignment.closeDate /></span></li>
-						</#if>
-
-						<#list info.stages as category>
-							<li class="category">
-								<strong><@workflowMessage category.category.code /></strong>:
-								<ul>
-									<#list category.stages as stage>
-										<#list stage.progress as progress>
-											<li><@workflowMessage progress.progress.messageCode /> (${progress.count} of ${studentCount})</li>
-										</#list>
-									</#list>
-								</ul>
-							</li>
-						</#list>
-					</ul>
-				</div>
-			</#if>
-			<#if info.nextStages??>
-				<div class="col-md-4">
-					<h6>Next steps</h6>
-
-					<ul class="list-unstyled">
-						<#if info.nextStages?size == 0>
-							<#if !assignment.opened>
-								<#-- Not open yet -->
-								<li>Not open yet</li>
-							<#elseif !assignment.openEnded && !assignment.closed>
-								<#-- Not closed yet -->
-								<li>Not closed yet</li>
-							<#else>
-								<#-- Complete? -->
-								<#if assignment.hasReleasedFeedback>
-									<#-- As of TAB-5388 show nothing -->
-								<#elseif assignment.openEnded && assignment.collectSubmissions && studentCount gt 0>
-									<li>Assignment needs submitting (${studentCount} of ${studentCount})</li>
-								<#else>
-									<li>Awaiting feedback</li>
-								</#if>
+							<#if assignment.opened>
+								<li><strong>Opened:</strong> <span class="use-tooltip" title="<@fmt.dateToWeek assignment.openDate />" data-html="true"><@fmt.date date=assignment.openDate /></span></li>
 							</#if>
-						<#else>
-							<#list info.nextStages as nextStage>
-								<li>
-									<#local nextStageDescription><@workflowMessage nextStage.stage.actionCode /> (${nextStage.count} of ${studentCount})</#local>
-									<#if nextStage.url??>
-										<a href="${nextStage.url}">${nextStageDescription}</a>
-									<#else>
-										${nextStageDescription}
-									</#if>
+
+							<#if !assignment.openEnded && assignment.closed>
+								<li><strong>Closed:</strong> <span class="use-tooltip" title="<@fmt.dateToWeek assignment.closeDate />" data-html="true"><@fmt.date date=assignment.closeDate /></span></li>
+							</#if>
+
+							<#list info.stages as category>
+								<li class="category">
+									<strong><@workflowMessage category.category.code /></strong>:
+									<ul>
+										<#list category.stages as stage>
+											<#list stage.progress as progress>
+												<li><@workflowMessage progress.progress.messageCode /> (${progress.count} of ${studentCount})</li>
+											</#list>
+										</#list>
+									</ul>
 								</li>
 							</#list>
-						</#if>
-					</ul>
-				</div>
+						</ul>
+					</div>
+				</#if>
+				<#if info.nextStages??>
+					<div class="col-md-4">
+						<h6>Next steps</h6>
+
+						<ul class="list-unstyled">
+							<#if info.nextStages?size == 0>
+								<#if !assignment.opened>
+									<#-- Not open yet -->
+									<li>Not open yet</li>
+								<#elseif !assignment.openEnded && !assignment.closed>
+									<#-- Not closed yet -->
+									<li>Not closed yet</li>
+								<#else>
+									<#-- Complete? -->
+									<#if assignment.hasReleasedFeedback>
+										<#-- As of TAB-5388 show nothing -->
+									<#elseif assignment.openEnded && assignment.collectSubmissions && studentCount gt 0>
+										<li>Assignment needs submitting (${studentCount} of ${studentCount})</li>
+									<#else>
+										<li>Awaiting feedback</li>
+									</#if>
+								</#if>
+							<#else>
+								<#list info.nextStages as nextStage>
+									<li>
+										<#local nextStageDescription><@workflowMessage nextStage.stage.actionCode /> (${nextStage.count} of ${studentCount})</#local>
+										<#if nextStage.url??>
+											<a href="${nextStage.url}">${nextStageDescription}</a>
+										<#else>
+											${nextStageDescription}
+										</#if>
+									</li>
+								</#list>
+							</#if>
+						</ul>
+					</div>
+				</#if>
 			</#if>
 		</div>
 	</div>

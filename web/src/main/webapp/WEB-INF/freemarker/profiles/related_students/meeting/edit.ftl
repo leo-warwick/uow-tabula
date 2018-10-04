@@ -89,6 +89,10 @@
 							</@bs3form.checkbox>
 						</#list>
 					</@bs3form.labelled_form_group>
+				<#else>
+					<#list allRelationships as relationshp>
+						<@f.hidden path="relationships" value=relationship />
+					</#list>
 				</#if>
 
 				<script>

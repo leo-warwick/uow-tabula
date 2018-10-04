@@ -60,12 +60,6 @@
 					<td>Preferred name</td>
 					<td>${student.fullName}</td>
 				</tr>
-				<#if student.gender??>
-					<tr>
-						<td>Gender</td>
-						<td>${student.gender.description}</td>
-					</tr>
-				</#if>
 				<#if student.nationality??>
 					<tr>
 						<td>Nationality</td>

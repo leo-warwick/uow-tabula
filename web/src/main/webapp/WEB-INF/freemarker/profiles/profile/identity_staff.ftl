@@ -21,9 +21,6 @@
 				<#if member.jobTitle??>
 					<strong>Job title:</strong> ${member.jobTitle}<br/>
 				</#if>
-				<#if member.gender??>
-					<strong>Gender:</strong> ${member.gender.description}<br/>
-				</#if>
 
 				<br/>
 

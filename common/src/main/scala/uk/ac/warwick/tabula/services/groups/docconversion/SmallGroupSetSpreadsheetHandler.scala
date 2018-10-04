@@ -122,7 +122,7 @@ object SmallGroupSetSpreadsheetContentsHandler {
 	case class Cell(cellReference: String, formattedValue: String)
 }
 
-class SmallGroupSetSpreadsheetContentsHandler extends SheetContentsHandler {
+abstract class SmallGroupSetSpreadsheetContentsHandler extends SheetContentsHandler with SyllabusPlusLocationServiceComponent {
 
 	var parsedSheets: mutable.Map[String, Sheet] = mutable.Map.empty
 	var parsedRows: mutable.ListBuffer[Row] = _
@@ -164,7 +164,8 @@ abstract class SmallGroupSetSpreadsheetHandlerImpl extends SmallGroupSetSpreadsh
 	self: ModuleAndDepartmentServiceComponent
 		with SmallGroupServiceComponent
 		with UserLookupComponent
-		with LocationFetchingServiceComponent =>
+		with LocationFetchingServiceComponent
+		with SyllabusPlusLocationServiceComponent =>
 
 	private def readSpreadsheet(file: InputStream, result: BindingResult): Map[String, Seq[Row]] = closeThis(file) { stream =>
 		val pkg = OPCPackage.open(stream)
@@ -172,7 +173,10 @@ abstract class SmallGroupSetSpreadsheetHandlerImpl extends SmallGroupSetSpreadsh
 		val reader = new XSSFReader(pkg)
 		val styles = reader.getStylesTable
 
-		val handler = new SmallGroupSetSpreadsheetContentsHandler
+		val locationService = syllabusPlusLocationService
+		val handler = new SmallGroupSetSpreadsheetContentsHandler {
+			override def syllabusPlusLocationService: SyllabusPlusLocationService = locationService
+		}
 		val parser = {
 			val p = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser")
 			p.setContentHandler(new XSSFSheetXMLHandler(styles, sst, handler, false))
@@ -532,7 +536,8 @@ abstract class SmallGroupSetSpreadsheetHandlerImpl extends SmallGroupSetSpreadsh
 			val location = row.values.get(ExtractedSmallGroupEvent.LocationColumn)
 				.map(_.formattedValue)
 				.flatMap { name =>
-					ScientiaCentrallyManagedRooms.CentrallyManagedRooms.get(name)
+
+					syllabusPlusLocationService.getByUpstreamName(name).map(_.asMapLocation)
 						.orElse(Some(locationFetchingService.locationFor(name)))
 				}
 				.map {
@@ -576,6 +581,7 @@ class AutowiringSmallGroupSetSpreadsheetHandler
 		with AutowiringUserLookupComponent
 		with AutowiringWAI2GoConfigurationComponent
 		with WAI2GoHttpLocationFetchingServiceComponent
+		with AutowiringSyllabusPlusLocationServiceComponent
 
 trait SmallGroupSetSpreadsheetHandlerComponent {
 	def smallGroupSetSpreadsheetHandler: SmallGroupSetSpreadsheetHandler

@@ -96,6 +96,8 @@ TODO grab values from the Routes object in code, as that's pretty equivalent and
 
 <#macro editassignmentdetails assignment><@_u page="/admin/assignments/${assignment.id}/edit" /></#macro>
 
+<#macro enhancedAssignmentDetails assignment><@_u page="/admin/assignments/detail/${assignment.id}" /></#macro>
+
 <#macro feedbackSummary assignment studentid><@_u page="/admin/assignments/${assignment.id}/feedback/summary/${studentid}"/></#macro>
 <#macro feedbackAudit assignment studentid><@_u page="/admin/assignments/${assignment.id}/audit/${studentid}"/></#macro>
 <#macro plagiarismInvestigation assignment><@_u page='/admin/assignments/${assignment.id}/submissionsandfeedback/mark-plagiarised'/></#macro>

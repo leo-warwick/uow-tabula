@@ -118,7 +118,8 @@ object TimetableEventType {
 	case class Other(c: String) extends TimetableEventType(c, c, false)
 
 	// lame manual collection. Keep in sync with the case objects above
-	val members = Seq(Lecture, Practical, Seminar, Induction, Meeting, Exam)
+	// Don't change this to a val https://warwick.slack.com/archives/C029QTGBN/p1493995125972397
+	def members = Seq(Lecture, Practical, Seminar, Induction, Meeting, Exam)
 
 	def unapply(code: String): Option[TimetableEventType] = code match {
 		case Lecture.code | Lecture.displayName => Some(Lecture)

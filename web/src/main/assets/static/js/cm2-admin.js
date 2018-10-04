@@ -17,6 +17,7 @@
 		if($container.length === 0){
 			$container = $('#content-'+$row.data('contentid'));
 		}
+		$form.append($('<input type="hidden" name="ajax" value="on">'));
 		prepareAjaxForm($form, $container, options);
 	};
 

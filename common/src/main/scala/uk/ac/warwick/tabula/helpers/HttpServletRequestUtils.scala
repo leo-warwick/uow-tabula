@@ -1,15 +1,14 @@
 package uk.ac.warwick.tabula.helpers
 
 import javax.servlet.http.HttpServletRequest
-
 import org.springframework.http.MediaType
-import org.springframework.web.servlet.mvc.condition.{ProducesRequestCondition, ConsumesRequestCondition}
+import org.springframework.web.servlet.mvc.condition.{ConsumesRequestCondition, ProducesRequestCondition}
 import uk.ac.warwick.util.web.Uri
 
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
-
 import HttpServletRequestUtils._
+import org.springframework.web.util.UriComponentsBuilder
 
 /**
  * Scala-style HttpServletRequest utilities. Adds the methods as implicit methods
@@ -49,7 +48,10 @@ trait HttpServletRequestUtils {
 
 		def requestedUri: Uri = Uri.parse(request.getHeader(XRequestedUriHeader) match {
 			case string: String => string
-			case _ => request.getRequestURL.toString
+			case _ =>
+				val builder = UriComponentsBuilder.fromUriString(request.getRequestURL.toString)
+				for ((name, values) <- requestParameters; value <- values) yield builder.queryParam(name, value)
+				builder.toUriString
 		})
 
 		def requestParameters: Map[String, Seq[String]] = {

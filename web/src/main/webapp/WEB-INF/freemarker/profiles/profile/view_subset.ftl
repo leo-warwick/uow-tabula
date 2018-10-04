@@ -17,13 +17,6 @@
 							<td>${profile.officialName}</td>
 						</tr>
 
-							<#if profile.gender??>
-							<tr>
-								<th>Gender</th>
-								<td>${profile.gender.description}</td>
-							</tr>
-							</#if>
-
 							<#if profile.email??>
 							<tr>
 								<th>Warwick email</th>

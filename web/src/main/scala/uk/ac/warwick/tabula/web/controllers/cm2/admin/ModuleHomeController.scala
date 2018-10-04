@@ -4,8 +4,8 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable, RequestMapping}
 import uk.ac.warwick.tabula.cm2.web.Routes
-import uk.ac.warwick.tabula.commands.cm2.assignments.ListAssignmentsCommand
-import uk.ac.warwick.tabula.commands.cm2.assignments.ListAssignmentsCommand._
+import uk.ac.warwick.tabula.commands.cm2.assignments.ListEnhancedAssignmentsCommand
+import uk.ac.warwick.tabula.commands.cm2.assignments.ListEnhancedAssignmentsCommand._
 import uk.ac.warwick.tabula.data.model.Module
 import uk.ac.warwick.tabula.services.{AutowiringMaintenanceModeServiceComponent, AutowiringUserSettingsServiceComponent}
 import uk.ac.warwick.tabula.web.Mav
@@ -22,11 +22,16 @@ abstract class AbstractModuleHomeController
 	@ModelAttribute("command")
 	def command(@PathVariable module: Module, @ModelAttribute("activeAcademicYear") activeAcademicYear: Option[AcademicYear], user: CurrentUser): ModuleCommand = {
 		val academicYear = activeAcademicYear.getOrElse(AcademicYear.now())
-
-		ListAssignmentsCommand.module(module, academicYear, user)
+		ListEnhancedAssignmentsCommand.module(module, academicYear, user)
 	}
 
-	@RequestMapping(params=Array("!ajax"), headers=Array("!X-Requested-With"))
+	@ModelAttribute("skeletonCommand")
+	def skeletonCommand(@PathVariable module: Module, @ModelAttribute("activeAcademicYear") activeAcademicYear: Option[AcademicYear], user: CurrentUser): ModuleCommand = {
+		val academicYear = activeAcademicYear.getOrElse(AcademicYear.now())
+		ListEnhancedAssignmentsCommand.moduleSkeleton(module, academicYear, user)
+	}
+
+	@RequestMapping(params=Array("!ajax", "!skeleton"), headers=Array("!X-Requested-With"))
 	def home(@ModelAttribute("command") command: ModuleCommand, @PathVariable module: Module): Mav =
 		Mav("cm2/admin/home/module", "moduleInfo" -> command.apply(), "academicYear" -> command.academicYear)
 			.crumbsList(Breadcrumbs.department(module.adminDepartment, Some(command.academicYear)))
@@ -35,6 +40,10 @@ abstract class AbstractModuleHomeController
 	@RequestMapping
 	def homeAjax(@ModelAttribute("command") command: ModuleCommand): Mav =
 		Mav("cm2/admin/home/assignments", "moduleInfo" -> command.apply(), "academicYear" -> command.academicYear).noLayout()
+
+	@RequestMapping(params=Array("skeleton", "!statusFilters"))
+	def homeSkeleton(@ModelAttribute("skeletonCommand") skeletonCommand: ModuleCommand): Mav =
+		Mav("cm2/admin/home/assignments-skeleton", "moduleInfo" -> skeletonCommand.apply(), "academicYear" -> skeletonCommand.academicYear, "skeleton" -> true).noLayout()
 
 }
 
@@ -69,7 +78,7 @@ class ModuleHomeRedirectController extends CourseworkController
 	with AutowiringMaintenanceModeServiceComponent {
 
 	@RequestMapping
-	def redirect(@PathVariable module: Module) =
+	def redirect(@PathVariable module: Module): Mav =
 		Redirect(Routes.admin.module(mandatory(module), retrieveActiveAcademicYear(None).getOrElse(AcademicYear.now())))
 
 }

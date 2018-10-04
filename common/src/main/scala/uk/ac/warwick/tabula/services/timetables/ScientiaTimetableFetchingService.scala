@@ -86,6 +86,7 @@ private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: Scient
 		with ModuleAndDepartmentServiceComponent
 		with UserLookupComponent
 		with ProfileServiceComponent
+		with SyllabusPlusLocationServiceComponent
 		with ApacheHttpClientComponent =>
 
 	import ScientiaHttpTimetableFetchingService._
@@ -206,34 +207,6 @@ private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: Scient
 		)
 	}
 
-}
-
-class TimetableEmptyException(val uris: Seq[(String, AcademicYear)], val param: String)
-	extends IllegalStateException(s"Received empty timetables for $param using: ${uris.map { case (uri, _) => uri}.mkString(", ") }")
-
-object ScientiaHttpTimetableFetchingService extends Logging {
-
-	val cacheName = "SyllabusPlusTimetableLists"
-
-	def apply(scientiaConfiguration: ScientiaConfiguration): CompleteTimetableFetchingService = {
-		val service =
-			new ScientiaHttpTimetableFetchingService(scientiaConfiguration)
-				with WAI2GoHttpLocationFetchingServiceComponent
-				with AutowiringSmallGroupServiceComponent
-				with AutowiringModuleAndDepartmentServiceComponent
-				with AutowiringWAI2GoConfigurationComponent
-				with AutowiringUserLookupComponent
-				with AutowiringApacheHttpClientComponent
-				with AutowiringProfileServiceComponent
-
-		if (scientiaConfiguration.perYearUris.exists(_._1.contains("stubTimetable"))) {
-			// don't cache if we're using the test stub - otherwise we won't see updates that the test setup makes
-			service
-		} else {
-			new CachedCompleteTimetableFetchingService(service, s"$cacheName${scientiaConfiguration.cacheSuffix}", scientiaConfiguration.cacheExpiryTime)
-		}
-	}
-
 	def parseXml(
 		xml: Elem,
 		year: AcademicYear,
@@ -254,7 +227,7 @@ object ScientiaHttpTimetableFetchingService extends Logging {
 			val location = (activity \\ "room").headOption.map(_.text) match {
 				case Some(text) if !text.isEmpty =>
 					// try and get the location from the map of managed rooms without calling the api. fall back to searching for this room
-					ScientiaCentrallyManagedRooms.CentrallyManagedRooms.get(text)
+					syllabusPlusLocationService.getByUpstreamName(text).map(_.asMapLocation)
 						.orElse({
 							// S+ has some (not all) rooms as "AB_AB1.2", where AB is a building code
 							// we're generally better off without this when searching.
@@ -275,9 +248,7 @@ object ScientiaHttpTimetableFetchingService extends Logging {
 						startTime.toString,
 						endTime.toString,
 						dayOfWeek.toString,
-						location.fold("") {
-							_.name
-						},
+						location.map(_.name).getOrElse(""),
 						parent.shortName.getOrElse(""),
 						(activity \\ "weeks").text
 					).mkString
@@ -308,6 +279,34 @@ object ScientiaHttpTimetableFetchingService extends Logging {
 				relatedUrl = None,
 				attendance = Map()
 			)
+		}
+	}
+}
+
+class TimetableEmptyException(val uris: Seq[(String, AcademicYear)], val param: String)
+	extends IllegalStateException(s"Received empty timetables for $param using: ${uris.map { case (uri, _) => uri}.mkString(", ") }")
+
+object ScientiaHttpTimetableFetchingService extends Logging {
+
+	val cacheName = "SyllabusPlusTimetableLists"
+
+	def apply(scientiaConfiguration: ScientiaConfiguration): CompleteTimetableFetchingService = {
+		val service =
+			new ScientiaHttpTimetableFetchingService(scientiaConfiguration)
+				with WAI2GoHttpLocationFetchingServiceComponent
+				with AutowiringSmallGroupServiceComponent
+				with AutowiringModuleAndDepartmentServiceComponent
+				with AutowiringWAI2GoConfigurationComponent
+				with AutowiringUserLookupComponent
+				with AutowiringApacheHttpClientComponent
+				with AutowiringProfileServiceComponent
+				with AutowiringSyllabusPlusLocationServiceComponent
+
+		if (scientiaConfiguration.perYearUris.exists(_._1.contains("stubTimetable"))) {
+			// don't cache if we're using the test stub - otherwise we won't see updates that the test setup makes
+			service
+		} else {
+			new CachedCompleteTimetableFetchingService(service, s"$cacheName${scientiaConfiguration.cacheSuffix}", scientiaConfiguration.cacheExpiryTime)
 		}
 	}
 }

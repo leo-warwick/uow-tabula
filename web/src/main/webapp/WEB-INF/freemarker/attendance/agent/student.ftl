@@ -18,9 +18,6 @@
 						<summary>
 							<strong>More info</strong>
 						</summary>
-						<#if student.gender??>
-							<strong>Gender:</strong> ${student.gender.description}<br/>
-						</#if>
 						<#if student.dateOfBirth??>
 							<strong>Date of birth:</strong> ${student.dateOfBirth?date("yyyy-MM-dd")?string("dd/MM/yyyy")}<br/>
 						</#if>

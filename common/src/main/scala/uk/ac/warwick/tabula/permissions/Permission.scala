@@ -139,6 +139,7 @@ object Permissions {
 	case object ReplicaSyncing extends ScopelessPermission("Manually run replica syncing")
 	case object ViewAuditLog extends ScopelessPermission("View and search the audit log")
 	case object DownloadZipFromJob extends ScopelessPermission("Download ZIP file from Job")
+	case object ManageSyllabusPlusLocations extends ScopelessPermission("Manage Syllabus+ location mappings")
 
 	// Masquerade no longer scopeless, can only masquerade as users who have a Member record against scope
 	case object Masquerade extends Permission("Masquerade as other users")

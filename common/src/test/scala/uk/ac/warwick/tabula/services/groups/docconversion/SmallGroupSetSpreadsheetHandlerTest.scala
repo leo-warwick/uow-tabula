@@ -3,6 +3,7 @@ package uk.ac.warwick.tabula.services.groups.docconversion
 import java.io.InputStream
 
 import org.joda.time.LocalTime
+import org.mockito.Matchers
 import org.springframework.validation.BindException
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.model._
@@ -20,11 +21,12 @@ class SmallGroupSetSpreadsheetHandlerTest extends TestBase with Mockito {
 		val smallGroupService: SmallGroupService = smartMock[SmallGroupService]
 		val userLookup = new MockUserLookup
 
-		val handler = new SmallGroupSetSpreadsheetHandlerImpl with ModuleAndDepartmentServiceComponent with SmallGroupServiceComponent with UserLookupComponent with LocationFetchingServiceComponent {
+		val handler = new SmallGroupSetSpreadsheetHandlerImpl with ModuleAndDepartmentServiceComponent with SmallGroupServiceComponent with UserLookupComponent with LocationFetchingServiceComponent with SyllabusPlusLocationServiceComponent {
 			val moduleAndDepartmentService: ModuleAndDepartmentService = Fixture.this.moduleAndDepartmentService
 			val smallGroupService: SmallGroupService = Fixture.this.smallGroupService
 			val userLookup: MockUserLookup = Fixture.this.userLookup
 			val locationFetchingService: LocationFetchingService = (_: String) => Success(Nil)
+			val syllabusPlusLocationService: SyllabusPlusLocationService = mock[SyllabusPlusLocationService]
 		}
 
 		val department: Department = Fixtures.department("in", "IT Services")
@@ -32,6 +34,10 @@ class SmallGroupSetSpreadsheetHandlerTest extends TestBase with Mockito {
 
 		val ch134: Module = Fixtures.module("ch134", "Introduction to Chemistry Stuff")
 		moduleAndDepartmentService.getModuleByCode("CH134") returns Some(ch134)
+
+		handler.syllabusPlusLocationService.getByUpstreamName(Matchers.any[String]) returns None
+		handler.syllabusPlusLocationService.getByUpstreamName("S0.28") returns Some(SyllabusPlusLocation("S0.28", "S0.28", "37406"))
+		handler.syllabusPlusLocationService.getByUpstreamName("CS_CS1.04") returns Some(SyllabusPlusLocation("CS_CS1.04", "CS1.04", "26858"))
 
 		val linkedUgY1: DepartmentSmallGroupSet = Fixtures.departmentSmallGroupSet("UG Y1")
 		linkedUgY1.groups.add(Fixtures.departmentSmallGroup("Alpha"))

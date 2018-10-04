@@ -1,11 +1,12 @@
 package uk.ac.warwick.tabula.services.timetables
 
+import org.apache.http.impl.client.CloseableHttpClient
 import org.joda.time.LocalTime
 import org.mockito.Matchers
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.model.groups.{DayOfWeek, WeekRange}
-import uk.ac.warwick.tabula.data.model.{MapLocation, Module}
-import uk.ac.warwick.tabula.services.ModuleAndDepartmentService
+import uk.ac.warwick.tabula.data.model.{MapLocation, Module, SyllabusPlusLocation}
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.timetables.{TimetableEvent, TimetableEventType}
 import uk.ac.warwick.userlookup.User
 
@@ -17,12 +18,6 @@ class TimetableFetchingServiceTest extends TestBase with Mockito {
 	val module: Module = Fixtures.module("cs132")
 
 	@Test def parseXML() {
-		val locationFetchingService: LocationFetchingService = (_: String) => Success(Nil)
-		val mockModuleAndDepartmentService = smartMock[ModuleAndDepartmentService]
-		mockModuleAndDepartmentService.getModulesByCodes(Matchers.any[Seq[String]]) answers {codes =>
-			codes.asInstanceOf[Seq[String]].map(code => Fixtures.module(code))
-		}
-
 		val userLookup = new MockUserLookup
 
 		val tutor = new User("abcdef")
@@ -35,7 +30,32 @@ class TimetableFetchingServiceTest extends TestBase with Mockito {
 
 		userLookup.registerUserObjects(tutor, student)
 
-		val events = ScientiaHttpTimetableFetchingService.parseXml(XML.loadString(TimetableEvents), AcademicYear(2012), student.getWarwickId, locationFetchingService, mockModuleAndDepartmentService, userLookup)
+		val service = new ScientiaHttpTimetableFetchingService(mock[ScientiaConfiguration])
+			with LocationFetchingServiceComponent
+			with SmallGroupServiceComponent
+			with ModuleAndDepartmentServiceComponent
+			with UserLookupComponent
+			with ProfileServiceComponent
+			with SyllabusPlusLocationServiceComponent
+			with ApacheHttpClientComponent {
+			val locationFetchingService: LocationFetchingService = (_: String) => Success(Nil)
+			val smallGroupService: SmallGroupService = mock[SmallGroupService]
+			val moduleAndDepartmentService: ModuleAndDepartmentService = smartMock[ModuleAndDepartmentService]
+			var userLookup: UserLookupService = mock[UserLookupService]
+			val profileService: ProfileService = mock[ProfileService]
+			val syllabusPlusLocationService: SyllabusPlusLocationService = mock[SyllabusPlusLocationService]
+			val httpClient: CloseableHttpClient = mock[CloseableHttpClient]
+		}
+
+		service.moduleAndDepartmentService.getModulesByCodes(Matchers.any[Seq[String]]) answers {codes =>
+			codes.asInstanceOf[Seq[String]].map(code => Fixtures.module(code))
+		}
+
+		service.syllabusPlusLocationService.getByUpstreamName(Matchers.any[String]) returns None
+		service.syllabusPlusLocationService.getByUpstreamName("L5") returns Some(SyllabusPlusLocation("L5", "Lecture Theatre 5", "31389"))
+		service.syllabusPlusLocationService.getByUpstreamName("MS.02") returns Some(SyllabusPlusLocation("MS.02", "MS.02", "40879"))
+
+		val events = service.parseXml(XML.loadString(TimetableEvents), AcademicYear(2012), student.getWarwickId, service.locationFetchingService, service.moduleAndDepartmentService, userLookup)
 		events.size should be (10)
 		events.head should be (TimetableEvent(
 			uid="625c69daa83eaaa6c12da006276eb947",

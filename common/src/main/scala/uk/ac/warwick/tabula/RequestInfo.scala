@@ -31,13 +31,7 @@ class RequestInfo(
 	val emergencyMessage: String = "",
 	val userAgent: String = "",
 	val ipAddress: String = ""
-) extends EarlyRequestInfo {
-	lazy val requestedUriWithParameters: String = {
-		val builder = UriComponentsBuilder.fromUriString(requestedUri.toString)
-		for ((name, values) <- requestParameters; value <- values) yield builder.queryParam(name, value)
-		builder.toUriString
-	}
-}
+) extends EarlyRequestInfo
 
 object RequestInfo {
 	private val threadLocal = new ThreadLocal[Option[RequestInfo]] {
