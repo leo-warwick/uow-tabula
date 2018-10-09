@@ -21,9 +21,8 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 
 	var assignmentMembershipService: AssessmentMembershipService = _
 	var userLookup: UserLookupService = _
-	//	var group: UserGroup = _
+	var group: UserGroup = UserGroup.ofUsercodes
 	val mockSessionFactory: SessionFactory = smartMock[SessionFactory]
-	//	val nobody: UserGroup = UserGroup.ofUsercodes
 
 	//	userLookup.registerUsers("1170836", "1170837", "1000001")
 	val stu1 = Fixtures.user(universityId = "1000001", userId = "1000001")
@@ -45,6 +44,9 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 		user.setFullName("Roger " + code.head.toUpper + code.tail)
 		user
 	}
+
+	group.addUserId("1170836")
+	group.addUserId("1170837")
 
 	userLookup = smartMock[UserLookupService]
 	userLookup.getUserByUserId(any[String]) answers { id =>
@@ -81,6 +83,7 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 	def setup(): Unit = transactional { tx =>
 		dao.sessionFactory = sessionFactory
 		session.save(dept)
+		session.save(group)
 		session.flush()
 	}
 
@@ -101,7 +104,8 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 
 
 			assignment.firstMarkers.addAll(Seq(
-				FirstMarkersMap(assignment, "1170836", UserGroup.ofUsercodes),
+				FirstMarkersMap(assignment, "1170837", group),
+				FirstMarkersMap(assignment, "1170836", group),
 			).asJava)
 
 			val feedback = Fixtures.assignmentFeedback("1000001", "1000001")
