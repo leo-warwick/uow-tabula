@@ -53,7 +53,7 @@ trait AutowiringModuleTimetableEventSourceComponent extends ModuleTimetableEvent
 		with CombinedHttpTimetableFetchingServiceComponent
 		with AutowiringSmallGroupServiceComponent
 		with AutowiringUserLookupComponent
-		with AutowiringScientiaConfigurationComponent
+		with AutowiringScientiaHttpTimetableFetchingServiceComponent
 		with AutowiringCelcatConfigurationComponent
 		with AutowiringExamTimetableConfigurationComponent
 		with AutowiringSecurityServiceComponent

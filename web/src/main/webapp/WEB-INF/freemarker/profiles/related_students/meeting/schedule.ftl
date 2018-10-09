@@ -73,6 +73,10 @@
 							</@bs3form.checkbox>
 						</#list>
 					</@bs3form.labelled_form_group>
+				<#else>
+					<#list command.relationships as relationship>
+						<@f.hidden path="relationships" value=relationship.id />
+					</#list>
 				</#if>
 
 				<div class="row">

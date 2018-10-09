@@ -9,7 +9,6 @@ import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.timetables.ViewModuleEventsCommand.{CommandType, ReturnType}
 import uk.ac.warwick.tabula.data.model.Module
 import uk.ac.warwick.tabula.helpers.ExecutionContexts.timetable
-import uk.ac.warwick.tabula.helpers.SystemClockComponent
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.timetables.TimetableFetchingService.EventOccurrenceList
 import uk.ac.warwick.tabula.services.timetables._
@@ -31,9 +30,7 @@ object ViewModuleEventsCommand {
 			with ViewModuleEventsPermissions
 			with ViewModuleEventsValidation
 			with Unaudited with ReadOnly
-			with AutowiringScientiaConfigurationComponent
-			with SystemClockComponent
-			with ScientiaHttpTimetableFetchingServiceComponent // Only include Scientia events for now. If we ever include from other sources, they should be opt-in via params
+			with AutowiringScientiaTimetableFetchingServiceComponent // Only include Scientia events for now. If we ever include from other sources, they should be opt-in via params
 			with AutowiringTermBasedEventOccurrenceServiceComponent
 
 	// Re-usable service

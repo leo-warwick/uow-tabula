@@ -47,7 +47,7 @@ trait AutowiringStudentTimetableEventSourceComponent extends StudentTimetableEve
 		with CombinedHttpTimetableFetchingServiceComponent
 		with AutowiringSmallGroupServiceComponent
 		with AutowiringUserLookupComponent
-		with AutowiringScientiaConfigurationComponent
+		with AutowiringScientiaHttpTimetableFetchingServiceComponent
 		with AutowiringCelcatConfigurationComponent
 		with AutowiringExamTimetableConfigurationComponent
 		with AutowiringSecurityServiceComponent

@@ -90,8 +90,8 @@
 						</#list>
 					</@bs3form.labelled_form_group>
 				<#else>
-					<#list allRelationships as relationshp>
-						<@f.hidden path="relationships" value=relationship />
+					<#list command.relationships as relationship>
+						<@f.hidden path="relationships" value=relationship.id />
 					</#list>
 				</#if>
 

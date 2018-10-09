@@ -172,6 +172,9 @@ subprojects {
     }
 
     test {
+        // Don't use cached test results from the gradle build cache
+        inputs.property "integration.date", java.time.LocalDateTime.now()
+
         // half the cores, but at least four
         def forks = Math.max(4, Runtime.runtime.availableProcessors().intdiv(2))
         doFirst {

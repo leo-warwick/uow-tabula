@@ -9,7 +9,6 @@ import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.data.model.{Location, MapLocation, Module, NamedLocation}
-import uk.ac.warwick.tabula.helpers.SystemClockComponent
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.timetables._
 import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, AutowiringUserLookupComponent, SmallGroupServiceComponent, UserLookupComponent}
@@ -32,9 +31,7 @@ object UpdateSmallGroupEventFromExternalSystemCommand {
 			with CommandSmallGroupEventUpdater
 			with AutowiringSmallGroupServiceComponent
 			with AutowiringUserLookupComponent
-			with AutowiringScientiaConfigurationComponent
-			with SystemClockComponent
-			with ScientiaHttpTimetableFetchingServiceComponent
+			with AutowiringScientiaTimetableFetchingServiceComponent
 
 }
 

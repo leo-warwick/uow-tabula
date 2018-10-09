@@ -3,17 +3,20 @@ package uk.ac.warwick.tabula.services.timetables
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.RequestBuilder
-import org.joda.time.{DateTime, DateTimeConstants, LocalTime}
+import org.joda.time.{DateTimeConstants, LocalTime}
+import org.springframework.beans.factory.annotation.{Autowired, Qualifier}
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.data.model.StudentMember
-import uk.ac.warwick.tabula.{AcademicYear, AutowiringFeaturesComponent, FeaturesComponent}
-import uk.ac.warwick.tabula.data.model.groups.{DayOfWeek, WeekRangeListUserType}
+import uk.ac.warwick.tabula.data.model.groups.{DayOfWeek, WeekRange, WeekRangeListUserType}
+import uk.ac.warwick.tabula.data.model.{MapLocation, StudentMember}
 import uk.ac.warwick.tabula.helpers.ExecutionContexts.timetable
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.helpers._
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.timetables.TimetableFetchingService.EventList
 import uk.ac.warwick.tabula.timetables.{TimetableEvent, TimetableEventType}
+import uk.ac.warwick.tabula.{AcademicYear, AutowiringFeaturesComponent, FeaturesComponent, ScalaFactoryBean}
 
 import scala.concurrent.Future
 import scala.xml.Elem
@@ -72,14 +75,6 @@ trait AutowiringScientiaConfigurationComponent extends ScientiaConfigurationComp
 	val scientiaConfiguration = new ScientiaConfigurationImpl with SystemClockComponent with AutowiringFeaturesComponent
 }
 
-trait ScientiaHttpTimetableFetchingServiceComponent extends CompleteTimetableFetchingServiceComponent {
-	self: ScientiaConfigurationComponent =>
-
-	lazy val timetableFetchingService = new CombinedTimetableFetchingService(
-		ScientiaHttpTimetableFetchingService(scientiaConfiguration)
-	)
-}
-
 private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: ScientiaConfiguration) extends CompleteTimetableFetchingService with Logging {
 	self: LocationFetchingServiceComponent
 		with SmallGroupServiceComponent
@@ -88,8 +83,6 @@ private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: Scient
 		with ProfileServiceComponent
 		with SyllabusPlusLocationServiceComponent
 		with ApacheHttpClientComponent =>
-
-	import ScientiaHttpTimetableFetchingService._
 
 	lazy val perYearUris: Seq[(String, AcademicYear)] = scientiaConfiguration.perYearUris
 
@@ -168,7 +161,7 @@ private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: Scient
 			}
 
 			// Some extra logging here
-			result.onFailure { case e =>
+			result.failed.foreach { e =>
 				logger.warn(s"Request for ${req.getURI.toString} failed: ${e.getMessage}")
 			}
 
@@ -286,8 +279,7 @@ private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: Scient
 class TimetableEmptyException(val uris: Seq[(String, AcademicYear)], val param: String)
 	extends IllegalStateException(s"Received empty timetables for $param using: ${uris.map { case (uri, _) => uri}.mkString(", ") }")
 
-object ScientiaHttpTimetableFetchingService extends Logging {
-
+object ScientiaHttpTimetableFetchingService {
 	val cacheName = "SyllabusPlusTimetableLists"
 
 	def apply(scientiaConfiguration: ScientiaConfiguration): CompleteTimetableFetchingService = {
@@ -309,4 +301,120 @@ object ScientiaHttpTimetableFetchingService extends Logging {
 			new CachedCompleteTimetableFetchingService(service, s"$cacheName${scientiaConfiguration.cacheSuffix}", scientiaConfiguration.cacheExpiryTime)
 		}
 	}
+}
+
+trait ScientiaTimetableFetchingServiceComponent extends CompleteTimetableFetchingServiceComponent
+
+@Profile(Array("dev", "test", "production")) @Service("scientiaHttpTimetableFetchingService")
+class ScientiaHttpTimetableFetchingServiceFactory extends ScalaFactoryBean[CompleteTimetableFetchingService] with AutowiringScientiaConfigurationComponent {
+	override def createInstance(): CompleteTimetableFetchingService =
+		ScientiaHttpTimetableFetchingService(scientiaConfiguration)
+}
+
+@Service("scientiaTimetableFetchingService")
+class ScientiaTimetableFetchingService extends ScalaFactoryBean[CompleteTimetableFetchingService] {
+	@Qualifier("scientiaHttpTimetableFetchingService") @Autowired
+	var scientiaHttpTimetableFetchingService: CompleteTimetableFetchingService = _
+
+	override def createInstance(): CompleteTimetableFetchingService =
+		new CombinedTimetableFetchingService(scientiaHttpTimetableFetchingService)
+}
+
+trait ScientiaHttpTimetableFetchingServiceComponent {
+	def scientiaHttpTimetableFetchingService: CompleteTimetableFetchingService
+}
+
+trait AutowiringScientiaHttpTimetableFetchingServiceComponent extends ScientiaHttpTimetableFetchingServiceComponent {
+	val scientiaHttpTimetableFetchingService: CompleteTimetableFetchingService = Wire.named[CompleteTimetableFetchingService]("scientiaHttpTimetableFetchingService")
+}
+
+@Profile(Array("sandbox")) @Service("scientiaHttpTimetableFetchingService")
+class SandboxScientiaHttpTimetableFetchingService extends CompleteTimetableFetchingService
+	with AutowiringProfileServiceComponent
+	with AutowiringModuleAndDepartmentServiceComponent {
+
+	override def getTimetableForStudent(universityId: String): Future[EventList] = {
+		profileService.getMemberByUniversityId(universityId).collect { case student: StudentMember => student }.map { student =>
+			Future.sequence(
+				student.mostSignificantCourse.latestStudentCourseYearDetails.moduleRegistrations
+					.map { mr => getTimetableForModule(mr.module.code, includeStudents = false) }
+			).map(EventList.combine)
+		}.getOrElse(Future.successful(EventList.empty))
+	}
+	override def getTimetableForStaff(universityId: String): Future[EventList] = Future.successful(EventList.empty)
+	override def getTimetableForModule(moduleCode: String, includeStudents: Boolean): Future[EventList] = {
+		moduleAndDepartmentService.getModuleByCode(moduleCode).map { module =>
+			Future.successful(EventList.fresh((0 until 2).map { i =>
+				val lastDigit = (7 * module.code.charAt(3).asDigit) + module.code.charAt(5).asDigit + (i * 9)
+				val name = s"${moduleCode.toUpperCase}L"
+
+				val startTime = new LocalTime(9, 0).plusHours(lastDigit % 9)
+				val endTime = startTime.plusHours(1).plusHours(lastDigit % 2)
+
+				val dayOfWeek = DayOfWeek((lastDigit % 5) + 1)
+
+				val location = lastDigit % 10 match {
+					case 0 => Some(MapLocation("A0.08A", "52953"))
+					case 1 => Some(MapLocation("H2.03", "21518"))
+					case 2 => Some(MapLocation("MOAC seminar room", "38566"))
+					case 3 => Some(MapLocation("H1.03", "21430"))
+					case 4 => Some(MapLocation("S2.86", "37733"))
+					case 5 => Some(MapLocation("Westwood Lecture Theatre", "38990"))
+					case 6 => Some(MapLocation("L3", "44845"))
+					case 7 => Some(MapLocation("OC0.05", "52131"))
+					case 8 => Some(MapLocation("L4", "31390"))
+					case 9 => Some(MapLocation("MA2.03", "33347"))
+				}
+
+				val parent = TimetableEvent.Parent(Some(module))
+				val weeks =  lastDigit % 5 match {
+					case 0 => Seq(WeekRange(0, 10))
+					case 1 => Seq(WeekRange(15, 20))
+					case 2 => Seq(WeekRange(15, 24))
+					case 3 => Seq(WeekRange(0, 5), WeekRange(7, 10))
+					case 4 => Seq(WeekRange(15, 20), WeekRange(22), WeekRange(24))
+				}
+
+				val uid =
+					DigestUtils.md5Hex(
+						Seq(
+							name,
+							startTime.toString,
+							endTime.toString,
+							dayOfWeek.toString,
+							location.map(_.name).getOrElse(""),
+							parent.shortName.getOrElse(""),
+							weeks.mkString("")
+						).mkString
+					)
+
+				TimetableEvent(
+					uid = uid,
+					name = name,
+					title = "",
+					description = "",
+					eventType = TimetableEventType.Lecture,
+					weekRanges = weeks,
+					day = dayOfWeek,
+					startTime = startTime,
+					endTime = endTime,
+					location = location,
+					comments = None,
+					parent = parent,
+					staff = Nil,
+					students = Nil,
+					year = AcademicYear.now(),
+					relatedUrl = None,
+					attendance = Map()
+				)
+			}))
+		}.getOrElse(Future.successful(EventList.empty))
+	}
+
+	override def getTimetableForCourse(courseCode: String): Future[EventList] = Future.successful(EventList.empty)
+	override def getTimetableForRoom(roomName: String): Future[EventList] = Future.successful(EventList.empty)
+}
+
+trait AutowiringScientiaTimetableFetchingServiceComponent extends ScientiaTimetableFetchingServiceComponent {
+	val timetableFetchingService: CompleteTimetableFetchingService = Wire.named[CompleteTimetableFetchingService]("scientiaTimetableFetchingService")
 }

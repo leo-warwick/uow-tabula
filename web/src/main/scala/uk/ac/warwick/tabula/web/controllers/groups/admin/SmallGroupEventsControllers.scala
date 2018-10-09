@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.web.controllers.groups.admin
 
 import javax.validation.Valid
-
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable, RequestMapping}
@@ -10,8 +9,7 @@ import uk.ac.warwick.tabula.commands.{Appliable, SelfValidating}
 import uk.ac.warwick.tabula.data.model.Module
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.groups.web.Routes
-import uk.ac.warwick.tabula.helpers.SystemClockComponent
-import uk.ac.warwick.tabula.services.timetables.{AutowiringScientiaConfigurationComponent, ScientiaHttpTimetableFetchingServiceComponent}
+import uk.ac.warwick.tabula.services.timetables.AutowiringScientiaTimetableFetchingServiceComponent
 import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.controllers.groups.GroupsController
 import uk.ac.warwick.tabula.{AcademicPeriod, AcademicYear}
@@ -93,8 +91,7 @@ class EditSmallGroupSetCreateEventController extends AbstractCreateSmallGroupEve
 }
 
 abstract class AbstractEditSmallGroupEventController extends SmallGroupEventsController
-	with AutowiringScientiaConfigurationComponent
-	with ScientiaHttpTimetableFetchingServiceComponent with SystemClockComponent
+	with AutowiringScientiaTimetableFetchingServiceComponent
 	with SyllabusPlusEventCountForModule {
 
 	type EditSmallGroupEventCommand = Appliable[SmallGroupEvent] with ModifySmallGroupEventCommandState

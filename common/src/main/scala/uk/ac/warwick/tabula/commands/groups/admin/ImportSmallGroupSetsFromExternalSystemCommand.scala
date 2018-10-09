@@ -11,7 +11,7 @@ import uk.ac.warwick.tabula.commands.groups.admin.ImportSmallGroupSetsFromExtern
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.groups._
-import uk.ac.warwick.tabula.helpers.{LazyLists, SystemClockComponent}
+import uk.ac.warwick.tabula.helpers.LazyLists
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.timetables._
@@ -45,9 +45,7 @@ object ImportSmallGroupSetsFromExternalSystemCommand {
 			with CommandSmallGroupEventGenerator
 			with AutowiringSmallGroupServiceComponent
 			with AutowiringUserLookupComponent
-			with AutowiringScientiaConfigurationComponent
-			with SystemClockComponent
-			with ScientiaHttpTimetableFetchingServiceComponent
+			with AutowiringScientiaTimetableFetchingServiceComponent
 
 	def generateSmallGroupSetNameAndFormat(module: Module, eventType: TimetableEventType): (String, SmallGroupFormat with Product with Serializable) = {
 		val format = eventType match {

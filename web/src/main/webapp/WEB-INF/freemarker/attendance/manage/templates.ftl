@@ -2,14 +2,14 @@
 
 	<h1>Use a template for scheme: ${command.schemes?first.displayName}</h1>
 
-	<p>Use an AQA-approved template to add points. Which template do you want to use?</p>
+	<p>Use an AQSC-approved template to add points. Which template do you want to use?</p>
 
 <#else>
 
 	<h1>Use template</h1>
 
 	<p>
-		Use an AQA-approved template to add points to
+		Use an AQSC-approved template to add points to
 		<a href="#" class="use-popover"
 		   data-content="
 			<ul>

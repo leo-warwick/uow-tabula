@@ -136,12 +136,12 @@ trait CompleteTimetableFetchingServiceComponent
 }
 
 trait CombinedHttpTimetableFetchingServiceComponent extends CompleteTimetableFetchingServiceComponent {
-	self: ScientiaConfigurationComponent
+	self: ScientiaHttpTimetableFetchingServiceComponent
 		with CelcatConfigurationComponent
 		with ExamTimetableConfigurationComponent =>
 
 	lazy val timetableFetchingService = new CombinedTimetableFetchingService(
-		ScientiaHttpTimetableFetchingService(scientiaConfiguration),
+		scientiaHttpTimetableFetchingService,
 		CelcatHttpTimetableFetchingService(celcatConfiguration),
 		ExamTimetableHttpTimetableFetchingService(examTimetableConfiguration)
 	)

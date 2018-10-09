@@ -5,22 +5,20 @@ import java.util.concurrent.TimeoutException
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.commands.groups.admin.ImportSmallGroupEventsFromExternalSystemCommand._
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.Module
 import uk.ac.warwick.tabula.data.model.groups._
-import uk.ac.warwick.tabula.helpers.SystemClockComponent
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, AutowiringUserLookupComponent, SmallGroupServiceComponent, UserLookupComponent}
 import uk.ac.warwick.tabula.services.timetables._
+import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, AutowiringUserLookupComponent, SmallGroupServiceComponent, UserLookupComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.timetables.{TimetableEvent, TimetableEventType}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.duration._
-import ImportSmallGroupEventsFromExternalSystemCommand._
-
 import scala.collection.mutable
 import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.util.Try
 
 object ImportSmallGroupEventsFromExternalSystemCommand {
@@ -37,9 +35,7 @@ object ImportSmallGroupEventsFromExternalSystemCommand {
 			with CommandSmallGroupEventGenerator
 			with AutowiringSmallGroupServiceComponent
 			with AutowiringUserLookupComponent
-			with AutowiringScientiaConfigurationComponent
-			with SystemClockComponent
-			with ScientiaHttpTimetableFetchingServiceComponent
+			with AutowiringScientiaTimetableFetchingServiceComponent
 			with LookupEventsFromModuleTimetable
 
 	def isValidForYear(academicYear: AcademicYear)(event: TimetableEvent): Boolean =
