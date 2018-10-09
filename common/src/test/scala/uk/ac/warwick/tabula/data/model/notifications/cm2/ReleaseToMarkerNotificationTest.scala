@@ -13,7 +13,7 @@ import uk.ac.warwick.tabula.data.CM2MarkingWorkflowDaoImpl
 import uk.ac.warwick.userlookup.{AnonymousUser, User}
 import uk.ac.warwick.tabula.{Mockito, TestBase}
 import uk.ac.warwick.tabula.JavaImports.{JHashMap, JList}
-import uk.ac.warwick.tabula.services.{AssessmentMembershipService, AssessmentMembershipServiceImpl, ProfileService, UserLookupService}
+import uk.ac.warwick.tabula.services._
 
 import collection.JavaConverters._
 
@@ -21,8 +21,13 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 
 	var assignmentMembershipService: AssessmentMembershipService = _
 	var userLookup: UserLookupService = _
+	val cm2MarkingWorkflowService: CM2MarkingWorkflowService = mock[CM2MarkingWorkflowService]
 	var group: UserGroup = UserGroup.ofUsercodes
 	val mockSessionFactory: SessionFactory = smartMock[SessionFactory]
+
+	group.addUserId("1170836")
+	group.addUserId("1170837")
+
 
 	//	userLookup.registerUsers("1170836", "1170837", "1000001")
 	val stu1 = Fixtures.user(universityId = "1000001", userId = "1000001")
@@ -44,9 +49,6 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 		user.setFullName("Roger " + code.head.toUpper + code.tail)
 		user
 	}
-
-	group.addUserId("1170836")
-	group.addUserId("1170837")
 
 	userLookup = smartMock[UserLookupService]
 	userLookup.getUserByUserId(any[String]) answers { id =>
@@ -82,6 +84,9 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 	@Before
 	def setup(): Unit = transactional { tx =>
 		dao.sessionFactory = sessionFactory
+		group.sessionFactory = sessionFactory
+
+		group.userLookup = userLookup
 		session.save(dept)
 		session.save(group)
 		session.flush()
@@ -95,6 +100,10 @@ class ReleaseToMarkerNotificationTest extends PersistenceTestBase with Mockito {
 			singleMarkerWorkflow.academicYear = AcademicYear(2016)
 
 			dao.saveOrUpdate(singleMarkerWorkflow)
+			singleMarkerWorkflow.stageMarkers.forEach { markers =>
+				markers.cm2MarkingWorkflowService = Some(cm2MarkingWorkflowService)
+			}
+
 			session.flush()
 
 			val assignment = Fixtures.assignment("test")
