@@ -92,7 +92,7 @@ trait FilterMonitoringPointsPermissions extends RequiresPermissionsChecking with
 
 trait FilterMonitoringPointsCommandState extends AttendanceFilterExtras {
 
-	final val MaxStudentsFromFilter = 600
+	final val MaxStudentsFromFilter = 9999
 
 	val defaultOrder = Seq(asc("lastName"), asc("firstName"))
 	var sortOrder: JList[Order] = null // No sorting in this command

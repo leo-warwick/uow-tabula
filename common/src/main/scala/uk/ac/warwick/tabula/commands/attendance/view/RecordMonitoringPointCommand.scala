@@ -138,8 +138,8 @@ trait RecordMonitoringPointCommandState {
 
 	lazy val pointsToRecord: Seq[AttendanceMonitoringPoint] = filteredPoints.values.flatten
 		.find(p => p.templatePoint.id == templatePoint.id)
-		.getOrElse(throw new IllegalArgumentException)
-		.points
+  	.map(_.points)
+  	.getOrElse(Seq.empty)
 
 	lazy val studentMap: Map[AttendanceMonitoringPoint, Seq[StudentMember]] =
 		pointsToRecord.map { point =>
