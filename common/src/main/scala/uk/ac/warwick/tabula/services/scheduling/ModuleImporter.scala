@@ -147,8 +147,7 @@ object ModuleImporter {
 		      (top.dpt_code is not null and top.top_perc = 100 and top.dpt_code = :department_code) or
 		      (top.sub_code is not null and top.top_perc <> 100 and substr(top.sub_code, 0, length(mod.dpt_code)) = :department_code) or
 		      (top.dpt_code is null and mod.dpt_code = :department_code)
-		    ) and
-		    mod.mod_iuse = 'Y'
+		    )
 		  group by substr(mod.mod_code,0,5)
 		"""
 
