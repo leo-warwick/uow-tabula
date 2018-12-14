@@ -44,12 +44,12 @@ class RouteDaoImpl extends RouteDao with Daoisms {
 	def getByCode(code: String): Option[Route] =
 		session.newQuery[Route]("from Route r where code = :code").setString("code", code).uniqueResult
 
-	def getByCodeActiveOrInactive(code: String): Option[Route] = {
-		val noFilterSession = session
-		noFilterSession.disableFilter(Route.ActiveRoutesOnlyFilter)
-		noFilterSession.newQuery[Route]("from Route r where code = :code").setString("code", code).uniqueResult
+	def getByCodeActiveOrInactive(code: String): Option[Route] = try {
+		session.disableFilter(Route.ActiveRoutesOnlyFilter)
+		session.newQuery[Route]("from Route r where code = :code").setString("code", code).uniqueResult
+	} finally {
+		session.enableFilter(Route.ActiveRoutesOnlyFilter)
 	}
-
 
 	def getAllByCodes(codes: Seq[String]): Seq[Route] = {
 		safeInSeq(() => { session.newCriteria[Route] }, "code", codes)
