@@ -246,16 +246,42 @@ trait AssessmentMembershipMethods extends Logging {
 	def determineMembership(upstream: Seq[UpstreamAssessmentGroup], others: Option[UnspecifiedTypeUserGroup]): AssessmentMembershipInfo = {
 		val sitsUsers =
 			userLookup.getUsersByWarwickUniIds(upstream.flatMap { _.members.asScala.map(_.universityId).filter(_.hasText) }.distinct).toSeq
-
+		logger.info("others:size:" + others.size)
+		logger.info("upstream:" + upstream.size)
+		sitsUsers.foreach { case(id, u) =>
+			logger.info("sitsUsers:" + id)
+			logger.info("sitsUsers: user:" + u.getLastName +  u.getFirstName)
+		}
 		val includes = others.map(_.users.map(u => u.getUserId -> u)).getOrElse(Nil)
+		includes.foreach { case(id, u) =>
+			logger.info("includes:" + id)
+			logger.info("includes: user" + u.getLastName +  u.getFirstName)
+		}
 		val excludes = others.map(_.excludes.map(u => u.getUserId -> u)).getOrElse(Nil)
-
+		excludes.foreach { case(id, u) =>
+			logger.info("excludes:" + id)
+			logger.info("excludes: user" + u.getLastName +  u.getFirstName)
+		}
 		// convert lists of Users to lists of MembershipItems that we can render neatly together.
 
 		val includeItems = makeIncludeItems(includes, sitsUsers)
+		includeItems.foreach { membership =>
+			val u = membership.user
+			logger.info("includeItems:" + u.getUserId)
+			logger.info("includeItems:name:" + membership.user.getLastName, membership.user.getFirstName)
+		}
 		val excludeItems = makeExcludeItems(excludes, sitsUsers)
+		excludeItems.foreach { membership =>
+			val u = membership.user
+			logger.info("excludeItems:" + u.getUserId)
+			logger.info("excludeItems:name:" + membership.user.getLastName, membership.user.getFirstName)
+		}
 		val sitsItems = makeSitsItems(includes, excludes, sitsUsers)
-
+		sitsItems.foreach { membership =>
+			val u = membership.user
+			logger.info("sitsItems:" + u.getUserId)
+			logger.info("sitsItems:name:" + membership.user.getLastName, membership.user.getFirstName)
+		}
 		val sorted = (includeItems ++ excludeItems ++ sitsItems)
 			.sortBy(membershipItem => (membershipItem.user.getLastName, membershipItem.user.getFirstName))
 
