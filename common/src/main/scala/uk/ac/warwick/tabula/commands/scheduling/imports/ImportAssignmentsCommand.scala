@@ -328,6 +328,7 @@ trait ImportAssignmentsCommand extends CommandInternal[Unit] with RequiresPermis
 			.flatMap { assignment =>
 				transactional() {
 					// Find students who are assigned to a marker but are not a member of the assignment
+					logger.info(s" checking assignment: " +  assignment.id)
 					val memberUsercodes = assessmentMembershipService.determineMembershipUsers(assignment).map(_.getUserId)
 					val removedMembers = assignment.allFeedback.map(_.usercode).toSet.diff(memberUsercodes.toSet)
 
