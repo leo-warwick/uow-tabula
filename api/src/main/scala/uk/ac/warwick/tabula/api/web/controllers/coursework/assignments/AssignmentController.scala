@@ -102,7 +102,15 @@ trait GetAssignmentApi {
   self: AssignmentController with GetAssignmentApiOutput =>
 
   @RequestMapping(method = Array(GET), produces = Array("application/json"))
-  def getIt(@Valid @ModelAttribute("getCommand") command: Appliable[SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults], errors: Errors, @PathVariable assignment: Assignment): Mav = {
+  def getIt(@Valid @ModelAttribute("getCommand") command: Appliable[SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults],
+    errors: Errors,
+    @PathVariable assignment: Assignment,
+    @RequestParam(value="includeInactive", required=false) includeInactive: Boolean = false
+  ): Mav = {
+    if(includeInactive) {
+      session.disableFilter(Member.FreshOnlyFilter);
+      session.disableFilter(Member.ActiveOnlyFilter);
+    }
     // Return the GET representation
     getAssignmentMav(command, errors, assignment)
 
