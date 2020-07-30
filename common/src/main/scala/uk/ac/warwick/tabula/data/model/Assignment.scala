@@ -907,6 +907,15 @@ class Assignment
     assessmentMembershipService.determineMembership(this)
   }
 
+  def membershipInfoWith(includePWD: Boolean = false): AssessmentMembershipInfo = RequestLevelCache.cachedBy("Assessment.membershipInfo", id) {
+    if(includePWD) {
+      assessmentMembershipService.determineMembershipIncludingPWD(assignment = this)
+    }
+    else {
+      assessmentMembershipService.determineMembership(assignment = this)
+    }
+  }
+
   @transient
   private lazy val seatNumbers: Map[String, Int] = assessmentMembershipService.determineMembershipUsersWithOrder(this).collect {
     case (user, Some(seat)) => (user.getUserId, seat)

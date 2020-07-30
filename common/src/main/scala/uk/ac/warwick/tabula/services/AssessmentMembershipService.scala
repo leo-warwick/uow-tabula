@@ -117,6 +117,8 @@ trait AssessmentMembershipService {
 
   def determineMembership(assignment: Assignment): AssessmentMembershipInfo
 
+  def determineMembershipIncludingPWD(assignment: Assignment): AssessmentMembershipInfo
+
   def determineMembershipUsers(upstream: Seq[UpstreamAssessmentGroupInfo], others: Option[UnspecifiedTypeUserGroup], resitOnly: Boolean): Seq[User]
 
   def determineMembershipUsers(assignment: Assignment): Seq[User]
@@ -471,6 +473,9 @@ trait AssessmentMembershipMethods extends Logging {
 
   def determineMembership(assignment: Assignment): AssessmentMembershipInfo =
     determineMembership(assignment.upstreamAssessmentGroupInfos, Option(assignment.members), resitOnly = assignment.resitAssessment)
+
+  def determineMembershipIncludingPWD(assignment: Assignment): AssessmentMembershipInfo =
+    generateAssessmentMembershipInfo(assignment.upstreamAssessmentGroupInfos, Option(assignment.members), resitOnly = assignment.resitAssessment, includePWD = true)
 
   /**
     * Returns just a list of User objects who are on this assessment group.

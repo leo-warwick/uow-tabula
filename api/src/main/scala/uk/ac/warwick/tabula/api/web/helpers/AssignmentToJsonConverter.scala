@@ -7,7 +7,7 @@ import uk.ac.warwick.tabula.web.Routes
 trait AssignmentToJsonConverter {
   self: TopLevelUrlComponent with AssessmentMembershipInfoToJsonConverter =>
 
-  def jsonAssignmentObject(assignment: Assignment): Map[String, Any] = {
+  def jsonAssignmentObject(assignment: Assignment, includePWD: Boolean = false): Map[String, Any] = {
     val basicInfo = Map(
       "id" -> assignment.id,
       "module" -> Map(
@@ -76,7 +76,7 @@ trait AssignmentToJsonConverter {
         "unapprovedExtensions" -> assignment.countUnapprovedExtensions,
       )
 
-    val membershipInfo = assignment.membershipInfo
+    val membershipInfo = assignment.membershipInfoWith(includePWD)
     val studentMembershipInfo = jsonAssessmentMembershipInfoObject(membershipInfo, assignment.upstreamAssessmentGroupInfos.groupBy(_.upstreamAssessmentGroup).keys.toSeq)
 
     val datesInfo =

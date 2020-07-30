@@ -29,7 +29,7 @@ class AssessmentGroupAssignmentsController extends ApiController
     val assignmentsByAssessmentGroup = command.apply()
 
     val assessmentGroups = assignmentsByAssessmentGroup.map{ case (ag, a) =>
-      val assignments: (String, Any) = "assignments" -> a.map(jsonAssignmentObject)
+      val assignments: (String, Any) = "assignments" -> a.map(jsonAssignmentObject(_))
       jsonUpstreamAssessmentGroupKeyObject(ag) + assignments
     }
 
