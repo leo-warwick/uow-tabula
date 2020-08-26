@@ -73,8 +73,10 @@ class GenerateModuleResitsController extends BaseModuleMarksController
       model.addAttribute("flash__error", "flash.hasErrors")
       formView
     } else {
-      cmd.apply()
-      RedirectFlashing(Routes.marks.Admin.home(module.adminDepartment, academicYear), "flash__success" -> "flash.module.resitsCreated")
+      val results = cmd.apply()
+      val adminHome = Routes.marks.Admin.home(module.adminDepartment, academicYear)
+      if (results.nonEmpty) RedirectFlashing(adminHome, "flash__success" -> "flash.module.resitsCreated")
+      else Redirect(adminHome)
     }
 
 }
