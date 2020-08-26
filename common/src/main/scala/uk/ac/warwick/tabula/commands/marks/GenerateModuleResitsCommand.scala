@@ -148,7 +148,10 @@ trait GenerateModuleResitsValidation extends SelfValidating {
       (sequence, resit) <- resits
     ) {
 
-      if (resit.create && !canUpdateResits) {
+      val existingResit = requiresResits.find(_.module.sprCode == sprCode)
+        .flatMap(_.components.find(_._1.sequence == sequence).flatMap(_._2.existingResit))
+
+      if (resit.create && existingResit.isDefined && !canUpdateResits) {
         errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "moduleMarks.resit.noEdit")
       }
 
