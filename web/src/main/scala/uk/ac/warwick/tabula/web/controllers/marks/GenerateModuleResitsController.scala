@@ -76,7 +76,7 @@ class GenerateModuleResitsController extends BaseModuleMarksController
       val results = cmd.apply()
       val adminHome = Routes.marks.Admin.home(module.adminDepartment, academicYear)
       if (results.nonEmpty) RedirectFlashing(adminHome, "flash__success" -> "flash.module.resitsCreated")
-      else Redirect(adminHome)
+      else RedirectFlashing(adminHome)
     }
 
 }

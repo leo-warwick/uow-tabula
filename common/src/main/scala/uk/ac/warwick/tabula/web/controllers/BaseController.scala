@@ -73,8 +73,6 @@ trait ControllerViews extends Logging {
 
   def Redirect(path: String, objects: Map[String, _]): Mav = Mav("redirect:" + validRedirectDestination(getReturnToUnescaped(path)), objects)
 
-  def Redirect(path: String): String =  s"redirect:${validRedirectDestination(getReturnToUnescaped(path))}"
-
   def RedirectFlashing(path: String, flash: (String, String)*)(implicit redirectAttributes: RedirectAttributes): String = {
     flash.foreach { case (k, v) => redirectAttributes.addFlashAttribute(k, v) }
     s"redirect:${validRedirectDestination(getReturnToUnescaped(path))}"
