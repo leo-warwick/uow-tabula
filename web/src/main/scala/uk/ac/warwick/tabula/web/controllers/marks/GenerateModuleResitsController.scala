@@ -49,11 +49,17 @@ class GenerateModuleResitsController extends BaseModuleMarksController
       .map(astCode => AssessmentType.factory(astCode.trim()))
   }
 
+  @ModelAttribute("canUpdateResits")
+  def canUpdateResits(@ModelAttribute("command") command: GenerateModuleResitsCommand.Command, errors: Errors): Boolean =
+    command.canUpdateResits
+
   private val formView: String = "marks/admin/modules/resits"
 
   @RequestMapping(params = Array("!confirm"))
-  def preview(@Valid @ModelAttribute("command") cmd: GenerateModuleResitsCommand.Command, errors: Errors): String =
+  def preview(@Valid @ModelAttribute("command") cmd: GenerateModuleResitsCommand.Command, errors: Errors): String = {
+    cmd.populate()
     formView
+  }
 
   @RequestMapping(params = Array("confirm=true"))
   def save(

@@ -50,9 +50,16 @@ abstract class ExportRecordedResitToSitsCommandInternal
         logger.warn(s"Not uploading resit $resit as department for ${resit.moduleCode} is closed for ${resit.academicYear}")
         None
       } else {
-        // first check to see if there is one and only one matching row
-        val rseq = exportResitsToSitsService.getNextResitSequence(resit)
-        exportResitsToSitsService.exportToSits(resit, rseq) match {
+
+        val rowsUpdated = if (resit.lastWrittenToSits.isDefined) {
+          exportResitsToSitsService.updateResit(resit)
+        } else {
+          val rseq = exportResitsToSitsService.getNextResitSequence(resit)
+          resit.resitSequence = Option(rseq)
+          exportResitsToSitsService.createResit(resit, rseq)
+        }
+
+        rowsUpdated match {
           case 0 =>
             logger.warn(s"Upload to SITS for resit $resit failed - updated zero rows")
             None
@@ -64,7 +71,6 @@ abstract class ExportRecordedResitToSitsCommandInternal
             logger.info(s"Resit uploaded to SITS -  $resit")
             resit.needsWritingToSitsSince = None
             resit.lastWrittenToSits = Some(DateTime.now)
-            resit.resitSequence = Option(rseq)
             Some(resitService.saveOrUpdate(resit))
         }
       }

@@ -26,7 +26,8 @@ trait AutowiringExportResitsToSitsServiceComponent extends ExportResitsToSitsSer
 }
 
 trait ExportResitsToSitsService {
-  def exportToSits(resit: RecordedResit, rseq: String): Int
+  def createResit(resit: RecordedResit, rseq: String): Int
+  def updateResit(resit: RecordedResit): Int
   def getNextResitSequence(resit: RecordedResit): String
 }
 
@@ -65,7 +66,7 @@ object ExportResitsToSitsService {
        |)
        |""".stripMargin
 
-  class ResetModuleResultQuery(ds: DataSource) extends SqlUpdate(ds, CreateResitRecordSql) {
+  class CreateResitRecordQuery(ds: DataSource) extends SqlUpdate(ds, CreateResitRecordSql) {
     declareParameter(new SqlParameter("sprCode", Types.VARCHAR))
     declareParameter(new SqlParameter("academicYear", Types.VARCHAR))
     declareParameter(new SqlParameter("moduleCode", Types.VARCHAR))
@@ -78,6 +79,33 @@ object ExportResitsToSitsService {
     declareParameter(new SqlParameter("weighting", Types.VARCHAR))
     compile()
   }
+
+  final def UpdateResitRecordSql: String =
+    s"""
+       |update $sitsSchema.cam_sra
+       |set
+       |  ast_code = :assessmentType,
+       |  sra_cura = :attempt,
+       |  sra_perc = :weighting
+       |where
+       |  spr_code = :sprCode
+       |  and ayr_code = :academicYear
+       |  and mod_code = :moduleCode
+       |  and sra_rseq = :resitSequence
+       |
+       |""".stripMargin
+
+  class UpdateResitRecordQuery(ds: DataSource) extends SqlUpdate(ds, UpdateResitRecordSql) {
+    declareParameter(new SqlParameter("sprCode", Types.VARCHAR))
+    declareParameter(new SqlParameter("academicYear", Types.VARCHAR))
+    declareParameter(new SqlParameter("moduleCode", Types.VARCHAR))
+    declareParameter(new SqlParameter("resitSequence", Types.VARCHAR))
+    declareParameter(new SqlParameter("assessmentType", Types.VARCHAR))
+    declareParameter(new SqlParameter("attempt", Types.VARCHAR))
+    declareParameter(new SqlParameter("weighting", Types.VARCHAR))
+    compile()
+  }
+
 
   final def CurrentSraSequenceSql =
     f"""
@@ -116,16 +144,31 @@ class RecordedResitsParameterGetter(resit: RecordedResit) {
     "attempt" -> resit.currentResitAttempt.toString,
     "weighting" -> resit.weighting.toString,
   )
+
+  def updateParams: JMap[String, Any] = JHashMap(
+    "sprCode" -> resit.sprCode,
+    "academicYear" -> resit.academicYear.toString,
+    "moduleCode" -> resit.moduleCode,
+    "resitSequence" -> resit.resitSequence.orNull,
+    "assessmentType" -> resit.assessmentType.astCode,
+    "attempt" -> resit.currentResitAttempt.toString,
+    "weighting" -> resit.weighting.toString,
+  )
 }
 
 class AbstractExportResitsToSitsService extends ExportResitsToSitsService with Logging {
   self: SitsDataSourceComponent =>
 
-  def exportToSits(resit: RecordedResit, rseq: String): Int = {
+  def createResit(resit: RecordedResit, rseq: String): Int = {
     val parameterGetter = new RecordedResitsParameterGetter(resit)
-    val updateQuery = new ResetModuleResultQuery(sitsDataSource)
-    val rowUpdated = updateQuery.updateByNamedParam(parameterGetter.createParams(rseq))
-    rowUpdated
+    val createQuery = new CreateResitRecordQuery(sitsDataSource)
+    createQuery.updateByNamedParam(parameterGetter.createParams(rseq))
+  }
+
+  def updateResit(resit: RecordedResit): Int = {
+    val parameterGetter = new RecordedResitsParameterGetter(resit)
+    val updateQuery = new UpdateResitRecordQuery(sitsDataSource)
+    updateQuery.updateByNamedParam(parameterGetter.updateParams)
   }
 
   override def getNextResitSequence(resit: RecordedResit): String = {
@@ -148,6 +191,7 @@ class ExportResitsToSitsServiceImpl
 @Profile(Array("sandbox"))
 @Service
 class ExportResitsToSitsSandboxService extends ExportResitsToSitsService {
-  def exportToSits(resit: RecordedResit, rseq: String): Int = 0
+  def createResit(resit: RecordedResit, rseq: String): Int = 0
+  def updateResit(resit: RecordedResit): Int = 0
   def getNextResitSequence(resit: RecordedResit): String = "001"
 }
