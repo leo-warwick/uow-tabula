@@ -48,7 +48,7 @@ object GenerateModuleResitsCommand {
     with GenerateModuleResitsState
     with GenerateModuleResitsRequest
     with ModuleOccurrenceLoadModuleRegistrations
-    with SelfValidating
+    with GenerateModuleResitsValidation
     with PopulateOnForm
   type SprCode = String
   type Sequence = String
