@@ -43,11 +43,11 @@ trait ViewRelatedStudentsCommandState extends FiltersRelationships {
   val currentMember: Member
   val relationshipType: StudentRelationshipType
 
-  var studentsPerPage = FiltersRelationships.DefaultStudentsPerPage
+  var studentsPerPage: Int = FiltersRelationships.DefaultStudentsPerPage
   var page = 1
 
   var departments: JList[Department] = JArrayList()
-  val defaultOrder = Seq(asc("lastName"), asc("firstName")) // Don't allow this to be changed atm
+  val defaultOrder: Seq[Order] = Seq(asc("lastName"), asc("firstName")) // Don't allow this to be changed atm
   var sortOrder: JList[Order] = JArrayList()
 
   var courseTypes: JList[CourseType] = JArrayList()
@@ -61,6 +61,8 @@ trait ViewRelatedStudentsCommandState extends FiltersRelationships {
   var sprStatuses: JList[SitsStatus] = JArrayList()
   var modules: JList[Module] = JArrayList()
   var hallsOfResidence: JList[String] = JArrayList()
+
+  var hasBeenFiltered = false
 
   lazy val allCourses: Seq[StudentCourseDetails] =
     profileService.getSCDsByAgentRelationshipAndRestrictions(relationshipType, currentMember, Nil)
@@ -94,7 +96,7 @@ abstract class ViewRelatedStudentsCommandInternal(val currentMember: Member, val
 
   def onBind(result: BindingResult): Unit = {
     // Add all non-withdrawn codes to SPR statuses by default
-    if (sprStatuses.isEmpty) {
+    if (!hasBeenFiltered) {
       allSprStatuses.filterNot(SitsStatus.isWithdrawnStatusOnRoute).foreach {
         sprStatuses.add
       }
