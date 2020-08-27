@@ -142,7 +142,7 @@
                           <td>
                             <#if componentRecord.existingResit?has_content && !canUpdateResits>
                               ${componentRecord.existingResit.assessmentType.name}
-                            <#elseif sitsResit?has_content>
+                            <#elseif sitsResit?has_content && !componentRecord.existingResit?has_content>
                               ${sitsResit.resitAssessmentType.name}
                             <#elseif record.requiresResit>
                               <@f.select path="resits[${sprCode}][${assessmentComponent.sequence}].assessmentType" cssClass="form-control assessment-type" data\-sequence="${assessmentComponent.sequence}">
@@ -155,7 +155,7 @@
                           <td>
                             <#if componentRecord.existingResit?has_content && !canUpdateResits>
                               ${componentRecord.existingResit.weighting}
-                            <#elseif sitsResit?has_content>
+                            <#elseif sitsResit?has_content && !componentRecord.existingResit?has_content>
                                 ${sitsResit.resitAssessmentWeighting!assessmentComponent.scaledWeighting}
                             <#else>
                               <@bs3form.form_group path="resits[${sprCode}][${assessmentComponent.sequence}].weighting">
