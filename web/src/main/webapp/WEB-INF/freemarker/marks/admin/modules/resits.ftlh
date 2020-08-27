@@ -123,13 +123,15 @@
                                   <span class="sr-only">Waiting to be written to SITS</span>
                                 </span>
                               </#if>
+                              <#if canUpdateResits>
+                                <@f.checkbox path="resits[${sprCode}][${assessmentComponent.sequence}].create" />
+                              </#if>
                             <#elseif sitsResit?has_content>
                               <span class="label label-success tabula-tooltip" data-title="Resit - ${sitsResit.resitSequence!''}. The resit was created directly in SITS. Any changes to this resit must be made in SITS.">
                                 Resit created in SITS
                                 <span class="sr-only">Resit - ${sitsResit.resitSequence!''}. The resit was created directly in SITS. Any changes to this resit must be made in SITS.</span>
                               </span>
-                            </#if>
-                            <#if record.requiresResit>
+                            <#elseif record.requiresResit>
                               <@f.checkbox path="resits[${sprCode}][${assessmentComponent.sequence}].create" />
                             </#if>
                           </td>
