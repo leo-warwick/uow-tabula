@@ -49,6 +49,7 @@ object GenerateModuleResitsCommand {
     with GenerateModuleResitsRequest
     with ModuleOccurrenceLoadModuleRegistrations
     with GenerateModuleResitsValidation
+    with SelfValidating
     with PopulateOnForm
   type SprCode = String
   type Sequence = String
@@ -142,6 +143,8 @@ trait GenerateModuleResitsValidation extends SelfValidating {
     securityService.can(currentUser, Permissions.Marks.ModifyResits, module)
 
   def validate(errors: Errors): Unit = {
+
+    if (resitsToCreate.values.flatten.isEmpty) errors.reject("moduleMarks.resit.noneSelected")
 
     for (
       (sprCode, resits) <- resitsToCreate;
