@@ -68,7 +68,7 @@ class MitigatingCircumstancesColumnOption extends ChosenYearExamGridColumnOption
 
             header ++ global ++ affected ++ acute ++ comments
           } else {
-            header ++ comments
+            header
           }
         }).mkString("\n")
 
@@ -79,8 +79,8 @@ class MitigatingCircumstancesColumnOption extends ChosenYearExamGridColumnOption
             ${globalRecommendations(s, html = true).mkStringOrEmpty("<dd>", "</dd><dd>", "</dd>")}
             ${affectedAssessmentsByRecommendation(s).mkStringOrEmpty("<dd>", "</dd><dd>", "</dd>")}
             ${modulesWithAcuteOutcomes(s).mkStringOrEmpty(s"<dd>${Option(s.acuteOutcome).map(_.description).getOrElse("")} (", ", ", ")</dd>")}
+            ${Option(s.boardRecommendationComments).map(comments => s"<dt>Comments</dt><dd>$comments</dd>").getOrElse("")}
             """} else ""}
-          ${Option(s.boardRecommendationComments).map(comments => s"<dt>Comments</dt><dd>$comments</dd>").getOrElse("")}
           </dl>""").mkString
 
         val notes = if (state.department.rootDepartment.code == "es") {

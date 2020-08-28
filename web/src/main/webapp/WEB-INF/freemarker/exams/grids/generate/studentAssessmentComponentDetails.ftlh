@@ -290,7 +290,7 @@
                 ${submission.gradingCode} <@fmt.help_popover id="grading-${submission.key}" content="${submission.outcomeGrading.helpText}" />
             </@mitcircs_components.detail>
 
-            <@mitcircs_components.detail label="Date approved">
+            <@mitcircs_components.detail label="Grading approved">
               <#if submission.acute><@fmt.date date=submission.outcomesLastRecordedOn /><#else><@fmt.date date=submission.outcomesApprovedOn /></#if>
             </@mitcircs_components.detail>
 
