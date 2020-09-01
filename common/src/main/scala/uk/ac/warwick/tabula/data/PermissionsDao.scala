@@ -60,6 +60,7 @@ trait PermissionsDao {
   def getCustomRoleDefinitionsFor(departments: Seq[Department]): Seq[CustomRoleDefinition]
 
   def getGlobalGrantedRole(builtIn: BuiltInRoleDefinition): Option[GrantedRole[PermissionsTarget]]
+  def getGlobalGrantedRole(custom: CustomRoleDefinition): Option[GrantedRole[PermissionsTarget]]
   def getGlobalGrantedRoles: Seq[GrantedRole[PermissionsTarget]]
   def createGlobalGrantedRole(builtIn: BuiltInRoleDefinition): GrantedRole[PermissionsTarget]
 
@@ -285,6 +286,12 @@ class PermissionsDaoImpl extends PermissionsDao with Daoisms {
     session.newCriteria[GrantedRole[PermissionsTarget]]
       .add(is("scopeType", PermissionsTarget.GlobalScopeType))
       .add(is("builtInRoleDefinition", builtInRoleDefinition))
+      .seq.headOption
+
+  override def getGlobalGrantedRole(customRoleDefinition: CustomRoleDefinition): Option[GrantedRole[PermissionsTarget]] =
+    session.newCriteria[GrantedRole[PermissionsTarget]]
+      .add(is("scopeType", PermissionsTarget.GlobalScopeType))
+      .add(is("customRoleDefinition", customRoleDefinition))
       .seq.headOption
 
   override def getGlobalGrantedRoles: Seq[GrantedRole[PermissionsTarget]] =

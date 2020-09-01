@@ -311,7 +311,7 @@ abstract class AbstractPermissionsService extends PermissionsService {
   override def getGlobalGrantedRole(roleDefinition: RoleDefinition): Option[GrantedRole[PermissionsTarget]] =
     roleDefinition match {
       case builtIn: BuiltInRoleDefinition => permissionsDao.getGlobalGrantedRole(builtIn)
-      case _ => None
+      case custom: CustomRoleDefinition => permissionsDao.getGlobalGrantedRole(custom)
     }
 
   override def getOrCreateGlobalGrantedRole(roleDefinition: RoleDefinition): GrantedRole[PermissionsTarget] =
