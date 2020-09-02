@@ -37,27 +37,30 @@ abstract class MemberSearchCommandInternal(override val departments: Seq[Departm
   def department: Department = null
 
   override def applyInternal(): Seq[Member] = {
-    memberDao.getAllByUserIds(userIds.slice(offset, offset + limit)).sortBy(m => userIds.indexOf(m.userId))
-  }
-
-  lazy val userIds: Seq[String] = {
     if (departments.isEmpty && serializeFilter.isEmpty) {
       // This is validated in MemberSearchCommandValidation
       throw new IllegalArgumentException("At least one filter value must be defined")
     }
 
     val restrictions = buildRestrictions(user, departments, academicYear)
+    sortOrder = JList(asc("userId"), asc("universityId"))
 
     departments match {
-      case Nil => profileService.findAllUserIdsByRestrictions(restrictions).distinct.sorted
+      case Nil => profileService.findAllMembersByRestrictions(restrictions, buildOrders(), limit, offset)
       case departments => departments.flatMap { department =>
-        profileService.findAllUserIdsByRestrictionsInAffiliatedDepartments(
-          department,
-          restrictions
-        )
-      }.distinct.sorted
+        profileService.findAllMembersByRestrictionsInAffiliatedDepartments(department, restrictions, buildOrders(), limit, offset)
+      }
     }
   }
+
+  lazy val total: Int = {
+    val restrictions = buildRestrictions(user, departments, academicYear)
+    departments match {
+      case Nil => profileService.countAllMembersByRestrictions(restrictions)
+      case departments => departments.map(profileService.countAllMembersByRestrictionsInAffiliatedDepartments(_, restrictions)).sum
+    }
+  }
+
 }
 
 trait MemberSearchCommandRequest extends RequiresPermissionsChecking with PermissionsCheckingMethods {
