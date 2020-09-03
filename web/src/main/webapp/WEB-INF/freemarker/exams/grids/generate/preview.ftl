@@ -436,7 +436,7 @@
               information within it. You agree to abide by the University's <a target='_blank' href='http://warwick.ac.uk/dataprotection'>
                 Data Protection Policy
               </a> and the mandatory working practices for <a target='_blank'
-                                                              href='http://www2.warwick.ac.uk/services/gov/informationsecurity/working_practices/assets_protection/'>
+                                                              href='https://warwick.ac.uk/services/idc/informationsecurity/working_practices##assets_protection2'>
                 electronic information asset protection.</a>
             </p>
           </div>
