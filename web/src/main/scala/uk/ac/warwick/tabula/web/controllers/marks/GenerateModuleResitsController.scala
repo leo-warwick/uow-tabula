@@ -49,11 +49,17 @@ class GenerateModuleResitsController extends BaseModuleMarksController
       .map(astCode => AssessmentType.factory(astCode.trim()))
   }
 
+  @ModelAttribute("canUpdateResits")
+  def canUpdateResits(@ModelAttribute("command") command: GenerateModuleResitsCommand.Command, errors: Errors): Boolean =
+    command.canUpdateResits
+
   private val formView: String = "marks/admin/modules/resits"
 
   @RequestMapping(params = Array("!confirm"))
-  def preview(@Valid @ModelAttribute("command") cmd: GenerateModuleResitsCommand.Command, errors: Errors): String =
+  def preview(@ModelAttribute("command") cmd: GenerateModuleResitsCommand.Command, errors: Errors): String = {
+    cmd.populate()
     formView
+  }
 
   @RequestMapping(params = Array("confirm=true"))
   def save(
@@ -67,8 +73,10 @@ class GenerateModuleResitsController extends BaseModuleMarksController
       model.addAttribute("flash__error", "flash.hasErrors")
       formView
     } else {
-      cmd.apply()
-      RedirectFlashing(Routes.marks.Admin.home(module.adminDepartment, academicYear), "flash__success" -> "flash.module.resitsCreated")
+      val results = cmd.apply()
+      val adminHome = Routes.marks.Admin.home(module.adminDepartment, academicYear)
+      if (results.nonEmpty) RedirectFlashing(adminHome, "flash__success" -> "flash.module.resitsCreated")
+      else RedirectFlashing(adminHome)
     }
 
 }

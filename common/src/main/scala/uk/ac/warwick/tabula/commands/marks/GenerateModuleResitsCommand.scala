@@ -12,8 +12,9 @@ import uk.ac.warwick.tabula.data.model.MarkState.Agreed
 import uk.ac.warwick.tabula.data.model.{AssessmentComponent, AssessmentType, GradeBoundary, GradeBoundaryProcess, Module, RecordedResit, UpstreamAssessmentGroupMember}
 import uk.ac.warwick.tabula.helpers.LazyMaps
 import uk.ac.warwick.tabula.helpers.StringUtils.StringToSuperString
+import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.marks._
-import uk.ac.warwick.tabula.services.{AssessmentMembershipServiceComponent, AutowiringAssessmentMembershipServiceComponent, AutowiringModuleRegistrationServiceComponent}
+import uk.ac.warwick.tabula.services.{AssessmentMembershipServiceComponent, AutowiringAssessmentMembershipServiceComponent, AutowiringModuleRegistrationServiceComponent, AutowiringSecurityServiceComponent, SecurityServiceComponent}
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser, SprCode}
 
 import scala.jdk.CollectionConverters._
@@ -24,7 +25,21 @@ case class StudentMarks (
   incrementsAttempt: Boolean,
   components: Map[AssessmentComponent, StudentMarkRecord],
   sitsResits: Map[AssessmentComponent, Option[UpstreamAssessmentGroupMember]]
-)
+) {
+  def resitOutOfSync(ac: AssessmentComponent): Boolean = {
+    val existingResit = components.get(ac).flatMap(_.existingResit)
+    val sitsResit = sitsResits.get(ac).flatten
+
+    (existingResit, sitsResit) match {
+      case (Some(er), Some(sr)) =>
+        er.resitSequence != sr.resitSequence ||
+        er.assessmentType != sr.resitAssessmentType.orNull ||
+        er.weighting != sr.resitAssessmentWeighting.orNull ||
+        er.currentResitAttempt != sr.currentResitAttempt.orNull
+      case _ => false
+    }
+  }
+}
 
 object GenerateModuleResitsCommand {
 
@@ -33,7 +48,9 @@ object GenerateModuleResitsCommand {
     with GenerateModuleResitsState
     with GenerateModuleResitsRequest
     with ModuleOccurrenceLoadModuleRegistrations
+    with GenerateModuleResitsValidation
     with SelfValidating
+    with PopulateOnForm
   type SprCode = String
   type Sequence = String
 
@@ -49,8 +66,10 @@ object GenerateModuleResitsCommand {
       with AutowiringAssessmentMembershipServiceComponent
       with AutowiringModuleRegistrationServiceComponent
       with AutowiringModuleRegistrationMarksServiceComponent
+      with AutowiringSecurityServiceComponent
       with ComposableCommand[Result] // late-init due to ModuleOccurrenceUpdateMarksPermissions being called from permissions
       with ModuleOccurrenceDescription[Result]
+      with GenerateModuleResitsPopulateOnForm
 
   class ResitItem {
     def this(sprCode: String, sequence: String, weighting: String) {
@@ -70,7 +89,7 @@ object GenerateModuleResitsCommand {
 
 
 class GenerateModuleResitsCommandInternal(val sitsModuleCode: String, val module: Module, val academicYear: AcademicYear, val occurrence: String, val currentUser: CurrentUser)
-  extends CommandInternal[Result] with GenerateModuleResitsState with GenerateModuleResitsValidation {
+  extends CommandInternal[Result] with GenerateModuleResitsState with GenerateModuleResitsValidation with AutowiringSecurityServiceComponent {
 
   self: GenerateModuleResitsRequest with ModuleOccurrenceLoadModuleRegistrations with ModuleRegistrationMarksServiceComponent
     with AssessmentComponentMarksServiceComponent with AssessmentMembershipServiceComponent with ResitServiceComponent =>
@@ -87,7 +106,7 @@ class GenerateModuleResitsCommandInternal(val sitsModuleCode: String, val module
       resits.flatMap { case (sequence, resitItem) =>
         val componentMarks = components.find(_._1.sequence == sequence).map(_._2)
         componentMarks.map { cm =>
-          val recordedResit = new RecordedResit(cm, sprCode)
+          val recordedResit = cm.existingResit.getOrElse(new RecordedResit(cm, sprCode))
           recordedResit.assessmentType = resitItem.assessmentType
           recordedResit.weighting = resitItem.weighting.toInt
           recordedResit.currentResitAttempt = {
@@ -104,15 +123,41 @@ class GenerateModuleResitsCommandInternal(val sitsModuleCode: String, val module
   }
 }
 
+trait GenerateModuleResitsPopulateOnForm extends PopulateOnForm {
+  self: ModuleOccurrenceState with GenerateModuleResitsRequest with GenerateModuleResitsState =>
+
+  override def populate(): Unit = {
+    requiresResits.flatMap(_.components.values).flatMap(_.existingResit).foreach { er =>
+      val item = new ResitItem(er.sprCode, er.sequence, er.weighting.toString)
+      item.assessmentType = er.assessmentType.astCode
+      item.create = true
+      resits.get(er.sprCode).put(er.sequence, item)
+    }
+  }
+}
+
 trait GenerateModuleResitsValidation extends SelfValidating {
-  self: GenerateModuleResitsState with GenerateModuleResitsRequest =>
+  self: GenerateModuleResitsState with GenerateModuleResitsRequest with SecurityServiceComponent =>
+
+  lazy val canUpdateResits: Boolean =
+    securityService.can(currentUser, Permissions.Marks.ModifyResits, module)
 
   def validate(errors: Errors): Unit = {
+
+    if (resitsToCreate.values.flatten.isEmpty) errors.reject("moduleMarks.resit.noneSelected")
 
     for (
       (sprCode, resits) <- resitsToCreate;
       (sequence, resit) <- resits
     ) {
+
+      val existingResit = requiresResits.find(_.module.sprCode == sprCode)
+        .flatMap(_.components.find(_._1.sequence == sequence).flatMap(_._2.existingResit))
+
+      if (resit.create && existingResit.isDefined && !canUpdateResits) {
+        errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "moduleMarks.resit.noEdit")
+      }
+
       if (!resit.weighting.hasText) {
         errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "moduleMarks.resit.weighting.missing")
       } else if (resit.weighting.toIntOption.isEmpty) {

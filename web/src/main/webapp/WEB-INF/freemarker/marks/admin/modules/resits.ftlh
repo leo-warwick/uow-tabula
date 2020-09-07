@@ -123,10 +123,13 @@
                                   <span class="sr-only">Waiting to be written to SITS</span>
                                 </span>
                               </#if>
+                              <#if canUpdateResits>
+                                <@f.checkbox path="resits[${sprCode}][${assessmentComponent.sequence}].create" />
+                              </#if>
                             <#elseif sitsResit?has_content>
-                              <span class="label label-success tabula-tooltip" data-title="Resit - ${sitsResit.resitSequence!''}">
-                                Resit created
-                                <span class="sr-only">Resit - ${sitsResit.resitSequence!''}</span>
+                              <span class="label label-success tabula-tooltip" data-title="Resit - ${sitsResit.resitSequence!''}. The resit was created directly in SITS. Any changes to this resit must be made in SITS.">
+                                Resit created in SITS
+                                <span class="sr-only">Resit - ${sitsResit.resitSequence!''}. The resit was created directly in SITS. Any changes to this resit must be made in SITS.</span>
                               </span>
                             <#elseif record.requiresResit>
                               <@f.checkbox path="resits[${sprCode}][${assessmentComponent.sequence}].create" />
@@ -137,22 +140,22 @@
                           <td>${componentRecord.mark!'-'}</td>
                           <td>${componentRecord.grade!'-'}</td>
                           <td>
-                            <#if componentRecord.existingResit?has_content>
+                            <#if componentRecord.existingResit?has_content && !canUpdateResits>
                               ${componentRecord.existingResit.assessmentType.name}
-                            <#elseif sitsResit?has_content>
+                            <#elseif sitsResit?has_content && !componentRecord.existingResit?has_content>
                               ${sitsResit.resitAssessmentType.name}
                             <#elseif record.requiresResit>
-                              <select name="resits[${sprCode}][${assessmentComponent.sequence}].assessmentType" class="form-control assessment-type" data-sequence="${assessmentComponent.sequence}">
-                                <#list assessmentTypes as at><option value="${at.astCode}" >${at.name}</option></#list>
-                              </select>
-                             <#else>
-                                ${assessmentComponent.assessmentType.name}
-                             </#if>
+                              <@f.select path="resits[${sprCode}][${assessmentComponent.sequence}].assessmentType" cssClass="form-control assessment-type" data\-sequence="${assessmentComponent.sequence}">
+                                <@f.options items=assessmentTypes itemLabel="name" itemValue="astCode" />
+                              </@f.select>
+                            <#else>
+                              ${assessmentComponent.assessmentType.name}
+                            </#if>
                           </td>
                           <td>
-                            <#if componentRecord.existingResit?has_content>
+                            <#if componentRecord.existingResit?has_content && !canUpdateResits>
                               ${componentRecord.existingResit.weighting}
-                            <#elseif sitsResit?has_content>
+                            <#elseif sitsResit?has_content && !componentRecord.existingResit?has_content>
                                 ${sitsResit.resitAssessmentWeighting!assessmentComponent.scaledWeighting}
                             <#else>
                               <@bs3form.form_group path="resits[${sprCode}][${assessmentComponent.sequence}].weighting">

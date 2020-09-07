@@ -81,7 +81,7 @@
 
 <#macro moduleMarkHistory student moduleCode member>
   <#if student.history?has_content>
-    <#local modalId = "mark-history-modal-${student.sprCode?replace('/', '_')}-${moduleCode}" />
+    <#local modalId = "mark-history-modal-${student.sprCode?replace('/', '_')}-${moduleCode?replace('.','_')}" />
     <button type="button" class="btn btn-default btn-xs tabula-tooltip" data-title="View history" data-toggle="modal" data-target="#${modalId}"><i class="fal fa-history" aria-hidden="true"></i><span class="sr-only">View history</span></button>
 
     <@modal.modal id=modalId>
@@ -131,7 +131,8 @@
 
 <#macro componentMarkHistory marks ac member>
   <#if marks.history?has_content>
-    <#local modalId = "mark-history-modal-${marks.universityId}-${ac.moduleCode}-${ac.sequence}" />
+
+    <#local modalId = "mark-history-modal-${marks.universityId}-${ac.moduleCode?replace('.','_')}-${ac.sequence}" />
     <button type="button" class="btn btn-default btn-xs tabula-tooltip" data-title="View history" data-toggle="modal" data-target="#${modalId}"><i class="fal fa-history" aria-hidden="true"></i><span class="sr-only">View history</span></button>
 
     <@modal.modal id=modalId>
