@@ -202,7 +202,10 @@
               <#if component.assessmentType.subtype.code == 'E' && component.assessmentType.astCode != 'LX' && component.assessmentType.astCode != 'HE' && component.assessmentType.astCode != 'OE'>
                 <tr>
                   <td>
-                    ${moduleRegistrationAndComponent.moduleRegistration.module.code?upper_case}<#if moduleRegistrationAndComponent.moduleRegistration.cats?has_content>-${moduleRegistrationAndComponent.moduleRegistration.cats}</#if>
+                    <#if module?has_content>${moduleRegistrationAndComponent.moduleRegistration.module.code?upper_case}
+                        <#if moduleRegistrationAndComponent.moduleRegistration.cats?has_content>-${moduleRegistrationAndComponent.moduleRegistration.cats}</#if>
+                    <#else>${moduleRegistrationAndComponent.moduleRegistration.sitsModuleCode}
+                    </#if>
                     <#if component.member.reassessment && ((component.member.currentResitAttempt)!2) lte 1>
                       <span class="label label-info">Further first sit</span>
                     <#elseif component.member.reassessment>

@@ -88,6 +88,25 @@ trait ProfileService {
 
   def findAllUniversityIdsByRestrictions(restrictions: Seq[ScalaRestriction], orders: Seq[ScalaOrder] = Seq()): Seq[String]
 
+  def findAllMembersByRestrictions(
+    restrictions: Seq[ScalaRestriction],
+    orders: Seq[ScalaOrder],
+    maxResults: Int = 50,
+    startResult: Int = 0
+  ): Seq[Member]
+
+  def findAllMembersByRestrictionsInAffiliatedDepartments(
+    department: Department,
+    restrictions: Seq[ScalaRestriction],
+    orders: Seq[ScalaOrder],
+    maxResults: Int = 50,
+    startResult: Int = 0
+  ): Seq[Member]
+
+  def countAllMembersByRestrictions(restrictions: Seq[ScalaRestriction]): Int
+
+  def countAllMembersByRestrictionsInAffiliatedDepartments(department: Department, restrictions: Seq[ScalaRestriction]): Int
+
   def findAllUserIdsByRestrictions(restrictions: Seq[ScalaRestriction]): Seq[String]
 
   def findAllUniversityIdsByRestrictionsInAffiliatedDepartments(department: Department, restrictions: Seq[ScalaRestriction], orders: Seq[ScalaOrder] = Seq()): Seq[String]
@@ -400,6 +419,38 @@ abstract class AbstractProfileService extends ProfileService with Logging {
     orders: Seq[ScalaOrder] = Seq()
   ): Seq[String] = transactional(readOnly = true) {
     memberDao.findUniversityIdsByRestrictions(restrictions, orders)
+  }
+
+  def findAllMembersByRestrictions(
+    restrictions: Seq[ScalaRestriction],
+    orders: Seq[ScalaOrder],
+    maxResults: Int,
+    startResult: Int
+  ): Seq[Member] = transactional(readOnly = true) {
+    memberDao.findAllMembersByRestrictions(restrictions, orders, maxResults, startResult)
+  }
+
+  def findAllMembersByRestrictionsInAffiliatedDepartments(
+    department: Department,
+    restrictions: Seq[ScalaRestriction],
+    orders: Seq[ScalaOrder],
+    maxResults: Int,
+    startResult: Int
+  ): Seq[Member] = transactional(readOnly = true) {
+
+    val allRestrictions = affiliatedDepartmentsRestriction(department, restrictions) ++
+      department.filterRule.restriction(FiltersStudents.AliasPaths, Some(department))
+
+    memberDao.findAllMembersByRestrictions(allRestrictions, orders, maxResults, startResult)
+  }
+
+  def countAllMembersByRestrictions(restrictions: Seq[ScalaRestriction]): Int =
+    memberDao.countAllMembersByRestrictions(restrictions)
+
+  def countAllMembersByRestrictionsInAffiliatedDepartments(department:Department, restrictions: Seq[ScalaRestriction]): Int = {
+    val allRestrictions = affiliatedDepartmentsRestriction(department, restrictions) ++
+      department.filterRule.restriction(FiltersStudents.AliasPaths, Some(department))
+    memberDao.countAllMembersByRestrictions(allRestrictions)
   }
 
   def findAllUserIdsByRestrictions(

@@ -27,7 +27,7 @@ class MembersController extends ApiController with AutowiringProfileServiceCompo
 
   type Command = Appliable[Seq[Member]] with MemberSearchCommandRequest with MemberSearchCommandInternal
 
-  final override def onPreRequest: Unit = {
+  final override def onPreRequest(): Unit = {
     session.enableFilter(Member.ActiveOnlyFilter)
     session.enableFilter(Member.FreshOnlyFilter)
   }
@@ -50,7 +50,7 @@ class MembersController extends ApiController with AutowiringProfileServiceCompo
         "members" -> members,
         "offset" -> command.offset,
         "limit" -> command.limit,
-        "total" -> command.userIds.length
+        "total" -> command.total
       )))
     }
   }

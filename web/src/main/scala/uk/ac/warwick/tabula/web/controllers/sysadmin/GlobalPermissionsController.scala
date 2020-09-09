@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.data.convert.RoleDefinitionConverter
 import uk.ac.warwick.tabula.data.model.StudentRelationshipType
 import uk.ac.warwick.tabula.data.model.permissions.{GrantedPermission, GrantedRole}
 import uk.ac.warwick.tabula.helpers.ReflectionHelper
@@ -98,16 +99,15 @@ class GlobalPermissionsController extends BaseSysadminController
       RedirectFlashing(Routes.sysadmin.globalPermissions, "flash__success" -> "flash.globalPermissions.permissionsRevoked")
     }
 
-  implicit val defaultOrderingForRoleDefinition: Ordering[RoleDefinition] = Ordering.by[RoleDefinition, String] {
-    case s: SelectorBuiltInRoleDefinition[_] => s"${s.getName}(${s.selector.id})"
-    case r => r.getName
-  }
+  val converter = new RoleDefinitionConverter
+
+  implicit val defaultOrderingForRoleDefinition: Ordering[RoleDefinition] = Ordering.by[RoleDefinition, String](converter.convertLeft)
 
   @ModelAttribute("globalGrantedRoles")
   def globalGrantedRoles(): Map[String, GrantedRole[PermissionsTarget]] =
     permissionsService.getAllGlobalGrantedRoles
       .groupBy(_.roleDefinition)
-      .map { case (defn, roles) => defn.getName -> roles.head }
+      .map { case (defn, roles) => converter.convertLeft(defn) -> roles.head }
 
   @ModelAttribute("existingRoleDefinitions")
   def existingRoleDefinitions(): SortedMap[RoleDefinition, GeneratedRole] =

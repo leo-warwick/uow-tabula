@@ -13,7 +13,6 @@ import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.helpers.StringUtils.StringToSuperString
 
 import scala.jdk.CollectionConverters._
-import scala.collection.mutable
 import scala.reflect.ClassTag
 
 trait MemberDaoComponent {
@@ -75,6 +74,8 @@ trait MemberDao {
 
   def countStudentsByRestrictions(restrictions: Iterable[ScalaRestriction]): Int
 
+  def countAllMembersByRestrictions(restrictions: Iterable[ScalaRestriction]): Int
+
   def getAllModesOfAttendance(department: Department): Seq[ModeOfAttendance]
 
   def getAllSprStatuses(department: Department): Seq[SitsStatus]
@@ -100,6 +101,13 @@ trait MemberDao {
   def getMemberByTimetableHash(timetableHash: String): Option[Member]
 
   def setTimetableHash(member: Member, timetableHash: String): Unit
+
+  def findAllMembersByRestrictions(
+    restrictions: Iterable[ScalaRestriction],
+    orders: Iterable[ScalaOrder],
+    maxResults: Int,
+    startResult: Int
+  ): Seq[Member]
 
   def findAllUsercodesByRestrictions(
     restrictions: Iterable[ScalaRestriction],
@@ -463,6 +471,13 @@ class MemberDaoImpl extends MemberDao with Logging with AttendanceMonitoringStud
     c.project[Number](countDistinct("universityId")).uniqueResult.get.intValue()
   }
 
+  def countAllMembersByRestrictions(restrictions: Iterable[ScalaRestriction]): Int = {
+    val c = session.newCriteria[Member]
+    restrictions.foreach(_.apply(c))
+
+    c.project[Number] (countDistinct("universityId")).uniqueResult.get.intValue()
+  }
+
   def getAllModesOfAttendance(department: Department): Seq[ModeOfAttendance] =
     session.newCriteria[StudentMember]
       .createAlias("mostSignificantCourse", "scd")
@@ -543,6 +558,23 @@ class MemberDaoImpl extends MemberDao with Logging with AttendanceMonitoringStud
         .setParameter("timetableHash", timetableHash)
         .setParameter("universityId", member.universityId)
         .executeUpdate()
+  }
+
+  def findAllMembersByRestrictions(
+    restrictions: Iterable[ScalaRestriction],
+    orders: Iterable[ScalaOrder],
+    maxResults: Int,
+    startResult: Int
+  ): Seq[Member] = {
+    val universityIds = findUniversityIdsByRestrictions(restrictions)
+    if (universityIds.isEmpty) Nil
+    else {
+      val c = session.newCriteria[Member].add(safeIn("universityId", universityIds))
+      orders.foreach {
+        c.addOrder
+      }
+      c.setMaxResults(maxResults).setFirstResult(startResult).distinct.seq
+    }
   }
 
   def findAllUsercodesByRestrictions(
