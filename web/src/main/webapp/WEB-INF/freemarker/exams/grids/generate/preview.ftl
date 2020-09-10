@@ -379,47 +379,67 @@
             });
           </script>
         </#if>
-      <#assign generateGridAction><@routes.exams.generateGrid department academicYear /></#assign>
-      <@f.form action=generateGridAction id="examGridDocuments" cssClass="dirty-check" method="post" target="_blank">
-          <@form_fields.select_course_fields />
-          <@form_fields.grid_options_fields />
 
-        <div class="fix-footer hidden-print">
-          <div class="btn-group dropup">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Download&hellip; <span class="caret"></span></button>
-            <ul class="dropdown-menu download-options">
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excel}">Excel grid</button>
-              </li>
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excelNoMergedCells}">Excel grid without merged cells</button>
-              </li>
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excelNoCellComments}">Excel grid without cell comments</button>
-              </li>
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excelNoMergedCellsNoCellComments}">Excel grid without merged cells, without cell comments</button>
-              </li>
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.marksRecord}">Marks record</button>
-              </li>
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.marksRecordConfidential}">Confidential marks record
-                </button>
-              </li>
-                <#-- Removed for - TAB-6217 -->
-                <#--<li><button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.passList}">Pass list</button></li>-->
-                <#--<li><button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.passListConfidential}">Confidential pass list</button></li>-->
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.transcript}">Transcript</button>
-              </li>
-              <li>
-                <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.transcriptConfidential}">Confidential transcript</button>
-              </li>
-            </ul>
+
+      <div class="fix-footer hidden-print">
+        <div class="btn-group" role="group">
+          <#assign generateGridAction><@routes.exams.generateGrid department academicYear /></#assign>
+          <@f.form action=generateGridAction id="examGridDocuments" cssClass="dirty-check" method="post" target="_blank">
+            <@form_fields.select_course_fields />
+            <@form_fields.grid_options_fields />
+              <div class="btn-group dropup">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Download&hellip; <span class="caret"></span></button>
+                <ul class="dropdown-menu download-options">
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excel}">Excel grid</button>
+                  </li>
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excelNoMergedCells}">Excel grid without merged cells</button>
+                  </li>
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excelNoCellComments}">Excel grid without cell comments</button>
+                  </li>
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.excelNoMergedCellsNoCellComments}">Excel grid without merged cells, without cell comments</button>
+                  </li>
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.marksRecord}">Marks record</button>
+                  </li>
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.marksRecordConfidential}">Confidential marks record
+                    </button>
+                  </li>
+                    <#-- Removed for - TAB-6217 -->
+                    <#--<li><button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.passList}">Pass list</button></li>-->
+                    <#--<li><button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.passListConfidential}">Confidential pass list</button></li>-->
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.transcript}">Transcript</button>
+                  </li>
+                  <li>
+                    <button class="btn btn-link" type="submit" name="${GenerateExamGridMappingParameters.transcriptConfidential}">Confidential transcript</button>
+                  </li>
+                </ul>
+              </div>
+            </@f.form>
+            <#if features.recordBoardOutcomes>
+              <@f.form cssClass="dirty-check" method="get" target="_blank">
+                <@form_fields.select_course_fields />
+                <div class="btn-group dropup">
+                  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Record outcomes&hellip; <span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <#assign processUrl><@routes.marks.cohort_process department academicYear /></#assign>
+                      <button type="submit" formaction="${processUrl}">Process marks for this cohort</button>
+                    </li>
+                  </ul>
+                </div>
+              </@f.form>
+            </#if>
           </div>
-        </div>
-      </@f.form>
+      </div>
+
+
+
     </div>
     <@modal.modal id='confirmModal'>
       <div class='modal-dialog' role='document'>
