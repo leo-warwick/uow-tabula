@@ -59,7 +59,7 @@
 
                 <tr>
                   <td data-sortby="u${student.universityId}">
-                    <@f.hidden path="students[${student.universityId}_${student.resitSequence!}].resitSequence" />
+                    <#if !student.outOfSync><@f.hidden path="students[${student.universityId}_${student.resitSequence!}].resitSequence" /></#if>
                     <@pl.profile_link member.universityId />
                     ${student.universityId}
                     <@components.componentMarkStudentStatus student />
@@ -75,34 +75,40 @@
                     <@components.format_grade student.grade!'-' />
                   </td>
                   <td>
-                    <@bs3form.labelled_form_group path="students[${student.universityId}_${student.resitSequence!}].mark">
-                      <div class="input-group">
-                        <@f.input path="students[${student.universityId}_${student.resitSequence!}].mark" cssClass="form-control mark-box" autocomplete="off" type="number" min="0" max="100" />
-                        <div class="input-group-addon">%</div>
-                      </div>
-                    </@bs3form.labelled_form_group>
+                    <#if !student.outOfSync>
+                      <@bs3form.labelled_form_group path="students[${student.universityId}_${student.resitSequence!}].mark">
+                        <div class="input-group">
+                            <@f.input path="students[${student.universityId}_${student.resitSequence!}].mark" cssClass="form-control mark-box" autocomplete="off" type="number" min="0" max="100" />
+                          <div class="input-group-addon">%</div>
+                        </div>
+                      </@bs3form.labelled_form_group>
+                    </#if>
                   </td>
                   <td>
-                    <@spring.bind path="students[${student.universityId}_${student.resitSequence!}]">
-                      <#assign studentMarkItem = status.actualValue />
-                    </@spring.bind>
-                    <@bs3form.labelled_form_group path="students[${student.universityId}_${student.resitSequence!}].grade">
-                      <#if isGradeValidation>
-                        <@f.input path="students[${student.universityId}_${student.resitSequence!}].grade" cssClass="form-control ${studentMarkItem.validGrades?has_content?string('auto-grade grades-already-available', 'auto-grade')} grade-box" data\-mark="students[${student.universityId}_${student.resitSequence!}].mark" data\-generate\-url=generateUrl?markup_string data\-resit\-attempt=(student.upstreamAssessmentGroupMember.currentResitAttempt)! />
-                        <@f.select path="students[${student.universityId}_${student.resitSequence!}].grade" cssClass="form-control" cssStyle="display: none;" disabled=true>
-                          <#if studentMarkItem.validGrades?has_content>
-                            <@gg.gradeOptions studentMarkItem.validGrades._1() studentMarkItem.validGrades._2() studentMarkItem.grade!'' />
-                          </#if>
-                        </@f.select>
-                      <#else>
-                        <@f.input path="students[${student.universityId}_${student.resitSequence!}].grade" cssClass="form-control grade-box" />
-                      </#if>
-                    </@bs3form.labelled_form_group>
+                    <#if !student.outOfSync>
+                      <@spring.bind path="students[${student.universityId}_${student.resitSequence!}]">
+                        <#assign studentMarkItem = status.actualValue />
+                      </@spring.bind>
+                      <@bs3form.labelled_form_group path="students[${student.universityId}_${student.resitSequence!}].grade">
+                        <#if isGradeValidation>
+                          <@f.input path="students[${student.universityId}_${student.resitSequence!}].grade" cssClass="form-control ${studentMarkItem.validGrades?has_content?string('auto-grade grades-already-available', 'auto-grade')} grade-box" data\-mark="students[${student.universityId}_${student.resitSequence!}].mark" data\-generate\-url=generateUrl?markup_string data\-resit\-attempt=(student.upstreamAssessmentGroupMember.currentResitAttempt)! />
+                          <@f.select path="students[${student.universityId}_${student.resitSequence!}].grade" cssClass="form-control" cssStyle="display: none;" disabled=true>
+                            <#if studentMarkItem.validGrades?has_content>
+                              <@gg.gradeOptions studentMarkItem.validGrades._1() studentMarkItem.validGrades._2() studentMarkItem.grade!'' />
+                            </#if>
+                          </@f.select>
+                        <#else>
+                          <@f.input path="students[${student.universityId}_${student.resitSequence!}].grade" cssClass="form-control grade-box" />
+                        </#if>
+                      </@bs3form.labelled_form_group>
+                    </#if>
                   </td>
                   <td>
-                    <@bs3form.labelled_form_group path="students[${student.universityId}_${student.resitSequence!}].comments">
-                      <@f.input path="students[${student.universityId}_${student.resitSequence!}].comments" cssClass="form-control" />
-                    </@bs3form.labelled_form_group>
+                    <#if !student.outOfSync>
+                      <@bs3form.labelled_form_group path="students[${student.universityId}_${student.resitSequence!}].comments">
+                        <@f.input path="students[${student.universityId}_${student.resitSequence!}].comments" cssClass="form-control" />
+                      </@bs3form.labelled_form_group>
+                    </#if>
                   </td>
                 </tr>
               </#list>
