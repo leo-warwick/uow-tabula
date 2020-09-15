@@ -274,7 +274,7 @@ trait RecordAssessmentComponentMarksPopulateOnForm extends PopulateOnForm {
     )
 
     ListAssessmentComponentsCommand.studentMarkRecords(info, assessmentComponentMarksService, resitService, assessmentMembershipService).foreach { student =>
-      if ((student.mark.nonEmpty || student.grade.nonEmpty) && !students.asScala.keysIterator.contains(student.universityId)) {
+      if (!student.outOfSync && (student.mark.nonEmpty || student.grade.nonEmpty) && !students.asScala.keysIterator.contains(student.universityId)) {
         val s = new StudentMarksItem(student.universityId)
         s.resitSequence = student.resitSequence.getOrElse("")
         student.mark.foreach(m => s.mark = m.toString)
@@ -337,7 +337,6 @@ trait RecordAssessmentComponentMarksValidation extends SelfValidating {
       val isUnchanged = upstreamAssessmentGroupMember.exists { uagm =>
         val studentMarkRecord = studentMarkRecords.find(_.upstreamAssessmentGroupMember == uagm).get
 
-        !studentMarkRecord.outOfSync &&
         !item.comments.hasText &&
         ((!item.mark.hasText && studentMarkRecord.mark.isEmpty) || studentMarkRecord.mark.map(_.toString).contains(item.mark)) &&
         ((!item.grade.hasText && studentMarkRecord.grade.isEmpty) || studentMarkRecord.grade.contains(item.grade))
