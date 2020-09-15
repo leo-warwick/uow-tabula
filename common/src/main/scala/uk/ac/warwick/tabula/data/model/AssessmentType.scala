@@ -45,9 +45,21 @@ object AssessmentType extends Enum[AssessmentType] {
   case object Week39Exam extends ExamType("WK39", "Exam (June / July)") // https://warwick.slack.com/archives/CMARBSEE9/p1583487098028300
   case object SeptemberExam extends ExamType("ES", "Exam (September)")
   case object DecemberExam extends ExamType("ED", "Exam (December)")
+
+  case object OnlineSummerExam extends ExamType("OE", "Online Examination (Summer)")
+  case object OnlineJanuaryExam extends ExamType("OEJ", "Online Examination (January)")
+  case object OnlineMarchExam extends ExamType("OEM", "Online Examination (March)")
+  case object OnlineAprilExam extends ExamType("OEA", "Online Examination (April)")
+  case object OnlineMayExam extends ExamType("OEY", "Online Examination (May)")
+  case object OnlineSeptemberExam extends ExamType("OES", "Online Examination (September)")
+  case object OnlineDecemberExam extends ExamType("OED", "Online Exam (December)")
+
+
   case object LocalExamination extends ExamType("LX", "Locally-timetabled examination")
   case object TakeHome extends ExamType("HE", "Take-home examiniation")
-  case object Oral extends ExamType("OE", "Oral examination (viva voce, interview)")
+  case object Viva extends ExamType("VV", "A verbal exchange between the student and the assessor")
+  case object Interview extends ExamType("INT", "A verbal exchange between the student and the assessor")
+  case object SpokenAssessment extends ExamType("SP", "A verbal exchange between the student and the assessor") //Help text currently same for Int/VV/SP.
 
   case object Assignment extends AssignmentType("A", "Assignment") // NOTE not in Module Approval 2020-01-22
   case object AssignmentBestSubsetGroup extends AssignmentType("AN", "Assignment") // NOTE not in Module Approval 2020-01-22 - don't rely on this name being what you think it is
