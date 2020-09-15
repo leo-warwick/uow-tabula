@@ -52,14 +52,14 @@ object AssessmentType extends Enum[AssessmentType] {
   case object OnlineAprilExam extends ExamType("OEA", "Online Examination (April)")
   case object OnlineMayExam extends ExamType("OEY", "Online Examination (May)")
   case object OnlineSeptemberExam extends ExamType("OES", "Online Examination (September)")
-  case object OnlineDecemberExam extends ExamType("OED", "Online Exam (December)")
+  case object OnlineDecemberExam extends ExamType("OED", "Online Examination (December)")
 
 
   case object LocalExamination extends ExamType("LX", "Locally-timetabled examination")
   case object TakeHome extends ExamType("HE", "Take-home examiniation")
-  case object Viva extends ExamType("VV", "A verbal exchange between the student and the assessor")
-  case object Interview extends ExamType("INT", "A verbal exchange between the student and the assessor")
-  case object SpokenAssessment extends ExamType("SP", "A verbal exchange between the student and the assessor") //Help text currently same for Int/VV/SP.
+  case object Viva extends ExamType("VV", "Viva Voce Examination")
+  case object Interview extends ExamType("INT", "Interview")
+  case object SpokenAssessment extends ExamType("SP", "Spoken Assessment")
 
   case object Assignment extends AssignmentType("A", "Assignment") // NOTE not in Module Approval 2020-01-22
   case object AssignmentBestSubsetGroup extends AssignmentType("AN", "Assignment") // NOTE not in Module Approval 2020-01-22 - don't rely on this name being what you think it is
