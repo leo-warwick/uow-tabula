@@ -337,6 +337,7 @@ trait RecordAssessmentComponentMarksValidation extends SelfValidating {
       val isUnchanged = upstreamAssessmentGroupMember.exists { uagm =>
         val studentMarkRecord = studentMarkRecords.find(_.upstreamAssessmentGroupMember == uagm).get
 
+        !studentMarkRecord.outOfSync &&
         !item.comments.hasText &&
         ((!item.mark.hasText && studentMarkRecord.mark.isEmpty) || studentMarkRecord.mark.map(_.toString).contains(item.mark)) &&
         ((!item.grade.hasText && studentMarkRecord.grade.isEmpty) || studentMarkRecord.grade.contains(item.grade))
