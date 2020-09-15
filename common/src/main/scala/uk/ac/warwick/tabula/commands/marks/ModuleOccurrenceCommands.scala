@@ -77,8 +77,15 @@ trait ModuleOccurrenceLoadModuleRegistrations {
           val attempt =
             if (mostRecentAttempt.exists(_.mark.nonEmpty)) {
               // Same student and assessment
-              allStudents.filter(s => s.upstreamAssessmentGroupMember.upstreamAssessmentGroup == uagm.upstreamAssessmentGroup && s.universityId == uagm.universityId)
+              val attemptWithHighestMark = allStudents.filter(s => s.upstreamAssessmentGroupMember.upstreamAssessmentGroup == uagm.upstreamAssessmentGroup && s.universityId == uagm.universityId)
                 .maxByOption(_.mark)
+
+              // make sure to return the most recent attempt if the highest marks are tied
+              if (mostRecentAttempt.flatMap(_.mark) == attemptWithHighestMark.flatMap(_.mark)) {
+                mostRecentAttempt
+              } else {
+                attemptWithHighestMark
+              }
             } else {
               mostRecentAttempt
             }
