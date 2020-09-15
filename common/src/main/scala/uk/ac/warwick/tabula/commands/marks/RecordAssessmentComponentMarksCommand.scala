@@ -274,7 +274,7 @@ trait RecordAssessmentComponentMarksPopulateOnForm extends PopulateOnForm {
     )
 
     ListAssessmentComponentsCommand.studentMarkRecords(info, assessmentComponentMarksService, resitService, assessmentMembershipService).foreach { student =>
-      if ((student.mark.nonEmpty || student.grade.nonEmpty) && !students.asScala.keysIterator.contains(student.universityId)) {
+      if (!student.outOfSync && (student.mark.nonEmpty || student.grade.nonEmpty) && !students.asScala.keysIterator.contains(student.universityId)) {
         val s = new StudentMarksItem(student.universityId)
         s.resitSequence = student.resitSequence.getOrElse("")
         student.mark.foreach(m => s.mark = m.toString)
