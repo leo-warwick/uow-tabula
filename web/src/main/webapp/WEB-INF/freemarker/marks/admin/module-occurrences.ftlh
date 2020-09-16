@@ -257,6 +257,31 @@
   </#list>
 </#macro>
 
+<#if pendingComponentMarkChanges?has_content || pendingModuleMarkChanges?has_content>
+  <div class="alert alert-info">
+    <h3>Pending mark changes</h3>
+
+    <p>
+      There
+      <#if pendingComponentMarkChanges?has_content || pendingModuleMarkChanges?has_content>
+        <@fmt.p number=pendingModuleMarkChanges?size singular="is" plural="are" shownumber=false />
+        <@fmt.p pendingModuleMarkChanges?size "pending module mark change" /> and <@fmt.p pendingComponentMarkChanges?size "pending component mark change" />
+      <#elseif pendingComponentMarkChanges?has_content>
+        <@fmt.p number=pendingComponentMarkChanges?size singular="is" plural="are" shownumber=false />
+        <@fmt.p pendingComponentMarkChanges?size "pending component mark change" />
+      <#else>
+        <@fmt.p number=pendingModuleMarkChanges?size singular="is" plural="are" shownumber=false />
+        <@fmt.p pendingModuleMarkChanges?size "pending module mark change" />
+      </#if>
+      from SITS.
+    </p>
+
+    <p>
+      <a href="<@routes.marks.out_of_sync_marks department academicYear />">View pending changes</a>
+    </p>
+  </div>
+</#if>
+
 <#if results?has_content>
   <@all_module_occurrences results false hasMultipleOccurrences />
 <#else>

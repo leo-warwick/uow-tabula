@@ -8,7 +8,7 @@
 
 <#import "*/modal_macros.ftlh" as modal />
 
-<#macro moduleMarkStatusIcon student>
+<#macro moduleMarkStatusIcon student showOutOfSync=true>
   <#if student.needsWritingToSits>
     <span tabindex="0" class="tabula-tooltip" data-title="Waiting to be written to SITS">
       <i class="fa-fw fad fa-cloud-upload" aria-hidden="true"></i>
@@ -19,7 +19,7 @@
       <i class="fa-fw fas fa-exclamation-square text-danger" aria-hidden="true"></i>
       <span class="sr-only">Error writing mark to SITS: ${student.sitsWriteError.description}</span>
     </span>
-  <#elseif student.outOfSync>
+  <#elseif student.outOfSync && showOutOfSync>
     <span tabindex="0" class="tabula-tooltip" data-title="Mark is out of sync with current mark in SITS">
       <i class="fa-fw fad fa-exclamation-circle" aria-hidden="true"></i>
       <span class="sr-only">Mark is out of sync with current mark in SITS</span>
@@ -32,7 +32,7 @@
   </#if>
 </#macro>
 
-<#macro componentMarkStatusIcon marks>
+<#macro componentMarkStatusIcon marks showOutOfSync=true>
   <#if marks.needsWritingToSits>
     <span tabindex="0" class="tabula-tooltip" data-title="Waiting to be written to SITS">
       <i class="fa-fw fad fa-cloud-upload" aria-hidden="true"></i>
@@ -43,7 +43,7 @@
       <i class="fa-fw fas fa-exclamation-square text-danger" aria-hidden="true"></i>
       <span class="sr-only">Error writing mark to SITS: ${marks.sitsWriteError.description}</span>
     </span>
-  <#elseif marks.outOfSync>
+  <#elseif marks.outOfSync && showOutOfSync>
     <span tabindex="0" class="tabula-tooltip" data-title="Mark is out of sync with current mark in SITS">
       <i class="fa-fw fad fa-exclamation-circle" aria-hidden="true"></i>
       <span class="sr-only">Mark is out of sync with current mark in SITS</span>

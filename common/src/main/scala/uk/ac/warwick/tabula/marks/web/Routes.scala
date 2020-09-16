@@ -21,6 +21,7 @@ object Routes {
   object Admin {
     def home(department: Department): String = s"$context/admin/${encoded(department.code)}"
     def home(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}"
+    def outOfSyncMarks(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/out-of-sync-marks"
 
     object AssessmentComponents {
       def apply(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/assessment-components"

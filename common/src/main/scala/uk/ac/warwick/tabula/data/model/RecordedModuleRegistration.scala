@@ -205,6 +205,7 @@ object RecordedModuleMarkSource extends Enum[RecordedModuleMarkSource] {
   case object ProcessModuleMarks extends RecordedModuleMarkSource("Process module marks")
   case object ProcessCohortMarks extends RecordedModuleMarkSource("Process cohort marks")
   case object ComponentMarkChange extends RecordedModuleMarkSource("Component mark changed")
+  case object SyncFromSITS extends RecordedModuleMarkSource("Sync from SITS")
 
   override def values: IndexedSeq[RecordedModuleMarkSource] = findValues
 }

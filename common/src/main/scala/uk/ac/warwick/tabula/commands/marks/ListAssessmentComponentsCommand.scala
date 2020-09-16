@@ -29,6 +29,7 @@ object ListAssessmentComponentsCommand {
     sitsWriteError: Option[RecordedAssessmentComponentStudentMarkSitsError],
     markState: Option[MarkState],
     agreed: Boolean,
+    recordedStudent: Option[RecordedAssessmentComponentStudent],
     history: Seq[RecordedAssessmentComponentStudentMark], // Most recent first
     upstreamAssessmentGroupMember: UpstreamAssessmentGroupMember
   ) {
@@ -73,8 +74,9 @@ object ListAssessmentComponentsCommand {
         outOfSync =
           recordedStudent.exists(!_.needsWritingToSits) && (
             recordedStudent.flatMap(_.latestState).exists {
-              // State is agreed but UAGM has no agreed marks
-              case MarkState.Agreed => member.agreedMark.isEmpty && member.agreedGrade.isEmpty
+              // State is agreed and we have a mark or grade but UAGM has no agreed marks
+              case MarkState.Agreed if recordedStudent.exists(r => r.latestMark.nonEmpty || r.latestGrade.nonEmpty) =>
+                member.agreedMark.isEmpty && member.agreedGrade.isEmpty
 
               // State is not agreed but UAGM has agreed marks
               case _ => member.agreedMark.nonEmpty || member.agreedGrade.nonEmpty
@@ -85,6 +87,7 @@ object ListAssessmentComponentsCommand {
         sitsWriteError = recordedStudent.flatMap(_.lastSitsWriteError),
         markState = recordedStudent.flatMap(_.latestState),
         agreed = isAgreedSITS,
+        recordedStudent = recordedStudent,
         history = recordedStudent.map(_.marks).getOrElse(Seq.empty),
         member
       )

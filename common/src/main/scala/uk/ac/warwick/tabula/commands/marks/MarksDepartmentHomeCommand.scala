@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.commands.marks
 
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.commands.marks.ListAssessmentComponentsCommand.AssessmentComponentInfo
+import uk.ac.warwick.tabula.commands.marks.ListAssessmentComponentsCommand.{AssessmentComponentInfo, StudentMarkRecord}
 import uk.ac.warwick.tabula.commands.marks.MarksDepartmentHomeCommand._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.services._
@@ -13,7 +13,23 @@ import scala.collection.immutable.ListMap
 object MarksDepartmentHomeCommand {
   case class MarksWorkflowProgress(percentage: Int, t: String, messageCode: String)
 
-  case class ModuleOccurrence(
+  case class Result(
+    modules: Seq[ModuleOccurrenceWithProgress],
+    pendingComponentMarkChanges: Seq[StudentMarkRecord],
+    pendingModuleMarkChanges: Seq[StudentModuleMarkRecord],
+  )
+
+  case class ModuleOccurrenceInfo(
+    moduleCode: String,
+    module: Module,
+    occurrence: String,
+    students: Seq[StudentModuleMarkRecord],
+
+    // Assessment components grouped by assessment group
+    assessmentComponents: Seq[(String, Seq[AssessmentComponentInfo])],
+  )
+
+  case class ModuleOccurrenceWithProgress(
     moduleCode: String,
     module: Module,
     occurrence: String,
@@ -22,6 +38,8 @@ object MarksDepartmentHomeCommand {
     progress: MarksWorkflowProgress,
     nextStage: Option[WorkflowStage],
     stages: ListMap[String, WorkflowStages.StageProgress],
+
+    students: Seq[StudentModuleMarkRecord],
 
     // Assessment components grouped by assessment group
     assessmentComponents: Seq[(String, Seq[AssessmentComponentInfo])],
@@ -37,6 +55,7 @@ object MarksDepartmentHomeCommand {
     sitsWriteError: Option[RecordedModuleMarkSitsError],
     markState: Option[MarkState],
     agreed: Boolean,
+    recordedStudent: Option[RecordedModuleRegistration],
     history: Seq[RecordedModuleMark], // Most recent first
     moduleRegistration: ModuleRegistration,
     requiresResit: Boolean,
@@ -71,7 +90,8 @@ object MarksDepartmentHomeCommand {
         outOfSync = recordedModuleRegistration.exists(!_.needsWritingToSits) && (
           recordedModuleRegistration.flatMap(_.latestState).exists {
             // State is agreed but MR has no agreed marks
-            case MarkState.Agreed => moduleRegistration.agreedMark.isEmpty && moduleRegistration.agreedGrade.isEmpty
+            case MarkState.Agreed if recordedModuleRegistration.exists(r => r.latestMark.nonEmpty || r.latestGrade.nonEmpty) =>
+              moduleRegistration.agreedMark.isEmpty && moduleRegistration.agreedGrade.isEmpty
 
             // State is not agreed but MR has agreed marks
             case _ => moduleRegistration.agreedMark.nonEmpty || moduleRegistration.agreedGrade.nonEmpty
@@ -83,6 +103,7 @@ object MarksDepartmentHomeCommand {
         sitsWriteError = recordedModuleRegistration.flatMap(_.lastSitsWriteError),
         markState = recordedModuleRegistration.flatMap(_.latestState),
         agreed = isAgreedSITS,
+        recordedStudent = recordedModuleRegistration,
         history = recordedModuleRegistration.map(_.marks).getOrElse(Seq.empty),
         moduleRegistration = moduleRegistration,
         requiresResit = requiresResit
@@ -125,7 +146,6 @@ object MarksDepartmentHomeCommand {
       StudentModuleMarkRecord(moduleRegistration, recordedModuleRegistration, gradeBoundary.exists(_.generatesResit))
     }
 
-  type Result = Seq[ModuleOccurrence]
   type Command = Appliable[Result]
 
   def apply(department: Department, academicYear: AcademicYear, currentUser: CurrentUser): Command =
@@ -144,20 +164,13 @@ object MarksDepartmentHomeCommand {
       with Unaudited with ReadOnly
 }
 
-abstract class MarksDepartmentHomeCommandInternal(val department: Department, val academicYear: AcademicYear, val currentUser: CurrentUser)
-  extends CommandInternal[Result]
-    with ListAssessmentComponentsState
+trait ListModuleOccurrencesWithPermission extends TaskBenchmarking {
+  self: ListAssessmentComponentsState
     with ListAssessmentComponentsForModulesWithPermission
-    with TaskBenchmarking {
-  self: AssessmentComponentMarksServiceComponent
-    with AssessmentMembershipServiceComponent
-    with ResitServiceComponent
-    with MarksWorkflowProgressServiceComponent
-    with ListAssessmentComponentsModulesWithPermission
-    with ModuleRegistrationServiceComponent
-    with ModuleRegistrationMarksServiceComponent =>
+    with ModuleRegistrationMarksServiceComponent
+    with AssessmentMembershipServiceComponent =>
 
-  override def applyInternal(): Result = {
+  lazy val moduleOccurrenceInfo: Seq[ModuleOccurrenceInfo] = benchmarkTask("Get module occurrence info") {
     val groupedInfo = benchmarkTask("Fetch and group assessment component info") {
       assessmentComponentInfos
         .groupBy { info => (info.assessmentComponent.moduleCode, info.upstreamAssessmentGroup.occurrence) }
@@ -179,46 +192,102 @@ abstract class MarksDepartmentHomeCommandInternal(val department: Department, va
       }.toMap
     }
 
-    benchmarkTask("Calculate progress for module") {
-      groupedInfo.map { case ((moduleCode, occurrence), infos) => benchmarkTask(s"Process $moduleCode $occurrence") {
-        val module = infos.head.assessmentComponent.module
+    groupedInfo.map { case ((moduleCode, occurrence), infos) => benchmarkTask(s"Process $moduleCode $occurrence") {
+      val module = infos.head.assessmentComponent.module
 
-        val moduleRegistrations = benchmarkTask("Get module registrations") { allModuleRegistrations.getOrElse((moduleCode, academicYear, occurrence), Seq.empty).sortBy(_.sprCode) }
-        val moduleRegistrationCurrentResitAttempt: Map[ModuleRegistration, Option[Int]] = benchmarkTask("Get module registration current resit attempt") {
-          val upstreamAssessmentGroupMembers: Map[String, Seq[UpstreamAssessmentGroupMember]] =
-            infos.flatMap(_.students.map(_.upstreamAssessmentGroupMember)).groupBy(_.universityId)
+      val moduleRegistrations = benchmarkTask("Get module registrations") { allModuleRegistrations.getOrElse((moduleCode, academicYear, occurrence), Seq.empty).sortBy(_.sprCode) }
+      val moduleRegistrationCurrentResitAttempt: Map[ModuleRegistration, Option[Int]] = benchmarkTask("Get module registration current resit attempt") {
+        val upstreamAssessmentGroupMembers: Map[String, Seq[UpstreamAssessmentGroupMember]] =
+          infos.flatMap(_.students.map(_.upstreamAssessmentGroupMember)).groupBy(_.universityId)
 
-          moduleRegistrations.map { moduleRegistration =>
-            val allMembers = upstreamAssessmentGroupMembers.getOrElse(SprCode.getUniversityId(moduleRegistration.sprCode), Seq.empty)
+        moduleRegistrations.map { moduleRegistration =>
+          val allMembers = upstreamAssessmentGroupMembers.getOrElse(SprCode.getUniversityId(moduleRegistration.sprCode), Seq.empty)
 
-            moduleRegistration -> ModuleRegistration.filterToLatestAttempt(allMembers).flatMap(_.currentResitAttempt).maxOption
-          }.toMap
-        }
+          moduleRegistration -> ModuleRegistration.filterToLatestAttempt(allMembers).flatMap(_.currentResitAttempt).maxOption
+        }.toMap
+      }
 
-        val students = benchmarkTask("Get student module mark records") {
-          val recordedModuleRegistrations = recordedModuleRegistrationsByModuleOccurrence.getOrElse((moduleCode, occurrence), Map.empty)
+      val students = benchmarkTask("Get student module mark records") {
+        val recordedModuleRegistrations = recordedModuleRegistrationsByModuleOccurrence.getOrElse((moduleCode, occurrence), Map.empty)
 
-          studentModuleMarkRecords(moduleRegistrations, moduleRegistrationCurrentResitAttempt, recordedModuleRegistrations, gradeBoundariesByMarksCode)
-        }
+        studentModuleMarkRecords(moduleRegistrations, moduleRegistrationCurrentResitAttempt, recordedModuleRegistrations, gradeBoundariesByMarksCode)
+      }
 
-        val progress = benchmarkTask("Progress") { workflowProgressService.moduleOccurrenceProgress(students, infos) }
+      ModuleOccurrenceInfo(
+        moduleCode = moduleCode,
+        module = module,
+        occurrence = occurrence,
+        students = students,
 
-        ModuleOccurrence(
-          moduleCode = moduleCode,
-          module = module,
-          occurrence = occurrence,
+        assessmentComponents =
+          infos.groupBy(_.assessmentComponent.assessmentGroup)
+            .toSeq
+            .sortBy { case (assessmentGroup, _) => assessmentGroup },
+      )
+    }}
+    .toSeq.sortBy { mo => (mo.moduleCode, mo.occurrence) }
+  }
+
+  lazy val pendingComponentMarkChanges: Seq[(AssessmentComponentInfo, Seq[StudentMarkRecord])] =
+    moduleOccurrenceInfo
+      .flatMap(_.assessmentComponents)
+      .flatMap(_._2)
+      .map { component =>
+        component ->
+          component.students
+            .filter(_.outOfSync)
+            .filter(_.recordedStudent.nonEmpty)
+      }
+      .filter(_._2.nonEmpty)
+
+  lazy val pendingModuleMarkChanges: Seq[(ModuleOccurrenceInfo, Seq[StudentModuleMarkRecord])] =
+    moduleOccurrenceInfo.map { moduleOccurrence =>
+      moduleOccurrence ->
+        moduleOccurrence.students
+          .filter(_.outOfSync)
+          .filter(_.recordedStudent.nonEmpty)
+    }.filter(_._2.nonEmpty)
+}
+
+abstract class MarksDepartmentHomeCommandInternal(val department: Department, val academicYear: AcademicYear, val currentUser: CurrentUser)
+  extends CommandInternal[Result]
+    with ListAssessmentComponentsState
+    with ListModuleOccurrencesWithPermission
+    with ListAssessmentComponentsForModulesWithPermission
+    with TaskBenchmarking {
+  self: AssessmentComponentMarksServiceComponent
+    with AssessmentMembershipServiceComponent
+    with ResitServiceComponent
+    with MarksWorkflowProgressServiceComponent
+    with ListAssessmentComponentsModulesWithPermission
+    with ModuleRegistrationServiceComponent
+    with ModuleRegistrationMarksServiceComponent =>
+
+  override def applyInternal(): Result = {
+    val modules = benchmarkTask("Calculate progress for module") {
+      moduleOccurrenceInfo.map { mo => benchmarkTask(s"Process ${mo.moduleCode} ${mo.occurrence}") {
+        val progress = benchmarkTask("Progress") { workflowProgressService.moduleOccurrenceProgress(mo.students, mo.assessmentComponents.flatMap(_._2)) }
+
+        ModuleOccurrenceWithProgress(
+          moduleCode = mo.moduleCode,
+          module = mo.module,
+          occurrence = mo.occurrence,
 
           progress = MarksWorkflowProgress(progress.percentage, progress.cssClass, progress.messageCode),
           nextStage = progress.nextStage,
           stages = progress.stages,
 
-          assessmentComponents =
-            infos.groupBy(_.assessmentComponent.assessmentGroup)
-              .toSeq
-              .sortBy { case (assessmentGroup, _) => assessmentGroup },
+          students = mo.students,
+
+          assessmentComponents = mo.assessmentComponents,
         )
       }}
-      .toSeq.sortBy { mo => (mo.moduleCode, mo.occurrence) }
     }
+
+    Result(
+      modules,
+      pendingComponentMarkChanges.flatMap(_._2),
+      pendingModuleMarkChanges.flatMap(_._2),
+    )
   }
 }
