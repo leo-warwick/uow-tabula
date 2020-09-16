@@ -23,6 +23,11 @@ object MarkState extends Enum[MarkState] {
   val UndergraduateIntermediateReleaseDate2020 = new LocalDate(2020, DateTimeConstants.JULY, 30)
   val PostgraduateTaughtReleaseDate2020 = new LocalDate(2020, DateTimeConstants.JULY, 8)
 
+  // Resit release dates, superseding the above
+  val UndergraduateFirstYearResitReleaseDate2020 = new LocalDate(2020, DateTimeConstants.SEPTEMBER, 29)
+  val UndergraduateFinalistResitReleaseDate2020 = new LocalDate(2020, DateTimeConstants.OCTOBER, 5)
+  val UndergraduateIntermediateResitReleaseDate2020 = new LocalDate(2020, DateTimeConstants.SEPTEMBER, 29)
+
   def resultsReleasedToStudents(moduleRegistration: ModuleRegistration, releaseTime: LocalTime): Boolean =
     resultsReleasedToStudents(moduleRegistration.academicYear, Option(moduleRegistration.studentCourseDetails), releaseTime)
 
@@ -34,13 +39,13 @@ object MarkState extends Enum[MarkState] {
           DegreeApprenticeshipFirstYearReleaseDate2020
 
         case scd if scd.courseType.contains(CourseType.UG) && scd.freshStudentCourseYearDetailsForYear(academicYear).exists(_.yearOfStudy == 1) =>
-          UndergraduateFirstYearReleaseDate2020
+          UndergraduateFirstYearResitReleaseDate2020
 
         case scd if scd.courseType.contains(CourseType.UG) && scd.freshStudentCourseYearDetailsForYear(academicYear).exists(_.isFinalYear) =>
-          UndergraduateFinalistReleaseDate2020
+          UndergraduateFinalistResitReleaseDate2020
 
         case scd if scd.courseType.contains(CourseType.UG) =>
-          UndergraduateIntermediateReleaseDate2020
+          UndergraduateIntermediateResitReleaseDate2020
 
         case scd if scd.courseType.contains(CourseType.PGT) =>
           PostgraduateTaughtReleaseDate2020
