@@ -18,7 +18,7 @@ import uk.ac.warwick.tabula.web.controllers.BaseController
 import uk.ac.warwick.tabula.web.controllers.profiles.ProfileBreadcrumbs
 import uk.ac.warwick.tabula.web.controllers.profiles.profile.AbstractViewProfileController
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser, FeaturesComponent, ItemNotFoundException}
-
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable.ListMap
 
 abstract class AbstractMitCircsFormController extends AbstractViewProfileController with FeaturesComponent {
@@ -132,8 +132,10 @@ class EditMitCircsController extends AbstractMitCircsFormController {
 
   @RequestMapping(method = Array(POST))
   def save(@Valid @ModelAttribute("command") cmd: EditCommand, errors: Errors, @PathVariable submission: MitigatingCircumstancesSubmission): Mav = {
-    if (errors.hasErrors) form(submission.student).addObjects("errors" -> errors)
-    else {
+    if (errors.hasErrors) {
+      logger.warn(s"Validation failed for mit circs submission ${submission.key} by ${submission.student.id}. ${errors.getAllErrors.asScala.map(_.toString)}")
+      form(submission.student).addObjects("errors" -> errors)
+    } else {
       val submission = cmd.apply()
       RedirectForce(Routes.Profile.PersonalCircumstances.view(submission))
     }
