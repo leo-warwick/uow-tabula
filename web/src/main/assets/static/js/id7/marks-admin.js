@@ -138,4 +138,6 @@ $(() => {
       $table.on('change', () => $table.trigger('update'));
     }
   });
+
+  $('.table-checkable:not(.table-sortable)').bigList({});
 });

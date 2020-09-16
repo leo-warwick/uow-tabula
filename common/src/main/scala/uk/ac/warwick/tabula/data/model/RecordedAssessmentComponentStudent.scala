@@ -217,6 +217,7 @@ object RecordedAssessmentComponentStudentMarkSource extends Enum[RecordedAssessm
   case object ProcessModuleMarks extends RecordedAssessmentComponentStudentMarkSource("Process module marks")
   case object ProcessCohortMarks extends RecordedAssessmentComponentStudentMarkSource("Process cohort marks")
   case object CourseworkMarking extends RecordedAssessmentComponentStudentMarkSource("Coursework marking")
+  case object SyncFromSITS extends RecordedAssessmentComponentStudentMarkSource("Sync from SITS")
 
   override def values: IndexedSeq[RecordedAssessmentComponentStudentMarkSource] = findValues
 }

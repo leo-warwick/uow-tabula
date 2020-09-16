@@ -27,17 +27,18 @@ abstract class AbstractMarksAdminDepartmentHomepageController
   def command(@PathVariable department: Department, @ModelAttribute("activeAcademicYear") academicYear: Option[AcademicYear]): MarksDepartmentHomeCommand.Command =
     MarksDepartmentHomeCommand(department, academicYear.getOrElse(AcademicYear.now()), user)
 
-  // We don't have any over-arching admin department home, so just redirect to the assessment components bit
   @RequestMapping
   def list(@ModelAttribute("command") command: MarksDepartmentHomeCommand.Command, @PathVariable department: Department, @ModelAttribute("activeAcademicYear") activeAcademicYear: Option[AcademicYear]): Mav = {
     val academicYear = activeAcademicYear.getOrElse(AcademicYear.now())
     val results = command.apply()
-    val hasMultipleOccurrences = results.groupBy(_.moduleCode).values.map(_.map(_.occurrence).distinct).exists(_.size > 1)
+    val hasMultipleOccurrences = results.modules.groupBy(_.moduleCode).values.map(_.map(_.occurrence).distinct).exists(_.size > 1)
 
     Mav("marks/admin/module-occurrences",
-      "results" -> results,
+      "results" -> results.modules,
       "hasMultipleOccurrences" -> hasMultipleOccurrences,
       "academicYear" -> academicYear,
+      "pendingComponentMarkChanges" -> results.pendingComponentMarkChanges,
+      "pendingModuleMarkChanges" -> results.pendingModuleMarkChanges,
     ).crumbs(
       MarksBreadcrumbs.Admin.HomeForYear(department, academicYear, active = true)
     ).secondCrumbs(academicYearBreadcrumbs(academicYear)(Routes.marks.Admin.home(department, _)): _*)
