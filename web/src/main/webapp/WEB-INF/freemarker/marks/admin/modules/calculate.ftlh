@@ -117,15 +117,24 @@
       </td>
     </#if>
   <#else>
+    <#assign failureMark><#compress><#if calculation.mark??>
+      <#if (student.mark!-1) != (calculation.mark!-1)>
+          ${student.mark!'-'}
+          <i class="fal fa-arrow-right"></i>
+        </#if>
+        ${calculation.mark!'-'}
+    </#if></#compress></#assign>
     <td colspan="3">
       <#if expand_failure_message>
         <i class="fa-fw fad fa-exclamation-triangle" aria-hidden="true"></i>
         ${calculation.message}
+        ${failureMark}
       <#else>
         <span tabindex="0" class="tabula-tooltip" data-title="${calculation.message}">
           <i class="fa-fw fad fa-exclamation-triangle" aria-hidden="true"></i>
           <span class="sr-only">${calculation.message}</span>
         </span>
+        ${failureMark}
       </#if>
     </td>
   </#if>

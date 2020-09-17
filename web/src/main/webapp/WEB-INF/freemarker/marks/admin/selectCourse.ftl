@@ -1,97 +1,27 @@
-<#import 'form_fields.ftl' as form_fields />
 <#import "*/csrf_macros.ftl" as csrf_macros />
+
 <#escape x as x?html>
 
   <#function route_function dept>
-    <#local selectCourseCommand><@routes.exams.generateGrid dept academicYear /></#local>
-    <#return selectCourseCommand />
+      <#local selectCourseCommand><@routes.exams.generateGrid dept academicYear /></#local>
+      <#return selectCourseCommand />
   </#function>
 
-  <@fmt.id7_deptheader title="Create a new exam grid for ${department.name}" route_function=route_function />
+  <@fmt.id7_deptheader title="Process marks for ${department.name}" route_function=route_function />
 
-  <h2>Select courses for this grid</h2>
+  <h2>Select courses</h2>
 
-  <p class="progress-arrows">
-    <span class="arrow-right active">Select courses</span>
-    <span class="arrow-right arrow-left">Set grid options</span>
-    <span class="arrow-right arrow-left">Preview and download</span>
-  </p>
-
-  <div class="alert alert-info">
-    <h3>Before you start</h3>
-    <p>Exam grids in Tabula are generated using data stored in SITS.
-      Before you create a new grid, ensure you have entered all the necessary data in SITS and verified its accuracy.</p>
-  </div>
-
-  <form action="<@routes.exams.generateGrid department academicYear />" class="form-inline select-course" method="post">
+  <#assign processUrl><@routes.marks.cohort_process department academicYear /></#assign>
+  <#assign cancelUrl><@routes.marks.adminhome department academicYear /></#assign>
+  <form method="get" action="${processUrl}" class="form-inline select-course">
     <@csrf_macros.csrfHiddenInputField />
-
-    <@form_fields.grid_options_fields />
-
-    <#include "_select_course_fields.ftl" />
-
+    <#assign chooseYears=false />
+    <#include "../../exams/grids/generate/_select_course_fields.ftl" />
     <@bs3form.errors path="selectCourseCommand" />
 
-    <div class="buttons">
-
-      <button class="btn btn-default" name="${GenerateExamGridMappingParameters.selectCourse}" type="submit" disabled>Configure grid options</button>
-
-      <button class="btn btn-default" name="${GenerateExamGridMappingParameters.usePreviousSettings}" type="submit" disabled>Generate using previous settings
-      </button>
-
-      <#assign popover>
-        <ul>
-          <#list gridOptionsCommand.predefinedColumnDescriptions as column>
-            <li>${column}</li>
-          </#list>
-          <#list gridOptionsCommand.customColumnTitles as column>
-            <li>Additional: ${column}</li>
-          </#list>
-          <#if gridOptionsCommand.nameToShow.toString == 'full'>
-            <li>Official name</li>
-          <#elseif gridOptionsCommand.nameToShow.toString == 'both'>
-            <li>First and last name</li>
-          <#else>
-            <li>No name</li>
-          </#if>
-          <#if gridOptionsCommand.marksToShow == 'overall'>
-            <li>Only show overall mark</li>
-          <#else>
-            <li>Show component marks</li>
-            <#if gridOptionsCommand.componentsToShow == 'all'>
-              <li>Show all assessment components</li>
-            <#else>
-              <li>Hide zero weighted assessment components</li>
-            </#if>
-            <#if gridOptionsCommand.componentsToShow == 'markOnly'>
-              <li>Only show component marks</li>
-            <#else>
-              <li>Show component marks and the sequence that they relate to</li>
-            </#if>
-          </#if>
-          <#if gridOptionsCommand.moduleNameToShow.toString == 'nameAndCode'>
-            <li>Show module names</li>
-          <#elseif gridOptionsCommand.moduleNameToShow.toString == 'shortNameAndCode'>
-            <li>Show module short names</li>
-          <#else>
-            <li>Show module code only</li>
-          </#if>
-          <#if gridOptionsCommand.layout == 'full'>
-            <li>Full grid</li>
-          <#else>
-            <li>Short grid</li>
-          </#if>
-          <#if gridOptionsCommand.yearMarksToUse == 'sits'>
-            <li>Uploaded year marks only</li>
-          <#elseif gridOptionsCommand.yearMarksToUse == 'sitsIfAvailable'>
-            <li>Uploaded year marks if available</li>
-          <#else>
-            <li>Calculate year marks</li>
-          </#if>
-        </ul>
-      </#assign>
-
-      <@fmt.help_popover id="gridOptions" title="Previous grid options" content=popover html=true />
+    <div class="submit-buttons fix-footer">
+      <input type="submit" class="btn btn-primary" value="Confirm" />
+      <a class="btn btn-default dirty-check-ignore" href="${cancelUrl}">Cancel</a>
     </div>
   </form>
 

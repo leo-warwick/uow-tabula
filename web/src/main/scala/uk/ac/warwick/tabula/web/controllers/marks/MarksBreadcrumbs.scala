@@ -57,6 +57,11 @@ object MarksBreadcrumbs {
       extends ModuleOccurrenceBookmark(sitsModuleCode, module, academicYear, occurrence, active) {
       val url = Some(Routes.marks.Admin.ModuleOccurrences.processMarks(sitsModuleCode, academicYear, occurrence))
     }
+
+    case class OutOfSyncMarks(department: model.Department, academicYear: AcademicYear, override val active: Boolean = false) extends BreadCrumb {
+      val title: String = "Pending mark changes"
+      val url = Some(Routes.marks.Admin.outOfSyncMarks(department, academicYear))
+    }
   }
 
 }

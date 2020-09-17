@@ -33,7 +33,6 @@ object CalculateModuleMarksCommand {
 
   sealed trait ModuleMarkCalculation {
     def isSuccessful: Boolean
-
     def isMultiple: Boolean
   }
 
@@ -51,10 +50,13 @@ object CalculateModuleMarksCommand {
       override val isMultiple: Boolean = true
     }
 
-    case class Failure(message: String) extends ModuleMarkCalculation {
+    sealed trait Fail extends ModuleMarkCalculation {
       override val isSuccessful: Boolean = false
       override val isMultiple: Boolean = false
     }
+
+    case class Failure(message: String) extends Fail
+    case class FailureWithMark(mark: Int, message: String) extends Fail
 
     // Some reusable results (just trying to keep these together)
     object Success {
@@ -123,6 +125,8 @@ object CalculateModuleMarksCommand {
       def WeightingsMissingFor(sequences: Seq[String]): Failure = Failure(s"Weightings are missing for ${sequences.mkString(", ")}")
 
       def NoGradeBoundary(grade: String): Failure = Failure(s"Unable to find grade boundary for $grade grade")
+
+      def NoGradeBoundary(mark: Int, grade: String): FailureWithMark = FailureWithMark(mark, s"$grade is not a valid grade for a mark of $mark. Another grade must be selected")
 
       def MismatchedIndicatorGrades(grades: Seq[String], sequences: Seq[String]): Failure =
         Failure(s"For a mark to be calculated when an indicator grade has been used for a component, this same grade (${grades.mkString(", ")}) must be used for all components (${sequences.mkString(", ")}, excluding any with a grade of ${GradeBoundary.ForceMajeureMissingComponentGrade})")
@@ -420,6 +424,9 @@ trait CalculateModuleMarksPopulateOnForm extends PopulateOnForm {
               doesntMatchCalculation(s)
             )
 
+        case ModuleMarkCalculation.FailureWithMark(mark, _) if shouldUseCalculation =>
+          populateMarksItem(Some(mark), None, None, None)
+          s.calculate = !student.agreed && (student.mark.isEmpty || doesntMatchCalculation(s))
         case _ => s.calculate = false // do nothing
       }
 
@@ -547,11 +554,16 @@ trait CalculateModuleMarksAlgorithm {
                     .filter { case (ac, (s, w)) => isIndicatorGrade(ac, s) && w.exists(_ > 0) }
                     .sortBy(_._1.sequence)
 
-                  if (componentsWithIndicatorGrades.size == componentsForCalculation.size && componentsForCalculation.nonEmpty && componentsForCalculation.forall(_._2._1.grade == componentsForCalculation.head._2._1.grade)) {
-                    val grade = componentsForCalculation.head._2._1.grade.get
+                  if (componentsForCalculation.nonEmpty && componentsWithIndicatorGrades.nonEmpty && componentsWithIndicatorGrades.forall(_._2._1.grade == componentsWithIndicatorGrades.head._2._1.grade)) {
+                    val grade = if(componentsWithIndicatorGrades.nonEmpty) {
+                      componentsWithIndicatorGrades.head._2._1.grade.get
+                    }
+                    else {
+                      componentsWithIndicatorGrades.head._2._1.grade.get
+                    }
 
                     validGrades.find(_.grade == grade) match {
-                      case None => ModuleMarkCalculation.Failure.NoGradeBoundary(grade)
+                      case None => ModuleMarkCalculation.Failure.NoGradeBoundary(calculatedMark, grade)
                       case Some(gradeBoundary) => ModuleMarkCalculation.Success(Some(calculatedMark), Some(gradeBoundary))
                     }
                   } else if (componentsWithIndicatorGrades.nonEmpty) {

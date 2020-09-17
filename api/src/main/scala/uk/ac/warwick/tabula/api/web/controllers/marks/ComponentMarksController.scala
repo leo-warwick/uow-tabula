@@ -124,6 +124,7 @@ class RecordComponentMarksRequest extends JsonApiRequest[RecordAssessmentCompone
     command.students.clear()
     students.asScala.filter(_.universityId.hasText).foreach { item =>
       val s = new StudentMarksItem(item.universityId)
+      s.resitSequence = item.resitSequence.maybeText.getOrElse("")
       s.mark = item.mark
       s.grade = item.grade
       s.comments = item.comments
@@ -135,6 +136,7 @@ class RecordComponentMarksRequest extends JsonApiRequest[RecordAssessmentCompone
 
 class RecordComponentMarkItem {
   @BeanProperty var universityId: String = _
+  @BeanProperty var resitSequence: String = _
   @BeanProperty var mark: String = _
   @BeanProperty var grade: String = _
   @BeanProperty var comments: String = _

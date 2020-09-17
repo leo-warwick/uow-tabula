@@ -36,3 +36,7 @@ TODO grab values from the Routes object in code, as that's pretty equivalent and
 <#macro module_marks_confirm sitsModuleCode academicYear occurrence><@_u page="/admin/module/${sitsModuleCode}/${academicYear.startYear?c}/${occurrence?url}/confirm" /></#macro>
 <#macro module_marks_process sitsModuleCode academicYear occurrence><@_u page="/admin/module/${sitsModuleCode}/${academicYear.startYear?c}/${occurrence?url}/process" /></#macro>
 <#macro module_marks_resits sitsModuleCode academicYear occurrence><@_u page="/admin/module/${sitsModuleCode}/${academicYear.startYear?c}/${occurrence?url}/resits" /></#macro>
+
+<#macro cohort_process department academicYear><@_u page="/admin/${department.code}/${academicYear.startYear?c}/cohort/process" /></#macro>
+
+<#macro out_of_sync_marks department academicYear><@_u page="/admin/${department.code}/${academicYear.startYear?c}/out-of-sync-marks" /></#macro>
