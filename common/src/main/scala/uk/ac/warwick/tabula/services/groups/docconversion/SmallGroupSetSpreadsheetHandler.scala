@@ -85,7 +85,9 @@ case class ExtractedSmallGroupEvent(
   startTime: Option[LocalTime],
   endTime: Option[LocalTime],
   location: Option[Location],
-  possibleMapLocations: Seq[WAI2GoLocation]
+  possibleMapLocations: Seq[WAI2GoLocation],
+  relatedUrl: Option[String],
+  relatedUrlTitle: Option[String]
 )
 
 object ExtractedSmallGroupEvent {
@@ -102,8 +104,11 @@ object ExtractedSmallGroupEvent {
   val EndTimeColumn = "End time"
   val LocationColumn = "Location"
   val LocationDisplayNameColumn = "Location display name"
+  val RelatedUrlColumn = "Link"
+  val RelatedUrlTitleColumn = "Link text"
 
-  val AllColumns = Seq(ModuleColumn, SetNameColumn, GroupNameColumn, TitleColumn, TutorsColumn, WeekRangesColumn, DayColumn, StartTimeColumn, EndTimeColumn, LocationColumn, LocationDisplayNameColumn)
+  val AllColumns = Seq(ModuleColumn, SetNameColumn, GroupNameColumn, TitleColumn, TutorsColumn, WeekRangesColumn, DayColumn,
+    StartTimeColumn, EndTimeColumn, LocationColumn, LocationDisplayNameColumn, RelatedUrlColumn, RelatedUrlTitleColumn)
   val RequiredColumns = Seq(ModuleColumn, SetNameColumn, GroupNameColumn)
 }
 
@@ -559,6 +564,9 @@ abstract class SmallGroupSetSpreadsheetHandlerImpl extends SmallGroupSetSpreadsh
           locationFetchingService.mapLocationsFor(name).getOrElse(Nil)
         }
 
+      val relatedUrl = row.values.get(ExtractedSmallGroupEvent.RelatedUrlColumn).flatMap(_.formattedValue.maybeText)
+      val relatedUrlTitle = row.values.get(ExtractedSmallGroupEvent.RelatedUrlTitleColumn).flatMap(_.formattedValue.maybeText)
+
       if (title.nonEmpty || tutors.nonEmpty || weekRanges.nonEmpty || dayOfWeek.nonEmpty || startTime.nonEmpty || endTime.nonEmpty || location.nonEmpty) {
         Seq(ExtractedSmallGroupEvent(
           title,
@@ -568,7 +576,9 @@ abstract class SmallGroupSetSpreadsheetHandlerImpl extends SmallGroupSetSpreadsh
           startTime,
           endTime,
           location,
-          possibleMapLocations
+          possibleMapLocations,
+          relatedUrl,
+          relatedUrlTitle
         ))
       } else {
         Nil
