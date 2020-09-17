@@ -316,7 +316,7 @@ class CalculateModuleMarksCommandTest extends TestBase with Mockito {
     algorithm.assessmentMembershipService.getVariableAssessmentWeightingRules("IN101-30", occurrence) returns Seq.empty
     algorithm.assessmentMembershipService.getAssessmentComponents("IN101-30", inUseOnly = false) returns Seq(ac1, ac2)
 
-    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting))) should be (ModuleMarkCalculation.Failure.NoGradeBoundary("AB"))
+    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting))) should be (ModuleMarkCalculation.Failure.NoGradeBoundary(12, "AB"))
   }
 
   @Test def calculatePartialMMA(): Unit = new UGModuleFixture {
@@ -348,8 +348,8 @@ class CalculateModuleMarksCommandTest extends TestBase with Mockito {
     algorithm.assessmentMembershipService.getVariableAssessmentWeightingRules("IN101-30", occurrence) returns Seq.empty
     algorithm.assessmentMembershipService.getAssessmentComponents("IN101-30", inUseOnly = false) returns Seq(ac1, ac2)
 
-    // TAB-8489 shouldn't be special cased, should show a failed calculation
-    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting))) should be (ModuleMarkCalculation.Failure.MismatchedIndicatorGrades(Seq(GradeBoundary.MitigatingCircumstancesGrade), Seq("A02")))
+    // TAB-8489 shouldn't be special cased
+    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting))) should be (ModuleMarkCalculation.Success(Some(20), Some(GradeBoundary.MitigatingCircumstancesGrade), Some(ModuleResult.Deferred), None))
   }
 
   @Test def calculateMitCircsAndMMA(): Unit = new UGModuleFixture {
@@ -405,8 +405,8 @@ class CalculateModuleMarksCommandTest extends TestBase with Mockito {
     algorithm.assessmentMembershipService.getVariableAssessmentWeightingRules("IN101-30", occurrence) returns Seq.empty
     algorithm.assessmentMembershipService.getAssessmentComponents("IN101-30", inUseOnly = false) returns Seq(ac1, ac2)
 
-    // Can't calculate where there is a mit circs indicator
-    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting), ac3 -> (smr3, ac3.scaledWeighting))) should be (ModuleMarkCalculation.Failure.MismatchedIndicatorGrades(Seq(GradeBoundary.MitigatingCircumstancesGrade), Seq("A03")))
+    // Calculate and suggest M as the module grade
+    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting), ac3 -> (smr3, ac3.scaledWeighting))) should be (ModuleMarkCalculation.Success(Some(42), Some(GradeBoundary.MitigatingCircumstancesGrade), Some(ModuleResult.Deferred),None))
   }
 
   @Test def calculatePartialMMAAndMitCircsMultipleComponents(): Unit = new UGModuleFixture {
@@ -425,8 +425,8 @@ class CalculateModuleMarksCommandTest extends TestBase with Mockito {
     algorithm.assessmentMembershipService.getVariableAssessmentWeightingRules("IN101-30", occurrence) returns Seq.empty
     algorithm.assessmentMembershipService.getAssessmentComponents("IN101-30", inUseOnly = false) returns Seq(ac1, ac2)
 
-    // No suggestion when mit circs
-    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting))) should be (ModuleMarkCalculation.Failure.MismatchedIndicatorGrades(Seq(GradeBoundary.MitigatingCircumstancesGrade), Seq("A01")))
+    // Mit circs are not special cased
+    algorithm.calculate(modReg, Seq(ac1 -> (smr1, ac1.scaledWeighting), ac2 -> (smr2, ac2.scaledWeighting))) should be (ModuleMarkCalculation.Success(Some(69), Some(GradeBoundary.MitigatingCircumstancesGrade), Some(ModuleResult.Deferred),None))
   }
 
   @Test def calculate(): Unit = new UGModuleFixture {
