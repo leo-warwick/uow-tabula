@@ -69,7 +69,7 @@
   <#if !(marks.currentMember!false)>
     <span tabindex="0" class="label label-warning tabula-tooltip" data-title="Permanently withdrawn">PWD</span>
   </#if>
-  <#if marks.reassessment!false && marks.furtherFirstSit!false>
+  <#if (marks.reassessment!false) && (marks.furtherFirstSit!false)>
     <span class="label label-info">Further first sit</span>
   <#elseif marks.reassessment!false>
     <span tabindex="0" class="tabula-tooltip" data-title="Resit mark will be capped at the pass mark when calculating the module mark">
