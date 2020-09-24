@@ -27,7 +27,8 @@ sealed abstract class AssessmentType(val astCode: String, val name: String, val 
 }
 
 sealed abstract class AssignmentType(astCode: String, name: String) extends AssessmentType(astCode, name, TabulaAssessmentSubtype.Assignment)
-sealed abstract class ExamType(astCode: String, name: String) extends AssessmentType(astCode, name, TabulaAssessmentSubtype.Exam)
+sealed abstract class ExamType(astCode: String, name: String, val onlineEquivalent: Option[OnlineExamType] = None) extends AssessmentType(astCode, name, TabulaAssessmentSubtype.Exam)
+sealed abstract class OnlineExamType(astCode: String, name: String) extends AssessmentType(astCode, name, TabulaAssessmentSubtype.Exam)
 
 object AssessmentType extends Enum[AssessmentType] {
 
@@ -35,25 +36,24 @@ object AssessmentType extends Enum[AssessmentType] {
 
   case object Other extends AssessmentType("O", "Other", TabulaAssessmentSubtype.Other)
 
-  case object SummerExam extends ExamType("E", "Exam (summer)")
-  case object JanuaryExam extends ExamType("EJ", "Exam (January)")
-  case object FebruaryExam extends ExamType("EF", "Exam (February)") // NOTE not in Module Approval 2020-01-22
-  case object MarchExam extends ExamType("EM", "Exam (March)")
-  case object AprilExam extends ExamType("EA", "Exam (April)")
-  case object MayExam extends ExamType("EY", "Exam (May)")
-  case object JulyExam extends ExamType("EL", "Exam (July)") // NOTE not in Module Approval 2020-01-22
-  case object Week39Exam extends ExamType("WK39", "Exam (June / July)") // https://warwick.slack.com/archives/CMARBSEE9/p1583487098028300
-  case object SeptemberExam extends ExamType("ES", "Exam (September)")
-  case object DecemberExam extends ExamType("ED", "Exam (December)")
+  case object OnlineSummerExam extends OnlineExamType("OE", "Online Examination (Summer)")
+  case object OnlineJanuaryExam extends OnlineExamType("OEJ", "Online Examination (January)")
+  case object OnlineMarchExam extends OnlineExamType("OEM", "Online Examination (March)")
+  case object OnlineAprilExam extends OnlineExamType("OEA", "Online Examination (April)")
+  case object OnlineMayExam extends OnlineExamType("OEY", "Online Examination (May)")
+  case object OnlineSeptemberExam extends OnlineExamType("OES", "Online Examination (September)")
+  case object OnlineDecemberExam extends OnlineExamType("OED", "Online Examination (December)")
 
-  case object OnlineSummerExam extends ExamType("OE", "Online Examination (Summer)")
-  case object OnlineJanuaryExam extends ExamType("OEJ", "Online Examination (January)")
-  case object OnlineMarchExam extends ExamType("OEM", "Online Examination (March)")
-  case object OnlineAprilExam extends ExamType("OEA", "Online Examination (April)")
-  case object OnlineMayExam extends ExamType("OEY", "Online Examination (May)")
-  case object OnlineSeptemberExam extends ExamType("OES", "Online Examination (September)")
-  case object OnlineDecemberExam extends ExamType("OED", "Online Examination (December)")
-
+  case object SummerExam extends ExamType("E", "Exam (summer)", Some(OnlineSummerExam))
+  case object JanuaryExam extends ExamType("EJ", "Exam (January)", Some(OnlineJanuaryExam))
+  case object FebruaryExam extends ExamType("EF", "Exam (February)", Some(OnlineMarchExam)) // NOTE not in Module Approval 2020-01-22
+  case object MarchExam extends ExamType("EM", "Exam (March)", Some(OnlineMarchExam))
+  case object AprilExam extends ExamType("EA", "Exam (April)", Some(OnlineAprilExam))
+  case object MayExam extends ExamType("EY", "Exam (May)", Some(OnlineMayExam))
+  case object JulyExam extends ExamType("EL", "Exam (July)", Some(OnlineSeptemberExam)) // NOTE not in Module Approval 2020-01-22
+  case object Week39Exam extends ExamType("WK39", "Exam (June / July)", Some(OnlineSeptemberExam)) // https://warwick.slack.com/archives/CMARBSEE9/p1583487098028300
+  case object SeptemberExam extends ExamType("ES", "Exam (September)", Some(OnlineSeptemberExam))
+  case object DecemberExam extends ExamType("ED", "Exam (December)", Some(OnlineDecemberExam))
 
   case object LocalExamination extends ExamType("LX", "Locally-timetabled examination")
   case object TakeHome extends ExamType("HE", "Take-home examiniation")
