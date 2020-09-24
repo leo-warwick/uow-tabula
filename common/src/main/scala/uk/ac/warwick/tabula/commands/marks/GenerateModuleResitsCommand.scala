@@ -9,7 +9,7 @@ import uk.ac.warwick.tabula.commands.marks.MarksDepartmentHomeCommand.StudentMod
 import uk.ac.warwick.tabula.commands.marks.GenerateModuleResitsCommand.{ResitItem, Result, Sequence, SprCode}
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.MarkState.Agreed
-import uk.ac.warwick.tabula.data.model.{AssessmentComponent, AssessmentType, GradeBoundary, GradeBoundaryProcess, Module, RecordedResit, UpstreamAssessmentGroupMember}
+import uk.ac.warwick.tabula.data.model.{AssessmentComponent, AssessmentType, ExamType, GradeBoundary, GradeBoundaryProcess, Module, OnlineExamType, RecordedResit, UpstreamAssessmentGroupMember}
 import uk.ac.warwick.tabula.helpers.LazyMaps
 import uk.ac.warwick.tabula.helpers.StringUtils.StringToSuperString
 import uk.ac.warwick.tabula.permissions.Permissions
@@ -24,6 +24,7 @@ case class StudentMarks (
   requiresResit: Boolean,
   incrementsAttempt: Boolean,
   components: Map[AssessmentComponent, StudentMarkRecord],
+  assessmentTypes: Map[AssessmentComponent, Seq[AssessmentType]],
   sitsResits: Map[AssessmentComponent, Option[UpstreamAssessmentGroupMember]]
 ) {
   def resitOutOfSync(ac: AssessmentComponent): Boolean = {
@@ -72,11 +73,12 @@ object GenerateModuleResitsCommand {
       with GenerateModuleResitsPopulateOnForm
 
   class ResitItem {
-    def this(sprCode: String, sequence: String, weighting: String) {
+    def this(sprCode: String, sequence: String, weighting: String, attempt: String) {
       this()
       this.sprCode = sprCode
       this.sequence = sequence
       this.weighting = weighting
+      this.attempt = attempt
     }
 
     var sprCode: SprCode = _
@@ -84,6 +86,7 @@ object GenerateModuleResitsCommand {
     var create: Boolean = _
     var assessmentType: String = AssessmentType.SeptemberExam.astCode // defaults to september exam
     var weighting: String = _
+    var attempt: String = _
   }
 }
 
@@ -109,10 +112,7 @@ class GenerateModuleResitsCommandInternal(val sitsModuleCode: String, val module
           val recordedResit = cm.existingResit.getOrElse(new RecordedResit(cm, sprCode))
           recordedResit.assessmentType = resitItem.assessmentType
           recordedResit.weighting = resitItem.weighting.toInt
-          recordedResit.currentResitAttempt = {
-            val currentAttempt = cm.currentResitAttempt.getOrElse(1)
-            if (studentMarks.exists(_.incrementsAttempt)) currentAttempt + 1 else currentAttempt
-          }
+          recordedResit.currentResitAttempt = resitItem.attempt.toInt
           recordedResit.needsWritingToSitsSince = Some(DateTime.now)
           recordedResit.updatedBy = currentUser.apparentUser
           recordedResit.updatedDate = DateTime.now
@@ -128,7 +128,7 @@ trait GenerateModuleResitsPopulateOnForm extends PopulateOnForm {
 
   override def populate(): Unit = {
     requiresResits.flatMap(_.components.values).flatMap(_.existingResit).foreach { er =>
-      val item = new ResitItem(er.sprCode, er.sequence, er.weighting.toString)
+      val item = new ResitItem(er.sprCode, er.sequence, er.weighting.toString, er.currentResitAttempt.toString)
       item.assessmentType = er.assessmentType.astCode
       item.create = true
       resits.get(er.sprCode).put(er.sequence, item)
@@ -163,6 +163,14 @@ trait GenerateModuleResitsValidation extends SelfValidating {
       } else if (resit.weighting.toIntOption.isEmpty) {
         errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "moduleMarks.resit.weighting.nonInt")
       }
+
+      if (!resit.attempt.hasText) {
+        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "moduleMarks.resit.attempt.missing")
+      } else if (resit.attempt.toIntOption.isEmpty) {
+        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "moduleMarks.resit.attempt.nonInt")
+      } else if (resit.attempt.toInt < 1 || resit.attempt.toInt > 3 ) {
+        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "moduleMarks.resit.attempt.outOfRange")
+      }
     }
   }
 }
@@ -183,18 +191,36 @@ trait GenerateModuleResitsState extends ModuleOccurrenceState {
 
   lazy val requiresResits: Seq[StudentMarks] = studentModuleMarkRecords.filter(_.markState.contains(Agreed)).flatMap { student =>
     val moduleRegistration = moduleRegistrations.find(_.sprCode == student.sprCode)
-    val components = moduleRegistration.map(mr => componentMarks(mr).view.mapValues(_._1).toMap)
-      .getOrElse(Map.empty[AssessmentComponent, StudentMarkRecord])
-
-    val sitsResits = components.keys.map(ac => ac -> existingResits.find { uagm =>
-      uagm.universityId == SprCode.getUniversityId(student.sprCode) && uagm.upstreamAssessmentGroup.sequence == ac.sequence
-    }).toMap
 
     val process = if (moduleRegistration.exists(_.currentResitAttempt.nonEmpty)) GradeBoundaryProcess.Reassessment else GradeBoundaryProcess.StudentAssessment
     val gradeBoundary = moduleRegistrations.find(_.sprCode == student.sprCode).flatMap { mr => getGradeBoundary(mr.marksCode, process, student.grade) }
 
     if (gradeBoundary.exists(_.generatesResit)) {
-      Some(StudentMarks(student, gradeBoundary.exists(_.generatesResit), gradeBoundary.exists(_.incrementsAttempt), components, sitsResits))
+
+      val components = moduleRegistration.map(mr => componentMarks(mr).view.mapValues(_._1).toMap)
+        .getOrElse(Map.empty[AssessmentComponent, StudentMarkRecord])
+
+      // for each component check to see if a resit already exists in SITS - ignores resits that are the current sit (has just been marked this cycle)
+      val sitsResits = components.map { case (ac, mr) => ac -> existingResits.find { uagm =>
+        uagm.universityId == SprCode.getUniversityId(student.sprCode) &&
+          uagm.upstreamAssessmentGroup.sequence == ac.sequence &&
+          !mr.resitSequence.exists(uagm.resitSequence.contains)
+      }}
+
+      val assessmentTypes = components.map { case (ac, mr) =>
+        val examTypes = if(mr.isReassessment) {
+          ac.assessmentType match {
+            case e: ExamType if e.onlineEquivalent.isDefined => Seq(e.onlineEquivalent.get, AssessmentType.Essay)
+            case o: OnlineExamType => Seq(o, AssessmentType.Essay)
+            case _ => Seq(AssessmentType.Essay, AssessmentType.OnlineSeptemberExam)
+          }
+        } else {
+          Seq(AssessmentType.Essay, AssessmentType.OnlineSeptemberExam)
+        }
+        ac -> examTypes
+      }
+
+      Some(StudentMarks(student, gradeBoundary.exists(_.generatesResit), gradeBoundary.exists(_.incrementsAttempt), components, assessmentTypes, sitsResits))
     } else {
       None
     }
@@ -208,7 +234,18 @@ trait GenerateModuleResitsRequest {
   var resits: JMap[SprCode, JMap[Sequence, ResitItem]] = LazyMaps.create { sprcode: SprCode =>
     LazyMaps.create { sequence: Sequence =>
       val weighting: Int = assessmentComponents.find(_.sequence == sequence).map(_.rawWeighting.toInt).getOrElse(0)
-      new ResitItem(sprcode, sequence, weighting.toString)
+      val attempt: Int = {
+        val studentMarks: Option[StudentMarks] = requiresResits.find(_.module.sprCode == sprcode)
+        val markRecord = requiresResits.find(_.module.sprCode == sprcode)
+          .map(_.components)
+          .getOrElse(Nil)
+          .find(_._1.sequence == sequence).map(_._2)
+
+        val currentAttempt = markRecord.flatMap(_.currentResitAttempt).getOrElse(1)
+        // increment the attempt but cap at three
+        if (studentMarks.exists(_.incrementsAttempt)) (currentAttempt + 1).min(3) else currentAttempt
+      }
+      new ResitItem(sprcode, sequence, weighting.toString, attempt.toString)
     }.asJava
   }.asJava
 

@@ -122,10 +122,11 @@
         <#assign mr = info.moduleRegistration />
         <tr>
           <td class="assessment_details_col assessment_details_col2">
-            <div>${mr.module.code?upper_case}</div>
-            <div>${mr.module.name}</div>
+            <#assign module = mr.module!"" />
+            <div><#if module?has_content>${module.code?upper_case}<#else>${mr.sitsModuleCode}</#if></div>
+            <div><#if module?has_content>${module.name}</#if></div>
           </td>
-          <td class="assessment_details_col">${mr.cats}</td>
+          <td class="assessment_details_col">${mr.cats!}</td>
           <td class="assessment_details_col"><#if mr.selectionStatus??>${(mr.selectionStatus.description)!}<#else>-</#if></td>
           <td>
             <table class="component_info">
@@ -221,29 +222,31 @@
           </td>
           <#assign unconfirmedClass><#if info.markState?? && info.markState.entryName == "UnconfirmedActual">exam-grid-unconfirmed</#if></#assign>
           <td class="assessment_details_col assessment_details_col1 ${unconfirmedClass}">
-            <#assign passMark = mapGet(passMarkMap, mr.module) />
-            <#if mr.agreedMark??>
-              <#if mr.agreedMark?number lt passMark>
-                <span class="exam-grid-fail">${mr.agreedMark}</span>
+            <#if module?has_content>
+              <#assign passMark = mapGet(passMarkMap, module) />
+              <#if mr.agreedMark??>
+                <#if mr.agreedMark?number lt passMark>
+                  <span class="exam-grid-fail">${mr.agreedMark}</span>
+                <#else>
+                  ${mr.agreedMark}
+                </#if>
+              <#elseif mr.actualMark??>
+                <#if mr.actualMark?number < passMark>
+                  <span class="exam-grid-fail">${mr.actualMark}</span>
+                <#else>
+                  <span class="exam-grid-actual-mark">${mr.actualMark}</span>
+                </#if>
+              <#elseif ((mr.agreedGrade)!((mr.actualGrade)!'FM')) == 'FM'>
+                <#if mr.agreedGrade??>
+                  -
+                <#else>
+                  <span class="exam-grid-actual-mark">-</span>
+                </#if>
               <#else>
-                ${mr.agreedMark}
+                <span tabindex="0" class="exam-grid-actual-mark tabula-tooltip" data-title="No marks set for Module registration">X</span>
               </#if>
-            <#elseif mr.actualMark??>
-              <#if mr.actualMark?number < passMark>
-                <span class="exam-grid-fail">${mr.actualMark}</span>
-              <#else>
-                <span class="exam-grid-actual-mark">${mr.actualMark}</span>
-              </#if>
-            <#elseif ((mr.agreedGrade)!((mr.actualGrade)!'FM')) == 'FM'>
-              <#if mr.agreedGrade??>
-                -
-              <#else>
-                <span class="exam-grid-actual-mark">-</span>
-              </#if>
-            <#else>
-              <span tabindex="0" class="exam-grid-actual-mark tabula-tooltip" data-title="No marks set for Module registration">X</span>
+              <@marks_components.moduleMarkHistory info.markRecord mr.sitsModuleCode member />
             </#if>
-            <@marks_components.moduleMarkHistory info.markRecord mr.sitsModuleCode member />
           </td>
           <td class="assessment_details_col assessment_details_col1 ${unconfirmedClass}">
             <#if mr.agreedGrade??>

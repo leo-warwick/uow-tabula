@@ -245,6 +245,8 @@ trait ImportSmallGroupSetsFromSpreadsheetBinding extends BindListener with Loggi
                     eventCommand.locationId = lid
                 }
                 eventCommand.possibleMapLocations = extractedEvent.possibleMapLocations
+                eventCommand.relatedUrl = extractedEvent.relatedUrl.orNull
+                eventCommand.relatedUrlTitle = extractedEvent.relatedUrlTitle.orNull
 
                 new ModifySmallGroupEventCommandHolder(eventCommand, eventCommandType)
               }

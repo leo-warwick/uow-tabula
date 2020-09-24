@@ -199,10 +199,11 @@
         <tbody>
           <#list moduleRegistrationsAndComponents as moduleRegistrationAndComponent>
             <#list moduleRegistrationAndComponent.components as component>
+              <#assign module = moduleRegistrationAndComponent.moduleRegistration.module!"" />
               <#if component.assessmentType.subtype.code == 'E' && component.assessmentType.astCode != 'LX' && component.assessmentType.astCode != 'HE' && component.assessmentType.astCode != 'OE'>
                 <tr>
                   <td>
-                    <#if module?has_content>${moduleRegistrationAndComponent.moduleRegistration.module.code?upper_case}
+                    <#if module?has_content>${module.code?upper_case}
                         <#if moduleRegistrationAndComponent.moduleRegistration.cats?has_content>-${moduleRegistrationAndComponent.moduleRegistration.cats}</#if>
                     <#else>${moduleRegistrationAndComponent.moduleRegistration.sitsModuleCode}
                     </#if>
