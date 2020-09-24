@@ -49,35 +49,6 @@
           the appropriate type from the drop-down.
         </p>
 
-        <p>
-          You can choose the assessment type to use for each assessment component below. You can also specify this for each student.
-        </p>
-
-        <table class="table table-sortable">
-          <thead>
-          <tr>
-            <th class="col-sm-2 sortable">Name</th>
-            <th class="col-sm-1 sortable">Sequence</th>
-            <th class="col-sm-2 sortable">Assessment Type</th>
-            <th class="col-sm-2 sortable">Weighting</th>
-          </tr>
-          </thead>
-          <tbody>
-            <#list assessmentComponents as assessmentComponent>
-              <tr>
-                <td>${assessmentComponent.name}</td>
-                <td>${assessmentComponent.sequence}</td>
-                <td>
-                  <select class="form-control update-assessment-type" data-sequence="${assessmentComponent.sequence}">
-                    <#list assessmentTypes as at><option value="${at.astCode}">${at.name}</option></#list>
-                  </select>
-                </td>
-                <td>${assessmentComponent.scaledWeighting}</td>
-              </tr>
-            </#list>
-          </tbody>
-        </table>
-
         <#list requiresResits as record>
           <#assign member = membersBySprCode[record.module.sprCode] />
           <#assign sprCode = record.module.sprCode />
@@ -145,7 +116,8 @@
                             <#elseif sitsResit?has_content && !componentRecord.existingResit?has_content>
                               ${sitsResit.resitAssessmentType.name}
                             <#elseif record.requiresResit>
-                              <@f.select path="resits[${sprCode}][${assessmentComponent.sequence}].assessmentType" cssClass="form-control assessment-type" data\-sequence="${assessmentComponent.sequence}">
+                              <#assign assessmentTypes = mapGet(record.assessmentTypes, assessmentComponent) />
+                              <@f.select path="resits[${sprCode}][${assessmentComponent.sequence}].assessmentType" cssClass="form-control assessment-type">
                                 <@f.options items=assessmentTypes itemLabel="name" itemValue="astCode" />
                               </@f.select>
                             <#else>
@@ -165,9 +137,17 @@
                             </#if>
                           </td>
                           <td>
-                              <#if componentRecord.existingResit?has_content> ${componentRecord.existingResit.currentResitAttempt}
-                              <#elseif sitsResit?has_content> ${sitsResit.currentResitAttempt}
-                              <#elseif record.incrementsAttempt>${record.currentResitAttempt!1 + 1}<#else>${componentRecord.currentResitAttempt!1}</#if>
+                            <#if componentRecord.existingResit?has_content && !canUpdateResits>
+                              ${componentRecord.existingResit.currentResitAttempt}
+                            <#elseif sitsResit?has_content && !componentRecord.existingResit?has_content>
+                              ${sitsResit.currentResitAttempt!1}
+                            <#else>
+                              <@f.select path="resits[${sprCode}][${assessmentComponent.sequence}].attempt" cssClass="form-control">
+                                <@f.option value="1"/>
+                                <@f.option value="2"/>
+                                <@f.option value="3"/>
+                              </@f.select>
+                            </#if>
                           </td>
                         </tr>
                       </#list>

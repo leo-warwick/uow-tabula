@@ -126,6 +126,7 @@ object ListAssessmentComponentsCommand {
     info.allMembers.sortBy { uagm => (uagm.universityId, uagm.resitSequence.getOrElse("000")) }.map { member =>
       val recordedStudent = recordedStudents.get((member.universityId, member.assessmentType, member.resitSequence))
       val existingResit = resits.get((member.universityId, member.upstreamAssessmentGroup.sequence))
+        .filterNot(r => member.resitSequence.exists(r.resitSequence.contains))
       val gradeBoundary = {
         val process = if (member.isReassessment) GradeBoundaryProcess.Reassessment else GradeBoundaryProcess.StudentAssessment
         val grade = recordedStudent.flatMap(_.latestGrade)

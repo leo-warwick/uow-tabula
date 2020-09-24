@@ -41,14 +41,6 @@ class GenerateModuleResitsController extends BaseModuleMarksController
   def assessmentComponents(@ModelAttribute("command") command: GenerateModuleResitsCommand.Command, errors: Errors): Seq[AssessmentComponent] =
     command.requiresResits.flatMap(_.components.keys).distinct.sortBy(_.sequence)
 
-  @ModelAttribute("assessmentTypes")
-  def assessmentTypes: Seq[AssessmentType] = {
-    Wire.property("${resit.assessmentTypes}")
-      .split(',').toSeq
-      .filter(_.hasText)
-      .map(astCode => AssessmentType.factory(astCode.trim()))
-  }
-
   @ModelAttribute("canUpdateResits")
   def canUpdateResits(@ModelAttribute("command") command: GenerateModuleResitsCommand.Command, errors: Errors): Boolean =
     command.canUpdateResits
