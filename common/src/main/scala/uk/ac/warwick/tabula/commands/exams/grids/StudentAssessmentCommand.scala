@@ -226,8 +226,9 @@ trait StudentModuleRegistrationAndComponents extends Logging {
           components = components.map { case (ug, uagm, weighting) =>
             val recordedAssessmentComponentStudent: Option[RecordedAssessmentComponentStudent] = assessmentComponentMarksService.getRecordedStudent(uagm)
             val resit: Option[RecordedResit] = studentsResits.filter(r => r.sprCode == mr.sprCode && r.sequence == ug.sequence)
-              .sortBy(_.currentResitAttempt)
+              .sortBy(_.resitSequence)
               .headOption
+              .filterNot(r => uagm.resitSequence.exists(r.resitSequence.contains))
             val gradeBoundary = {
               val process = if (uagm.isReassessment) GradeBoundaryProcess.Reassessment else GradeBoundaryProcess.StudentAssessment
               val grade = recordedAssessmentComponentStudent.flatMap(_.latestGrade)
