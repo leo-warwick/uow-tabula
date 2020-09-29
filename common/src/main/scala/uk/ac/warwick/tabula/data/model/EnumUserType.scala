@@ -25,7 +25,10 @@ abstract class OptionEnumUserType[E <: EnumEntry : ClassTag](enum: Enum[E]) exte
   override val nullValue: String = null
 
   override def convertToObject(s: String): Option[E] = s.maybeText.map(enum.namesToValuesMap)
-  override def convertToValue(e: Option[E]): String = e.map(_.entryName).orNull
+  override def convertToValue(e: Option[E]): String = e match {
+    case e if !e.contains(null) => e.map(_.entryName).orNull
+    case _ => null
+  }
 
   override def sqlTypes(): Array[Int] = Array(Types.VARCHAR)
 }
