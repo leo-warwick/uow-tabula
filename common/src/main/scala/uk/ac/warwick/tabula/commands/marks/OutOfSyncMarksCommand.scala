@@ -220,7 +220,7 @@ abstract class OutOfSyncMarksCommandInternal(val department: Department, val aca
             uploader = currentUser.apparentUser,
             mark = moduleRegistration.firstDefinedMark,
             grade = moduleRegistration.firstDefinedGrade,
-            result = Some(moduleRegistration.moduleResult),
+            result = Option(moduleRegistration.moduleResult),
             source = RecordedModuleMarkSource.SyncFromSITS,
             markState = student.latestState match {
               // Don't revert ConfirmedActual to UnconfirmedActual
