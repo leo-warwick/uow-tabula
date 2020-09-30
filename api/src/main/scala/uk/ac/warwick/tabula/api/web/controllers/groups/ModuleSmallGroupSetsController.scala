@@ -2,7 +2,6 @@ package uk.ac.warwick.tabula.api.web.controllers.groups
 
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
-import org.joda.time.DateTime
 import org.springframework.http.{HttpStatus, MediaType}
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
@@ -11,15 +10,16 @@ import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.api.commands.JsonApiRequest
 import uk.ac.warwick.tabula.api.web.controllers.ApiController
 import uk.ac.warwick.tabula.api.web.controllers.groups.ModuleSmallGroupSetsController._
-import uk.ac.warwick.tabula.api.web.helpers.{AssessmentMembershipInfoToJsonConverter, FileAttachmentToJsonConverter, SmallGroupAttendanceToJsonConverter, SmallGroupEventAttendanceNoteToJsonConverter, SmallGroupEventToJsonConverter, SmallGroupSetToJsonConverter, SmallGroupToJsonConverter}
+import uk.ac.warwick.tabula.api.web.helpers._
 import uk.ac.warwick.tabula.commands.Appliable
 import uk.ac.warwick.tabula.commands.groups.admin.{AdminSmallGroupsHomeCommand, _}
+import uk.ac.warwick.tabula.commands.scheduling.UpdateLinkedSmallGroupSetsCommand
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.data.model.groups.{SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.groups.{SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupMembershipStyle, SmallGroupSet}
 import uk.ac.warwick.tabula.groups.web.views.GroupsViewModel
 import uk.ac.warwick.tabula.groups.web.views.GroupsViewModel.{ViewGroup, ViewSet}
-import uk.ac.warwick.tabula.web.{Mav, Routes}
 import uk.ac.warwick.tabula.web.views.{JSONErrorView, JSONView}
+import uk.ac.warwick.tabula.web.{Mav, Routes}
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 
 import scala.beans.BeanProperty
@@ -93,10 +93,14 @@ class CreateSmallGroupSetControllerForModuleApi extends ModuleSmallGroupSetsCont
       Mav(new JSONErrorView(errors))
     } else {
       val smallGroupSet: SmallGroupSet = command.apply()
-      response.setStatus(HttpStatus.CREATED.value())
-      response.addHeader("Location", toplevelUrl + Routes.api.groupSet(smallGroupSet))
+      val set = if (smallGroupSet.membershipStyle == SmallGroupMembershipStyle.Default && !smallGroupSet.memberQuery.hasText) {
+        UpdateLinkedSmallGroupSetsCommand.updateIndividualSmallGroupSet(smallGroupSet).apply()
+      } else smallGroupSet
 
-      val viewSet = new ViewSet(smallGroupSet, ViewGroup.fromGroups(smallGroupSet.groups.asScala.toSeq.sorted), GroupsViewModel.Tutor)
+      response.setStatus(HttpStatus.CREATED.value())
+      response.addHeader("Location", toplevelUrl + Routes.api.groupSet(set))
+
+      val viewSet = new ViewSet(set, ViewGroup.fromGroups(set.groups.asScala.toSeq.sorted), GroupsViewModel.Tutor)
       Mav(new JSONView(Map(
         "success" -> true,
         "status" -> "ok",

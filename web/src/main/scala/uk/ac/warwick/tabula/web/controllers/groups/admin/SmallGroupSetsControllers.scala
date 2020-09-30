@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.web.controllers.groups.admin
 
 import javax.validation.Valid
-
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
 import org.springframework.web.bind.WebDataBinder
@@ -11,8 +10,9 @@ import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.groups.admin.ModifySmallGroupSetCommand.Command
 import uk.ac.warwick.tabula.commands.groups.admin._
+import uk.ac.warwick.tabula.commands.scheduling.UpdateLinkedSmallGroupSetsCommand
 import uk.ac.warwick.tabula.data.model.Module
-import uk.ac.warwick.tabula.data.model.groups.{DepartmentSmallGroupSet, SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.groups.{DepartmentSmallGroupSet, SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupMembershipStyle, SmallGroupSet}
 import uk.ac.warwick.tabula.groups.web.Routes
 import uk.ac.warwick.tabula.services.SmallGroupService
 import uk.ac.warwick.tabula.web.Mav
@@ -68,7 +68,13 @@ class CreateSmallGroupSetController extends SmallGroupSetsController {
     if (errors.hasErrors) form(cmd)
     else {
       val set = cmd.apply()
-      RedirectForce(route(set))
+      // store default membership at the time of creation for linked to SITS type with module and current students member query
+      if (set.membershipStyle == SmallGroupMembershipStyle.Default && !set.memberQuery.hasText) {
+        val setWithMembers = UpdateLinkedSmallGroupSetsCommand.updateIndividualSmallGroupSet(set).apply()
+        RedirectForce(route(setWithMembers))
+      } else {
+        RedirectForce(route(set))
+      }
     }
   }
 
