@@ -15,7 +15,7 @@ import uk.ac.warwick.tabula.commands.Appliable
 import uk.ac.warwick.tabula.commands.groups.admin.{AdminSmallGroupsHomeCommand, _}
 import uk.ac.warwick.tabula.commands.scheduling.UpdateLinkedSmallGroupSetsCommand
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.data.model.groups.{SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupMembershipStyle, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.groups.{SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupSet}
 import uk.ac.warwick.tabula.groups.web.views.GroupsViewModel
 import uk.ac.warwick.tabula.groups.web.views.GroupsViewModel.{ViewGroup, ViewSet}
 import uk.ac.warwick.tabula.web.views.{JSONErrorView, JSONView}
@@ -93,7 +93,7 @@ class CreateSmallGroupSetControllerForModuleApi extends ModuleSmallGroupSetsCont
       Mav(new JSONErrorView(errors))
     } else {
       val smallGroupSet: SmallGroupSet = command.apply()
-      val set = if (smallGroupSet.membershipStyle == SmallGroupMembershipStyle.Default && !smallGroupSet.memberQuery.hasText) {
+      val set = if (smallGroupSet.generateLinkedSitsQueryMembers) {
         UpdateLinkedSmallGroupSetsCommand.updateIndividualSmallGroupSet(smallGroupSet).apply()
       } else smallGroupSet
 

@@ -69,7 +69,7 @@ class CreateSmallGroupSetController extends SmallGroupSetsController {
     else {
       val set = cmd.apply()
       // store default membership at the time of creation for linked to SITS type with module and current students member query
-      if (set.membershipStyle == SmallGroupMembershipStyle.Default && !set.memberQuery.hasText) {
+      if (set.generateLinkedSitsQueryMembers) {
         val setWithMembers = UpdateLinkedSmallGroupSetsCommand.updateIndividualSmallGroupSet(set).apply()
         RedirectForce(route(setWithMembers))
       } else {

@@ -4,7 +4,7 @@ import javax.persistence.CascadeType._
 import javax.persistence._
 import javax.validation.constraints.NotNull
 import org.hibernate.annotations.{BatchSize, Filter, FilterDef, Proxy, Type}
-import org.joda.time.LocalTime
+import org.joda.time.{LocalDate, LocalTime}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands.TaskBenchmarking
@@ -12,6 +12,7 @@ import uk.ac.warwick.tabula.data.PostLoadBehaviour
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.StudentSignUp
 import uk.ac.warwick.tabula.helpers.RequestLevelCache
+import uk.ac.warwick.tabula.helpers.StringUtils.StringToSuperString
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.permissions.PermissionsService
@@ -19,7 +20,6 @@ import uk.ac.warwick.tabula.{AcademicYear, ToString}
 import uk.ac.warwick.userlookup.User
 
 import scala.jdk.CollectionConverters._
-import scala.collection.mutable
 
 object SmallGroupSet {
   final val NotDeletedFilter = "notDeleted"
@@ -381,5 +381,7 @@ class SmallGroupSet
   }
 
   def department: Department = module.adminDepartment
+
+  def generateLinkedSitsQueryMembers: Boolean = membershipStyle == SmallGroupMembershipStyle.Default && memberQuery.isEmptyOrWhitespace && !academicYear.isSITSInFlux(LocalDate.now)
 }
 

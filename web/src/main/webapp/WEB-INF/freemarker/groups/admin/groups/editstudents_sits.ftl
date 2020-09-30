@@ -29,7 +29,7 @@
   <form method="POST">
     <@csrf_macros.csrfHiddenInputField />
     <#assign filterQueryString = findCommand.serializeFilter />
-    <input type="hidden" name="filterQueryString" value="${findCommand.serializeFilter}" />
+    <input type="hidden" name="filterQueryString" value="${filterQueryString}" />
     <@listStudentIdInputs />
 
     <@components.set_wizard false 'students' smallGroupSet />
