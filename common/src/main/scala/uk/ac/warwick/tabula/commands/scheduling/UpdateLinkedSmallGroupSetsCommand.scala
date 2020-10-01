@@ -12,19 +12,6 @@ import uk.ac.warwick.tabula.{AutowiringFeaturesComponent, FeaturesComponent}
 
 import scala.jdk.CollectionConverters._
 
-object UpdateLinkedSmallGroupSetCommand {
-  def apply() =
-    new UpdateLinkedSmallGroupSetsCommandInternal(
-      FindStudentsForUserGroupCommandFactoryImpl,
-      UpdateStudentsForUserGroupCommandFactoryImpl,
-
-    ) with ComposableCommandWithoutTransaction[Seq[SmallGroupSet]]
-      with AutowiringFeaturesComponent
-      with AutowiringProfileServiceComponent
-      with AutowiringSmallGroupServiceComponent
-      with UpdateLinkedSmallGroupSetsDescription
-      with UpdateLinkedSmallGroupSetsPermissions
-}
 object UpdateLinkedSmallGroupSetsCommand {
   def apply() =
     new UpdateLinkedSmallGroupSetsCommandInternal(
