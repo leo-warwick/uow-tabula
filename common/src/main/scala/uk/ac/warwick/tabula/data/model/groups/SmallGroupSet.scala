@@ -10,7 +10,7 @@ import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands.TaskBenchmarking
 import uk.ac.warwick.tabula.data.PostLoadBehaviour
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.StudentSignUp
+import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.{Linked, StudentSignUp}
 import uk.ac.warwick.tabula.helpers.RequestLevelCache
 import uk.ac.warwick.tabula.helpers.StringUtils.StringToSuperString
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
@@ -382,6 +382,7 @@ class SmallGroupSet
 
   def department: Department = module.adminDepartment
 
-  def generateLinkedSitsQueryMembers: Boolean = membershipStyle == SmallGroupMembershipStyle.Default && memberQuery.isEmptyOrWhitespace && !academicYear.isSITSInFlux(LocalDate.now)
+  //Generate members for SGT at start if  1)linked by SITS query 2)sits not in flux 3)Not using linked allocation
+  def generateLinkedSitsQueryMembers: Boolean = membershipStyle == SmallGroupMembershipStyle.Default && memberQuery.isEmptyOrWhitespace && !academicYear.isSITSInFlux(LocalDate.now) && allocationMethod != Linked
 }
 
