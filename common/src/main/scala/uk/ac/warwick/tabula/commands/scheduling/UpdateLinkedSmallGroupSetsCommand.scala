@@ -42,8 +42,8 @@ object UpdateLinkedSmallGroupSetsCommand {
 class UpdateLinkedSmallGroupSetCommandInternal(
   findStudentsCommandFactory: FindStudentsForUserGroupCommandFactory,
   updateCommandFactory: UpdateStudentsForUserGroupCommandFactory,
-  set: SmallGroupSet
-) extends CommandInternal[SmallGroupSet] with Logging with TaskBenchmarking {
+  val set: SmallGroupSet
+) extends CommandInternal[SmallGroupSet] with Logging with TaskBenchmarking with UpdateLinkedSmallGroupSetState {
 
   self: FeaturesComponent with SmallGroupServiceComponent  with SitsStatusDaoComponent =>
 
@@ -126,11 +126,16 @@ trait UpdateLinkedSmallGroupSetsDescription extends Describable[Seq[SmallGroupSe
   }
 }
 
+trait UpdateLinkedSmallGroupSetState {
+  def set: SmallGroupSet
+}
+
 trait UpdateLinkedSmallGroupSetDescription extends Describable[SmallGroupSet] {
 
+  self: UpdateLinkedSmallGroupSetState =>
   override lazy val eventName = "UpdateLinkedSmallGroupSet"
 
   override def describe(d: Description): Unit = {
-
+    d.smallGroupSet(set)
   }
 }
