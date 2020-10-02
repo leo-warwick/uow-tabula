@@ -163,12 +163,13 @@
               </@filter>
 
               <#assign placeholder = "All modules" />
-              <#assign currentfilter><@current_filter_value "findCommand.modules" placeholder; module>${module.code?upper_case}</@current_filter_value></#assign>
+              <#assign currentfilter><#if !filterQueryString?has_content>${module.code?upper_case}<#else><@current_filter_value "findCommand.modules" placeholder; module>${module.code?upper_case}</@current_filter_value></#if></#assign>
               <@filter "findCommand.modules" placeholder currentfilter findCommand.allModules; module>
+                  <#-- If there is no filter query then the default should be current module associated students -->
+                <#assign applyModuleDefault=(!findCommand.filterQueryString?has_content && module.code?upper_case == "${findCommand.module.code?upper_case}") />
                 <input type="checkbox" name="${status.expression}"
                        value="${module.code}"
-                       data-short-value="${module.code?upper_case}"
-                        ${contains_by_code(findCommand.modules, module)?string('checked','')}>
+                       data-short-value="${module.code?upper_case}" ${(applyModuleDefault || contains_by_code(findCommand.modules, module))?string('checked','')}>
                   <@fmt.module_name module false />
               </@filter>
 

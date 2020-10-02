@@ -21,7 +21,8 @@
 
   <form method="POST">
     <@csrf_macros.csrfHiddenInputField />
-    <input type="hidden" name="filterQueryString" value="${findCommand.serializeFilter}" />
+    <#assign filterQueryString = findCommand.serializeFilter />
+    <input type="hidden" name="filterQueryString" value="${filterQueryString}" />
     <@listStudentIdInputs />
 
     <@components.set_wizard true 'students' smallGroupSet />
