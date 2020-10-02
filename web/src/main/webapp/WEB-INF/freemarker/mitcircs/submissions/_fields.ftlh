@@ -21,9 +21,14 @@
   </@mitcirc.question_section>
 </#if>
 
+<#--TODO get URL for appendix B -->
+<#assign typeHint>
+  Tick all that apply, but remember that you'll need to tell us something about each item you tick, and to upload some supporting evidence for each item. Detailed evidence requirements can be found <a href='#'>here</a>.
+</#assign>
+
 <@mitcirc.question_section
   question = "Your coronavirus circumstances"
-  hint = "Tick all that apply, but remember that you'll need to tell us something about each item you tick."
+  hint = typeHint
   cssClass = "mitcircs-form__fields__section--covid19--yes"
   covid19Hide = true
 >
@@ -34,8 +39,7 @@
 <@mitcirc.question_section
   question = "What kind of mitigating circumstances are you presenting?"
   covidQuestion = "What kind of coronavirus circumstances are you presenting?"
-  hint = "Tick all that apply, but remember that you'll need to tell us something about each item you tick,
-    and to upload some supporting evidence for each item."
+  hint = typeHint
   cssClass="mitcircs-form__fields__section--covid19--no"
   covid19Hide = true
 >
@@ -309,31 +313,30 @@
 </@mitcirc.question_section>
 
 <#assign evidenceGeneralHelp>
-  <p>Evidence is a vital part of a mitigating circumstances submission. Without it your claim will be rejected.</p>
+  <p>Evidence is a vital part of a mitigating circumstances submission. Without it your claim may be rejected.</p>
   <ul>
     <li>Photocopy or scanned evidence is acceptable.</li>
     <li>If you are waiting for evidence and are worried it will not arrive in time before the mitigating circumstances deadline you should still submit your case BUT use the next section of the form to tell us about evidence that you'll provide later.</li>
     <li>Written around the time you were experiencing your claim in order for an assessment to be made on the impact of your claim. Evidence written sometime after the event will not normally be accepted.</li>
-    <li>Written by an independent qualified practitioner (letters from relatives are not acceptable); dated and written on headed or official notepaper and in English. If the letter is in another language you must provide both a copy of the original note and a certified translation into English. The University may seek to verify the accuracy of the translation provided.</li>
+    <li>Written by an independent qualified practitioner (letters from relatives are not normally acceptable); dated and written on headed or official notepaper and in English. If the letter is in another language you must provide both a copy of the original note and a certified translation into English. The University may seek to verify the accuracy of the translation provided.</li>
   </ul>
 </#assign>
-<#assign evidenceCovidHelp>
-  Photocopy or scanned evidence is acceptable and should be in English. If the evidence is in another language you should
-  provide both a copy of the original note and a certified translation into English. The University may seek to verify the
-  accuracy of any evidence provided.
-</#assign>
+
 <#if features.mitcircsCovid19>
-  <#assign supportingEvidenceHint = "Due to the coronavirus pandemic we realise it may not be possible to obtain supporting evidence for your claim. If this is the case, please explain why you cannot obtain the evidence above. If you do have evidence please upload as much evidence as you have that is relevant." />
+  <#assign supportingEvidenceHint>
+    Due to the coronavirus pandemic it may not be possible to obtain the required evidence in a timely manner, or at all. During the pandemic the University will be sympathetic to claims that do not contain such evidence <u>as long as you explain why it has not been possible to obtain it</u>.  Any evidence from the list below that you are able to provide will help your Department make an informed decision on your mitigation request. You should not compromise your safety or the safety of others in order to obtain evidence.
+  </#assign>
 <#else>
   <#assign supportingEvidenceHint = "Claims submitted without some independent supporting evidence will not normally be considered for mitigating circumstances. If your supporting evidence is particularly sensitive, then instead of uploading it here, you may prefer to show it to a member of staff (e.g. your personal tutor) who will then certify the evidence on your behalf." />
 </#if>
+
 <@mitcirc.question_section
   question = "Please upload any supporting evidence relevant to your submission"
   hint = supportingEvidenceHint
-  covidHint = "<strong>For coronavirus claims it is not currently necessary to upload evidence. However if you do have evidence, for example a NHS111 virtual sick note or a school closure letter, then please do so here. If you have evidence but you would prefer not to upload it to the system, it is possible to share this with a trusted member of staff, eg. your personal or senior tutor.</strong>"
+  covidHint = supportingEvidenceHint
   cssClass = "mitcircs-form__fields__section__evidence-upload"
   helpPopover = evidenceGeneralHelp
-  helpCovidPopover = evidenceCovidHelp
+  helpCovidPopover = evidenceGeneralHelp
   covid19Hide = true
 >
   <#function render_attachment attachment>

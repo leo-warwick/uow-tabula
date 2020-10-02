@@ -178,8 +178,8 @@ trait MitCircsSubmissionValidation extends SelfValidating {
       if (!affectedAssessments.asScala.exists(_.selected))
         errors.rejectValue("affectedAssessments", "mitigatingCircumstances.affectedAssessments.required")
 
-      // validate evidence
-      val covid19EvidenceExempt: Boolean = features.mitcircsCovid19 && Option(covid19Submission).exists(_.booleanValue)
+      // validate evidence - evidence isn't mandatory as per TAB-8766
+      val covid19EvidenceExempt: Boolean = features.mitcircsCovid19 // && Option(covid19Submission).exists(_.booleanValue)
 
       // validate contact
       Option(contacted).map(_.booleanValue) match {

@@ -17,22 +17,22 @@ object IssueType extends Enum[IssueType] {
   case object SeriousAccident extends IssueType(
     description = "Serious accident",
     helpText = "An accident which had a significant effect on your ability to complete an assessment. Normally the accident would have required you to receive medical treatment and would be supported by a doctor's (or other healthcare professional) note.",
-    evidenceGuidance = "Normally a letter or email from a qualified health professional (eg medical doctor, nurse). It should confirm the accident with dates and should indicate the impact on the student of possible."
+    evidenceGuidance = "The evidence that is helpful, if available: (i) Official letter or email from an appropriately qualified professional (e.g. medical doctor, nurse, counsellor) confirming dates affected. Normally this should have been recorded around the date of the serious illness, accident or trauma and should attest to evidenced impact on the student. (ii) Evidence of impact on your ability to undertake the assessment obtained from sources such as a Personal or Senior Tutor, Doctor, Counsellor, Students’ Union Advice Centre, Report and Support, Student Services and other external support services."
   )
   case object SeriousPhysicalIllness extends IssueType(
     description = "Serious physical illness",
     helpText = "An illness that might require medication prescribed by a GP, or a referral to a specialist, normally supported by a doctor's (or other healthcare professional) note. Minor illnesses such as coughs and colds not requiring treatment would not normally be eligible.",
-    evidenceGuidance = "Normally a letter or email from a qualified health professional (eg medical doctor, nurse). It should confirm the illness with dates and should indicate the impact on the student of possible."
+    evidenceGuidance = "The evidence that is helpful, if available: (i) Official letter or email from an appropriately qualified professional (e.g. medical doctor, nurse, counsellor) confirming dates affected. Normally this should have been recorded around the date of the serious illness, accident or trauma and should attest to evidenced impact on the student. (ii) Evidence of impact on your ability to undertake the assessment obtained from sources such as a Personal or Senior Tutor, Doctor, Counsellor, Students’ Union Advice Centre, Report and Support, Student Services and other external support services."
   )
   case object MentalHealth extends IssueType(
     description = "Mental health issue",
     helpText = "A mental health issue for which you’re receiving or are waiting for support from university or other mental health services or your GP, normally supported by a note from your support service or GP / healthcare professional. Issues arising from short-term assessment stress and anxiety are not normally eligible unless it is a flare-up of a pre-diagnosed illness / condition.",
-    evidenceGuidance = "Normally a letter or email from a qualified health professional (eg medical doctor, nurse). It should confirm the mental health issue with dates and should indicate the impact on the student of possible."
+    evidenceGuidance = "The evidence that is helpful, if available: (i) Official letter or email from an appropriately qualified professional (e.g. medical doctor, nurse, counsellor) confirming dates affected. Normally this should have been recorded around the date of the serious illness, accident or trauma and should attest to evidenced impact on the student. (ii) Evidence of impact on your ability to undertake the assessment obtained from sources such as a Personal or Senior Tutor, Doctor, Counsellor, Students’ Union Advice Centre, Report and Support, Student Services and other external support services."
   )
   case object SeriousMedicalOther extends IssueType(
     description = "Serious accident or illness of someone close",
     helpText = "This would normally be a close family member, and would normally be supported by a doctor's note. Conditions which require you to undertake new and significant caring responsibilities are particularly relevant.",
-    evidenceGuidance = "Normally a letter or email from a qualified health professional (e.g. medical doctor, nurse). It should confirm the illness with dates. For carers, please upload any appropriate documentation that shows you have significant caring responsibility (the exception is for children and parents). You should indicate the impact this had on your ability to do assessment."
+    evidenceGuidance = "The evidence that is helpful, if available: EITHER Official letter or email from a health professional confirming the circumstances with the dates OR letter from Personal or Senior Tutor, health professional, or Student Support explaining how the circumstances are affecting your ability to do the assessment. OR FOR CARERS: Official letter from health professional confirming the circumstances with the dates AND a statement written yourself or by a Personal or Senior Tutor, health professional, or Student Support to confirm that you have substantial care and support responsibilities for the person."
   )
   case object Employment extends IssueType(
     description = "Significant changes in employment circumstances",
@@ -42,17 +42,17 @@ object IssueType extends Enum[IssueType] {
   case object Deterioration extends IssueType(
     description = "Deterioration of a permanent condition",
     helpText = "A condition which you have already reported and is already covered by reasonable adjustments, but which has become significantly worse.",
-    evidenceGuidance = "A lNormally a letter or email from a qualified health professional (e.g. medical doctor, nurse). It should confirm the mental health issue with dates and should indicate the impact on the student of possible."
+    evidenceGuidance = "If this permanent condition has already been adequately adjusted through Special Examination arrangements or other reasonable adjustments, it is only the deterioration or significant change of circumstance that can be considered as a Mitigating Circumstance. An official letter or email from a health professional, or Disability Services or Counsellor or Senior Tutor or an email confirming deterioration with dates. This letter/email should be written around the time of the deterioration and should attest to evidenced impact on the student"
   )
   case object Bereavement extends IssueType(
     description = "Bereavement",
     helpText = "If there has been a death of someone in your family or close to you, tick this option",
-    evidenceGuidance = "Depending upon your circumstances you may not be able to upload any evidence, (e.g order of funeral service, death announcement, death certificate). If you do have documentation and feel able to share it, please submit it here. Alternatively, you can share information about your circumstances with your personal or senior tutor who can acknowledge your claim on your behalf (you should tick the ‘sensitive evidence’ box below in this case)."
+    evidenceGuidance = "If you do have documentation and feel able to share it, you can submit it within the portal. You do not need to submit evidence immediately.  Alternatively, you can share information about your circumstances with your personal or senior tutor who can acknowledge your claim on your behalf, without the provision of evidence.  Please tell us how the bereavement has affected your ability to study. If you require an extension for assessed work then contact your department. The evidence that is helpful, if available: Evidence of impact on your ability to undertake the assessment either through a short statement written yourself or obtained from sources such as a Personal or Senior Tutor doctor, counsellor or Students’ Union Advice Centre or Student Services OR a copy of the death certificate or order of funeral service or death announcement in a newspaper or on the web."
   )
   case object AbruptChange extends IssueType(
     description = "Sudden change in personal circumstances",
     helpText = "Changes of this sort may include a divorce or separation, a sudden change in financial circumstances, a court appearance, or an acute accommodation crisis. If this is related to the coronavirus crisis either claim it here or separately in the coronavirus part of the portal.",
-    evidenceGuidance = "Normally a letter from a doctor, solicitor or other professional person, on official headed paper confirming the circumstances, the dates, and evidence of how it affects your ability to do the assessment. For financial problems, any evidence of unforeseen hardship, e.g. bank statements or a letter of support from Student Funding or the Hardship Fund."
+    evidenceGuidance = "Employment or finances: Evidence of unforeseen financial hardship, e.g. bank statements showing current financial circumstances, loss of job or redundancy AND/OR Statement from Personal tutor or Senior Tutor or Student Support, Student Funding or Students’ Union Advice Centre attesting to impact on student.\nSerious Family Problems: Letter from a doctor, solicitor or other professional person confirming the circumstances and dates AND/OR Evidence from a doctor, nurse or relevant professional, Personal Tutor, Senior Tutor, Student Support or Students’ Union Advice Centre attesting to the impact on your ability to carry out the assessment.\nCourt Appearance/jury duty: Letter from court with date student is expected to appear.\nOther issues not listed above: Evidence provided should prove the circumstance exists (must be from independent source) with dates AND evidence from a doctor, nurse or relevant professional, Personal tutor or Senior Tutor or Student Support or Students’ Union Advice Centre attesting to the impact on your ability to carry out the assessment. "
   )
   case object LateDiagnosis extends IssueType(
     description = "Late diagnosis of a specific learning difference",
@@ -62,17 +62,22 @@ object IssueType extends Enum[IssueType] {
   case object VictimOfCrime extends IssueType(
     description = "Victim of crime",
     helpText = "If you are the victim of a crime (normally supported by a crime number provided by the police) which has caused you significant distress and/or practical difficulties. Involvement in a criminal case as a witness may also be eligible.",
-    evidenceGuidance = "A crime reference number, and either an official police report giving the date of the crime or a letter from health professional, or Senior Tutor or similar, explaining how the circumstances are affecting your ability to do the assessment."
+    evidenceGuidance = "Official police report giving the date of the crime OR a statement from a Personal or Senior Tutor, Doctor, Counsellor, Students’ Union Advice Centre, Report and Support, Student Services or other external support service outlining nature of circumstance with dates affected and the impact on your ability to undertake the assessment."
   )
   case object Harassment extends IssueType(
     description = "Suffered bullying, harassment, victimisation or threatening behaviour",
     helpText = "If you have suffered behaviour which has caused you significant distress and which you have reported to an appropriate body.",
-    evidenceGuidance = "A report from Senior Tutor or Wellbeing Support Services or Students’ Union Advice Centre outlining the circumstance with dates affected."
+    evidenceGuidance = "Statement from a Personal or Senior Tutor, Doctor, Counsellor, Students’ Union Advice Centre, Report and Support, Student Services or other external support service outlining nature of circumstance with dates affected and the impact on your ability to undertake the assessment."
   )
   case object IndustrialAction extends IssueType(
     description = "Industrial action",
     helpText = "If your studies are affected by industrial action (e.g. your lectures or seminars get cancelled or rearranged) then this may be eligible as mitigating circumstances. A statement of the disruption that has occurred should be provided by your department, and you should say how this has affected your ability to complete your assessments.",
     evidenceGuidance = "A statement from your department of the disruption that has affected your studies."
+  )
+  case object Trauma extends IssueType(
+    description = "Trauma",
+    helpText = "We are aware that trauma can take many forms and caused by a wide range of pressures arising from circumstances which may be specific to an individual. If something has occurred that has significantly impacted on your ability to engage with your academic studies please discuss what has occurred with your Personal Tutor, Departmental Senior Tutor, or the Wellbeing Support Service",
+    evidenceGuidance = "We are aware that trauma can take many forms and caused by a wide range of pressures arising from circumstances which may be specific to an individual. If something has occurred that has significantly impacted on your ability to engage with your academic studies please discuss what has occurred with your Personal Tutor, Departmental Senior Tutor, or the Wellbeing Support Service.  Please provide a Statement from a Personal or Senior Tutor, Doctor, Counsellor, Students’ Union Advice Centre, Report and Support, Student Services or other external support service outlining nature of circumstance with dates affected and the impact on your ability to undertake assessment."
   )
   case object Other extends IssueType(
     description = "Other",
@@ -83,74 +88,84 @@ object IssueType extends Enum[IssueType] {
   }
 
   case object SelfIsolate extends CoronavirusIssueType(
-    description = "Advised by NHS111 / medical service to self isolate",
-    helpText = "If you have been advised by NHS111 or the local equivalent in your country, or by your GP or a doctor, that you need to self-isolate, tick this option",
+    description = "Self-isolating due to somebody in household having symptoms",
+    helpText = "If you’re self-isolating because someone in your household has symptoms that suggest coronavirus (even though you may not be showing symptoms yourself), tick this option",
+    evidenceGuidance = "If you remain symptom-free, then you do not need to provide any formal evidence other than explaining how this has affected your ability to study. If you require an extension for assessed work within this period please contact your department. If you are on campus or elsewhere and receive a test and trace notification, then this could be submitted as evidence."
   )
 
   case object SelfIsolate7Days extends CoronavirusIssueType(
-    description = "Currently self-isolating for 7 days due to a persistent cough or fever or other symptoms",
-    helpText = "If you’re self-isolating for 7 days because you have a persistent cough, fever, or other relevant symptoms, tick this option",
+    description = "Required to self-isolate for 7 days by test and trace or medically qualified person",
+    helpText = "If you have been advised by your GP or a doctor or test and trace that you need to self-isolate, tick this option",
+    evidenceGuidance = "Please provide evidence of the need to quarantine or the instruction from a medically qualified person or test and trace.\nIf your illness is mild, then you do not need to provide any other formal evidence other than explaining how this has affected your ability to study. If you require an extension for assessed work within this period please contact your department. If you are on campus or elsewhere and receive a test and trace notification then this could be submitted as evidence."
   )
 
   case object SelfIsolate14Days extends CoronavirusIssueType(
-    description = "Currently self-isolating for 14 days",
-    helpText = "If you’re self-isolating for 14 days because you have come into close contact with a person with symptoms that suggest coronavirus (even though you may not be showing symptoms yourself), tick this option",
+    description = "Required to self-isolate for 14 days by test and trace or medically qualified person",
+    helpText = "If you have been advised by your GP or a doctor or test and trace that you need to self-isolate, tick this option",
+    evidenceGuidance = "Please provide evidence of the need to quarantine or the instruction from a medically qualified person or test and trace.\nIf your illness is mild, then you do not need to provide any other formal evidence other than explaining how this has affected your ability to study. If you require an extension for assessed work within this period please contact your department. If you are on campus or elsewhere and receive a test and trace notification then this could be submitted as evidence."
   )
 
+  // this option can't be selected anymore but must remain to support existing claims of this type
   case object VulnerableGroup extends CoronavirusIssueType(
     description = "I am in a highly vulnerable group and am being shielded for 12 weeks isolation",
     helpText = "For example, people undergoing cancer treatment, people with severe respiratory conditions",
     evidenceGuidance = "Please provide a copy of your official letter directing you to be shielded for 12 weeks isolation."
   )
 
+  case object InsufficientITProvision extends CoronavirusIssueType(
+    description = "My internet connection or IT provision failed/is not sufficient to undertake on-line teaching and assessment",
+    helpText = "If you have a problem with IT provision, tick this option",
+    evidenceGuidance = "Provide date and time of failure of internet connection or IT equipment. If your internet connection is not appropriate to participate in assessments or if you are not able to obtain certain teaching or examination materials due to your location, please contact your Department as soon as possible to discuss appropriate support."
+  )
+
   case object Diagnosed extends CoronavirusIssueType(
-    description = "Diagnosed with coronavirus and/or a coronavirus hospital inpatient",
-    helpText = "If you have been diagnosed with coronavirus by a doctor, tick this option",
-    evidenceGuidance = "Please provide the date you were diagnosed and/or entered hospital, the length of time you were ill or hospitalised, and the name of the hospital where you were treated. At a later date we may ask you to upload any formal evidence of your diagnosis and treatment."
+    description = "Diagnosed with coronavirus (10 day self-isolation) and/or a coronavirus hospital inpatient",
+    helpText = "If you have been diagnosed with coronavirus, tick this option",
+    evidenceGuidance = "Please provide the date you were diagnosed and your notification and how this has affected your ability to study. If you require an extension for assessed work within this affected period, please contact your department if you are able to. If you are admitted to hospital, please provide the length of time you were ill or hospitalised, and the name of the hospital where you were treated. We recognise that there will be times when it isn’t possible to submit this information at the time. This can be provided at a later date but if it is possible to inform your department of your circumstances in the meantime please do so."
   )
 
   case object AwaitingResults extends CoronavirusIssueType(
     description = "Awaiting the result of a coronavirus test",
     helpText = "If you have been tested for coronavirus but have not yet received the results of your test, tick this option",
-    evidenceGuidance = "Please provide the test result when known."
+    evidenceGuidance = "Please provide evidence of the result when known and tell us how this has affected your ability to study. If you require an extension for assessed work within this period please contact your department."
   )
 
   case object CoronavirusBereavement extends CoronavirusIssueType(
     description = "Bereavement due to coronavirus",
     helpText = "If there has been a death of someone in your family or close to you as a result of coronavirus, tick this option",
-    evidenceGuidance = "Depending upon your circumstances you may not be able to upload any evidence, (e.g order of funeral service, death announcement, death certificate). If you do have documentation and feel able to share it, please submit it here. Alternatively, you can share information about your circumstances with your personal or senior tutor who can acknowledge your claim on your behalf (you should tick the ‘sensitive evidence’ box below in this case)."
+    evidenceGuidance = "If you do have documentation and feel able to share it, you can submit it within the portal. You do not need to submit evidence immediately.  Alternatively, you can share information about your circumstances with your personal or senior tutor who can acknowledge your claim on your behalf, without the provision of evidence.  Please tell us how the bereavement has affected your ability to study. If you require an extension for assessed work then contact your department. The evidence that is helpful, if available: Evidence of impact on your ability to undertake the assessment either through a short statement written yourself or obtained from sources such as a Personal or Senior Tutor doctor, counsellor or Students’ Union Advice Centre or Student Services OR a copy of the death certificate or order of funeral service or death announcement in a newspaper or on the web."
   )
 
   case object Carer extends CoronavirusIssueType(
     description = "Carer for a coronavirus patient ",
     helpText = "If you are acting as the carer for someone (other than yourself) who is suffering from coronavirus, tick this option",
-    evidenceGuidance = "Please provide the date the patient was diagnosed and/or entered hospital, the length of time they were ill or hospitalised, and the name of the hospital where they were treated. At a later date we may ask you to upload any formal evidence of the coronavirus patient in question."
+    evidenceGuidance = "Please provide the date the patient was diagnosed and/or entered hospital, the length of time they were ill or hospitalised, and the name of the hospital where they were treated. We recognise that there will be times when it isn’t possible to submit this information at the time. This can be provided at a later date but if it is possible to inform your department of your circumstances in the meantime please do so.  Please tell us how this has affected your ability to study. If you require an extension for assessed work then contact your department. "
   )
 
   case object CarerSelfIsolate extends CoronavirusIssueType(
     description = "Carer for a family/household member required to self-isolate",
-    helpText = "If someone in your family has been required to self-isolate, and you need to care for them while they are isolated, tick this option",
+    helpText = "Please tell us how this has affected your ability to study and the name of the family or household member required to self-isolate. If you require an extension for assessed work then contact your department.  If you require more support or any other reasonable adjustment, please contact your department.",
   )
 
   case object CarerChildcareClosure extends CoronavirusIssueType(
     description = "Carer of children due to school closure",
     helpText = "If you are experiencing difficulties due to childcare (eg difficulty fully participating in on-line teaching or assessment), tick this box",
-    evidenceGuidance = "Please tell us how this has affected your ability to study and the name of the school(s) and dates closed. "
+    evidenceGuidance = "Please tell us how this has affected your ability to study and the name of the school(s) closed. If you require an extension for assessed work then contact your department.  If you require more support or any other reasonable adjustment, please contact your department."
   )
 
   case object NoVisa extends CoronavirusIssueType(
     description = "Not able to obtain a Visa",
     helpText = "If you have not been able to obtain a visa to come to the UK because of travel or other restrictions put in place by your country or by the UK, tick this option",
-    evidenceGuidance = "Please provide us with any visa rejection."
+    evidenceGuidance = "Evidence is not required for students affected until 11th January 2021. From 12th January 2021 please provide us with any visa rejection letters."
   )
 
   case object CannotTravel extends CoronavirusIssueType(
-    description = "Cannot travel to the UK",
+    description = "Unable to travel to the UK due to a travel ban resulting from coronavirus",
     helpText = "If there are travel restrictions in place which make it impossible for you to travel to the UK, tick this option",
-    evidenceGuidance = "Please provide links to any government advice/official travel restrictions or cancelled flight tickets where available."
+    evidenceGuidance = "Evidence is not required for students affected until 11th January 2021. From 12th January 2021 please provide us with any links to government advice/official travel restrictions or cancelled flight tickets"
   )
 
-  def coronavirusIssueTypes: Seq[IssueType] = (IssueType.values.collect { case i: CoronavirusIssueType => i }) ++ Seq(Other)
+  def coronavirusIssueTypes: Seq[IssueType] = IssueType.values.collect { case i: CoronavirusIssueType => i }.filterNot(_ == VulnerableGroup) ++ Seq(Other)
   def generalIssueTypes: Seq[IssueType] =  IssueType.values.diff(coronavirusIssueTypes) ++ Seq(Other)
 
   def validIssueTypes(student: StudentMember): Seq[IssueType] = {
