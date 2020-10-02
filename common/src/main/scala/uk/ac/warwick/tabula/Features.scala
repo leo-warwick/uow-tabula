@@ -160,7 +160,7 @@ abstract class Features {
   @Value("${features.enforceCsp:true}") var enforceCsp: Boolean = defaults.enforceCsp
   @Value("${features.notificationBatching:true}") var notificationBatching: Boolean = defaults.notificationBatching
   @Value("${features.marksManagement:true}") var marksManagement: Boolean = defaults.marksManagement
-  @Value("${features.includeSMSForCurrentYear:false}") var includeSMSForCurrentYear: Boolean = defaults.includeSMSForCurrentYear
+  @Value("${features.includeSMSForCurrentYear:true}") var includeSMSForCurrentYear: Boolean = defaults.includeSMSForCurrentYear
   @Value("${features.progressionDecisionsInStudentProfile:true}") var progressionDecisionsInStudentProfile: Boolean = defaults.progressionDecisionsInStudentProfile
   @Value("${features.processAgreedMarks:true}") var processAgreedMarks: Boolean = defaults.processAgreedMarks
   @Value("${features.ignoreResultRelease:false}") var ignoreResultRelease: Boolean = defaults.processAgreedMarks
@@ -322,7 +322,7 @@ class FeaturesMessage {
   @BeanProperty var enforceCsp = true
   @BeanProperty var notificationBatching = true
   @BeanProperty var marksManagement = true
-  @BeanProperty var includeSMSForCurrentYear = false
+  @BeanProperty var includeSMSForCurrentYear = true
   @BeanProperty var progressionDecisionsInStudentProfile = true
   @BeanProperty var processAgreedMarks = true
   @BeanProperty var ignoreResultRelease = false
