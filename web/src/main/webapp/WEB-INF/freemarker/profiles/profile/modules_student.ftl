@@ -12,15 +12,15 @@
         View in MRM<img class="targetBlank" alt="" title="Link opens in a new window" src="/static/images/shim.gif" />
         </a>
       </div>
-
-      <p>Module Registration Status:
-        <#if command.studentCourseYearDetails.moduleRegistrationStatus??>
-          ${(command.studentCourseYearDetails.moduleRegistrationStatus.description)!}
-        <#else>
-          Unknown (not in SITS)
-        </#if>
-      </p>
     </#if>
+
+    <p>Module Registration Status:
+      <#if command.studentCourseYearDetails.moduleRegistrationStatus??>
+        ${(command.studentCourseYearDetails.moduleRegistrationStatus.description)!}
+      <#else>
+        Unknown (not in SITS)
+      </#if>
+    </p>
 
     <#if (command.studentCourseYearDetails.studentCourseDetails.courseType.code)! == "PG(T)">
       <div class="alert alert-info">
