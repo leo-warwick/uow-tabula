@@ -165,14 +165,17 @@ object IssueType extends Enum[IssueType] {
     evidenceGuidance = "Evidence is not required for students affected until 11th January 2021. From 12th January 2021 please provide us with any links to government advice/official travel restrictions or cancelled flight tickets"
   )
 
-  def coronavirusIssueTypes: Seq[IssueType] = IssueType.values.collect { case i: CoronavirusIssueType => i } ++ Seq(Other)
-  def generalIssueTypes: Seq[IssueType] =  IssueType.values.diff(coronavirusIssueTypes) ++ Seq(Other)
+  // types that can't be selected anymore
+  val UnusedTypes = Seq(VulnerableGroup)
+
+  def coronavirusIssueTypes: Seq[IssueType] = IssueType.values.filterNot(UnusedTypes.contains).collect { case i: CoronavirusIssueType => i } ++ Seq(Other)
+  def generalIssueTypes: Seq[IssueType] =  IssueType.values.filterNot(UnusedTypes.contains).diff(coronavirusIssueTypes) ++ Seq(Other)
 
   def validIssueTypes(student: StudentMember): Seq[IssueType] = {
     // TODO - Make it possible for TQ to enable this (we could also just manage this in code)
     val invalidTypes =
-      if (Option(student.mostSignificantCourse).flatMap(scd => Option(scd.latestStudentCourseYearDetails)).flatMap(scyd => Option(scyd.modeOfAttendance)).map(_.code).contains("P")) Seq(IndustrialAction, VulnerableGroup)
-      else Seq(Employment, IndustrialAction, VulnerableGroup)
+      if (Option(student.mostSignificantCourse).flatMap(scd => Option(scd.latestStudentCourseYearDetails)).flatMap(scyd => Option(scyd.modeOfAttendance)).map(_.code).contains("P")) Seq(IndustrialAction)
+      else Seq(Employment, IndustrialAction)
 
     generalIssueTypes.filterNot(invalidTypes.contains)
   }
