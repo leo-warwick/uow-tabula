@@ -21,9 +21,9 @@
   </@mitcirc.question_section>
 </#if>
 
-<#--TODO get URL for appendix B -->
+<#--TODO point to ARO version of appendix B rather than the one hosted in the manual -->
 <#assign typeHint>
-  Tick all that apply, but remember that you'll need to tell us something about each item you tick, and to upload some supporting evidence for each item. Detailed evidence requirements can be found <a href='#'>here</a>.
+  Tick all that apply, but remember that you'll need to tell us something about each item you tick, and to upload some supporting evidence for each item. Detailed evidence requirements can be found <a href='https://warwick.ac.uk/services/its/servicessupport/web/tabula/manual/cm2/mit-circs/declare/appendix_b.docx' target="_blank">here</a>.
 </#assign>
 
 <@mitcirc.question_section
