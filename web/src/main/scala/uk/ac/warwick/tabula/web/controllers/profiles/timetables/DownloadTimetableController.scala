@@ -6,7 +6,6 @@ import uk.ac.warwick.tabula.commands.TaskBenchmarking
 import uk.ac.warwick.tabula.commands.timetables.ViewMemberTimetableCommand
 import uk.ac.warwick.tabula.commands.timetables.ViewMemberTimetableCommand.TimetableCommand
 import uk.ac.warwick.tabula.data.model.Member
-import uk.ac.warwick.tabula.helpers.DateTimeOrdering._
 import uk.ac.warwick.tabula.web.controllers.profiles.ProfilesController
 import uk.ac.warwick.tabula.web.views.PDFView
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser, RequestFailedException}
@@ -38,7 +37,8 @@ class DownloadTimetableController extends ProfilesController with TaskBenchmarki
           title = s"${member.fullName.getOrElse("")} (${member.universityId}) for ${academicYear.toString}"
         )
       case Failure(t) =>
-        throw new RequestFailedException("The timetabling service could not be reached", t)
+        logger.error("Couldn't generate timetable for member for PDF", t)
+        throw new RequestFailedException("The timetabling service could not be reached-DownloadTimetableController", t)
     }
   }
 

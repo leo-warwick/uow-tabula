@@ -44,6 +44,7 @@ abstract class Features {
 
   @Value("${features.timetableFeedCurrentAcademicYear:true}") var timetableFeedCurrentAcademicYear: Boolean = defaults.timetableFeedCurrentAcademicYear
   @Value("${features.timetableIncludeLectureFeedWBS:false}") var timetableIncludeLectureFeedWBS: Boolean = defaults.timetableIncludeLectureFeedWBS
+  @Value("${features.timetableIncludeMitCircsPanelEvents:false}") var timetableIncludeMitCircsPanelEvents: Boolean = defaults.timetableIncludeMitCircsPanelEvents
 
   @Value("${features.emailStudents:false}") var emailStudents: Boolean = defaults.emailStudents
   @Value("${features.collectRatings:true}") var collectRatings: Boolean = defaults.collectRatings
@@ -202,6 +203,7 @@ class FeaturesMessage {
   // without the Scala module.
   @BeanProperty var timetableFeedCurrentAcademicYear = true
   @BeanProperty var timetableIncludeLectureFeedWBS = false
+  @BeanProperty var timetableIncludeMitCircsPanelEvents = false
 
   @BeanProperty var emailStudents = false
   @BeanProperty var activityStreams = true

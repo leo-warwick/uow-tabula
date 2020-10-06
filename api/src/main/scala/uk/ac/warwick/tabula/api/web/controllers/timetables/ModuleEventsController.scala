@@ -50,7 +50,7 @@ trait GetModuleEventsApi {
         "lastUpdated" -> result.lastUpdated.map(DateFormats.IsoDateTime.print).orNull
       )))
       case Failure(t) =>
-        logger.error("Couldn't generate timetable events", t)
+        logger.error("Couldn't generate timetable module events", t)
         throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
