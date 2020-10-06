@@ -70,7 +70,9 @@ class DownloadTimetableCalendarController extends ProfilesController
           fileNameSuffix = member.universityId
         )
 
-      case Failure(t) => throw new RequestFailedException("The timetabling service could not be reached", t)
+      case Failure(t) =>
+        logger.error("Couldn't generate member timetable events for PDF", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 

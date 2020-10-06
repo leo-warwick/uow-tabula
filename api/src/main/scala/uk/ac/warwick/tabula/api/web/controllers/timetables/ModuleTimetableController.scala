@@ -49,7 +49,9 @@ trait GetModuleTimetableApi {
         "events" -> result.events.map(jsonTimetableEventObject),
         "lastUpdated" -> result.lastUpdated.map(DateFormats.IsoDateTime.print).orNull
       )))
-      case Failure(t) => throw new RequestFailedException("The timetabling service could not be reached", t)
+      case Failure(t) =>
+        logger.error("Couldn't generate module timetable", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 }

@@ -51,6 +51,7 @@ trait AutowiringEventOccurrenceSourceComponent
 
     val mitCircsPanelsSource = (new MitCircsPanelEventOccurrenceSourceComponent
       with AutowiringMitCircsPanelServiceComponent
+      with AutowiringFeaturesComponent
       with AutowiringSecurityServiceComponent
     ).eventOccurrenceSource
 

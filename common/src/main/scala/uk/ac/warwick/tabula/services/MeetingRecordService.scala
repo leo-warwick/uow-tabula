@@ -4,6 +4,7 @@ import org.joda.time.{DateTime, LocalDate}
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.data.Transactions.transactional
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.{AutowiringMeetingRecordDaoComponent, MeetingRecordDaoComponent}
 
@@ -77,7 +78,7 @@ abstract class AbstractMeetingRecordService extends MeetingRecordService {
 
   def list(rel: StudentRelationship): Seq[MeetingRecord] = meetingRecordDao.list(rel)
 
-  def listAll(rel: Set[StudentRelationship], currentMember: Option[Member]): Seq[AbstractMeetingRecord] = {
+  def listAll(rel: Set[StudentRelationship], currentMember: Option[Member]): Seq[AbstractMeetingRecord] = transactional(readOnly = true) {
     (meetingRecordDao.list(rel, currentMember) ++ meetingRecordDao.listScheduled(rel, currentMember)).sorted
   }
 

@@ -115,7 +115,9 @@ trait GetMemberCalendarJsonApi {
         "events" -> FullCalendarEvent.colourEvents(result.events.map(FullCalendarEvent(_, userLookup))),
         "lastUpdated" -> result.lastUpdated.map(DateFormats.IsoDateTime.print).orNull
       )))
-      case Failure(t) => throw new RequestFailedException("The timetabling service could not be reached", t)
+      case Failure(t) =>
+        logger.error("Couldn't generate member timetable for calendar", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 }
@@ -147,6 +149,7 @@ trait GetMemberCalendarIcalFeed {
         val cal = getIcalFeed(result.events, member)
         Mav(new IcalView(cal), "filename" -> s"${member.universityId}.ics")
       case Failure(t) =>
+        logger.error("Couldn't generate member timetable for icalFeed", t)
         throw new RequestFailedException("The timetabling service could not be reached", t)
     }
 
