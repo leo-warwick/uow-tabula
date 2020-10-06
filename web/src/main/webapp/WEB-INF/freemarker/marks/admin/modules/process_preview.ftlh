@@ -56,7 +56,7 @@
                 <@pl.profile_link member.universityId />
                 ${student.sprCode}
                 <@components.moduleMarkStatusIcon student />
-                <@components.moduleMarkHistory student sitsModuleCode member />
+                <@components.moduleMarkHistory student sitsModuleCode member.fullName />
               </td>
               <td>${member.firstName}</td>
               <td>${member.lastName}</td>

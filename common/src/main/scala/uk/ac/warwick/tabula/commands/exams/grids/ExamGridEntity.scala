@@ -15,6 +15,7 @@ case class ExamGridEntity(
   yearWeightings: Seq[CourseYearWeighting],
   mitigatingCircumstances: Seq[MitigatingCircumstancesSubmission] = Nil
 ) {
+  def fullName = s"$firstName $lastName"
   def validYears: Map[YearOfStudy, ExamGridEntityYear] = years.filter { case (_, year) => year.nonEmpty }.view.mapValues(_.get).toMap
 }
 

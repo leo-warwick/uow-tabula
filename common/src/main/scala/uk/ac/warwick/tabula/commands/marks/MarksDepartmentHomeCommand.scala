@@ -7,6 +7,7 @@ import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.marks._
 import uk.ac.warwick.tabula._
+import uk.ac.warwick.tabula.helpers.RequestLevelCache
 
 import scala.collection.immutable.ListMap
 
@@ -104,7 +105,7 @@ object MarksDepartmentHomeCommand {
         markState = recordedModuleRegistration.flatMap(_.latestState),
         agreed = isAgreedSITS,
         recordedStudent = recordedModuleRegistration,
-        history = recordedModuleRegistration.map(_.marks).getOrElse(Seq.empty),
+        history = recordedModuleRegistration.map(_.marks.distinct).getOrElse(Seq.empty),
         moduleRegistration = moduleRegistration,
         requiresResit = requiresResit
       )
@@ -121,13 +122,18 @@ object MarksDepartmentHomeCommand {
   ): Seq[StudentModuleMarkRecord] = {
     val currentResitAttempt = moduleRegistrations.map(mr => mr -> mr.currentResitAttempt).toMap
 
+    val sprCodes = moduleRegistrations.map(_.sprCode)
+
     val recordedModuleRegistrations =
       moduleRegistrationMarksService.getAllRecordedModuleRegistrations(sitsModuleCode, academicYear, occurrence)
+        .filter(rmr => sprCodes.contains(rmr.sprCode))
         .map(student => student.sprCode -> student)
         .toMap
 
     val gradeBoundaries: Map[String, Seq[GradeBoundary]] =
-      moduleRegistrations.map(_.marksCode).distinct.map(gb => gb -> assessmentMembershipService.markScheme(gb)).toMap
+      moduleRegistrations.map(_.marksCode).distinct.map(gb => gb -> RequestLevelCache.cachedBy("AssessmentMembershipService.markScheme", gb) {
+        assessmentMembershipService.markScheme(gb)
+      }).toMap
 
     studentModuleMarkRecords(moduleRegistrations, currentResitAttempt, recordedModuleRegistrations, gradeBoundaries)
   }

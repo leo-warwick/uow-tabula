@@ -68,6 +68,8 @@ trait AssessmentMembershipService {
 
   def getAssessmentComponents(moduleCode: String, inUseOnly: Boolean): Seq[AssessmentComponent]
 
+  def getAssessmentComponents(moduleCodes: Set[String], inUseOnly: Boolean): Seq[AssessmentComponent]
+
   def getAssessmentComponents(department: Department, ids: Seq[String]): Seq[AssessmentComponent]
 
   def getAssessmentComponentsByPaperCode(department: Department, paperCodes: Seq[String]): Map[String, Seq[AssessmentComponent]]
@@ -291,6 +293,9 @@ class AssessmentMembershipServiceImpl
     */
   def getAssessmentComponents(moduleCode: String, inUseOnly: Boolean): Seq[AssessmentComponent] =
     dao.getAssessmentComponents(moduleCode, inUseOnly)
+
+  def getAssessmentComponents(moduleCodes: Set[String], inUseOnly: Boolean): Seq[AssessmentComponent] =
+    dao.getAssessmentComponents(moduleCodes, inUseOnly)
 
   def getAssessmentComponents(department: Department, ids: Seq[String]): Seq[AssessmentComponent] = dao.getAssessmentComponents(department, ids)
 

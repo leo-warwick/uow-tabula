@@ -2,6 +2,7 @@
 <#import "*/_profile_link.ftl" as pl />
 <#import "*/marks_components.ftlh" as components />
 <#import "/WEB-INF/freemarker/generated_grades_macros.ftlh" as gg />
+<#import "/WEB-INF/freemarker/exams/grids/generate/form_fields.ftl" as gf />
 
 <#assign courses><#list selectCourseCommand.courses as course >${course.code}<#if course_has_next>, </#if></#list></#assign>
 <div class="deptheader">
@@ -21,14 +22,12 @@
   wish to agree marks for.
 </p>
 
-<#assign submitUrl><@routes.marks.adminhome department academicYear /></#assign>
-
 <@modal.modal id="profile-modal" cssClass="profile-subset"></@modal.modal>
 
 <div class="fix-area process-module-marks">
-<#--    <@f.form method="post" action=submitUrl?markup_string modelAttribute="command" cssClass="marks-form">-->
-      <div class="has-error"><@f.errors path="" cssClass="help-block" /></div>
-      <table class="table table-striped table-sortable table-checkable">
+  <@f.form method="post" modelAttribute="processCohortMarksCommand" cssClass="marks-form">
+      <@gf.select_course_fields />
+      <table class="table table-striped table-sortable table-checkable process-cohort">
         <thead>
         <tr>
           <th class="for-check-all" data-sorter="false"><input type="checkbox" class="collection-check-all" title="Select all/none" /></th>
@@ -39,27 +38,119 @@
         </tr>
         </thead>
         <tbody>
-          <#list students?keys as student>
-            <#assign studentYearDetails = mapGet(students, student) />
-            <#assign sprCode = studentYearDetails.studentCourseYearDetails.studentCourseDetails.sprCode />
-            <tr>
+          <#list entities?keys as sprCode>
+            <#assign student = mapGet(entities, sprCode)._1() />
+            <#assign moduleRegistrations = mapGet(entities, sprCode)._2() />
+            <@spring.bind path="students[${sprCode}]*"><#if status.error><#assign hasErrors=true /><#else><#assign hasErrors=false /></#if></@spring.bind>
+            <tr class="student">
               <td>
-                <#-- <@f.checkbox cssClass="collection-checkbox" path="students[${sprCode}].process" /> --> <input type="checkbox" class="collection-checkbox" />
+                <input type="checkbox" class="collection-checkbox process-checkbox" data-student="students[${sprCode}]"/>
               </td>
               <td data-sortby="${sprCode}">
-                  <@pl.profile_link student.universityId />
-                  ${sprCode}
+                <#if hasErrors>
+                  <span class="tabula-tooltip text-danger" data-title="There is a problem with one or more module results for this student">
+                    <i class="fa-fw fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span class="sr-only">There is a problem with one or more module results for this student</span>
+                  </span>
+                </#if>
+                <@pl.profile_link student.universityId />
+                ${sprCode}
               </td>
               <td>${student.firstName}</td>
               <td>${student.lastName}</td>
               <td>
                 <table class="table table-condensed">
-                  <thead><tr><#list studentYearDetails.moduleRegistrations as mr>
-                    <th>${mr.sitsModuleCode}</th>
+                  <thead><tr><#list moduleRegistrations as mr>
+                    <#assign studentModuleMarkRecord = (mapGet(mapGet(mapGet(recordsByStudent, sprCode), mr.sitsModuleCode), mr.occurrence))?first />
+                    <th>
+                      ${mr.sitsModuleCode}
+                      <@components.moduleMarkStatusIcon studentModuleMarkRecord />
+                      <@components.moduleMarkHistory studentModuleMarkRecord mr.sitsModuleCode student.fullName />
+                    </th>
                   </#list></tr></thead>
                   <tbody><tr>
-                  <#list studentYearDetails.moduleRegistrations as mr>
-                    <td><#if mr.firstDefinedMark??>${mr.firstDefinedMark}% &mdash; </#if>${mr.firstDefinedGrade!"-"}  &mdash; ${mr.moduleResult.description}</td>
+                  <#list moduleRegistrations as mr>
+                    <#assign moduleCode = mr.sitsModuleCode  />
+                    <#assign studentModuleMarkRecord = (mapGet(mapGet(mapGet(recordsByStudent, sprCode), moduleCode), mr.occurrence))?first />
+                    <@spring.bind path="students[${sprCode}][${moduleCode}]*"><#if status.error><#assign hasModuleErrors=true /><#else><#assign hasModuleErrors=false /></#if></@spring.bind>
+                    <td>
+                      <#if hasModuleErrors>
+                        <span class="tabula-tooltip text-danger" data-title="There is a problem with the module result for ${moduleCode}. Please edit the result and correct any errors.">
+                          <i class="fa-fw fas fa-exclamation-triangle" aria-hidden="true"></i>
+                          <span class="sr-only">There is a problem with the module result for ${moduleCode}. Please edit the result and correct any errors.</span>
+                        </span
+                      </#if>
+                      <@f.hidden path="students[${sprCode}][${moduleCode}].process" />
+                      <@f.hidden path="students[${sprCode}][${moduleCode}].moduleCode" />
+                      <@f.hidden path="students[${sprCode}][${moduleCode}].occurrence" />
+                      <@f.hidden path="students[${sprCode}][${moduleCode}].academicYear" />
+                      <#if studentModuleMarkRecord.mark??>
+                        <span data-updated-by="students${sprCode?replace('/', '_')}_${moduleCode}.mark"><#compress>
+                          <@spring.bind path="students[${sprCode}][${moduleCode}].mark">
+                            <#if status.actualValue?? && status.actualValue?has_content>${status.actualValue}%<#else>-</#if>
+                          </@spring.bind>
+                        </#compress></span> &mdash;
+                      </#if>
+                        <span data-updated-by="students${sprCode?replace('/', '_')}_${moduleCode}.grade"><#compress>
+                          <@spring.bind path="students[${sprCode}][${moduleCode}].grade">
+                            <#if status.actualValue?? && status.actualValue?has_content>${status.actualValue}<#else>-</#if>
+                          </@spring.bind>
+                        </#compress></span>
+                      <#if studentModuleMarkRecord.result??> &mdash;
+                        <span data-updated-by="students${sprCode?replace('/', '_')}_${moduleCode}.result"><#compress>
+                          <@spring.bind path="students[${sprCode}][${moduleCode}].result">
+                            <#if status.actualValue?? && status.actualValue?has_content>${mapGet(moduleResultsDescriptions, status.actualValue)}<#else>-</#if>
+                          </@spring.bind>
+                        </#compress></span>
+                      </#if>
+                      <button type="button" class="btn btn-default btn-xs tabula-tooltip" data-title="Edit marks" data-toggle="modal" data-target="#students${sprCode?replace('/', '_')}_${moduleCode}_markmodal">
+                        <i class="fal fa-pencil" aria-hidden="true"></i><span class="sr-only">Edit marks</span>
+                      </button>
+                      <@modal.modal id="students${sprCode?replace('/', '_')}_${moduleCode}_markmodal" cssClass="module-mark-modal">
+                        <@modal.wrapper>
+                          <div class="modal-header"><h3 class="modal-title">Edit the module mark for ${sprCode} &mdash; ${moduleCode}</h3></div>
+                          <@modal.body>
+                            <p class="help-block">
+                              Changes you make here won't be saved until you process this student.
+                            </p>
+                              <@bs3form.labelled_form_group path="students[${sprCode}][${moduleCode}].mark" labelText="Mark">
+                                <div class="input-group">
+                                  <@f.input id="students${sprCode?replace('/', '_')}_${moduleCode}.mark" path="students[${sprCode}][${moduleCode}].mark" cssClass="form-control mark-box" autocomplete="off" type="number" min="0" max="100" data\-initial="${studentModuleMarkRecord.mark!''}" />
+                                  <div class="input-group-addon">%</div>
+                                </div>
+                              </@bs3form.labelled_form_group>
+                              <@bs3form.labelled_form_group path="students[${sprCode}][${moduleCode}].grade" labelText="Grade">
+                                <@spring.bind path="students[${sprCode}][${moduleCode}]">
+                                  <#assign markItem = status.actualValue />
+                                </@spring.bind>
+                                <#assign generateUrl><@routes.marks.module_generateGrades moduleCode academicYear mr.occurrence sprCode /></#assign>
+                                <@f.input id="students${sprCode?replace('/', '_')}_${moduleCode}.grade-txt" path="students[${sprCode}][${moduleCode}].grade" cssClass="form-control ${markItem.validGrades?has_content?string('auto-grade-modal grades-already-available', 'auto-grade-modal')} grade-box" data\-mark="students[${sprCode}][${moduleCode}].mark" data\-generate\-url=generateUrl?markup_string />
+                                <@f.select id="students${sprCode?replace('/', '_')}_${moduleCode}.grade" path="students[${sprCode}][${moduleCode}].grade" cssClass="form-control" cssStyle="display: none;" disabled=true data\-initial="${studentModuleMarkRecord.grade!''}">
+                                  <#if markItem.validGrades?has_content>
+                                    <@gg.gradeOptions markItem.validGrades._1() markItem.validGrades._2() markItem.grade!'' />
+                                  </#if>
+                                </@f.select>
+                              </@bs3form.labelled_form_group>
+                              <@bs3form.labelled_form_group path="students[${sprCode}][${moduleCode}].result" labelText="Result">
+                                <#assign resultInitial><#if studentModuleMarkRecord.result??>${studentModuleMarkRecord.result.entryName}</#if></#assign>
+                                <@f.select id="students${sprCode?replace('/', '_')}_${moduleCode}.result" path="students[${sprCode}][${moduleCode}].result" cssClass="form-control" data\-initial="${resultInitial?markup_string}">
+                                  <@f.option value="" />
+                                  <#list moduleResults as result>
+                                    <@f.option value=result.entryName label=result.description />
+                                  </#list>
+                                </@f.select>
+                              </@bs3form.labelled_form_group>
+                              <@bs3form.labelled_form_group path="students[${sprCode}][${moduleCode}].comments" labelText="Comments">
+                                <@f.textarea path="students[${sprCode}][${moduleCode}].comments" cssClass="form-control" data\-initial="" />
+                              </@bs3form.labelled_form_group>
+                          </@modal.body>
+                          <@modal.footer>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                            <button type="button" class="btn btn-default module-mark-cancel">Cancel</button>
+                          </@modal.footer>
+                        </@modal.wrapper>
+                      </@modal.modal>
+                    </td>
                   </#list>
                 </tr></tbody></table>
               </td>
@@ -68,9 +159,9 @@
         </tbody>
       </table>
       <div class="submit-buttons fix-footer">
-<#--        <input type="submit" class="btn btn-primary" value="Save" />-->
+        <input type="submit" class="btn btn-primary" value="Save" />
         <a class="btn btn-default dirty-check-ignore" href="<@routes.marks.adminhome department academicYear />">Cancel</a>
       </div>
-<#--    </@f.form>-->
+    </@f.form>
 </div>
 

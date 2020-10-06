@@ -4,8 +4,7 @@ import $ from 'jquery';
 $(() => {
   $('.fix-area').fixHeaderFooter();
 
-  // Auto grade generator
-  $('.auto-grade[data-mark][data-generate-url]').each((i, el) => {
+  function autoGradeSelect(i, el) {
     const $input = $(el);
     const generateUrl = $input.data('generate-url');
     const $markInput = $input.closest('form').find(`[name="${$input.data('mark')}"]`);
@@ -62,7 +61,12 @@ $(() => {
         initialiseSelect();
       }
     }
-  });
+
+    $input.data('grades-initialised', true);
+  }
+
+  // Auto grade generator
+  $('.auto-grade[data-mark][data-generate-url]').each(autoGradeSelect);
 
   // Treat enter as tab in .marks-form
   $('form.marks-form').each((i, form) => {
@@ -109,6 +113,63 @@ $(() => {
     });
   });
 
+  $('.module-mark-modal').on('show.bs.modal', (e) => {
+    const $modal = $(e.target);
+    $modal.find('.auto-grade-modal[data-mark][data-generate-url]').not('[data-grades-initialised]').each(autoGradeSelect);
+  });
+
+  // module mark modals on the cohort processing page update the overview when changed
+  $('.module-mark-modal').on('hidden.bs.modal', (e) => {
+    const $modal = $(e.target);
+    const $fields = $modal.find('input,select,textarea');
+    let hasChanged = false;
+    $fields.each((i, field) => {
+      const $field = $(field);
+      const $view = $(`[data-updated-by="${$field.attr('id')}"]`);
+      const value = ($field.is('select')) ? $field.find('option:selected').text() : $field.val();
+      // eslint-disable-next-line eqeqeq
+      if ($field.data('initial') && $field.data('initial') != $field.val()) hasChanged = true;
+      $view.text(value);
+    });
+    const $container = $modal.closest('td');
+    const $pendingChangesIcon = $container.find('.pending-changes');
+    if (hasChanged && $pendingChangesIcon.length === 0) {
+      $container.prepend($(`
+        <span tabindex="0" class="tabula-tooltip pending-changes" data-title="Pending changes - these won't be saved unless you process this students marks">
+          <i class="fa-fw fad fa-save" aria-hidden="true"></i>
+          <span class="sr-only">Pending changes - these won't be saved unless you process this students marks</span>
+        </span>
+      `));
+    } else if (!hasChanged) {
+      $pendingChangesIcon.remove();
+    }
+  });
+
+  // cancel button on process module mark model resets the form
+  $('.module-mark-modal .module-mark-cancel').on('click', (e) => {
+    const $modal = $(e.target).closest('.module-mark-modal');
+    const $fields = $modal.find('input,select,textarea');
+    $fields.filter('*[data-initial]').each((i, field) => {
+      const $field = $(field);
+      $field.val($field.data('initial'));
+    });
+    $modal.modal('hide');
+  });
+
+  // per-student process checkbox drives hidden module process inputs
+  const updateProcess = (checkbox) => {
+    const $checkbox = $(checkbox);
+    const $container = $checkbox.closest('tr');
+    $container.find('input[type=hidden][name$="process"]').val($checkbox.is(':checked'));
+  };
+
+  // $('.process-checkbox').on('change', (e) => { updateProcess(e.target); });
+
+  // if any modules require processing set the parent checkbox to true
+  $('input[type=hidden][name$="process"][value=true]').closest('tr.student').find('.process-checkbox')
+    .prop('checked', true)
+    .each((i, checkbox) => { updateProcess(checkbox); });
+
   // This is intentionally at the end, after we've messed around with things
   $('.table-sortable').sortableTable({
     sortLocaleCompare: true,
@@ -117,7 +178,13 @@ $(() => {
     const $table = $(e.target);
 
     if ($table.hasClass('table-checkable')) {
-      $table.bigList({});
+      const options = $table.hasClass('process-cohort') ? {
+        onChange: function onChange() {
+          updateProcess(this);
+        },
+      } : {};
+
+      $table.bigList(options);
     }
 
     /*

@@ -25,13 +25,15 @@ trait ModuleOccurrenceState {
   def occurrence: String
 }
 
-trait ModuleOccurrenceLoadModuleRegistrations {
+
+trait ModuleOccurrenceLoadModuleRegistrations extends RetrieveComponentMarks {
   self: ModuleOccurrenceState
     with AssessmentMembershipServiceComponent
     with AssessmentComponentMarksServiceComponent
     with ModuleRegistrationServiceComponent
     with ModuleRegistrationMarksServiceComponent
-    with ResitServiceComponent =>
+    with ResitServiceComponent
+    with RetrieveComponentMarks =>
 
   lazy val assessmentComponents: Seq[AssessmentComponent] =
     assessmentMembershipService.getAssessmentComponents(sitsModuleCode, inUseOnly = false)
@@ -52,49 +54,6 @@ trait ModuleOccurrenceLoadModuleRegistrations {
         info.upstreamAssessmentGroup.assessmentComponent.get ->
           ListAssessmentComponentsCommand.studentMarkRecords(info, assessmentComponentMarksService, resitService, assessmentMembershipService)
       }
-
-  def componentMarks(moduleRegistration: ModuleRegistration): Map[AssessmentComponent, (StudentMarkRecord, Option[BigDecimal])] = {
-    def extractMarks(components: Seq[UpstreamAssessmentGroupMember]): Seq[(AssessmentType, String, Option[Int])] = components.flatMap { uagm =>
-      uagm.upstreamAssessmentGroup.assessmentComponent.map { ac =>
-        val mark: Option[Int] =
-          studentComponentMarkRecords.find(_._1 == ac)
-            .flatMap(_._2.find(_.upstreamAssessmentGroupMember == uagm).flatMap(_.mark))
-            .orElse(uagm.firstDefinedMark)
-
-        (ac.assessmentType, ac.sequence, mark)
-      }
-    }
-
-    moduleRegistration.upstreamAssessmentGroupMembersAllAttempts(extractMarks)
-      .last // Use the weightings and components from the most recent attempt
-      .flatMap { case (uagm, weighting) =>
-        studentComponentMarkRecords.flatMap { case (ac, allStudents) =>
-          // If a student has had multiple attempts at the same assessment, use the attempt with the highest mark
-          val mostRecentAttempt = allStudents.find(_.upstreamAssessmentGroupMember == uagm)
-
-          // If the most recent attempt has a mark, allow using a previous attempt if it has a higher mark
-          // (Don't need to worry about pass/fail modules here)
-          val attempt =
-            if (mostRecentAttempt.exists(_.mark.nonEmpty)) {
-              // Same student and assessment
-              val attemptWithHighestMark = allStudents.filter(s => s.upstreamAssessmentGroupMember.upstreamAssessmentGroup == uagm.upstreamAssessmentGroup && s.universityId == uagm.universityId)
-                .maxByOption(_.mark)
-
-              // make sure to return the most recent attempt if the highest marks are tied
-              if (mostRecentAttempt.flatMap(_.mark) == attemptWithHighestMark.flatMap(_.mark)) {
-                mostRecentAttempt
-              } else {
-                attemptWithHighestMark
-              }
-            } else {
-              mostRecentAttempt
-            }
-
-          attempt.map(ac -> (_, weighting))
-        }
-      }
-      .toMap
-  }
 
   lazy val moduleRegistrations: Seq[ModuleRegistration] = moduleRegistrationService.getByModuleOccurrence(sitsModuleCode, academicYear, occurrence)
 
@@ -159,37 +118,30 @@ object ModuleOccurrenceCommands {
   }
 }
 
-trait ModuleOccurrenceValidation {
-  self: SelfValidating
-    with ModuleOccurrenceState
-    with ClearRecordedModuleMarksState
-    with ModuleOccurrenceLoadModuleRegistrations
-    with AssessmentMembershipServiceComponent
-    with SecurityServiceComponent =>
 
-  lazy val canEditAgreedMarks: Boolean =
-    securityService.can(currentUser, Permissions.Marks.OverwriteAgreedMarks, module)
+trait ValidatesModuleMark {
 
-  def validateMarkEntry(errors: Errors)(item: ModuleOccurrenceCommands.StudentModuleMarksItem, doGradeValidation: Boolean): Unit = {
+  self: AssessmentMembershipServiceComponent with SecurityServiceComponent =>
+
+  def validateModuleMark(errors: Errors)(
+    item: ModuleOccurrenceCommands.StudentModuleMarksItem,
+    moduleRegistration: Option[ModuleRegistration],
+    studentModuleMarkRecord: StudentModuleMarkRecord,
+    department: Department,
+    canEditAgreedMarks: Boolean,
+    doGradeValidation: Boolean,
+  ): Unit = {
+
     val sprCode = item.sprCode
-
-    // Check that there's a module registration for the student
-    val moduleRegistration = moduleRegistrations.find(_.sprCode == sprCode)
-
-    // We allow returning marks for PWD students so we don't need to filter by "current" members here
-    if (moduleRegistration.isEmpty) {
-      errors.reject("uniNumber.notOnModule", Array(sprCode), "")
-    }
 
     // Don't worry about validating marks/grades if there's been no change
     val isUnchanged = moduleRegistration.exists { modReg =>
-      val studentModuleMarkRecord = studentModuleMarkRecords.find(_.sprCode == modReg.sprCode).get
 
       !studentModuleMarkRecord.outOfSync &&
-      !item.comments.hasText &&
-      ((!item.mark.hasText && studentModuleMarkRecord.mark.isEmpty) || studentModuleMarkRecord.mark.map(_.toString).contains(item.mark)) &&
-      ((!item.grade.hasText && studentModuleMarkRecord.grade.isEmpty) || studentModuleMarkRecord.grade.contains(item.grade)) &&
-      ((!item.result.hasText && studentModuleMarkRecord.result.isEmpty) || studentModuleMarkRecord.result.map(_.dbValue).contains(item.result))
+        !item.comments.hasText &&
+        ((!item.mark.hasText && studentModuleMarkRecord.mark.isEmpty) || studentModuleMarkRecord.mark.map(_.toString).contains(item.mark)) &&
+        ((!item.grade.hasText && studentModuleMarkRecord.grade.isEmpty) || studentModuleMarkRecord.grade.contains(item.grade)) &&
+        ((!item.result.hasText && studentModuleMarkRecord.result.isEmpty) || studentModuleMarkRecord.result.map(_.dbValue).contains(item.result))
     }
 
     if (!isUnchanged) {
@@ -216,7 +168,7 @@ trait ModuleOccurrenceValidation {
                   }
                 }
               }
-            } else if (asInt != 0 || module.adminDepartment.assignmentGradeValidationUseDefaultForZero) {
+            } else if (asInt != 0 || department.assignmentGradeValidationUseDefaultForZero) {
               // This is a bit naughty, validation shouldn't modify state, but it's clearer in the preview if we show what the grade will be
               validGrades.find(_.isDefault).foreach { gb =>
                 item.grade = gb.grade
@@ -258,16 +210,38 @@ trait ModuleOccurrenceValidation {
     }
 
     moduleRegistration.foreach { modReg =>
-      val studentModuleMarkRecord = studentModuleMarkRecords.find(_.sprCode == modReg.sprCode).get
-
       val isAgreed = studentModuleMarkRecord.agreed || studentModuleMarkRecord.markState.contains(MarkState.Agreed)
-
       val resultsReleasedToStudents = MarkState.resultsReleasedToStudents(modReg, MarkState.MarkUploadTime)
-
       if (isAgreed && !isUnchanged && resultsReleasedToStudents && !canEditAgreedMarks) {
         errors.rejectValue("mark", "actualMark.module.agreed")
       }
     }
+  }
+}
+
+trait ModuleOccurrenceValidation extends ValidatesModuleMark {
+  self: SelfValidating
+    with ModuleOccurrenceState
+    with ClearRecordedModuleMarksState
+    with ModuleOccurrenceLoadModuleRegistrations
+    with AssessmentMembershipServiceComponent
+    with SecurityServiceComponent =>
+
+  lazy val canEditAgreedMarks: Boolean =
+    securityService.can(currentUser, Permissions.Marks.OverwriteAgreedMarks, module)
+
+  def validateMarkEntry(errors: Errors)(item: ModuleOccurrenceCommands.StudentModuleMarksItem, doGradeValidation: Boolean): Unit = {
+    val sprCode = item.sprCode
+
+    // Check that there's a module registration for the student
+    val moduleRegistration = moduleRegistrations.find(_.sprCode == sprCode)
+
+    // We allow returning marks for PWD students so we don't need to filter by "current" members here
+    if (moduleRegistration.isEmpty) {
+      errors.reject("uniNumber.notOnModule", Array(sprCode), "")
+    }
+    val studentModuleMarkRecord = moduleRegistration.flatMap(mr => studentModuleMarkRecords.find(_.sprCode == mr.sprCode)).get
+    validateModuleMark(errors)(item, moduleRegistration, studentModuleMarkRecord, module.adminDepartment, canEditAgreedMarks, doGradeValidation)
   }
 }
 
