@@ -116,8 +116,8 @@ trait GetMemberCalendarJsonApi {
         "lastUpdated" -> result.lastUpdated.map(DateFormats.IsoDateTime.print).orNull
       )))
       case Failure(t) =>
-        logger.error("Couldn't generate timetable for member calendar", t)
-        throw new RequestFailedException("The timetabling service could not be reached-GetMemberCalendarJsonApi", t)
+        logger.error("Couldn't generate member timetable for calendar", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 }

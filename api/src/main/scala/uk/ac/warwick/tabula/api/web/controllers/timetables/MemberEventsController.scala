@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.api.web.controllers.timetables
 
 import javax.validation.Valid
-
 import org.joda.time.LocalDate
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
@@ -61,8 +60,8 @@ trait GetMemberEventsApi {
         "lastUpdated" -> result.lastUpdated.map(DateFormats.IsoDateTime.print).orNull
       )))
       case Failure(t) =>
-        logger.error("Couldn't generate timetable member events", t)
-        throw new RequestFailedException("The timetabling service could not be reached-showMemberTimetable", t)
+        logger.error("Couldn't generate member timetable events", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 }

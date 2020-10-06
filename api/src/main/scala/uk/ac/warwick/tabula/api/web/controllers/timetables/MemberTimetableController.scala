@@ -50,8 +50,8 @@ trait GetMemberTimetableApi {
         "lastUpdated" -> result.lastUpdated.map(DateFormats.IsoDateTime.print).orNull
       )))
       case Failure(t) =>
-        logger.error("Couldn't generate timetable for member", t)
-        throw new RequestFailedException("The timetabling service could not be reached-MemberTimetableController", t)
+        logger.error("Couldn't generate member timetable", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 }

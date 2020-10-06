@@ -37,8 +37,8 @@ class DownloadTimetableController extends ProfilesController with TaskBenchmarki
           title = s"${member.fullName.getOrElse("")} (${member.universityId}) for ${academicYear.toString}"
         )
       case Failure(t) =>
-        logger.error("Couldn't generate timetable for member for PDF", t)
-        throw new RequestFailedException("The timetabling service could not be reached-DownloadTimetableController", t)
+        logger.error("Couldn't generate member timetable for PDF", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 

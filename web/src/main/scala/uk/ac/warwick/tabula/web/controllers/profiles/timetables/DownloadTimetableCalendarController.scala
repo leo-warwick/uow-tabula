@@ -71,8 +71,8 @@ class DownloadTimetableCalendarController extends ProfilesController
         )
 
       case Failure(t) =>
-        logger.error("Couldn't generate timetable member events for PDF", t)
-        throw new RequestFailedException("The timetabling service could not be reached-render", t)
+        logger.error("Couldn't generate member timetable events for PDF", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
   }
 
