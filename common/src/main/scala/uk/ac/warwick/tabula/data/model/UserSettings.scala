@@ -112,7 +112,7 @@ object UserSettings {
   val DefaultCourseworkShowEmptyModules = true
   val DefaultReceiveStudentComments = true
 
-  val DefaultBatchedNotificationsSetting: FiniteDuration = Duration.Zero
+  val DefaultBatchedNotificationsSetting: FiniteDuration = 10.minutes
 
   object Settings {
     val AlertsSubmission = "alertsSubmission"
