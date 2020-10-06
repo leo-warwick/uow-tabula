@@ -149,10 +149,8 @@ trait GetMemberCalendarIcalFeed {
         val cal = getIcalFeed(result.events, member)
         Mav(new IcalView(cal), "filename" -> s"${member.universityId}.ics")
       case Failure(t) =>
-        System.out.println("icalFeed-printStackTrace-" +t.printStackTrace())
-        System.out.println("icalFeed-getmessage-" +t.getMessage())
-        System.out.println("icalFeed-t-" +t)
-        throw new RequestFailedException("The timetabling service could not be reached-icalFeed", t)
+        logger.error("Couldn't generate member timetable for icalFeed", t)
+        throw new RequestFailedException("The timetabling service could not be reached", t)
     }
 
   }
