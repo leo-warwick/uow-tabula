@@ -903,9 +903,7 @@ class Assignment
   }
 
   // Gets a breakdown of the membership for this assessment. Note that this cannot be sorted by seat number
-  def membershipInfo: AssessmentMembershipInfo = RequestLevelCache.cachedBy("Assessment.membershipInfo", id) {
-    assessmentMembershipService.determineMembership(this)
-  }
+  def membershipInfo: AssessmentMembershipInfo = membershipInfoWith()
 
   def membershipInfoWith(includePWD: Boolean = false): AssessmentMembershipInfo = RequestLevelCache.cachedBy("Assessment.membershipInfo", id) {
     if(includePWD) {
