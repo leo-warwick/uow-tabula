@@ -946,7 +946,7 @@ $(() => {
     if ($form.length === 1 && !$form.hasClass('dirty-check-ignore')) {
       $form.areYouSure();
 
-      $m.find('[data-dismiss="modal"]').on('click', (ev) => {
+      $m.find('[data-dismiss="modal"]').not('.dirty-check-ignore').on('click', (ev) => {
         $form.trigger('checkForm.areYouSure');
         // eslint-disable-next-line no-alert
         if ($form.hasClass('dirty') && !window.confirm('You have unsaved changes! \n\n Are you sure you want to close this form?')) {

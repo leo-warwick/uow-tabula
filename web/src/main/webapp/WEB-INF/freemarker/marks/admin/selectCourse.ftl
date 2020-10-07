@@ -20,7 +20,7 @@
     <@bs3form.errors path="selectCourseCommand" />
 
     <div class="submit-buttons fix-footer">
-      <input type="submit" class="btn btn-primary" value="Confirm" />
+      <input type="submit" class="btn btn-primary" value="View marks" />
       <a class="btn btn-default dirty-check-ignore" href="${cancelUrl}">Cancel</a>
     </div>
   </form>

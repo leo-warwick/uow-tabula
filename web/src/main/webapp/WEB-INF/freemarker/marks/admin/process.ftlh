@@ -144,7 +144,7 @@
                               </@bs3form.labelled_form_group>
                           </@modal.body>
                           <@modal.footer>
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                            <button type="button" class="btn btn-primary dirty-check-ignore" data-dismiss="modal">Save</button>
                             <button type="button" class="btn btn-default module-mark-cancel">Cancel</button>
                           </@modal.footer>
                         </@modal.wrapper>
