@@ -137,7 +137,7 @@ $(() => {
       $container.prepend($(`
         <span tabindex="0" class="tabula-tooltip pending-changes" data-title="Pending changes - these won't be saved unless you process this students marks">
           <i class="fa-fw fad fa-save" aria-hidden="true"></i>
-          <span class="sr-only">Pending changes - these won't be saved unless you process this students marks</span>
+          <span class="sr-only">Pending changes - these won't be saved unless you process this student's marks</span>
         </span>
       `));
     } else if (!hasChanged) {
