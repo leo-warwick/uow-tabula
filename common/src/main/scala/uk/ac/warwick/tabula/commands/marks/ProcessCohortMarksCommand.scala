@@ -131,9 +131,11 @@ trait ProcessCohortMarksPopulateOnForm extends PopulateOnForm {
     with AssessmentMembershipServiceComponent =>
 
   override def populate(): Unit = {
-
     for ((sprCode, modules) <- recordsByStudent; (moduleCode, marks) <- modules; markRecord <- marks.values.flatten.headOption) {
       val s = new StudentCohortMarksItem(sprCode)
+      s.moduleCode = markRecord.moduleRegistration.sitsModuleCode
+      s.occurrence = markRecord.moduleRegistration.occurrence
+      s.academicYear = markRecord.moduleRegistration.academicYear
       s.populate(markRecord)(assessmentMembershipService = assessmentMembershipService)
       s.shouldProcess(markRecord)
       students.get(sprCode).put(moduleCode, s)
@@ -263,9 +265,9 @@ trait ProcessCohortMarksValidation extends ValidatesModuleMark with SelfValidati
 
         val moduleRegistration = moduleRegistrations.find(mr => mr.sprCode == item.sprCode && mr.sitsModuleCode == moduleCode)
 
-        val studentMarkRecord = moduleRegistration.flatMap(mr => studentModuleMarkRecords(mr.sitsModuleCode)(mr.occurrence).find(_.sprCode == sprCode)).get
+        val studentMarkRecord = moduleRegistration.flatMap(mr => studentModuleMarkRecords(mr.sitsModuleCode)(mr.occurrence).find(_.sprCode == sprCode))
 
-        validateModuleMark(errors)(item, moduleRegistration, studentMarkRecord, department, canEditAgreedMarks, doGradeValidation = true)
+        validateModuleMark(errors)(item, moduleRegistration, studentMarkRecord.get, department, canEditAgreedMarks, doGradeValidation = true)
 
         // Validate that every entry has a grade and a result
         if (!item.grade.hasText) {
