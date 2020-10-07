@@ -42,7 +42,7 @@ class ListAssignmentsForDepartmentController extends DepartmentAssignmentsContro
         "success" -> true,
         "status" -> "ok",
         "academicYear" -> Option(academicYear).map(_.toString).orNull,
-        "assignments" -> assignments.map(jsonAssignmentObject)
+        "assignments" -> assignments.map(jsonAssignmentObject(_))
       )))
     }
   }
