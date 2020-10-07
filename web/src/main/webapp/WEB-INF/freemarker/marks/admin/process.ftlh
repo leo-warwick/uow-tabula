@@ -26,7 +26,6 @@
 
 <div class="fix-area process-module-marks">
   <@f.form method="post" modelAttribute="processCohortMarksCommand" cssClass="marks-form">
-      <@gf.select_course_fields />
       <table class="table table-striped table-sortable table-checkable process-cohort">
         <thead>
         <tr>

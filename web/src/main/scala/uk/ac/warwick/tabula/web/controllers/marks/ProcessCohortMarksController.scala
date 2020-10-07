@@ -115,42 +115,47 @@ class ProcessCohortMarksController extends BaseController
     @PathVariable department: Department,
     @PathVariable academicYear: AcademicYear,
   ): String = {
-    processCohortMarksCommand.entities = selectCourseCommand.apply()
-    processCohortMarksCommand.validate(processCohortMarksErrors)
-    if (processCohortMarksErrors.hasErrors) {
-      model.addAttribute("flash__error", "flash.hasErrors")
-      processSummary(selectCourseCommand, selectCourseErrors, processCohortMarksCommand, processCohortMarksErrors, model, department, academicYear)
+    val cohort = selectCourseCommand.apply()
+    if (cohort.isEmpty) {
+      selectCourseErrors.reject("examGrid.noStudents")
+      selectCourseRender(selectCourseCommand, selectCourseErrors, department, academicYear)
     } else {
+      processCohortMarksCommand.entities = selectCourseCommand.apply()
+      processCohortMarksCommand.validate(processCohortMarksErrors)
+      if (processCohortMarksErrors.hasErrors) {
+        model.addAttribute("flash__error", "flash.hasErrors")
+        processSummary(selectCourseCommand, selectCourseErrors, processCohortMarksCommand, processCohortMarksErrors, model, department, academicYear)
+      } else {
+        val changes: Map[SprCode, Seq[(StudentModuleMarkRecord, Boolean)]] = processCohortMarksCommand.students.asScala.map { case (sprCode, studentModules) =>
+          sprCode -> studentModules
+            .asScala
+            .values
+            .filter(_.process)
+            .flatMap { markItem =>
+              val studentModuleMarkRecord = processCohortMarksCommand.studentModuleMarkRecords(markItem.moduleCode)(markItem.occurrence)
+                .find(_.sprCode == markItem.sprCode).get
 
-      val changes: Map[SprCode, Seq[(StudentModuleMarkRecord, Boolean)]] = processCohortMarksCommand.students.asScala.map { case (sprCode, studentModules) =>
-        sprCode -> studentModules
-          .asScala
-          .values
-          .filter(_.process)
-          .flatMap { markItem =>
-            val studentModuleMarkRecord = processCohortMarksCommand.studentModuleMarkRecords(markItem.moduleCode)(markItem.occurrence)
-              .find(_.sprCode == markItem.sprCode).get
+              val isNotNotifiableChange =
+                !markItem.comments.hasText &&
+                  ((!markItem.mark.hasText && studentModuleMarkRecord.mark.isEmpty) || studentModuleMarkRecord.mark.map(_.toString).contains(markItem.mark)) &&
+                  ((!markItem.grade.hasText && studentModuleMarkRecord.grade.isEmpty) || studentModuleMarkRecord.grade.contains(markItem.grade)) &&
+                  ((!markItem.result.hasText && studentModuleMarkRecord.result.isEmpty) || studentModuleMarkRecord.result.map(_.dbValue).contains(markItem.result))
 
-            val isNotNotifiableChange =
-              !markItem.comments.hasText &&
-                ((!markItem.mark.hasText && studentModuleMarkRecord.mark.isEmpty) || studentModuleMarkRecord.mark.map(_.toString).contains(markItem.mark)) &&
-                ((!markItem.grade.hasText && studentModuleMarkRecord.grade.isEmpty) || studentModuleMarkRecord.grade.contains(markItem.grade)) &&
-                ((!markItem.result.hasText && studentModuleMarkRecord.result.isEmpty) || studentModuleMarkRecord.result.map(_.dbValue).contains(markItem.result))
+              // Mark and grade and result haven't changed and no comment and not out of sync (we always re-push out of sync records)
+              if (
+                !studentModuleMarkRecord.outOfSync &&
+                  (studentModuleMarkRecord.markState.contains(MarkState.Agreed) || studentModuleMarkRecord.agreed) &&
+                  isNotNotifiableChange
+              ) None else Some(studentModuleMarkRecord -> !isNotNotifiableChange)
+            }.toSeq
+        }.filterNot(_._2.isEmpty).toMap
+        model.addAttribute("entities", processCohortMarksCommand.entitiesBySprCode)
+        model.addAttribute("changes", SortedMap(changes.view.mapValues(_.map(_._1)).toSeq.sortBy(_._1): _*))
+        model.addAttribute("notificationDepartments", departmentalStudents(changes.values.flatten.filter(_._2).map(_._1).toSeq))
+        //model.addAttribute("returnTo", getReturnTo(Routes.marks.Admin.ModuleOccurrences.processMarks(sitsModuleCode, academicYear, occurrence)))
 
-            // Mark and grade and result haven't changed and no comment and not out of sync (we always re-push out of sync records)
-            if (
-              !studentModuleMarkRecord.outOfSync &&
-                (studentModuleMarkRecord.markState.contains(MarkState.Agreed) || studentModuleMarkRecord.agreed) &&
-                isNotNotifiableChange
-            ) None else Some(studentModuleMarkRecord -> !isNotNotifiableChange)
-          }.toSeq
-      }.filterNot(_._2.isEmpty).toMap
-      model.addAttribute("entities", processCohortMarksCommand.entitiesBySprCode)
-      model.addAttribute("changes", SortedMap(changes.view.mapValues(_.map(_._1)).toSeq.sortBy(_._1): _*))
-      model.addAttribute("notificationDepartments", departmentalStudents(changes.values.flatten.filter(_._2).map(_._1).toSeq))
-      //model.addAttribute("returnTo", getReturnTo(Routes.marks.Admin.ModuleOccurrences.processMarks(sitsModuleCode, academicYear, occurrence)))
-
-      "marks/admin/process_preview"
+        "marks/admin/process_preview"
+      }
     }
   }
 
