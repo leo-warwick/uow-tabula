@@ -7,7 +7,6 @@ import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.marks._
 import uk.ac.warwick.tabula._
-import uk.ac.warwick.tabula.helpers.RequestLevelCache
 
 import scala.collection.immutable.ListMap
 
@@ -131,9 +130,7 @@ object MarksDepartmentHomeCommand {
         .toMap
 
     val gradeBoundaries: Map[String, Seq[GradeBoundary]] =
-      moduleRegistrations.map(_.marksCode).distinct.map(gb => gb -> RequestLevelCache.cachedBy("AssessmentMembershipService.markScheme", gb) {
-        assessmentMembershipService.markScheme(gb)
-      }).toMap
+      moduleRegistrations.map(_.marksCode).distinct.map(gb => gb -> assessmentMembershipService.markScheme(gb)).toMap
 
     studentModuleMarkRecords(moduleRegistrations, currentResitAttempt, recordedModuleRegistrations, gradeBoundaries)
   }

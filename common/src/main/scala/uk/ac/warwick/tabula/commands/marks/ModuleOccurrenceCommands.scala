@@ -10,7 +10,7 @@ import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.helpers.marks.ValidGradesForMark
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.marks.{AssessmentComponentMarksServiceComponent, ModuleRegistrationMarksServiceComponent, ResitServiceComponent}
-import uk.ac.warwick.tabula.services.{AssessmentMembershipServiceComponent, ModuleRegistrationServiceComponent, SecurityServiceComponent}
+import uk.ac.warwick.tabula.services.{AssessmentMembershipService, AssessmentMembershipServiceComponent, ModuleRegistrationServiceComponent, SecurityServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.{AcademicYear, ItemNotFoundException}
 
@@ -115,7 +115,31 @@ object ModuleOccurrenceCommands {
     var validGrades: (Seq[GradeBoundary], Option[GradeBoundary]) = _
     var result: String = _
     var comments: String = _
+
+    def populate(student: StudentModuleMarkRecord)(assessmentMembershipService: AssessmentMembershipService): Unit = {
+      student.mark.foreach(m => mark = m.toString)
+      student.grade.foreach(grade = _)
+      student.result.foreach(r => result = r.dbValue)
+
+      val request = new ValidModuleRegistrationGradesRequest
+      request.mark = student.mark.map(_.toString).getOrElse("")
+      request.existing = student.grade.orNull
+      validGrades = ValidGradesForMark.getTuple(request, student.moduleRegistration)(assessmentMembershipService = assessmentMembershipService)
+    }
   }
+
+  trait OptionalMarksItem {
+    self: StudentModuleMarksItem =>
+
+    var process: Boolean = true
+
+    def shouldProcess(student: StudentModuleMarkRecord): Unit = {
+      if (student.grade.isEmpty || student.result.isEmpty || student.agreed || student.markState.contains(MarkState.Agreed)) {
+        process = false
+      }
+    }
+  }
+
 }
 
 

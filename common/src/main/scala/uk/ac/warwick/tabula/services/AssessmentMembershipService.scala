@@ -388,7 +388,9 @@ class AssessmentMembershipServiceImpl
       gradesForMark(marksCode, mark, moduleRegistration.currentResitAttempt)
     }.getOrElse(Seq.empty)
 
-  def markScheme(marksCode: String): Seq[GradeBoundary] = dao.getGradeBoundaries(marksCode)
+  def markScheme(marksCode: String): Seq[GradeBoundary] = RequestLevelCache.cachedBy("AssessmentMembershipService.markScheme", marksCode) {
+    dao.getGradeBoundaries(marksCode)
+  }
 
   def passMark(moduleRegistration: ModuleRegistration, resitAttempt: Option[Int]): Option[Int] =
     dao.getPassMark(moduleRegistration.marksCode, if (resitAttempt.nonEmpty) GradeBoundaryProcess.Reassessment else GradeBoundaryProcess.StudentAssessment, resitAttempt.getOrElse(1))
