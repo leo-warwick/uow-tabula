@@ -279,7 +279,11 @@ trait StudentAssignmentsSummary extends TaskBenchmarking {
   }
 
   lazy val studentCompletedAssignments: Seq[StudentAssignmentInformation] = benchmarkTask("Get past assignments") {
-    (assignmentsWithFeedback ++ enrolledAssignments.filter(lateFormative).filterNot(_.publishFeedback) ++ assignmentsWithSubmission.filterNot(_.publishFeedback))
+    val lateFormativeAssignments = enrolledAssignments.filter(lateFormative).filterNot(_.publishFeedback)
+
+    val submittedAwaitingFeedback = assignmentsWithSubmission.filterNot(lateFormative).filterNot(_.publishFeedback)
+
+    (assignmentsWithFeedback ++ lateFormativeAssignments ++ submittedAwaitingFeedback)
       .map(enhance)
       .sortWith(hasEarlierEffectiveDate)
   }
