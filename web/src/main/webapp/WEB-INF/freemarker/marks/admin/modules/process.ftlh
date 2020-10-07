@@ -3,6 +3,7 @@
 <#import "*/marks_components.ftlh" as components />
 <#import "/WEB-INF/freemarker/generated_grades_macros.ftlh" as gg />
 
+
 <div class="deptheader">
   <h1>Process module marks</h1>
   <h4 class="with-related">for ${sitsModuleCode} ${module.name} (${academicYear.toString}, ${occurrence})</h4>
@@ -52,7 +53,7 @@
               <@pl.profile_link member.universityId />
               ${student.sprCode}
               <@components.moduleMarkStatusIcon student />
-              <@components.moduleMarkHistory student sitsModuleCode member />
+              <@components.moduleMarkHistory student sitsModuleCode member.fullName />
             </td>
             <td>${member.firstName}</td>
             <td>${member.lastName}</td>

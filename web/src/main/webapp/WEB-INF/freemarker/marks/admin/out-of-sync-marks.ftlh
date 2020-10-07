@@ -183,7 +183,7 @@
                         </#if>
                       </td>
                       <td>
-                        <@components.moduleMarkHistory student info.moduleCode member />
+                        <@components.moduleMarkHistory student info.moduleCode member.fullName />
                       </td>
                     </tr>
                   </@spring.nestedPath>

@@ -76,6 +76,8 @@ trait AssessmentMembershipDao {
 
   def getAssessmentComponents(moduleCode: String, inUseOnly: Boolean): Seq[AssessmentComponent]
 
+  def getAssessmentComponents(moduleCodes: Set[String], inUseOnly: Boolean): Seq[AssessmentComponent]
+
   def getAssessmentComponents(department: Department, ids: Seq[String]): Seq[AssessmentComponent]
 
   def getAssessmentComponentsByPaperCode(department: Department, paperCodes: Seq[String]): Map[String, Seq[AssessmentComponent]]
@@ -415,6 +417,16 @@ class AssessmentMembershipDaoImpl extends AssessmentMembershipDao with Daoisms w
   def getAssessmentComponents(moduleCode: String, inUseOnly: Boolean): Seq[AssessmentComponent] = {
     val c = session.newCriteria[AssessmentComponent]
       .add(is("moduleCode", moduleCode))
+      .addOrder(Order.asc("sequence"))
+    if (inUseOnly) {
+      c.add(is("inUse", true))
+    }
+    c.seq
+  }
+
+  def getAssessmentComponents(moduleCodes: Set[String], inUseOnly: Boolean): Seq[AssessmentComponent] = {
+    val c = session.newCriteria[AssessmentComponent]
+      .add(safeIn("moduleCode", moduleCodes.toSeq))
       .addOrder(Order.asc("sequence"))
     if (inUseOnly) {
       c.add(is("inUse", true))

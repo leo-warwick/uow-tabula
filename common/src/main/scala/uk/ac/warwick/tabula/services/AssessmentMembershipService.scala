@@ -68,6 +68,8 @@ trait AssessmentMembershipService {
 
   def getAssessmentComponents(moduleCode: String, inUseOnly: Boolean): Seq[AssessmentComponent]
 
+  def getAssessmentComponents(moduleCodes: Set[String], inUseOnly: Boolean): Seq[AssessmentComponent]
+
   def getAssessmentComponents(department: Department, ids: Seq[String]): Seq[AssessmentComponent]
 
   def getAssessmentComponentsByPaperCode(department: Department, paperCodes: Seq[String]): Map[String, Seq[AssessmentComponent]]
@@ -292,6 +294,9 @@ class AssessmentMembershipServiceImpl
   def getAssessmentComponents(moduleCode: String, inUseOnly: Boolean): Seq[AssessmentComponent] =
     dao.getAssessmentComponents(moduleCode, inUseOnly)
 
+  def getAssessmentComponents(moduleCodes: Set[String], inUseOnly: Boolean): Seq[AssessmentComponent] =
+    dao.getAssessmentComponents(moduleCodes, inUseOnly)
+
   def getAssessmentComponents(department: Department, ids: Seq[String]): Seq[AssessmentComponent] = dao.getAssessmentComponents(department, ids)
 
   def getAssessmentComponentsByPaperCode(department: Department, paperCodes: Seq[String]): Map[String, Seq[AssessmentComponent]] =
@@ -383,7 +388,9 @@ class AssessmentMembershipServiceImpl
       gradesForMark(marksCode, mark, moduleRegistration.currentResitAttempt)
     }.getOrElse(Seq.empty)
 
-  def markScheme(marksCode: String): Seq[GradeBoundary] = dao.getGradeBoundaries(marksCode)
+  def markScheme(marksCode: String): Seq[GradeBoundary] = RequestLevelCache.cachedBy("AssessmentMembershipService.markScheme", marksCode) {
+    dao.getGradeBoundaries(marksCode)
+  }
 
   def passMark(moduleRegistration: ModuleRegistration, resitAttempt: Option[Int]): Option[Int] =
     dao.getPassMark(moduleRegistration.marksCode, if (resitAttempt.nonEmpty) GradeBoundaryProcess.Reassessment else GradeBoundaryProcess.StudentAssessment, resitAttempt.getOrElse(1))

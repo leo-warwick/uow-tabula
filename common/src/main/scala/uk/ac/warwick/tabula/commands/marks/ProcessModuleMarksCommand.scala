@@ -3,6 +3,7 @@ package uk.ac.warwick.tabula.commands.marks
 import org.springframework.validation.{BindingResult, Errors}
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.commands.marks.ModuleOccurrenceCommands.OptionalMarksItem
 import uk.ac.warwick.tabula.commands.marks.ProcessModuleMarksCommand._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
@@ -26,13 +27,11 @@ object ProcessModuleMarksCommand {
     with PopulateOnForm
 
   type SprCode = ModuleOccurrenceCommands.SprCode
-  class StudentModuleMarksItem extends ModuleOccurrenceCommands.StudentModuleMarksItem {
+  class StudentModuleMarksItem extends ModuleOccurrenceCommands.StudentModuleMarksItem with OptionalMarksItem {
     def this(sprCode: SprCode) {
       this()
       this.sprCode = sprCode
     }
-
-    var process: Boolean = true
   }
 
   def apply(sitsModuleCode: String, module: Module, academicYear: AcademicYear, occurrence: String, currentUser: CurrentUser): Command =
@@ -60,7 +59,9 @@ object ProcessModuleMarksCommand {
 abstract class ProcessModuleMarksCommandInternal(val sitsModuleCode: String, val module: Module, val academicYear: AcademicYear, val occurrence: String, val currentUser: CurrentUser)
   extends CommandInternal[Result]
     with ModuleOccurrenceState
-    with ClearRecordedModuleMarksState {
+    with ClearRecordedModuleMarksState
+    with ProcessModuleAndComponentMarks {
+
   self: ProcessModuleMarksRequest
     with ModuleOccurrenceLoadModuleRegistrations
     with TransactionalComponent
@@ -70,76 +71,88 @@ abstract class ProcessModuleMarksCommandInternal(val sitsModuleCode: String, val
 
   override val mandatoryEventName: String = "ProcessModuleMarks"
 
-  override def applyInternal(): Result = transactional() {
-    val allRecordedModuleRegistrations: Map[SprCode, RecordedModuleRegistration] =
-      moduleRegistrationMarksService.getAllRecordedModuleRegistrations(sitsModuleCode, academicYear, occurrence)
-        .map(rmr => rmr.sprCode -> rmr)
-        .toMap
+  lazy val allRecordedModuleRegistrations: Map[SprCode, RecordedModuleRegistration] =
+    moduleRegistrationMarksService.getAllRecordedModuleRegistrations(sitsModuleCode, academicYear, occurrence)
+      .map(rmr => rmr.sprCode -> rmr)
+      .toMap
 
-    val allRecordedAssessmentComponentStudents: Map[UpstreamAssessmentGroup, Map[UpstreamAssessmentGroupMember, RecordedAssessmentComponentStudent]] =
-      students.asScala.values.filter(_.process).toSeq
-        .flatMap { item =>
-          val moduleRegistration =
-            moduleRegistrations.find(_.sprCode == item.sprCode)
-              .get // We validate that this exists
-
-          componentMarks(moduleRegistration).map(_._2._1.upstreamAssessmentGroupMember)
-        }
-        .groupBy(_.upstreamAssessmentGroup)
-        .map { case (uag, members) =>
-          val recordedStudents = assessmentComponentMarksService.getAllRecordedStudents(uag)
-
-          uag -> members.flatMap { uagm =>
-            recordedStudents.find(_.matchesIdentity(uagm)).map(uagm -> _)
-          }.toMap
-        }
-
+  val allRecordedAssessmentComponentStudents: Map[UpstreamAssessmentGroup, Map[UpstreamAssessmentGroupMember, RecordedAssessmentComponentStudent]] =
     students.asScala.values.filter(_.process).toSeq
-      .map { item =>
+      .flatMap { item =>
         val moduleRegistration =
           moduleRegistrations.find(_.sprCode == item.sprCode)
             .get // We validate that this exists
 
-        val components = componentMarks(moduleRegistration)
-
-        require(item.grade.nonEmpty && item.result.nonEmpty)
-
-        val recordedModuleRegistration: RecordedModuleRegistration =
-          allRecordedModuleRegistrations.getOrElse(moduleRegistration.sprCode, new RecordedModuleRegistration(moduleRegistration))
-
-        recordedModuleRegistration.addMark(
-          uploader = currentUser.apparentUser,
-          mark = item.mark.maybeText.map(_.toInt),
-          grade = item.grade.maybeText,
-          result = item.result.maybeText.flatMap(c => Option(ModuleResult.fromCode(c))),
-          source = RecordedModuleMarkSource.ProcessModuleMarks,
-          markState = MarkState.Agreed,
-          comments = item.comments,
-        )
-
-        // change the state of all components that are Unconfirmed actual (or that have no state)
-        // this includes writing an empty agreed mark/grade if necessary - it stops it being modified later
-        components.values.map(_._1).filterNot(c => c.markState.contains(MarkState.Agreed) || c.agreed).foreach { component =>
-          val recordedAssessmentComponentStudent =
-            allRecordedAssessmentComponentStudents.getOrElse(component.upstreamAssessmentGroupMember.upstreamAssessmentGroup, Map.empty)
-              .getOrElse(component.upstreamAssessmentGroupMember, new RecordedAssessmentComponentStudent(component.upstreamAssessmentGroupMember))
-
-          recordedAssessmentComponentStudent.addMark(
-            uploader = currentUser.apparentUser,
-            mark = component.mark,
-            grade = component.grade,
-            comments = null,
-            source = RecordedAssessmentComponentStudentMarkSource.ProcessModuleMarks,
-            markState = MarkState.Agreed
-          )
-
-          assessmentComponentMarksService.saveOrUpdate(recordedAssessmentComponentStudent)
-        }
-
-        moduleRegistrationMarksService.saveOrUpdate(recordedModuleRegistration)
-
-        recordedModuleRegistration
+        componentMarks(moduleRegistration).map(_._2._1.upstreamAssessmentGroupMember)
       }
+      .groupBy(_.upstreamAssessmentGroup)
+      .map { case (uag, members) =>
+        val recordedStudents = assessmentComponentMarksService.getAllRecordedStudents(uag)
+        uag -> members.flatMap { uagm =>
+          recordedStudents.find(_.matchesIdentity(uagm)).map(uagm -> _)
+        }.toMap
+      }
+
+  val existingRecordedModuleRegistration: ModuleRegistration => Option[RecordedModuleRegistration] =
+    mr => allRecordedModuleRegistrations.get(mr.sprCode)
+
+  override def applyInternal(): Result = transactional() {
+    students.asScala.values.filter(_.process).toSeq.map { item =>
+      val moduleRegistration = moduleRegistrations.find(_.sprCode == item.sprCode).get // We validate that this exists
+      process(moduleRegistration, item)
+    }
+  }
+}
+
+trait ProcessModuleAndComponentMarks {
+
+  self: RetrieveComponentMarks with AssessmentComponentMarksServiceComponent with ModuleRegistrationMarksServiceComponent =>
+
+  val currentUser: CurrentUser
+  val existingRecordedModuleRegistration: ModuleRegistration => Option[RecordedModuleRegistration]
+  val allRecordedAssessmentComponentStudents: Map[UpstreamAssessmentGroup, Map[UpstreamAssessmentGroupMember, RecordedAssessmentComponentStudent]]
+
+  def process(moduleRegistration: ModuleRegistration, item: ModuleOccurrenceCommands.StudentModuleMarksItem): RecordedModuleRegistration = {
+
+    val components = componentMarks(moduleRegistration)
+
+    require(item.grade.nonEmpty && item.result.nonEmpty)
+
+    val recordedModuleRegistration: RecordedModuleRegistration = existingRecordedModuleRegistration(moduleRegistration)
+      .getOrElse(new RecordedModuleRegistration(moduleRegistration))
+
+    recordedModuleRegistration.addMark(
+      uploader = currentUser.apparentUser,
+      mark = item.mark.maybeText.map(_.toInt),
+      grade = item.grade.maybeText,
+      result = item.result.maybeText.flatMap(c => Option(ModuleResult.fromCode(c))),
+      source = RecordedModuleMarkSource.ProcessModuleMarks,
+      markState = MarkState.Agreed,
+      comments = item.comments,
+    )
+
+    // change the state of all components that are Unconfirmed actual (or that have no state)
+    // this includes writing an empty agreed mark/grade if necessary - it stops it being modified later
+    components.values.map(_._1).filterNot(c => c.markState.contains(MarkState.Agreed) || c.agreed).foreach { component =>
+      val recordedAssessmentComponentStudent: RecordedAssessmentComponentStudent = allRecordedAssessmentComponentStudents
+        .getOrElse(component.upstreamAssessmentGroupMember.upstreamAssessmentGroup, Map.empty)
+        .getOrElse(component.upstreamAssessmentGroupMember, new RecordedAssessmentComponentStudent(component.upstreamAssessmentGroupMember))
+
+      recordedAssessmentComponentStudent.addMark(
+        uploader = currentUser.apparentUser,
+        mark = component.mark,
+        grade = component.grade,
+        comments = null,
+        source = RecordedAssessmentComponentStudentMarkSource.ProcessModuleMarks,
+        markState = MarkState.Agreed
+      )
+
+      assessmentComponentMarksService.saveOrUpdate(recordedAssessmentComponentStudent)
+    }
+
+    moduleRegistrationMarksService.saveOrUpdate(recordedModuleRegistration)
+
+    recordedModuleRegistration
   }
 }
 
@@ -158,19 +171,8 @@ trait ProcessModuleMarksPopulateOnForm extends PopulateOnForm {
   override def populate(): Unit =
     studentModuleMarkRecords.foreach { student =>
       val s = new StudentModuleMarksItem(student.sprCode)
-      student.mark.foreach(m => s.mark = m.toString)
-      student.grade.foreach(s.grade = _)
-      student.result.foreach(r => s.result = r.dbValue)
-
-      val request = new ValidModuleRegistrationGradesRequest
-      request.mark = student.mark.map(_.toString).getOrElse("")
-      request.existing = student.grade.orNull
-      s.validGrades = ValidGradesForMark.getTuple(request, student.moduleRegistration)(assessmentMembershipService = assessmentMembershipService)
-
-      if (student.grade.isEmpty || student.result.isEmpty || student.agreed || student.markState.contains(MarkState.Agreed)) {
-        s.process = false
-      }
-
+      s.populate(student)(assessmentMembershipService)
+      s.shouldProcess(student)
       students.put(student.sprCode, s)
     }
 }

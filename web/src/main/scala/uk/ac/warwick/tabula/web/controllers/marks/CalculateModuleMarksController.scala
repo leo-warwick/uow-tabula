@@ -29,6 +29,7 @@ trait StudentModuleMarkRecordNotificationDepartment extends RecordedModuleRegist
       .filter(_._2.nonEmpty)
       .groupBy(_._2.get)
       .map { case (d, rmrWithDeptList) => d -> rmrWithDeptList.map(data => SprCode.getUniversityId(data._1.sprCode)) }
+      .view.mapValues(_.distinct).toMap
   }
 }
 

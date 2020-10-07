@@ -6,7 +6,7 @@ import org.joda.time.Duration
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.PreSaveBehaviour
-import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.helpers.{Logging, RequestLevelCache}
 import uk.ac.warwick.tabula.services.AssessmentMembershipService
 import uk.ac.warwick.tabula.{AcademicYear, ToString}
 
@@ -102,9 +102,11 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
   @transient lazy val variableAssessmentWeightingRules: Seq[VariableAssessmentWeightingRule] =
     membershipService.getVariableAssessmentWeightingRules(moduleCode, assessmentGroup)
 
-  @transient lazy val allComponentsForAssessmentGroup: Seq[AssessmentComponent] =
-    membershipService.getAssessmentComponents(moduleCode, inUseOnly = false)
-      .filter(_.assessmentGroup == assessmentGroup)
+  @transient lazy val allComponentsForAssessmentGroup: Seq[AssessmentComponent] = {
+    RequestLevelCache.cachedBy("AssessmentMembershipService.getAssessmentComponents", moduleCode) {
+      membershipService.getAssessmentComponents(moduleCode, inUseOnly = false)
+    }.filter(_.assessmentGroup == assessmentGroup)
+  }
 
   /**
    * Calculate the weighting for the student that the UpstreamAssessmentGroupMembers represent, taking into account any

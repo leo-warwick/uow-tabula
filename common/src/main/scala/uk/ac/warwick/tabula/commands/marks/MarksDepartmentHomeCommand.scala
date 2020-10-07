@@ -104,7 +104,7 @@ object MarksDepartmentHomeCommand {
         markState = recordedModuleRegistration.flatMap(_.latestState),
         agreed = isAgreedSITS,
         recordedStudent = recordedModuleRegistration,
-        history = recordedModuleRegistration.map(_.marks).getOrElse(Seq.empty),
+        history = recordedModuleRegistration.map(_.marks.distinct).getOrElse(Seq.empty),
         moduleRegistration = moduleRegistration,
         requiresResit = requiresResit
       )
@@ -121,8 +121,11 @@ object MarksDepartmentHomeCommand {
   ): Seq[StudentModuleMarkRecord] = {
     val currentResitAttempt = moduleRegistrations.map(mr => mr -> mr.currentResitAttempt).toMap
 
+    val sprCodes = moduleRegistrations.map(_.sprCode)
+
     val recordedModuleRegistrations =
       moduleRegistrationMarksService.getAllRecordedModuleRegistrations(sitsModuleCode, academicYear, occurrence)
+        .filter(rmr => sprCodes.contains(rmr.sprCode))
         .map(student => student.sprCode -> student)
         .toMap
 
