@@ -135,7 +135,7 @@ $(() => {
     const $pendingChangesIcon = $container.find('.pending-changes');
     if (hasChanged && $pendingChangesIcon.length === 0) {
       $container.prepend($(`
-        <span tabindex="0" class="tabula-tooltip pending-changes" data-title="Pending changes - these won't be saved unless you process this students marks">
+        <span tabindex="0" class="tabula-tooltip pending-changes" data-title="Pending changes - these won't be saved unless you process this student's marks">
           <i class="fa-fw fad fa-save" aria-hidden="true"></i>
           <span class="sr-only">Pending changes - these won't be saved unless you process this student's marks</span>
         </span>
