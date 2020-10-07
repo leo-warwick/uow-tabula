@@ -263,7 +263,7 @@
           <#list meetings as meeting>
             <#assign expand = defaultExpand(meeting)/>
             <tr ${expand?string('class=expand','')} <#if meeting.deleted>class="deleted subtle"</#if>>
-              <td data-sortby="${meeting.meetingDate.millis?c}"><@fmt.date date=meeting.meetingDate includeTime=false /></td>
+              <td data-sortby="${meeting.meetingDate.millis?c}"><@fmt.interval start=meeting.meetingDate end=meeting.meetingEndDate /></td>
               <td>${meeting.title!}</td>
               <td><@meetingStateSummary meeting /></td>
               <td>
