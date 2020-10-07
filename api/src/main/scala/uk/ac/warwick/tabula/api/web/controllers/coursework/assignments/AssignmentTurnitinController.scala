@@ -81,7 +81,7 @@ class CreateAssignmentTurnitinJobRequest extends JsonApiRequest[SubmitToTurnitin
 trait GetAssignmentApiTurnitinOutput extends GetAssignmentApiOutput {
   self: AssignmentToJsonConverter with AssignmentStudentToJsonConverter =>
 
-  override def outputJson(assignment: Assignment, results: SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults) = Map(
+  override def outputJson(assignment: Assignment, results: SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults, includePWD: Boolean) = Map(
     "students" -> results.students.map { student =>
       jsonAssignmentStudentObject(student).view.filterKeys { key => key == "universityId" || key == "submission" } // only include the universityId and submission keys
     }

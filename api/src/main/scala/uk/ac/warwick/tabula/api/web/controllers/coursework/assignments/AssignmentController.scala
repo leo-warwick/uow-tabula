@@ -46,7 +46,7 @@ abstract class AssignmentController extends ApiController
   def getCommand(@PathVariable module: Module, @PathVariable assignment: Assignment): Appliable[SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults] =
     SubmissionAndFeedbackCommand(assignment)
 
-  def getAssignmentMav(command: Appliable[SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults], errors: Errors, assignment: Assignment): Mav = {
+  def getAssignmentMav(command: Appliable[SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults], errors: Errors, assignment: Assignment, includePWD: Boolean): Mav = {
     if (errors.hasErrors) {
       Mav(new JSONErrorView(errors))
     } else {
@@ -55,7 +55,7 @@ abstract class AssignmentController extends ApiController
       Mav(new JSONView(Map(
         "success" -> true,
         "status" -> "ok"
-      ) ++ outputJson(assignment, results)))
+      ) ++ outputJson(assignment, results, includePWD)))
     }
   }
 }
@@ -104,9 +104,14 @@ trait GetAssignmentApi {
   self: AssignmentController with GetAssignmentApiOutput =>
 
   @RequestMapping(method = Array(GET), produces = Array("application/json"))
-  def getIt(@Valid @ModelAttribute("getCommand") command: Appliable[SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults], errors: Errors, @PathVariable assignment: Assignment): Mav = {
+  def getIt(
+    @Valid @ModelAttribute("getCommand") command: Appliable[SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults],
+    errors: Errors,
+    @PathVariable assignment: Assignment,
+    @RequestParam(required=false) includePWD: Boolean = false
+  ): Mav = {
     // Return the GET representation
-    getAssignmentMav(command, errors, assignment)
+    getAssignmentMav(command, errors, assignment, includePWD)
 
   }
 
@@ -121,14 +126,14 @@ trait GetAssignmentApi {
 }
 
 trait GetAssignmentApiOutput {
-  def outputJson(assignment: Assignment, results: SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults): Map[String, Any]
+  def outputJson(assignment: Assignment, results: SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults, includePWD: Boolean): Map[String, Any]
 }
 
 trait GetAssignmentApiFullOutput extends GetAssignmentApiOutput {
   self: ApiController with AssignmentToJsonConverter with AssignmentStudentToJsonConverter with ExtensionToJsonConvertor =>
 
-  def outputJson(assignment: Assignment, results: SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults): Map[String, Any] = Map(
-    "assignment" -> jsonAssignmentObject(assignment),
+  def outputJson(assignment: Assignment, results: SubmissionAndFeedbackCommand.SubmissionAndFeedbackResults, includePWD: Boolean): Map[String, Any] = Map(
+    "assignment" -> jsonAssignmentObject(assignment, includePWD),
     "genericFeedback" -> assignment.genericFeedback,
     "students" -> results.students.map(jsonAssignmentStudentObject)
   )
@@ -158,7 +163,7 @@ trait EditAssignmentApi {
       val assignment = command.apply()
 
       // Return the GET representation
-      getAssignmentMav(getCommand(assignment.module, assignment), errors, assignment)
+      getAssignmentMav(getCommand(assignment.module, assignment), errors, assignment, includePWD = false)
     }
   }
 }

@@ -51,7 +51,7 @@ class ListAssignmentsForModuleController extends ModuleAssignmentsController {
         "success" -> true,
         "status" -> "ok",
         "academicYear" -> Option(academicYear).map(_.toString).orNull,
-        "assignments" -> assignments.map(jsonAssignmentObject)
+        "assignments" -> assignments.map(jsonAssignmentObject(_))
       )))
     }
   }
