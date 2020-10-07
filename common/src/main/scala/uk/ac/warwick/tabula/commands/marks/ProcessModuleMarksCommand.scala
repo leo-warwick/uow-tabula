@@ -76,7 +76,7 @@ abstract class ProcessModuleMarksCommandInternal(val sitsModuleCode: String, val
       .map(rmr => rmr.sprCode -> rmr)
       .toMap
 
-  val allRecordedAssessmentComponentStudents: Map[UpstreamAssessmentGroup, Map[UpstreamAssessmentGroupMember, RecordedAssessmentComponentStudent]] =
+  lazy val allRecordedAssessmentComponentStudents: Map[UpstreamAssessmentGroup, Map[UpstreamAssessmentGroupMember, RecordedAssessmentComponentStudent]] =
     students.asScala.values.filter(_.process).toSeq
       .flatMap { item =>
         val moduleRegistration =
