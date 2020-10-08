@@ -1,6 +1,9 @@
 name: Documentation
 
-on: [push]
+# Trigger the workflow on push, but only for the develop branch
+push:
+  branches:
+    - develop
 
 jobs:
   build:
