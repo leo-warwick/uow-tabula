@@ -23,7 +23,7 @@ jobs:
 
       # Upload documentation to the GH wiki
       - name: Upload Documentation to Wiki
-        uses: SwiftDocOrg/github-wiki-publish-action@v1
+        uses: SwiftDocOrg/github-wiki-publish-action@rsync
         with:
           path: "docs"
         env:
