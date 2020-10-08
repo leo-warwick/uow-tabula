@@ -130,6 +130,9 @@ $(() => {
       // eslint-disable-next-line eqeqeq
       if ($field.data('initial') && $field.data('initial') != $field.val()) hasChanged = true;
       $view.text(value);
+      if ($field.is('[name$="mark"]') && !(value.length === 0 || !value.trim())) {
+        $view.append('%');
+      }
     });
     const $container = $modal.closest('td');
     const $pendingChangesIcon = $container.find('.pending-changes');
@@ -151,7 +154,11 @@ $(() => {
     const $fields = $modal.find('input,select,textarea');
     $fields.filter('*[data-initial]').each((i, field) => {
       const $field = $(field);
-      $field.val($field.data('initial'));
+      const value = $field.data('initial');
+      if ($field.is('select') && $field.find(`option[value="${value}"]`).length === 0) {
+        $field.append($(`<option value="${value}">${value}</option>`));
+      }
+      $field.val(value).trigger('change');
     });
     $modal.modal('hide');
   });
@@ -162,8 +169,6 @@ $(() => {
     const $container = $checkbox.closest('tr');
     $container.find('input[type=hidden][name$="process"]').val($checkbox.is(':checked'));
   };
-
-  // $('.process-checkbox').on('change', (e) => { updateProcess(e.target); });
 
   // if any modules require processing set the parent checkbox to true
   $('input[type=hidden][name$="process"][value=true]').closest('tr.student').find('.process-checkbox')

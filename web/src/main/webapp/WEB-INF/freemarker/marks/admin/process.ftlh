@@ -105,7 +105,7 @@
                       <button type="button" class="btn btn-default btn-xs tabula-tooltip" data-title="Edit marks" data-toggle="modal" data-target="#students${sprCode?replace('/', '_')}_${moduleCode}_markmodal">
                         <i class="fal fa-pencil" aria-hidden="true"></i><span class="sr-only">Edit marks</span>
                       </button>
-                      <@modal.modal id="students${sprCode?replace('/', '_')}_${moduleCode}_markmodal" cssClass="module-mark-modal">
+                      <@modal.modal id="students${sprCode?replace('/', '_')}_${moduleCode}_markmodal" cssClass="module-mark-modal" backdrop=false>
                         <@modal.wrapper>
                           <div class="modal-header"><h3 class="modal-title">Edit the module mark for ${sprCode} &mdash; ${moduleCode}</h3></div>
                           <@modal.body>

@@ -40,7 +40,7 @@
 </#macro>
 
 <#--  outer most div  -->
-<#macro modal cssClass="" id="" ariaLabel="" ariaLabelledby="" role="" style="" ariaHidden=true enabled=true>
+<#macro modal cssClass="" id="" ariaLabel="" ariaLabelledby="" role="" style="" ariaHidden=true enabled=true backdrop=true>
   <#if enabled>
     <div
     aria-hidden="${ariaHidden?string('true', 'false')}"
@@ -50,6 +50,7 @@
     <#if role?has_content>role="${role}"</#if>
     tabindex="-1"
     class="modal fade ${cssClass}"
+    <#if !backdrop>data-backdrop="static"</#if>
     >
   </#if>
   <#nested />
