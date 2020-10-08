@@ -8,7 +8,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      # Additional steps to generate documentation in "Documentation" directory
+
+      # Remove .md from links to match GH wiki format
+      - name: Find and Replace links to .md files
+        uses: shitiomatic/str-replace@master
+        with:
+          find: ".md"
+          replace: ""
+          includes: "docs/"
+
+      # Upload documentation to the GH wiki
       - name: Upload Documentation to Wiki
         uses: SwiftDocOrg/github-wiki-publish-action@v1
         with:
