@@ -36,7 +36,7 @@ Table of Contents
   - [Building assets](#building-assets)
 - [Directory structure](#directory-structure)
 - [WAR overlays](#war-overlays)
-- [Developer documentation](docs/index.md)
+- [Developer documentation](docs/Home.md)
 
 Quick start
 -----------
@@ -405,4 +405,4 @@ that would be defined in the overlay.
 Developer documentation
 -----------------------
 
-Available here: **[Developer documentation](docs/index.md)**
+Available here: **[Developer documentation](docs/Home.md)**
