@@ -1,0 +1,25 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 8
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Set-up FA Pro access
+      env:
+        FA_PRO: ${{ secrets.FA_PRO_TOKEN }}
+      run: |
+        npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+        npm config set "//npm.fontawesome.com/:_authToken" $FA_PRO
+    - name: Build with Gradle
+      run: ./gradlew check
