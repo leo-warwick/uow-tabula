@@ -2,7 +2,7 @@
 =======
 
 Tabula extensively uses the [Cake Pattern][1] to provide runtime dependency injection to
-a number of areas, most notably [Commands](commands.md). This allows code to be abstracted into
+a number of areas, most notably [Commands](Commands.md). This allows code to be abstracted into
 traits which are themselves self-contained, which are then combined together (like making a cake mix)
 to allow them to be reusable and easily testable.
 

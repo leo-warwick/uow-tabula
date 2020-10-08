@@ -2,7 +2,7 @@ Commands
 ========
 
 A Command is a parameterised, reusable action that (optionally) takes bound values from the request or elsewhere
-and performs an action to give a result. These work best when constructed using the [Cake pattern](cake.md) and
+and performs an action to give a result. These work best when constructed using the [Cake pattern](Cake.md) and
 combining several components together, so this documentation will exclusively use that method, based off
 `ComposableCommand`.
 
