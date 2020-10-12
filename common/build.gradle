@@ -162,7 +162,6 @@ dependencies {
 
   testCompile "com.sksamuel.elastic4s:elastic4s-testkit_${scalaMajorVersion}:${elastic4sVersion}"
   testCompile "org.testcontainers:elasticsearch:1.14.3"
-  testCompile 'org.apache.logging.log4j:log4j-core:2.11.1' // Thanks, Elasticsearch
 }
 
 jar.dependsOn(generateRebel)

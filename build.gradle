@@ -125,6 +125,12 @@ subprojects {
       resolutionStrategy {
         // deal with transitive dep relocation
         force 'xml-apis:xml-apis:1.4.01'
+
+        // Force logging library versions to match warwick-logging
+        force 'org.slf4j:slf4j-api:1.7.26'
+        force 'org.slf4j:log4j-over-slf4j:1.7.26'
+        force 'org.slf4j:jcl-over-slf4j:1.7.26'
+        force 'org.slf4j:jul-to-slf4j:1.7.26'
       }
     }
   }
