@@ -11,7 +11,6 @@ class ElasticsearchIndexInitialisationTest extends ElasticsearchTestBase {
 
   private trait Fixture {
     val index = Index("mock-index")
-    val indexType = "wibble"
 
     val service = new ElasticsearchIndexInitialisation with ElasticsearchIndexName with ElasticsearchIndexSupport with AuditEventElasticsearchConfig {
       override val index: Index = Fixture.this.index

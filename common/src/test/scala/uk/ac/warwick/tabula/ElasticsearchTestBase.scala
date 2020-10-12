@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.requests.indexes.admin.RefreshIndexResponse
 import com.sksamuel.elastic4s.testkit.{ClientProvider, IndexMatchers, SearchMatchers}
 import com.sksamuel.elastic4s._
 import org.junit.{After, Before}
+import org.scalatest.time.{Millis, Seconds, Span}
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import uk.ac.warwick.tabula.helpers.Logging
 
@@ -15,7 +16,10 @@ abstract class ElasticsearchTestBase
   extends TestBase
     with TestElasticsearchClient
     with IndexMatchers
-    with SearchMatchers
+    with SearchMatchers {
+  override implicit val patienceConfig: PatienceConfig =
+    PatienceConfig(timeout = Span(30, Seconds), interval = Span(200, Millis))
+}
 
 trait TestElasticsearchClient extends ElasticSugar with ClientProvider {
   self: TestHelpers with Logging =>
