@@ -17,7 +17,7 @@ object Level {
   new NamedQuery(name = "level.code", query = "select level from StudyLevel level where code = :code")))
 class Level {
 
-  def this(code: String = null, name: String = null) {
+  def this(code: String = null, name: String = null) = {
     this()
     this.code = code
     this.name = name

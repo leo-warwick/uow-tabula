@@ -18,7 +18,7 @@ class UpstreamRouteRuleEntry extends GeneratedId {
     maxCats: Option[BigDecimal],
     minModules: Option[Int],
     maxModules: Option[Int]
-  ) {
+  ) = {
     this()
     this.rule = rule
     this.list = list

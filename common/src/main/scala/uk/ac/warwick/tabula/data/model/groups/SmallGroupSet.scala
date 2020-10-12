@@ -69,7 +69,7 @@ class SmallGroupSet
   // FIXME this isn't really optional, but testing is a pain unless it's made so
   @transient var smallGroupService: Option[SmallGroupService with SmallGroupMembershipHelpers] = Wire.option[SmallGroupService with SmallGroupMembershipHelpers]
 
-  def this(_module: Module) {
+  def this(_module: Module) = {
     this()
     this.module = _module
   }

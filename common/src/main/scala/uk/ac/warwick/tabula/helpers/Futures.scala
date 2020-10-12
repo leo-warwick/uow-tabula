@@ -44,7 +44,7 @@ trait Futures {
     * the specified Duration, else will return a failure with a TimeoutException.
     */
   def withTimeout[A](f: Future[A], duration: Duration)(implicit executor: ExecutionContext, scheduler: ScheduledExecutorService): Future[A] = {
-    val p = scala.concurrent.Promise[A]
+    val p = scala.concurrent.Promise[A]()
 
     // After the specified time, fail the promise
     scheduler.schedule(Runnable {

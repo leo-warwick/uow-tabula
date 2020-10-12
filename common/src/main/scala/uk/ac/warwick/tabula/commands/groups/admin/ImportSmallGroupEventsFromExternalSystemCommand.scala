@@ -15,10 +15,9 @@ import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, Auto
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.timetables.{TimetableEvent, TimetableEventType}
 
-import scala.jdk.CollectionConverters._
-import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.jdk.CollectionConverters._
 import scala.util.Try
 
 object ImportSmallGroupEventsFromExternalSystemCommand {
@@ -45,7 +44,7 @@ object ImportSmallGroupEventsFromExternalSystemCommand {
     eventType == TimetableEventType.Practical || eventType == TimetableEventType.Seminar || eventType == TimetableEventType.Other("WRB-ACTIVE")
 
   class EventToImport {
-    def this(event: TimetableEvent) {
+    def this(event: TimetableEvent) = {
       this()
       timetableEvent = event
     }

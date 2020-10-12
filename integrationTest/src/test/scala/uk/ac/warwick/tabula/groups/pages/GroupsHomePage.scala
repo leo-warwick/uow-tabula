@@ -1,8 +1,8 @@
 package uk.ac.warwick.tabula.groups.pages
 
 import org.openqa.selenium.WebDriver
-import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatestplus.selenium.WebBrowser
 import uk.ac.warwick.tabula.FunctionalTestProperties

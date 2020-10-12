@@ -6,7 +6,7 @@ abstract class GroupsController extends BaseController with GroupsBreadcrumbs {
 
   hideDeletedItems
 
-  final override def onPreRequest: Unit = {
+  final override def onPreRequest(): Unit = {
 
   }
 

@@ -3,7 +3,6 @@ package uk.ac.warwick.tabula.services
 import com.fasterxml.jackson.annotation.JsonAutoDetect
 import org.springframework.beans.BeanWrapperImpl
 import org.springframework.beans.factory.InitializingBean
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.Reactor
@@ -66,7 +65,7 @@ class EmergencyMessageServiceImpl extends EmergencyMessageService with Logging {
   var message: Option[String] = None
 
   // for other classes to listen to changes to emergency messahe.
-  val changingState: EventSource[Boolean] = Reactor.EventSource[Boolean]
+  val changingState: EventSource[Boolean] = Reactor.EventSource[Boolean]()
 
   def exception(callee: Describable[_]): EmergencyMessageServiceEnabledException = {
     val m = EventDescription.generateMessage(Event.fromDescribable(callee))
@@ -124,7 +123,7 @@ class CannotPerformWriteOperationException(callee: Describable[_])
 class EmergencyMessage {
   // Warning: If you make this more complicated, you may break the Jackson auto-JSON stuff for the EmergencyMessageController
 
-  def this(enabled: Boolean, message: Option[String]) {
+  def this(enabled: Boolean, message: Option[String]) = {
     this()
 
     val bean = new BeanWrapperImpl(this)

@@ -15,8 +15,8 @@ trait StringUtils {
     def isEmptyOrWhitespace: Boolean = !hasText
     def hasLength: Boolean = Utils hasLength string
     def safeTrim: String = Option(string).map(_.trim).getOrElse("")
-    def safeSubstring(proposedStart: Int): String = Utils safeSubstring(string, proposedStart)
-    def safeSubstring(proposedStart: Int, proposedEnd: Int): String = Utils safeSubstring(string, proposedStart, proposedEnd)
+    def safeSubstring(proposedStart: Int): String = Utils.safeSubstring(string, proposedStart)
+    def safeSubstring(proposedStart: Int, proposedEnd: Int): String = Utils.safeSubstring(string, proposedStart, proposedEnd)
     def orEmpty: String = Option(string).getOrElse("")
     def maybeText: Option[String] = Option(string).filter(Utils.hasText)
     def textOrEmpty: String = maybeText.getOrElse("")

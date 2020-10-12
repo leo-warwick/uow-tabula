@@ -1,16 +1,17 @@
 package uk.ac.warwick.tabula.services
 
-import org.springframework.stereotype.Component
-import uk.ac.warwick.util.queue.{Queue, QueueListener}
-import org.springframework.beans.factory.InitializingBean
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.util.queue.conversion.ItemType
-import uk.ac.warwick.tabula.data.Daoisms
 import com.fasterxml.jackson.annotation.JsonAutoDetect
-import scala.beans.BeanProperty
 import org.hibernate.stat.Statistics
 import org.joda.time.format.DateTimeFormat
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.stereotype.Component
+import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.data.Daoisms
+import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.util.queue.conversion.ItemType
+import uk.ac.warwick.util.queue.{Queue, QueueListener}
+
+import scala.beans.BeanProperty
 
 /**
   * Listens for messages
@@ -62,7 +63,7 @@ class HibernateStatisticsService extends QueueListener with InitializingBean wit
 @JsonAutoDetect
 @ItemType("HibernateStatistics")
 case class HibernateStatisticsMessage(@BeanProperty var action: String) {
-  def this() {
+  def this() = {
     this(null)
   }
 }

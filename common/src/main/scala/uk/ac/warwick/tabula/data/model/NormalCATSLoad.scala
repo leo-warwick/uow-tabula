@@ -17,7 +17,7 @@ object NormalCATSLoad {
 @Proxy
 class NormalCATSLoad extends GeneratedId {
 
-  def this(academicYear: AcademicYear, route: Route, yearOfStudy: YearOfStudy, normalLoad: BigDecimal) {
+  def this(academicYear: AcademicYear, route: Route, yearOfStudy: YearOfStudy, normalLoad: BigDecimal) = {
     this()
     this.academicYear = academicYear
     this.route = route

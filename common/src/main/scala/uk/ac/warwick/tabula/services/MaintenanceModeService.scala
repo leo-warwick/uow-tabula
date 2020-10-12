@@ -77,7 +77,7 @@ class MaintenanceModeServiceImpl extends MaintenanceModeService with Logging {
   var message: Option[String] = None
 
   // for other classes to listen to changes to maintenance mode.
-  val changingState: EventSource[Boolean] = Reactor.EventSource[Boolean]
+  val changingState: EventSource[Boolean] = Reactor.EventSource[Boolean]()
 
   def exception(callee: Describable[_]): MaintenanceModeEnabledException = {
     val m = EventDescription.generateMessage(Event.fromDescribable(callee))
@@ -140,7 +140,7 @@ class MaintenanceModeEnabledException(val until: Option[DateTime], val message: 
 class MaintenanceModeMessage {
   // Warning: If you make this more complicated, you may break the Jackson auto-JSON stuff for the MaintenanceModeController
 
-  def this(enabled: Boolean, until: Option[DateTime], message: Option[String]) {
+  def this(enabled: Boolean, until: Option[DateTime], message: Option[String]) = {
     this()
 
     val bean = new BeanWrapperImpl(this)

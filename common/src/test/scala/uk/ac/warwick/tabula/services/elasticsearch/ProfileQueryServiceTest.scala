@@ -1,10 +1,9 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
-import com.sksamuel.elastic4s.{Index, IndexAndType}
-import com.sksamuel.elastic4s.http.ElasticDsl._
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.Index
 import org.joda.time.DateTime
 import org.junit.{After, Before}
-import org.scalatest.time.{Millis, Seconds, Span}
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.model.MemberUserType.{Staff, Student}
 import uk.ac.warwick.tabula.data.model.{Member, StudentMember}
@@ -12,8 +11,7 @@ import uk.ac.warwick.tabula.services.ProfileService
 
 class ProfileQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
-  val index = Index("profiles")
-  val indexType: String = new ProfileIndexType {}.indexType
+  val index: Index = Index("profiles")
 
   private trait Fixture {
     val queryService = new ProfileQueryServiceImpl
@@ -27,7 +25,7 @@ class ProfileQueryServiceTest extends ElasticsearchTestBase with Mockito {
   @Before def setUp(): Unit = {
     new ProfileElasticsearchConfig {
       client.execute {
-        createIndex(index.name).mappings(mapping(indexType).fields(fields)).analysis(analysers)
+        createIndex(index.name).mapping(properties(fields)).analysis(analysis)
       }.await.result.acknowledged should be(true)
     }
     blockUntilIndexExists(index.name)
@@ -54,8 +52,8 @@ class ProfileQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
       // Index the profile
       client.execute {
-        indexInto(IndexAndType(index.name, indexType)).source(m.asInstanceOf[Member]).id(m.id)
-      }
+        indexInto(index).source(m.asInstanceOf[Member]).id(m.id)
+      }.await.result.result should be ("created")
       blockUntilCount(1, index.name)
 
       // General sanity that this is working before we go into the tests of the query service
@@ -96,8 +94,8 @@ class ProfileQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
       // Index the profile
       client.execute {
-        indexInto(IndexAndType(index.name, indexType)).source(m.asInstanceOf[Member]).id(m.id)
-      }
+        indexInto(index).source(m.asInstanceOf[Member]).id(m.id)
+      }.await.result.result should be ("created")
       blockUntilCount(1, index.name)
 
       // Check inactive student is filtered out
@@ -124,8 +122,8 @@ class ProfileQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
       // Index the profile
       client.execute {
-        indexInto(IndexAndType(index.name, indexType)).source(m.asInstanceOf[Member]).id(m.id)
-      }
+        indexInto(index).source(m.asInstanceOf[Member]).id(m.id)
+      }.await.result.result should be ("created")
       blockUntilCount(1, index.name)
 
       queryService.find("bob thornton", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true) should be(Symbol("empty"))
@@ -157,8 +155,8 @@ class ProfileQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
       // Index the profile
       client.execute {
-        indexInto(IndexAndType(index.name, indexType)).source(m.asInstanceOf[Member]).id(m.id)
-      }
+        indexInto(index).source(m.asInstanceOf[Member]).id(m.id)
+      }.await.result.result should be ("created")
       blockUntilCount(1, index.name)
 
       // General sanity that this is working before we go into the tests of the query service
@@ -171,6 +169,33 @@ class ProfileQueryServiceTest extends ElasticsearchTestBase with Mockito {
       queryService.find("a kiltinavi\u010Di\u016Ba", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true).head should be(m)
       queryService.find("aiste kiltinavi\u010Di\u016Ba", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true).head should be(m)
       queryService.find("aiste kiltinaviciua", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true).head should be(m)
+    }
+  }
+
+  @Test def synonyms(): Unit = withFakeTime(dateTime(2000, 6)) {
+    new Fixture {
+      val m = new StudentMember
+      m.universityId = "0000001"
+      m.userId = "helpme"
+      m.firstName = "Jenniffer"
+      m.lastName = "Saunders"
+      m.homeDepartment = Fixtures.department("CS", "Computer Science")
+      m.lastUpdatedDate = new DateTime(2000, 1, 2, 0, 0, 0)
+      m.userType = Student
+      m.inUseFlag = "Active"
+
+      queryService.profileService.getMemberByUniversityId(m.universityId) returns Some(m)
+
+      // Index the profile
+      client.execute {
+        indexInto(index).source(m.asInstanceOf[Member]).id(m.id)
+      }.await.result.result should be ("created")
+      blockUntilCount(1, index.name)
+
+      queryService.find("bob thornton", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true) should be(Symbol("empty"))
+      queryService.find("jenifer", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true).head should be(m)
+      queryService.find("jenifer saunders", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true).head should be(m)
+      queryService.find("jennie saunders", Seq(m.homeDepartment), Set(), searchAllDepts = false, activeOnly = true).head should be(m)
     }
   }
 

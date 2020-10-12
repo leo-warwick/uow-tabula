@@ -5,7 +5,6 @@ import javax.persistence._
 import org.hibernate.annotations.{BatchSize, Proxy}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.{AcademicYear, ToString}
 import uk.ac.warwick.tabula.data.PostLoadBehaviour
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
@@ -13,9 +12,9 @@ import uk.ac.warwick.tabula.helpers.StringUtils
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.services.permissions.PermissionsService
 import uk.ac.warwick.tabula.services.{SmallGroupMembershipHelpers, SmallGroupService, UserGroupCacheManager}
+import uk.ac.warwick.tabula.{AcademicYear, ToString}
 
 import scala.jdk.CollectionConverters._
-import scala.collection.mutable
 
 object SmallGroup {
   final val DefaultGroupSize = 15
@@ -61,7 +60,7 @@ class SmallGroup
   // FIXME this isn't really optional, but testing is a pain unless it's made so
   @transient var smallGroupService: Option[SmallGroupService with SmallGroupMembershipHelpers] = Wire.option[SmallGroupService with SmallGroupMembershipHelpers]
 
-  def this(_set: SmallGroupSet) {
+  def this(_set: SmallGroupSet) = {
     this()
     this.groupSet = _set
   }
@@ -170,7 +169,7 @@ class SmallGroup
     newGroup
   }
 
-  def postLoad: Unit = {
+  def postLoad(): Unit = {
     ensureSettings
   }
 

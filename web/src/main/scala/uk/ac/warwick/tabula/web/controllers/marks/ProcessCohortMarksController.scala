@@ -4,19 +4,19 @@ import javax.validation.Valid
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.Errors
-import org.springframework.web.bind.annotation.{GetMapping, ModelAttribute, PathVariable, PostMapping, RequestMapping}
+import org.springframework.web.bind.annotation._
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
-import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
-import uk.ac.warwick.tabula.commands.{Appliable, SelfValidating}
 import uk.ac.warwick.tabula.commands.exams.grids.{ExamGridEntity, GenerateExamGridSelectCourseCommand, GenerateExamGridSelectCourseCommandRequest, GenerateExamGridSelectCourseCommandState}
 import uk.ac.warwick.tabula.commands.marks.MarksDepartmentHomeCommand.StudentModuleMarkRecord
 import uk.ac.warwick.tabula.commands.marks.ModuleOccurrenceCommands.SprCode
 import uk.ac.warwick.tabula.commands.marks.ProcessCohortMarksCommand
+import uk.ac.warwick.tabula.commands.{Appliable, SelfValidating}
 import uk.ac.warwick.tabula.data.model.{Department, MarkState, ModuleResult}
 import uk.ac.warwick.tabula.permissions.{Permission, Permissions}
 import uk.ac.warwick.tabula.services.{AutowiringMaintenanceModeServiceComponent, AutowiringModuleAndDepartmentServiceComponent, AutowiringUserSettingsServiceComponent}
 import uk.ac.warwick.tabula.web.Routes
 import uk.ac.warwick.tabula.web.controllers.{AcademicYearScopedController, BaseController, DepartmentScopedController}
+import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 
 import scala.collection.SortedMap
 import scala.jdk.CollectionConverters._
@@ -93,7 +93,7 @@ class ProcessCohortMarksController extends BaseController
         selectCourseRender(selectCourseCommand, selectCourseErrors, department, academicYear)
       } else {
         processCohortMarksCommand.entities = cohort
-        processCohortMarksCommand.fetchValidGrades
+        processCohortMarksCommand.fetchValidGrades()
         if (!processCohortMarksErrors.hasErrors) {
           processCohortMarksCommand.populate()
         }

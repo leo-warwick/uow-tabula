@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.web.controllers
 
 import java.net.URI
-import java.util.UUID
 
 import javax.annotation.Resource
 import org.springframework.beans.factory.annotation.{Autowired, Required}
@@ -9,14 +8,14 @@ import org.springframework.context.MessageSource
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Validator
 import org.springframework.web.bind.WebDataBinder
-import org.springframework.web.bind.annotation.{InitBinder, ModelAttribute}
+import org.springframework.web.bind.annotation.InitBinder
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import uk.ac.warwick.sso.client.SSOConfiguration
 import uk.ac.warwick.sso.client.tags.SSOLoginLinkGenerator
 import uk.ac.warwick.tabula.data.Daoisms
 import uk.ac.warwick.tabula.events.EventHandling
-import uk.ac.warwick.tabula.helpers.{Logging, StringUtils}
 import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.helpers.{Logging, StringUtils}
 import uk.ac.warwick.tabula.services.SecurityService
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods}
 import uk.ac.warwick.tabula.validators.CompositeValidator
@@ -189,7 +188,7 @@ abstract class BaseController extends ControllerMethods
     if (_hideDeletedItems) {
       session.enableFilter("notDeleted")
     }
-    onPreRequest
+    onPreRequest()
   }
 
   // Stub implementation that can be overridden for logic that goes before a request

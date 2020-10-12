@@ -2,8 +2,8 @@ package uk.ac.warwick.tabula.groups.web
 
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupEventOccurrence.WeekNumber
-import uk.ac.warwick.tabula.data.model.{Module, Department}
-import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEvent, DepartmentSmallGroupSet, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.groups.{DepartmentSmallGroupSet, SmallGroupEvent, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.{Department, Module}
 import uk.ac.warwick.tabula.web.RoutesUtils
 
 /**
@@ -27,11 +27,11 @@ object Routes {
 
     def mygroupsForYear(academicYear: AcademicYear): String = context + "/tutor/%s" format encoded(academicYear.startYear.toString)
 
-    def registerForWeek(event: SmallGroupEvent, week: WeekNumber): String = context + "/event/%s/register?week=%s" format(encoded(event.id), encoded(week.toString))
+    def registerForWeek(event: SmallGroupEvent, week: WeekNumber): String = context + "/event/%s/register?week=%s".format(encoded(event.id), encoded(week.toString))
   }
 
   object admin {
-    def apply(department: Department, year: AcademicYear): String = context + "/admin/department/%s/%s" format(encoded(department.code), year.startYear.toString)
+    def apply(department: Department, year: AcademicYear): String = context + "/admin/department/%s/%s".format(encoded(department.code), year.startYear.toString)
 
     def module(module: Module, year: AcademicYear): String = apply(module.adminDepartment, year) + s"?moduleFilters=Module(${module.code})"
 
@@ -42,33 +42,33 @@ object Routes {
 
     def create(module: Module): String = context + "/admin/module/%s/groups/new" format encoded(module.code)
 
-    def create(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s" format(encoded(set.module.code), encoded(set.id))
+    def create(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s".format(encoded(set.module.code), encoded(set.id))
 
-    def createAddStudents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/students" format(encoded(set.module.code), encoded(set.id))
+    def createAddStudents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/students".format(encoded(set.module.code), encoded(set.id))
 
-    def createAddStudentsBySitsQuery(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/sits-students" format(encoded(set.module.code), encoded(set.id))
+    def createAddStudentsBySitsQuery(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/sits-students".format(encoded(set.module.code), encoded(set.id))
 
-    def createAddGroups(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/groups" format(encoded(set.module.code), encoded(set.id))
+    def createAddGroups(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/groups".format(encoded(set.module.code), encoded(set.id))
 
-    def createAddEvents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/events" format(encoded(set.module.code), encoded(set.id))
+    def createAddEvents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/events".format(encoded(set.module.code), encoded(set.id))
 
-    def createAllocate(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/allocate" format(encoded(set.module.code), encoded(set.id))
+    def createAllocate(set: SmallGroupSet): String = context + "/admin/module/%s/groups/new/%s/allocate".format(encoded(set.module.code), encoded(set.id))
 
-    def createEditEvent(event: SmallGroupEvent): String = context + "/admin/module/%s/groups/new/%s/events/%s/edit/%s" format(encoded(event.group.groupSet.module.code), encoded(event.group.groupSet.id), encoded(event.group.id), encoded(event.id))
+    def createEditEvent(event: SmallGroupEvent): String = context + "/admin/module/%s/groups/new/%s/events/%s/edit/%s".format(encoded(event.group.groupSet.module.code), encoded(event.group.groupSet.id), encoded(event.group.id), encoded(event.id))
 
-    def edit(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s" format(encoded(set.module.code), encoded(set.id))
+    def edit(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s".format(encoded(set.module.code), encoded(set.id))
 
-    def editAddStudents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/students" format(encoded(set.module.code), encoded(set.id))
+    def editAddStudents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/students".format(encoded(set.module.code), encoded(set.id))
 
-    def editAddStudentsBySitsQuery(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/sits-students" format(encoded(set.module.code), encoded(set.id))
+    def editAddStudentsBySitsQuery(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/sits-students".format(encoded(set.module.code), encoded(set.id))
 
-    def editAddGroups(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/groups" format(encoded(set.module.code), encoded(set.id))
+    def editAddGroups(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/groups".format(encoded(set.module.code), encoded(set.id))
 
-    def editAddEvents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/events" format(encoded(set.module.code), encoded(set.id))
+    def editAddEvents(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/events".format(encoded(set.module.code), encoded(set.id))
 
-    def editAllocate(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/allocate" format(encoded(set.module.code), encoded(set.id))
+    def editAllocate(set: SmallGroupSet): String = context + "/admin/module/%s/groups/edit/%s/allocate".format(encoded(set.module.code), encoded(set.id))
 
-    def editEditEvent(event: SmallGroupEvent): String = context + "/admin/module/%s/groups/edit/%s/events/%s/edit/%s" format(encoded(event.group.groupSet.module.code), encoded(event.group.groupSet.id), encoded(event.group.id), encoded(event.id))
+    def editEditEvent(event: SmallGroupEvent): String = context + "/admin/module/%s/groups/edit/%s/events/%s/edit/%s".format(encoded(event.group.groupSet.module.code), encoded(event.group.groupSet.id), encoded(event.group.id), encoded(event.id))
 
     def copy(department: Department): String = context + s"/admin/department/${encoded(department.code)}/groups/copy"
 

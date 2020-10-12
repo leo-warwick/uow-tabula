@@ -3,7 +3,8 @@ package uk.ac.warwick.tabula.commands.scheduling.imports
 import org.hibernate.Session
 import org.joda.time.DateTime
 import org.junit.runner.RunWith
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.junit._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.StringUtils._
@@ -16,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 @RunWith(classOf[JUnitRunner])
-class ImportAssignmentsCommandTest extends FlatSpec with Matchers with Mockito {
+class ImportAssignmentsCommandTest extends AnyFlatSpec with Matchers with Mockito {
 
   trait Fixture {
     val mockSession: Session = smartMock[Session]

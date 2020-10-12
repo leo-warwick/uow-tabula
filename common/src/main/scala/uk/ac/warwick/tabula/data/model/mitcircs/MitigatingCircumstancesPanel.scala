@@ -28,7 +28,7 @@ class MitigatingCircumstancesPanel extends GeneratedId with StringId with Serial
 
   override type Entity = MitigatingCircumstancesPanel
 
-  def this(department: Department, academicYear: AcademicYear) {
+  def this(department: Department, academicYear: AcademicYear) = {
     this()
     this.department = department
     this.academicYear = academicYear

@@ -15,7 +15,7 @@ class ImportClassificationCommandTest extends AppContextTestBase with Mockito wi
 
     // test command
     val command = new ImportClassificationCommand(info)
-    val (classification, result) = command.applyInternal
+    val (classification, result) = command.applyInternal()
     classification.code should be("01")
     classification.shortName should be("1 ST CLASS HONS")
     classification.name should be("First Class")

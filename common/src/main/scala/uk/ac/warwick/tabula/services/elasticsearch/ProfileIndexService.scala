@@ -2,10 +2,10 @@ package uk.ac.warwick.tabula.services.elasticsearch
 
 import java.io.Closeable
 
+import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.analyzers._
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.mappings.FieldDefinition
+import com.sksamuel.elastic4s.analysis._
+import com.sksamuel.elastic4s.requests.mappings.FieldDefinition
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.stereotype.Service
@@ -27,7 +27,7 @@ object ProfileIndexService {
     override def fields(item: Member): Map[String, Any] = {
       var fields = mutable.Map[String, Any]()
 
-      fields += (
+      fields ++= Seq(
         "userId" -> item.userId,
         "department" -> item.affiliatedDepartments.map(_.code),
         "touchedDepartments" -> item.touchedDepartments.map(_.code),
@@ -223,8 +223,7 @@ object ProfileIndexService {
 class ProfileIndexService
   extends AbstractIndexService[Member]
     with MemberDaoComponent
-    with ProfileElasticsearchConfig
-    with ProfileIndexType {
+    with ProfileElasticsearchConfig {
 
   override implicit val indexable: ElasticsearchIndexable[Member] = ProfileIndexService.MemberIndexable
 
@@ -252,10 +251,6 @@ class ProfileIndexService
     memberDao.listUpdatedSince(startDate).all
 }
 
-trait ProfileIndexType extends ElasticsearchIndexType {
-  final val indexType = "profile"
-}
-
 trait ProfileElasticsearchConfig extends ElasticsearchConfig {
   override def fields: Seq[FieldDefinition] = Seq(
     // id field stores the universityId
@@ -273,24 +268,34 @@ trait ProfileElasticsearchConfig extends ElasticsearchConfig {
     dateField("lastUpdatedDate").format("strict_date_time_no_millis")
   )
 
-  override def analysers: Seq[AnalyzerDefinition] = Seq(
+  override def analysis: Analysis = Analysis(
     // A custom analyzer for names
-    CustomAnalyzerDefinition("name",
+    CustomAnalyzer(name = "name",
       // Delimit on whitespace (preserves punctuation for the word delimiter filter)
-      WhitespaceTokenizer,
-      LowercaseTokenFilter,
-      // Delimit words, preserving original, i.e. o'toole -> o toole o'toole
-      WordDelimiterTokenFilter("name_word_delimiter")
-        .preserveOriginal(true)
-        .stemEnglishPossesive(false)
-        .catenateAll(true),
-      // Fold non-ASCII characters (e.g. accented characters) into their ASCII equivalent
-      AsciiFoldingTokenFilter,
-      SynonymTokenFilter(
-        name = "name_synonyms",
-        synonyms = ProfileIndexService.Synonyms.names.toSeq.map { case (key, values) => s"$key => ${values.mkString(",")}" }.toSet,
-        ignoreCase = Some(true)
-      )
+      tokenizer = "whitespace",
+      tokenFilters = List("name_multiplexer")
     )
-  )
+  ).copy(tokenFilters = List(
+    // Define the synonym token filter first, otherwise other defined filters will run on the synonyms
+    SynonymGraphTokenFilter(
+      "name_synonyms",
+      synonyms = ProfileIndexService.Synonyms.names.toSeq.map { case (key, values) =>
+        s"$key => ${values.mkString(",")}"
+      }.toSet
+    ).expand(false),
+
+    WordDelimiterGraphTokenFilter(
+      name = "name_word_delimiter",
+      catenateAll = Some(true),
+      stem_english_possessive = Some(false),
+    ),
+
+    // Multi paths here, preserving original, as word delimiter can't run on synonyms
+    MultiplexerTokenFilter("name_multiplexer")
+      .filters(Seq(
+        "lowercase, asciifolding, name_synonyms",
+        "lowercase, asciifolding, name_word_delimiter",
+      ))
+      .preserveOriginal(true),
+  ))
 }

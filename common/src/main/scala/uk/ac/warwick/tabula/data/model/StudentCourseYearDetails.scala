@@ -75,7 +75,7 @@ class StudentCourseYearDetails extends StudentCourseYearProperties
   with GeneratedId with ToString with HibernateVersioned with PermissionsTarget with CanBeStale
   with Ordered[StudentCourseYearDetails] with PostLoadBehaviour {
 
-  def this(studentCourseDetails: StudentCourseDetails, sceSequenceNumber: JInteger, year: AcademicYear) {
+  def this(studentCourseDetails: StudentCourseDetails, sceSequenceNumber: JInteger, year: AcademicYear) = {
     this()
     this.studentCourseDetails = studentCourseDetails
     this.sceSequenceNumber = sceSequenceNumber

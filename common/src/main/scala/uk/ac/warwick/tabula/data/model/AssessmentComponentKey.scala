@@ -21,7 +21,7 @@ class AssessmentComponentKey(
   val sequence: String
 ) extends UserType with ToString {
 
-  def this() {
+  def this() = {
     this(null, null, null)
   }
 

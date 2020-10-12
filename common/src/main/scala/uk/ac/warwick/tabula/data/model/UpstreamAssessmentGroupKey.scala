@@ -19,8 +19,8 @@ class UpstreamAssessmentGroupKey (
   var sequence: String,
   var occurrence: String
 ) extends UserType with ToString {
-  
-  def this() {
+
+  def this() = {
     this(null, null, null, null)
   }
 
@@ -67,9 +67,9 @@ class UpstreamAssessmentGroupKey (
   override def assemble(cached: java.io.Serializable, owner: Object): AnyRef = cached.asInstanceOf[AnyRef]
 
   override def equals(that: Any): Boolean = that match {
-    case other: UpstreamAssessmentGroupKey => 
-      moduleCode == other.moduleCode && 
-      academicYear == other.academicYear && 
+    case other: UpstreamAssessmentGroupKey =>
+      moduleCode == other.moduleCode &&
+      academicYear == other.academicYear &&
       sequence == other.sequence &&
       occurrence == other.occurrence
     case _ => false

@@ -16,7 +16,7 @@ class TurnitinJobErrorNotification
 
   def content = FreemarkerModel("/WEB-INF/freemarker/emails/turnitinjobfailed.ftl", Map(
     "assignment" -> assignment,
-    "assignmentTitle" -> ("%s - %s" format(assignment.module.code.toUpperCase, assignment.name)),
+    "assignmentTitle" -> ("%s - %s".format(assignment.module.code.toUpperCase, assignment.name)),
     "path" -> url
   ))
 

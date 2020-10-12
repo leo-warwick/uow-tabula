@@ -27,7 +27,7 @@ object SitsStatus {
   new NamedQuery(name = "status.code", query = "select sitsStatus from SitsStatus sitsStatus where code = :code")))
 class SitsStatus {
 
-  def this(code: String = null, shortName: String = null, fullName: String = null) {
+  def this(code: String = null, shortName: String = null, fullName: String = null) = {
     this()
     this.code = code
     this.shortName = shortName

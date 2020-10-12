@@ -146,13 +146,13 @@ abstract class AbstractMeetingRecord extends GeneratedId with PermissionsTarget 
 
   def escapedDescription: TemplateHTMLOutputModel = FormattedHtml(description)
 
-  def this(creator: Member, relationship: StudentRelationship) {
+  def this(creator: Member, relationship: StudentRelationship) = {
     this()
     this.creator = creator
     this.relationships = Seq(relationship)
   }
 
-  def this(creator: Member, relationships: Seq[StudentRelationship]) {
+  def this(creator: Member, relationships: Seq[StudentRelationship]) = {
     this()
     this.creator = creator
     this.relationships = relationships

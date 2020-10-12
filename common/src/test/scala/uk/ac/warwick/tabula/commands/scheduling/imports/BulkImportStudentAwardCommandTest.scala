@@ -63,7 +63,7 @@ class BulkImportStudentAwardCommandTest extends TestBase with Mockito with Loggi
       studentAwardImporter.getStudentAwardRowsForAcademicYears(years) returns Seq(sAwardRow1, sAwardRow2)
       studentAwardService.getByAcademicYears(years) returns Seq()
 
-      val result = command.applyInternal
+      val result = command.applyInternal()
       result.created should be(2)
       result.deleted should be(0)
       result.updated should be(0)
@@ -85,7 +85,7 @@ class BulkImportStudentAwardCommandTest extends TestBase with Mockito with Loggi
       studentAwardImporter.getStudentAwardRowsForAcademicYears(years) returns Seq(sitsStudentAwardRow1, sitsStudentAwardRow2)
       studentAwardService.getByAcademicYears(years) returns Seq(existingStudentAward2)
 
-      val result = command.applyInternal
+      val result = command.applyInternal()
       result.created should be(1)
       result.deleted should be(0)
       result.updated should be(1)
@@ -108,7 +108,7 @@ class BulkImportStudentAwardCommandTest extends TestBase with Mockito with Loggi
       studentAwardImporter.getStudentAwardRowsForAcademicYears(years) returns Seq(sitsStudentAwardRow1, sitsStudentAwardRow2)
       studentAwardService.getByAcademicYears(years) returns Seq(existingStudentAward1, existingStudentAward2)
 
-      val result = command.applyInternal
+      val result = command.applyInternal()
       result.created should be(0)
       result.deleted should be(0)
       result.updated should be(0)
@@ -130,7 +130,7 @@ class BulkImportStudentAwardCommandTest extends TestBase with Mockito with Loggi
       studentAwardImporter.getStudentAwardRowsForAcademicYears(years) returns Seq(sitsStudentAwardRow1)
       studentAwardService.getByAcademicYears(years) returns Seq(existingStudentAward1, existingStudentAward2)
 
-      val result = command.applyInternal
+      val result = command.applyInternal()
       result.created should be(0)
       result.deleted should be(1)
       result.updated should be(0)
@@ -152,7 +152,7 @@ class BulkImportStudentAwardCommandTest extends TestBase with Mockito with Loggi
       studentAwardImporter.getStudentAwardRowsForAcademicYears(years) returns Seq(sitsStudentAwardRow1)
       studentAwardService.getByAcademicYears(years) returns Seq(existingStudentAward1, existingStudentAward2)
 
-      val result = command.applyInternal
+      val result = command.applyInternal()
       result.created should be(0)
       result.deleted should be(1)
       result.updated should be(1)

@@ -9,7 +9,7 @@ import uk.ac.warwick.tabula.JavaImports._
 @Access(AccessType.FIELD)
 class RouteTeachingInformation extends GeneratedId with Serializable {
 
-  def this(r: Route, d: Department, p: JBigDecimal) {
+  def this(r: Route, d: Department, p: JBigDecimal) = {
     this()
     route = r
     department = d

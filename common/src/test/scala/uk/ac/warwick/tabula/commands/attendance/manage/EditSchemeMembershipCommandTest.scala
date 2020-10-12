@@ -1,9 +1,9 @@
 package uk.ac.warwick.tabula.commands.attendance.manage
 
 import uk.ac.warwick.tabula._
-import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.commands.MemberOrUser
 import uk.ac.warwick.tabula.permissions.Permissions
+import uk.ac.warwick.tabula.services._
 
 import scala.jdk.CollectionConverters._
 
@@ -32,7 +32,7 @@ class EditSchemeMembershipCommandTest extends TestBase with Mockito {
 
       command.includedStudentIds.add(validStudentAlreadyIncluded.universityId)
 
-      command.massAddUsers = "%s\n%s\n%s\n%s\n%s\n%s" format(
+      command.massAddUsers = "%s\n%s\n%s\n%s\n%s\n%s".format(
         validStudent.universityId,
         validStudentAlreadyIncluded.universityId,
         validStudentWithUsercode.userId,

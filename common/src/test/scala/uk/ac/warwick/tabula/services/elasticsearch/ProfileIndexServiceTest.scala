@@ -1,15 +1,13 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
-import com.sksamuel.elastic4s.{Index, IndexAndType}
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.Response
-import com.sksamuel.elastic4s.http.get.GetResponse
-import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.searches.sort.SortOrder
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.requests.get.GetResponse
+import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder
+import com.sksamuel.elastic4s.{Index, Response}
 import org.hibernate.Session
 import org.joda.time.DateTime
 import org.junit.After
-import org.scalatest.time.{Millis, Seconds, Span}
 import org.springframework.transaction.annotation.Transactional
 import uk.ac.warwick.tabula.data.model.MemberUserType.Student
 import uk.ac.warwick.tabula.data.model.{Member, StudentMember}
@@ -17,14 +15,12 @@ import uk.ac.warwick.tabula.data.{MemberDaoImpl, SessionComponent}
 import uk.ac.warwick.tabula.{Fixtures, Mockito, PersistenceTestBase, TestElasticsearchClient}
 import uk.ac.warwick.util.core.StopWatch
 
-import scala.jdk.CollectionConverters._
 import scala.collection.immutable.IndexedSeq
 import scala.concurrent.Future
 
 class ProfileIndexServiceTest extends PersistenceTestBase with Mockito with TestElasticsearchClient {
 
   val index = Index("profile")
-  val indexType: String = new ProfileIndexType {}.indexType
 
   private trait Fixture {
     val dao: MemberDaoImpl = new MemberDaoImpl with SessionComponent {
@@ -64,7 +60,7 @@ class ProfileIndexServiceTest extends PersistenceTestBase with Mockito with Test
 
       // University ID is the ID field so it isn't in the doc source
       val doc: GetResponse = client.execute {
-        get(m.universityId).from(IndexAndType(index.name, indexType))
+        get(index, m.universityId)
       }.futureValue.result
 
       doc.source should be(Map(

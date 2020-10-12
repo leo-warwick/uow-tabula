@@ -2,12 +2,14 @@ package uk.ac.warwick.tabula.services.elasticsearch
 
 import java.util.regex.Pattern
 
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.{SearchResponse, TopHit}
-import com.sksamuel.elastic4s.http.{Response, SourceAsContentBuilder}
-import com.sksamuel.elastic4s.searches.queries.Query
-import com.sksamuel.elastic4s.searches.sort.SortOrder
-import com.sksamuel.elastic4s.{Hit, Index}
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.json.SourceAsContentBuilder
+import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.requests.searches.aggs.responses.bucket.Terms
+import com.sksamuel.elastic4s.requests.searches.aggs.responses.metrics.{TopHit, TopHits}
+import com.sksamuel.elastic4s.requests.searches.queries.Query
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder
+import com.sksamuel.elastic4s.{Hit, Index, Response}
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.stereotype.Service
@@ -110,7 +112,6 @@ trait AuditEventQueryMethods extends AuditEventNoteworthySubmissionsService {
 
 @Service
 class AuditEventQueryServiceImpl extends AbstractQueryService
-  with AuditEventIndexType
   with AuditEventQueryService
   with AuditEventQueryMethodsImpl
   with AuditEventServiceComponent
@@ -120,7 +121,7 @@ class AuditEventQueryServiceImpl extends AbstractQueryService
     * The name of the index alias that this service reads from
     */
   @Value("${elasticsearch.index.audit.alias}") var indexName: String = _
-  lazy val index = Index(indexName)
+  lazy val index: Index = Index(indexName)
 
   @Autowired var auditEventService: AuditEventService = _
   @Autowired var userLookup: UserLookupService = _
@@ -229,6 +230,10 @@ trait AuditEventQueryMethodsImpl extends AuditEventQueryMethods {
 
     override def version: Long = 1
 
+    override def seqNo: Long = 1
+
+    override def primaryTerm: Long = 1
+
     override def sourceAsString: String = SourceAsContentBuilder(sourceAsMap).string()
 
     override def sourceAsMap: Map[String, AnyRef] = hit.source.asInstanceOf[Map[String, AnyRef]]
@@ -249,11 +254,10 @@ trait AuditEventQueryMethodsImpl extends AuditEventQueryMethods {
       searchRequest
         .query(searchQuery).limit(0)
         .aggregations(
-          termsAggregation("userIds")
-            .field("userId.keyword")
+          termsAgg("userIds", "userId.keyword")
             .size(1000)
             .addSubAggregation(
-              topHitsAggregation("latestEvent")
+              topHitsAgg("latestEvent")
                 .size(1)
                 .sortBy(fieldSort("eventDate").order(SortOrder.Desc))
             )
@@ -262,10 +266,10 @@ trait AuditEventQueryMethodsImpl extends AuditEventQueryMethods {
       val hits =
         response.result
           .aggregations
-          .terms("userIds")
+          .result[Terms]("userIds")
           .buckets.map { bucket =>
-          TopHitHit(bucket.tophits("latestEvent").hits.head)
-        }
+            TopHitHit(bucket.result[TopHits]("latestEvent").hits.head)
+          }
 
       toAuditEvents(hits)
     }
@@ -322,16 +326,14 @@ trait AuditEventQueryMethodsImpl extends AuditEventQueryMethods {
           )
           .limit(0)
           .aggregations(
-            termsAggregation("studentUsercodes")
-              .field("studentUsercodes.keyword")
+            termsAgg("studentUsercodes", "studentUsercodes.keyword")
               .size(1000),
-            termsAggregation("studentUniversityIds")
-              .field("students.keyword")
+            termsAgg("studentUniversityIds", "students.keyword")
               .size(1000)
           )
       }.map { response =>
-        val studentUsercodes = response.result.aggregations.terms("studentUsercodes").buckets.map(_.key)
-        val studentUniversityIds = response.result.aggregations.terms("studentUniversityIds").buckets.map(_.key)
+        val studentUsercodes = response.result.aggregations.result[Terms]("studentUsercodes").buckets.map(_.key)
+        val studentUniversityIds = response.result.aggregations.result[Terms]("studentUniversityIds").buckets.map(_.key)
 
         (studentUsercodes, studentUniversityIds)
       }
@@ -355,12 +357,11 @@ trait AuditEventQueryMethodsImpl extends AuditEventQueryMethods {
           )
           .limit(0)
           .aggregations(
-            termsAggregation("submissionId")
-              .field("submission.keyword")
+            termsAgg("submissionId", "submission.keyword")
               .size(1000)
           )
       }.map { response =>
-        response.result.aggregations.terms("submissionId").buckets.map(_.key)
+        response.result.aggregations.result[Terms]("submissionId").buckets.map(_.key)
       }
 
     val submissions3: Future[Seq[Submission]] = individualDownloadSubmissionIds.map { submissionIds =>

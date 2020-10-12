@@ -16,7 +16,7 @@ case class WeekRange(minWeek: WeekRange.Week, maxWeek: WeekRange.Week) {
   def toWeeks: Seq[WeekRange.Week] = minWeek to maxWeek
 
   override def toString: String =
-    if (!isSingleWeek) "%d-%d" format(minWeek, maxWeek)
+    if (!isSingleWeek) "%d-%d".format(minWeek, maxWeek)
     else minWeek.toString
 }
 

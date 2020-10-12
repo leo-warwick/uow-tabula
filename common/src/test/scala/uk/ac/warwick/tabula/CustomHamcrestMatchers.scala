@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula
 
-import org.hamcrest.{Description, BaseMatcher}
-import org.scalatest.Matchers._
+import org.hamcrest.{BaseMatcher, Description}
+import org.scalatest.matchers.should.Matchers._
 
 /**
   * Some custom Hamcrest matchers. Usually Scalatest matchers are fine,
@@ -21,7 +21,7 @@ trait CustomHamcrestMatchers {
   class HasPropertyMatcher[A](name: Symbol, value: Any) extends BaseMatcher[A] {
     def matches(obj: Object): Boolean = {
       // Uses the Scalatest Symbol->Matcher conversion internally
-      name(value).apply(obj).matches
+      have(name(value)).apply(obj).matches
     }
 
     def describeTo(d: Description): Unit = {

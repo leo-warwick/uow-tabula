@@ -152,7 +152,7 @@ abstract class CM2MarkingWorkflow extends GeneratedId with PermissionsTarget wit
 @Access(AccessType.FIELD)
 class StageMarkers extends GeneratedId with Serializable {
 
-  def this(stage: MarkingWorkflowStage, workflow: CM2MarkingWorkflow) {
+  def this(stage: MarkingWorkflowStage, workflow: CM2MarkingWorkflow) = {
     this()
     this.workflow = workflow
     this.stage = stage

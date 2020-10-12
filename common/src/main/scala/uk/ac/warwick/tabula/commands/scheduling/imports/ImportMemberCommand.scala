@@ -9,14 +9,14 @@ import org.springframework.beans.BeanWrapper
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands.{Command, Unaudited}
-import uk.ac.warwick.tabula.data.{Daoisms, MemberDao}
 import uk.ac.warwick.tabula.data.model.{Gender, Member, MemberProperties}
+import uk.ac.warwick.tabula.data.{Daoisms, MemberDao}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.helpers.scheduling.{PropertyCopying, SitsStudentRow}
 import uk.ac.warwick.tabula.permissions._
-import uk.ac.warwick.tabula.services.{ModuleAndDepartmentService, UserLookupService}
 import uk.ac.warwick.tabula.services.scheduling.{MembershipInformation, MembershipMember}
+import uk.ac.warwick.tabula.services.{ModuleAndDepartmentService, UserLookupService}
 import uk.ac.warwick.userlookup.User
 
 import scala.language.implicitConversions
@@ -38,7 +38,7 @@ abstract class ImportMemberCommand extends Command[Member] with Logging with Dao
 
   var membershipLastUpdated: DateTime = _
 
-  def this(mac: MembershipInformation, ssoUser: User, rs: Option[ResultSet], ssr: Option[SitsStudentRow] = None) {
+  def this(mac: MembershipInformation, ssoUser: User, rs: Option[ResultSet], ssr: Option[SitsStudentRow] = None) = {
     this()
 
     implicit val resultSet = rs

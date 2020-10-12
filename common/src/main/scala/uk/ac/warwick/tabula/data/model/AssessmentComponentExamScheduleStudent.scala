@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.data.model
 
 import javax.persistence._
-import org.hibernate.annotations.{Proxy, Where}
+import org.hibernate.annotations.Proxy
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.ToString
 
@@ -9,7 +9,7 @@ import uk.ac.warwick.tabula.ToString
 @Proxy
 class AssessmentComponentExamScheduleStudent extends GeneratedId with ToString {
 
-  def this(schedule: AssessmentComponentExamSchedule) {
+  def this(schedule: AssessmentComponentExamSchedule) = {
     this()
     this.schedule = schedule
   }

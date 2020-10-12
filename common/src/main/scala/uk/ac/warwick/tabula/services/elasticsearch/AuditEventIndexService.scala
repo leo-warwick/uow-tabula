@@ -1,10 +1,10 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
+import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.analyzers.AnalyzerDefinition
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.json.XContentBuilder
-import com.sksamuel.elastic4s.mappings.FieldDefinition
+import com.sksamuel.elastic4s.analysis.{Analysis, Analyzer}
+import com.sksamuel.elastic4s.json.{XContentBuilder, XContentFactory}
+import com.sksamuel.elastic4s.requests.mappings.FieldDefinition
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.stereotype.Service
@@ -72,16 +72,11 @@ object AuditEventIndexService {
   }
 }
 
-trait AuditEventIndexType extends ElasticsearchIndexType {
-  final val indexType = "auditEvent"
-}
-
 @Service
 class AuditEventIndexService
   extends AbstractIndexService[AuditEvent]
     with AuditEventServiceComponent
-    with AuditEventElasticsearchConfig
-    with AuditEventIndexType {
+    with AuditEventElasticsearchConfig {
 
   override implicit lazy val indexable: ElasticsearchIndexable[AuditEvent] = AuditEventIndexService.auditEventIndexable(auditEventService)
 
@@ -115,16 +110,17 @@ trait AuditEventElasticsearchConfig extends ElasticsearchConfig {
     keywordField("feedbacks"),
     keywordField("submissions"),
     keywordField("attachments"),
-    dateField("eventDate").format("strict_date_time_no_millis")
+    dateField("eventDate").format("strict_date_time_no_millis"),
   )
 
-  override val analysers: Seq[AnalyzerDefinition] = Seq(
-    KeywordAnalyzerDefinition("default")
-  )
+  override def analysis: Analysis = Analysis(KeywordAnalyzer("default"))
+
 }
 
-case class KeywordAnalyzerDefinition(override val name: String) extends AnalyzerDefinition(name) {
-  override def build(source: XContentBuilder): Unit = {
-    source.field("type", "keyword")
+case class KeywordAnalyzer(override val name: String) extends Analyzer {
+  override def build: XContentBuilder = {
+    val b = XContentFactory.jsonBuilder()
+    b.field("type", "keyword")
+    b.endObject()
   }
 }

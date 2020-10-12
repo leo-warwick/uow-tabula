@@ -19,7 +19,7 @@ import uk.ac.warwick.tabula.web.views.JSONView
 class MemberSearchController extends ApiController
   with GetMembersApi with AutowiringProfileServiceComponent {
 
-  final override def onPreRequest: Unit = {
+  final override def onPreRequest(): Unit = {
     session.enableFilter(Member.ActiveOnlyFilter)
   }
 

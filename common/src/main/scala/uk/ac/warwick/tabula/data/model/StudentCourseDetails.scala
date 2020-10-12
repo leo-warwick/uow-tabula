@@ -42,7 +42,7 @@ class StudentCourseDetails
   @transient
   var levelService: LevelService = Wire.auto[LevelService]
 
-  def this(student: StudentMember, scjCode: String) {
+  def this(student: StudentMember, scjCode: String) = {
     this()
     this.student = student
     this.scjCode = scjCode

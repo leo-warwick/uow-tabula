@@ -20,7 +20,7 @@ class TurnitinJobSuccessNotification
     val (successfulReports, failedReports) = items.asScala.map(_.entity).partition(_.reportReceived)
     FreemarkerModel("/WEB-INF/freemarker/emails/turnitinjobdone.ftl", Map(
       "assignment" -> assignment,
-      "assignmentTitle" -> ("%s - %s" format(assignment.module.code.toUpperCase, assignment.name)),
+      "assignmentTitle" -> ("%s - %s".format(assignment.module.code.toUpperCase, assignment.name)),
       "failureCount" -> failedReports.size,
       "successCount" -> successfulReports.size,
       "totalCount" -> items.size(),

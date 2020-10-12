@@ -15,7 +15,7 @@ import uk.ac.warwick.tabula.web.views.JSONView
 class DepartmentUserSearchController extends ApiController
   with GetDepartmentUsersApi with AutowiringProfileServiceComponent {
 
-  final override def onPreRequest: Unit = {
+  final override def onPreRequest(): Unit = {
     session.enableFilter(Member.ActiveOnlyFilter)
     session.enableFilter(Member.FreshOnlyFilter)
   }

@@ -1,26 +1,20 @@
 package uk.ac.warwick.tabula.system.exceptions
 
-import java.io.IOException
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.{IOException, PrintWriter, StringWriter}
 
 import com.itextpdf.text.ExceptionConverter
-import org.joda.time.DateTime
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.beans.factory.InitializingBean
-import org.springframework.mail.MailException
-import freemarker.template.{Configuration => FreemarkerConfiguration}
-import freemarker.template.Template
+import freemarker.template.{Template, Configuration => FreemarkerConfiguration}
 import javax.annotation.Resource
 import javax.servlet.http.HttpServletRequest
-import uk.ac.warwick.tabula.helpers.Logging
-import uk.ac.warwick.tabula.RequestInfo
-import uk.ac.warwick.util.mail.WarwickMailSender
-import uk.ac.warwick.tabula.web.views.FreemarkerRendering
-import uk.ac.warwick.tabula.system.exceptions._
-import uk.ac.warwick.tabula.helpers.UnicodeEmails
+import org.joda.time.DateTime
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.{Autowired, Value}
+import org.springframework.mail.MailException
 import uk.ac.warwick.tabula.JavaImports._
+import uk.ac.warwick.tabula.RequestInfo
+import uk.ac.warwick.tabula.helpers.{Logging, UnicodeEmails}
+import uk.ac.warwick.tabula.web.views.FreemarkerRendering
+import uk.ac.warwick.util.mail.WarwickMailSender
 
 import scala.jdk.CollectionConverters._
 
@@ -89,7 +83,7 @@ class EmailingExceptionHandler extends ExceptionHandler with Logging with Initia
     val env = if (production) "PROD" else "TEST"
 
     message.setTo(recipient)
-    message.setSubject("[HFCX] (%s) %s %s" format(env, userId(info), context.token))
+    message.setSubject("[HFCX] (%s) %s %s".format(env, userId(info), context.token))
     message.setText(renderToString(template, Map(
       "token" -> context.token,
       "exception" -> context.exception,

@@ -130,7 +130,7 @@ dependencies {
   compile 'org.mnode.ical4j:ical4j:3.0.9'
 
   compile "com.sksamuel.elastic4s:elastic4s-core_${scalaMajorVersion}:${elastic4sVersion}"
-  compile "com.sksamuel.elastic4s:elastic4s-http_${scalaMajorVersion}:${elastic4sVersion}"
+  compile "com.sksamuel.elastic4s:elastic4s-client-esjava_${scalaMajorVersion}:${elastic4sVersion}"
 
   compile "org.apache.jclouds:jclouds-blobstore:${jcloudsVersion}"
   compile "org.apache.jclouds.driver:jclouds-slf4j:${jcloudsVersion}"
@@ -161,8 +161,7 @@ dependencies {
   testCompile 'com.opentable.components:otj-pg-embedded:0.13.3'
 
   testCompile "com.sksamuel.elastic4s:elastic4s-testkit_${scalaMajorVersion}:${elastic4sVersion}"
-  testCompile "com.sksamuel.elastic4s:elastic4s-embedded_${scalaMajorVersion}:${elastic4sVersion}"
-  testCompile "org.codelibs.elasticsearch.module:analysis-common:${elasticsearchVersion}" // Wrong version in elastic4s-embedded
+  testCompile "org.testcontainers:elasticsearch:1.14.3"
   testCompile 'org.apache.logging.log4j:log4j-core:2.11.1' // Thanks, Elasticsearch
 }
 

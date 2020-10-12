@@ -6,7 +6,7 @@ import uk.ac.warwick.tabula.DateFormats
 import uk.ac.warwick.tabula.cm2.web.Routes
 import uk.ac.warwick.tabula.data.model.NotificationPriority.Warning
 import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage
-import uk.ac.warwick.tabula.data.model.{Assignment, MarkerFeedback, NotificationWithTarget, SingleRecipientNotification, UserIdRecipientNotification, _}
+import uk.ac.warwick.tabula.data.model.{Assignment, MarkerFeedback, SingleRecipientNotification, UserIdRecipientNotification, _}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
@@ -28,7 +28,7 @@ class ReturnToMarkerNotification
     with Logging
     with AllCompletedActionRequiredNotification {
 
-  def this(stage: MarkingWorkflowStage, commentValue: String) {
+  def this(stage: MarkingWorkflowStage, commentValue: String) = {
     this()
     whichMarker.value = stage.name
     comment.value = commentValue

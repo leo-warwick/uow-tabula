@@ -1,12 +1,12 @@
 package uk.ac.warwick.tabula.commands.admin.permissions
 
-import uk.ac.warwick.tabula.commands.admin.permissions.BuildPermissionsTreeCommand.{PermissionAndUsers, RoleAndUsers, PermissionsTree}
-import uk.ac.warwick.tabula.commands.{CommandInternal, ReadOnly, Unaudited, ComposableCommand}
+import uk.ac.warwick.tabula.commands.admin.permissions.BuildPermissionsTreeCommand.{PermissionAndUsers, PermissionsTree, RoleAndUsers}
+import uk.ac.warwick.tabula.commands.{CommandInternal, ComposableCommand, ReadOnly, Unaudited}
 import uk.ac.warwick.tabula.data.model.Department
 import uk.ac.warwick.tabula.data.model.permissions.GrantedPermission
-import uk.ac.warwick.tabula.permissions.{Permissions, Permission, PermissionsTarget}
-import uk.ac.warwick.tabula.roles.{UserAccessMgrRoleDefinition, RoleDefinition}
-import uk.ac.warwick.tabula.services.permissions.{PermissionsServiceComponent, AutowiringPermissionsServiceComponent}
+import uk.ac.warwick.tabula.permissions.{Permission, Permissions, PermissionsTarget}
+import uk.ac.warwick.tabula.roles.{RoleDefinition, UserAccessMgrRoleDefinition}
+import uk.ac.warwick.tabula.services.permissions.{AutowiringPermissionsServiceComponent, PermissionsServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.userlookup.User
 
@@ -89,7 +89,7 @@ trait PermissionsTreeBuilderImpl extends PermissionsTreeBuilder {
 abstract class BuildPermissionsTreeCommandInternal[A <: PermissionsTarget : ClassTag](val target: A) extends CommandInternal[PermissionsTree[A]] with BuildPermissionsTreeCommandState {
   self: PermissionsTreeBuilder =>
 
-  def applyInternal: PermissionsTree[A] = buildTree(target)
+  def applyInternal(): PermissionsTree[A] = buildTree(target)
 }
 
 trait BuildPermissionsTreeCommandPermissions extends RequiresPermissionsChecking with PermissionsCheckingMethods {

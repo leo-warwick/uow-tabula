@@ -73,7 +73,7 @@ trait FetchMarkerAllocations {
     }
 
     val unallocatedStudents = allocations.map { case (key, allocation) =>
-      val allocated = allocation.filterKeys(_.isFoundUser).values.flatten.toSet
+      val allocated = allocation.view.filterKeys(_.isFoundUser).values.flatten.toSet
       // BEWARE - Don't try and use "allStudents -- allocated" or  "allStudents.diff(allocated)" here - some stupid Heron magic prevents that from working.
       // Probably some hashCode equality nonsense that I couldn't figure out - allStudents are Member.asSsoUser(s) but I think hashCode and equals should
       // compare with regular SSO Users just fine ¯\_(ツ)_/¯

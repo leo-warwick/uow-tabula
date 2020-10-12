@@ -15,7 +15,6 @@ import uk.ac.warwick.tabula.JsonObjectMapperFactory
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.services.UserLookupService
-import uk.ac.warwick.userlookup.User
 
 import scala.reflect._
 
@@ -63,7 +62,7 @@ abstract class FormField extends GeneratedId with Logging {
     json.writeValueAsString(propertiesMap)
   }
 
-  def properties: String = getProperties
+  def properties: String = getProperties()
 
   def setProperties(props: String): Unit = {
     propertiesMap = json.readValue(new StringReader(props), classOf[Map[String, Any]])

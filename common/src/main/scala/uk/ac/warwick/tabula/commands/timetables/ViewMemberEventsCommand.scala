@@ -203,7 +203,7 @@ trait ViewStaffMemberEventsCommandFactory {
 class ViewStaffMemberEventsCommandFactoryImpl(currentUser: CurrentUser, source: Option[StaffTimetableEventSource] = None)
   extends ViewStaffMemberEventsCommandFactory {
 
-  def this(currentUser: CurrentUser, source: StaffTimetableEventSource) {
+  def this(currentUser: CurrentUser, source: StaffTimetableEventSource) = {
     this(currentUser, Some(source))
   }
 

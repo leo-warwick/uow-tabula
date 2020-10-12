@@ -36,7 +36,7 @@ abstract class ProfilesController extends BaseController with ProfileBreadcrumbs
     _activeProfilesOnly = false
   }
 
-  final override def onPreRequest: Unit = {
+  final override def onPreRequest(): Unit = {
     // if studentsOnly has been called, activate the studentsOnly filter
     if (_studentProfilesOnly) {
       session.enableFilter(Member.StudentsOnlyFilter)

@@ -40,7 +40,7 @@ class FileDaoTest extends PersistenceTestBase with Mockito {
       }
     }
     transactional { _ =>
-      dao.deleteOldTemporaryFiles should be(36) // 50 files, 14 days of leeway
+      dao.deleteOldTemporaryFiles() should be(36) // 50 files, 14 days of leeway
     }
   }
 

@@ -30,7 +30,7 @@ import scala.util.{Try, Using}
 object RecordAssessmentComponentMarksCommand {
   type UniversityID = String
   class StudentMarksItem {
-    def this(universityID: UniversityID) {
+    def this(universityID: UniversityID) = {
       this()
       this.universityID = universityID
     }

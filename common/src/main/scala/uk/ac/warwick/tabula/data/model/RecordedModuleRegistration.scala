@@ -33,7 +33,7 @@ class RecordedModuleRegistration extends GeneratedId
 
   override type Entity = RecordedModuleRegistration
 
-  def this(mr: ModuleRegistration) {
+  def this(mr: ModuleRegistration) = {
     this()
     this.sprCode = mr.sprCode
     this.sitsModuleCode = mr.sitsModuleCode

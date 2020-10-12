@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.data.model
 
 import javax.persistence.CascadeType.ALL
-import javax.persistence.{Basic, Column, Entity, FetchType, JoinColumn, OneToMany, OrderBy}
+import javax.persistence._
 import org.hibernate.annotations.{BatchSize, Proxy, Type}
 import org.joda.time.DateTime
 import uk.ac.warwick.tabula.JavaImports._
@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters._
 @Proxy
 class AssessmentComponentExamSchedule extends GeneratedId with ToString {
 
-  def this(examProfileCode: String, slotId: String, sequence: String, locationSequence: String) {
+  def this(examProfileCode: String, slotId: String, sequence: String, locationSequence: String) = {
     this()
     this.examProfileCode = examProfileCode
     this.slotId = slotId

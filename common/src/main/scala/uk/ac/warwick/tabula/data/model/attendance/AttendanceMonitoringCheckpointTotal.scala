@@ -12,7 +12,7 @@ import uk.ac.warwick.tabula.data.model._
 @Table(name = "ATTENDANCEMONITORINGTOTAL")
 class AttendanceMonitoringCheckpointTotal extends GeneratedId with ToEntityReference {
 
-  def this(student: StudentMember, department: Department, academicYear: AcademicYear) {
+  def this(student: StudentMember, department: Department, academicYear: AcademicYear) = {
     this()
     this.student = student
     this.department = department

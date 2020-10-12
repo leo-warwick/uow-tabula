@@ -274,7 +274,7 @@ class SandboxAssignmentImporter extends AssignmentImporter
       } yield {
         val yearOfStudy = (uniId % 3) + 1
         val level = moduleCode.substring(3, 4).toInt
-        val registrationForPreviousYear = level <= yearOfStudy && academicYear == (AcademicYear.now - (yearOfStudy - level))
+        val registrationForPreviousYear = level <= yearOfStudy && academicYear == (AcademicYear.now() - (yearOfStudy - level))
         // always import full component marks for History of Music students
         if (module.code.substring(0, 3) == "hom" || registrationForPreviousYear) uk.ac.warwick.tabula.data.Transactions.transactional() {
           val universityId = uniId.toString
@@ -518,7 +518,7 @@ class SandboxAssignmentImporter extends AssignmentImporter
       uniId <- route.studentsStartId to route.studentsEndId if moduleCode.substring(3, 4).toInt <= ((uniId % 3) + 1)
       yearOfStudy = (uniId % 3) + 1
       level = moduleCode.substring(3, 4).toInt
-      if level <= yearOfStudy && schedule.academicYear == (AcademicYear.now - (yearOfStudy - level))
+      if level <= yearOfStudy && schedule.academicYear == (AcademicYear.now() - (yearOfStudy - level))
     } yield uniId).zipWithIndex.map { case (uniId, index) =>
       val student = new AssessmentComponentExamScheduleStudent
       student.seatNumber = Some(index + 1)

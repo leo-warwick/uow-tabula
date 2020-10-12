@@ -57,7 +57,7 @@ class ViewPlagiarismReportCommandInternal(val assignment: Assignment, val attach
   extends CommandInternal[Either[Uri, TurnitinReportError]] with ViewPlagiarismReportRequest with Logging {
   self: TurnitinLtiServiceComponent =>
 
-  def this(assignment: Assignment, attachment: FileAttachment, user: CurrentUser) {
+  def this(assignment: Assignment, attachment: FileAttachment, user: CurrentUser) = {
     this(assignment, attachment)
 
     viewer = user.apparentUser

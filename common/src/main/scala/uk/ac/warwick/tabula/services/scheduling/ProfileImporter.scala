@@ -408,8 +408,8 @@ class SandboxProfileImporter extends ProfileImporter with AutowiringProfileServi
         }
 
         val yearOfStudy = (uniId % 3) + 1
-        val startDate = (AcademicYear.now - (yearOfStudy - 1)).termOrVacation(AcademicYearPeriod.PeriodType.autumnTerm).firstDay
-        val endDate = (AcademicYear.now + (3 - yearOfStudy)).termOrVacation(AcademicYearPeriod.PeriodType.summerTerm).lastDay
+        val startDate = (AcademicYear.now() - (yearOfStudy - 1)).termOrVacation(AcademicYearPeriod.PeriodType.autumnTerm).firstDay
+        val endDate = (AcademicYear.now() + (3 - yearOfStudy)).termOrVacation(AcademicYearPeriod.PeriodType.summerTerm).lastDay
 
         MembershipInformation(
           MembershipMember(

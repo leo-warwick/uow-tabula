@@ -32,7 +32,7 @@ class CsrfServiceImpl(interceptor: CSRFInterceptor) extends CsrfService with Log
 @ItemType("CsrfEnforce")
 @JsonAutoDetect
 class CsrfEnforceMessage {
-  def this(enforce: Boolean) {
+  def this(enforce: Boolean) = {
     this()
 
     this.enforce = enforce

@@ -6,7 +6,7 @@ abstract class AdminController extends BaseController with AdminBreadcrumbs {
 
   hideDeletedItems
 
-  final override def onPreRequest: Unit = {
+  final override def onPreRequest(): Unit = {
 
   }
 

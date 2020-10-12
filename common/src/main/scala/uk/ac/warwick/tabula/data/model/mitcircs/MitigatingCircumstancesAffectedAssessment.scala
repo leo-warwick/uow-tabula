@@ -6,7 +6,7 @@ import javax.persistence._
 import org.hibernate.annotations.{Proxy, Type}
 import org.joda.time.{DateTime, LocalDate}
 import uk.ac.warwick.tabula.commands.mitcircs.submission.AffectedAssessmentItem
-import uk.ac.warwick.tabula.data.model.{AssessmentComponent, AssessmentType, Assignment, GeneratedId, Module}
+import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.{AcademicYear, ToString}
 
@@ -25,7 +25,7 @@ class MitigatingCircumstancesAffectedAssessment extends GeneratedId
   with PermissionsTarget
   with Serializable {
 
-  def this(_submission: MitigatingCircumstancesSubmission, item: AffectedAssessmentItem) {
+  def this(_submission: MitigatingCircumstancesSubmission, item: AffectedAssessmentItem) = {
     this()
     this.mitigatingCircumstancesSubmission = _submission
     this.moduleCode = item.moduleCode

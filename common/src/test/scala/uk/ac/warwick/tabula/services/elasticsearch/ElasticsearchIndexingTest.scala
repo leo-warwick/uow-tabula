@@ -1,11 +1,9 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
-import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.analyzers.SimpleAnalyzer
-import com.sksamuel.elastic4s.http.ElasticClient
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.searches.sort.SortOrder
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.{ElasticClient, Index}
+import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder
 import org.joda.time.DateTime
 import org.junit.{After, Before}
 import uk.ac.warwick.tabula.data.model.Identifiable
@@ -28,7 +26,7 @@ class ElasticsearchIndexingTest extends ElasticsearchTestBase {
     override def lastUpdatedDate(item: Item): DateTime = item.date
   }
 
-  val index = Index("mock")
+  val index: Index = Index("mock")
   val indexType = "wibble"
 
   private trait ElasticsearchIndexingSupport extends ElasticsearchClientComponent {
@@ -38,12 +36,11 @@ class ElasticsearchIndexingTest extends ElasticsearchTestBase {
   private trait Fixture {
     val fakeItems: IndexedSeq[Item] = for (i <- 1 to 100) yield Item(i, s"item$i", new DateTime().plusMinutes(i))
 
-    val service = new ElasticsearchIndexing[Item] with ElasticsearchIndexName with ElasticsearchIndexType with ElasticsearchIndexingSupport with ElasticsearchIndexEnsure {
+    val service = new ElasticsearchIndexing[Item] with ElasticsearchIndexName with ElasticsearchIndexingSupport with ElasticsearchIndexEnsure {
       override val index: Index = ElasticsearchIndexingTest.this.index
-      override val indexType: String = ElasticsearchIndexingTest.this.indexType
       override val UpdatedDateField = "date"
       override val IncrementalBatchSize: Int = 1000
-      override implicit val indexable = IndexableItem
+      override implicit val indexable: ElasticsearchIndexable[Item] = IndexableItem
 
       override protected def listNewerThan(startDate: DateTime, batchSize: Int): TraversableOnce[Item] = ???
 
@@ -53,9 +50,9 @@ class ElasticsearchIndexingTest extends ElasticsearchTestBase {
 
   @Before def setup(): Unit = {
     client.execute {
-      createIndex(index.name).mappings(
-        mapping(indexType).fields(
-          textField("name").analyzer(SimpleAnalyzer),
+      createIndex(index.name).mapping(
+        properties(
+          textField("name").analyzer("simple"),
           dateField("date").format("strict_date_time_no_millis")
         )
       )

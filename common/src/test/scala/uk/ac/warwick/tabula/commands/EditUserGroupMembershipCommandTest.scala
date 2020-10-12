@@ -2,8 +2,8 @@ package uk.ac.warwick.tabula.commands
 
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.model.UserGroupMembershipType._
-import uk.ac.warwick.tabula.data.model.groups.DepartmentSmallGroupSet
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.data.model.groups.DepartmentSmallGroupSet
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.UserLookupComponent
 import uk.ac.warwick.tabula.system.permissions.PermissionsChecking
@@ -100,7 +100,7 @@ class EditUserGroupMembershipCommandTest extends TestBase with Mockito {
       val invalidStaff: StaffMember = Fixtures.staff("3333333", "abcd")
       val invalidNoone = "unknown"
 
-      command.massAddUsers = "%s\n%s\n%s\n%s" format(
+      command.massAddUsers = "%s\n%s\n%s\n%s".format(
         validStudent.universityId,
         validStudentWithUsercode.userId,
         invalidStaff.universityId,

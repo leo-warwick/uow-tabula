@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
-import com.sksamuel.elastic4s.{Index, IndexAndType}
-import com.sksamuel.elastic4s.http.ElasticDsl._
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.Index
 import org.joda.time.DateTime
 import org.junit.{After, Before}
 import uk.ac.warwick.tabula.data.NotificationDao
@@ -16,7 +16,6 @@ import scala.collection.immutable.IndexedSeq
 class NotificationQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
   val index = Index("notifications")
-  val indexType: String = new NotificationIndexType {}.indexType
 
   private trait Fixture {
     val queryService = new NotificationQueryServiceImpl
@@ -82,7 +81,7 @@ class NotificationQueryServiceTest extends ElasticsearchTestBase with Mockito {
     (items :+ dismissedItem).foreach { item =>
       queryService.notificationDao.getById(item.notification.id) returns Some(item.notification)
       client.execute {
-        indexInto(IndexAndType(index.name, indexType)).source(item).id(item.id)
+        indexInto(index).source(item).id(item.id)
       }
     }
     blockUntilExactCount(101, index.name)
@@ -104,7 +103,7 @@ class NotificationQueryServiceTest extends ElasticsearchTestBase with Mockito {
   @Before def setUp(): Unit = {
     new NotificationElasticsearchConfig {
       client.execute {
-        createIndex(index.name).mappings(mapping(indexType).fields(fields)).analysis(analysers)
+        createIndex(index.name).mapping(properties(fields)).analysis(analysis)
       }.await.result.acknowledged should be(true)
     }
     blockUntilIndexExists(index.name)

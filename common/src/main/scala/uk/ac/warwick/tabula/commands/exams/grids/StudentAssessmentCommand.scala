@@ -113,7 +113,7 @@ class StudentAssessmentCommandInternal(val studentCourseDetails: StudentCourseDe
     val modules = generateModuleRegistrationAndComponents(Seq(studentCourseYearDetails))
 
     // We explicitly allow years in the past for year marks
-    val yearMarkReleasedToStudents: Boolean = academicYear < AcademicYear.now || MarkState.resultsReleasedToStudents(academicYear, Option(studentCourseDetails), MarkState.DecisionReleaseTime)
+    val yearMarkReleasedToStudents: Boolean = academicYear < AcademicYear.now() || MarkState.resultsReleasedToStudents(academicYear, Option(studentCourseDetails), MarkState.DecisionReleaseTime)
 
     val weightedMeanYearMark: Option[BigDecimal] =
       moduleRegistrationService.agreedWeightedMeanYearMark(studentCourseYearDetails.moduleRegistrations, Map(), allowEmpty = false)

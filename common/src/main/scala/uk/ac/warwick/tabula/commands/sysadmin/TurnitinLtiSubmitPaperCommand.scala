@@ -1,19 +1,18 @@
 package uk.ac.warwick.tabula.commands.sysadmin
 
-import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.permissions.Permissions
-
-import uk.ac.warwick.tabula.system.permissions.{PermissionsCheckingMethods, PermissionsChecking, RequiresPermissionsChecking}
-import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.services.turnitinlti._
-
-import uk.ac.warwick.tabula.CurrentUser
-import uk.ac.warwick.tabula.helpers.StringUtils._
-import org.springframework.validation.Errors
 import java.net.{MalformedURLException, URL}
-import uk.ac.warwick.tabula.data.model.{OriginalityReport, FileAttachment, Assignment}
+
+import org.springframework.validation.Errors
+import uk.ac.warwick.tabula.CurrentUser
+import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.data.model.{Assignment, FileAttachment, OriginalityReport}
 import uk.ac.warwick.tabula.helpers.Logging
+import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.permissions.Permissions
+import uk.ac.warwick.tabula.services.turnitinlti._
 import uk.ac.warwick.tabula.services.{AutowiringOriginalityReportServiceComponent, OriginalityReportServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 
 object TurnitinLtiSubmitPaperCommand {
   def apply(user: CurrentUser) =
@@ -39,11 +38,11 @@ class TurnitinLtiSubmitPaperCommandInternal(val user: CurrentUser) extends Comma
     if (response.success) {
       val originalityReport = originalityReportService.getOriginalityReportByFileId(attachment.id)
       if (originalityReport.isDefined) {
-        originalityReport.get.turnitinId = response.turnitinSubmissionId
+        originalityReport.get.turnitinId = response.turnitinSubmissionId()
         originalityReport.get.reportReceived = false
       } else {
         val report = new OriginalityReport
-        report.turnitinId = response.turnitinSubmissionId
+        report.turnitinId = response.turnitinSubmissionId()
         attachment.originalityReport = report
         originalityReportService.saveOriginalityReport(attachment)
       }

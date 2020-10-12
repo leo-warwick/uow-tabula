@@ -85,7 +85,7 @@ trait MarksOpenAndCloseDepartmentsRequest extends PopulateOnForm {
 }
 
 class DepartmentMarkStateItem {
-  def this(department: Department) {
+  def this(department: Department) = {
     this()
     this.uploadCourseworkMarksToSits = department.uploadCourseworkMarksToSits
 

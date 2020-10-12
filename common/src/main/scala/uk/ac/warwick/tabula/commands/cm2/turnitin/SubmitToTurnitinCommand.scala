@@ -54,7 +54,7 @@ abstract class SubmitToTurnitinCommandInternal(val assignment: Assignment)
 
   self: AssessmentServiceComponent with FeaturesComponent with TurnitinLtiQueueServiceComponent =>
 
-  def this(assignment: Assignment, user: CurrentUser) {
+  def this(assignment: Assignment, user: CurrentUser) = {
     this(assignment)
 
     submitter = user.apparentUser
