@@ -201,7 +201,7 @@ trait CourseworkFixtures extends BrowserTest with FeaturesDriver with FixturesDr
       click on className("add-students-manually")
       eventually(pageSource contains "Your changes will not be recorded until you save this assignment." should be (true))
       eventually {
-        pageSource should include(students.size + " manually enrolled")
+        pageSource should include(s"${students.size} manually enrolled")
       }
     }
     studentSettings(students)

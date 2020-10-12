@@ -20,7 +20,7 @@ import scala.jdk.CollectionConverters._
 @Proxy
 class UpstreamRouteRule extends GeneratedId {
 
-  def this(academicYear: Option[AcademicYear], route: Route, levelCode: String) {
+  def this(academicYear: Option[AcademicYear], route: Route, levelCode: String) = {
     this()
     this.academicYear = academicYear
     this.route = route

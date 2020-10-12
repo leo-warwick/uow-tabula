@@ -4,17 +4,17 @@ import org.joda.time.DateTime
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.JavaImports.JMap
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.commands.marks.GenerateModuleResitsCommand.{ResitItem, Result, Sequence, SprCode}
 import uk.ac.warwick.tabula.commands.marks.ListAssessmentComponentsCommand.StudentMarkRecord
 import uk.ac.warwick.tabula.commands.marks.MarksDepartmentHomeCommand.StudentModuleMarkRecord
-import uk.ac.warwick.tabula.commands.marks.GenerateModuleResitsCommand.{ResitItem, Result, Sequence, SprCode}
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.MarkState.Agreed
-import uk.ac.warwick.tabula.data.model.{AssessmentComponent, AssessmentType, ExamType, GradeBoundary, GradeBoundaryProcess, Module, OnlineExamType, RecordedResit, UpstreamAssessmentGroupMember}
+import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.LazyMaps
 import uk.ac.warwick.tabula.helpers.StringUtils.StringToSuperString
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.marks._
-import uk.ac.warwick.tabula.services.{AssessmentMembershipServiceComponent, AutowiringAssessmentMembershipServiceComponent, AutowiringModuleRegistrationServiceComponent, AutowiringSecurityServiceComponent, SecurityServiceComponent}
+import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser, SprCode}
 
 import scala.jdk.CollectionConverters._
@@ -73,7 +73,7 @@ object GenerateModuleResitsCommand {
       with GenerateModuleResitsPopulateOnForm
 
   class ResitItem {
-    def this(sprCode: String, sequence: String, weighting: String, attempt: String) {
+    def this(sprCode: String, sequence: String, weighting: String, attempt: String) = {
       this()
       this.sprCode = sprCode
       this.sequence = sequence

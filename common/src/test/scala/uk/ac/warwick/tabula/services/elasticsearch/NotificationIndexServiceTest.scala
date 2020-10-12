@@ -1,12 +1,11 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
-import com.sksamuel.elastic4s.{Index, IndexAndType}
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.get.GetResponse
-import com.sksamuel.elastic4s.searches.sort.SortOrder
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.requests.get.GetResponse
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder
 import org.joda.time.DateTime
 import org.junit.After
-import org.scalatest.time.{Millis, Seconds, Span}
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.NotificationDao
 import uk.ac.warwick.tabula.data.model._
@@ -19,7 +18,6 @@ import scala.collection.immutable.IndexedSeq
 class NotificationIndexServiceTest extends ElasticsearchTestBase with Mockito {
 
   val index = Index("notification")
-  val indexType: String = new NotificationIndexType {}.indexType
 
   private trait Fixture {
     val dao: NotificationDao = smartMock[NotificationDao]
@@ -107,7 +105,7 @@ class NotificationIndexServiceTest extends ElasticsearchTestBase with Mockito {
 
       // University ID is the ID field so it isn't in the doc source
       val doc: GetResponse = client.execute {
-        get(item.id).from(IndexAndType(index.name, indexType))
+        get(index, item.id)
       }.futureValue.result
 
       doc.source should be(Map(

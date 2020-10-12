@@ -224,7 +224,7 @@ class AssessmentMembershipServiceImpl
   }
 
   private def debugReplace(template: UpstreamAssessmentGroup, universityIds: Seq[String]): Unit = {
-    logger.debug("Setting %d members in group %s" format(universityIds.size, template.toString))
+    logger.debug("Setting %d members in group %s".format(universityIds.size, template.toString))
   }
 
   /**

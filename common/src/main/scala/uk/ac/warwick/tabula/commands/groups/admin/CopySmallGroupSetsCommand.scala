@@ -100,7 +100,7 @@ abstract class CopySmallGroupSetsCommandInternal(val department: Department, val
 }
 
 class CopySmallGroupSetState {
-  def this(set: SmallGroupSet) {
+  def this(set: SmallGroupSet) = {
     this()
     smallGroupSet = set
   }

@@ -1,6 +1,5 @@
 package uk.ac.warwick.tabula
 
-import org.junit.Test
 import scala.collection.immutable.SortedSet
 import scala.math.max
 
@@ -30,6 +29,6 @@ class ShortCodeTest extends TestBase {
       maxIndividualCollisions = max(maxIndividualCollisions, individualCollisions)
       generated += code
     }
-    println("Generated %d codes with %d collisions (max %d retries for one item)" format(number, collisions, maxIndividualCollisions))
+    println("Generated %d codes with %d collisions (max %d retries for one item)".format(number, collisions, maxIndividualCollisions))
   }
 }

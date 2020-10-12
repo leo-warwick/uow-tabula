@@ -1,13 +1,13 @@
 package uk.ac.warwick.tabula.services.scheduling
 
 import java.sql.ResultSet
-import javax.sql.DataSource
 
+import javax.sql.DataSource
 import org.springframework.context.annotation.Profile
 import org.springframework.jdbc.`object`.MappingSqlQuery
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.scheduling.imports.{ImportDisabilitiesCommand, ImportAcademicInformationCommand}
+import uk.ac.warwick.tabula.commands.scheduling.imports.{ImportAcademicInformationCommand, ImportDisabilitiesCommand}
 import uk.ac.warwick.tabula.data.DisabilityDao
 import uk.ac.warwick.tabula.data.Transactions.transactional
 import uk.ac.warwick.tabula.data.model.Disability
@@ -62,7 +62,7 @@ class SitsDisabilityImporter extends DisabilityImporter {
 
   lazy val disabilitysQuery = new DisabilitysQuery(sits)
 
-  def getImportCommands: Seq[ImportDisabilitiesCommand] = {
+  def getImportCommands(): Seq[ImportDisabilitiesCommand] = {
     disabilitysQuery.execute.asScala.toSeq
   }
 }

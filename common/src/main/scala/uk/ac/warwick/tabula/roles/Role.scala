@@ -203,7 +203,7 @@ abstract class Role(val definition: RoleDefinition, val scope: Option[Permission
 }
 
 abstract class BuiltInRole(definition: BuiltInRoleDefinition, scope: Option[PermissionsTarget]) extends Role(definition, scope) {
-  def this(definition: BuiltInRoleDefinition, scope: PermissionsTarget) {
+  def this(definition: BuiltInRoleDefinition, scope: PermissionsTarget) = {
     this(definition, Option(scope))
   }
 }

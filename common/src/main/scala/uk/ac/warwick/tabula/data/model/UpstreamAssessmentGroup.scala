@@ -76,7 +76,7 @@ class UpstreamAssessmentGroup extends GeneratedId with Serializable {
       // This intentionally doesn't take into account deadline
       .isEquals
 
-  override def toString: String = "%s %s g:%s o:%s s:%s d:%s" format(moduleCode, academicYear, assessmentGroup, occurrence, sequence, deadline.map(_.toString("yyyy-MM-dd")).orNull)
+  override def toString: String = "%s %s g:%s o:%s s:%s d:%s".format(moduleCode, academicYear, assessmentGroup, occurrence, sequence, deadline.map(_.toString("yyyy-MM-dd")).orNull)
 
 }
 

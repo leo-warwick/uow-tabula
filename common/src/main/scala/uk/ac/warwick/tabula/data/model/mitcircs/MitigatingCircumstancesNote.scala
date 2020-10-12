@@ -23,7 +23,7 @@ class MitigatingCircumstancesNote extends GeneratedId
   with ToString
   with Serializable {
 
-  def this(submission: MitigatingCircumstancesSubmission, creator: User) {
+  def this(submission: MitigatingCircumstancesSubmission, creator: User) = {
     this()
     this._creator = creator
     this.lastModifiedBy = creator

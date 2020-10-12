@@ -13,7 +13,7 @@ class ScheduledMeetingRecordBehalfNotification
     with AddsIcalAttachmentToScheduledMeetingNotification
     with MyWarwickActivity {
 
-  def this(theVerb: String) {
+  def this(theVerb: String) = {
     this()
     verbSetting.value = theVerb
   }

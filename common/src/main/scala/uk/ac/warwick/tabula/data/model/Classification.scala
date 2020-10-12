@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 @Proxy
 class Classification {
 
-  def this(code: String = null, name: String = null) {
+  def this(code: String = null, name: String = null) = {
     this()
     this.code = code
     this.name = name

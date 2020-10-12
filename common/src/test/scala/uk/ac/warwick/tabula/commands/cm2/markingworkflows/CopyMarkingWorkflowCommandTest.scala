@@ -1,9 +1,9 @@
 package uk.ac.warwick.tabula.commands.cm2.markingworkflows
 
-import uk.ac.warwick.tabula.data.model.{Department, UserGroup}
 import uk.ac.warwick.tabula.data.model.markingworkflow.{CM2MarkingWorkflow, ModeratedWorkflow, ModerationSampler, SelectedModeratedWorkflow}
+import uk.ac.warwick.tabula.data.model.{Department, UserGroup}
 import uk.ac.warwick.tabula.services.{CM2MarkingWorkflowService, CM2MarkingWorkflowServiceComponent}
-import uk.ac.warwick.tabula.{AcademicYear, Fixtures, MockUserLookup, Mockito, TestBase}
+import uk.ac.warwick.tabula._
 import uk.ac.warwick.userlookup.User
 
 import scala.jdk.CollectionConverters._
@@ -27,7 +27,7 @@ class CopyMarkingWorkflowCommandTest extends TestBase with Mockito {
     userLookup.registerUserObjects(marker1, marker2, moderator)
 
     val markingWorkflow: ModeratedWorkflow = SelectedModeratedWorkflow("test", department, ModerationSampler.Admin, Seq(marker1, marker2), Seq(moderator))
-    markingWorkflow.academicYear = AcademicYear.now - 1
+    markingWorkflow.academicYear = AcademicYear.now() - 1
     markingWorkflow.isReusable = true
     markingWorkflow.stageMarkers.asScala.foreach(_.markers.asInstanceOf[UserGroup].userLookup = userLookup)
   }

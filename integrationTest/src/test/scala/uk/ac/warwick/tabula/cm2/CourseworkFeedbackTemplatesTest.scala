@@ -146,7 +146,7 @@ class CourseworkFeedbackTemplatesTest extends BrowserTest with CourseworkFixture
     var beforeDelete = currentCount()
 
     // This works, but it doesn't reload the page automatically properly. Do it manually
-    reloadPage
+    reloadPage()
 
     And("The second template should not have changed")
     tbody = id("feedback-template-list").webElement.findElement(By.tagName("tbody"))

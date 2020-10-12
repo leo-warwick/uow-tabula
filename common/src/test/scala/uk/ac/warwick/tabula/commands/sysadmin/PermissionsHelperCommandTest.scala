@@ -2,13 +2,13 @@ package uk.ac.warwick.tabula.commands.sysadmin
 
 import org.springframework.core.convert.ConversionService
 import org.springframework.validation.BindException
+import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.data.model.Department
 import uk.ac.warwick.tabula.permissions.{Permission, Permissions, PermissionsTarget}
 import uk.ac.warwick.tabula.roles.BuiltInRoleDefinition
 import uk.ac.warwick.tabula.roles.RoleBuilder.GeneratedRole
 import uk.ac.warwick.tabula.services.SecurityService
 import uk.ac.warwick.tabula.services.permissions.{PermissionDefinition, RoleService}
-import uk.ac.warwick.tabula._
 import uk.ac.warwick.userlookup.User
 
 class PermissionsHelperCommandTest extends TestBase with Mockito {
@@ -52,7 +52,7 @@ class PermissionsHelperCommandTest extends TestBase with Mockito {
       r1, r2
     ))
 
-    val result = cmd.applyInternal
+    val result = cmd.applyInternal()
     verify(securityService, times(0)).can(isA[CurrentUser], isA[Permission], isA[PermissionsTarget])
 
     result.canDo should be(false)
@@ -86,7 +86,7 @@ class PermissionsHelperCommandTest extends TestBase with Mockito {
 
     securityService.can(isA[CurrentUser], isEq(Permissions.Assignment.Archive), isNull[PermissionsTarget]) returns (false)
 
-    val result = cmd.applyInternal
+    val result = cmd.applyInternal()
 
     result.canDo should be(false)
     result.permissions should be(Seq(pd1, pd2))
@@ -120,7 +120,7 @@ class PermissionsHelperCommandTest extends TestBase with Mockito {
 
     securityService.can(isA[CurrentUser], isEq(Permissions.Assignment.Archive), isNull[PermissionsTarget]) returns (false)
 
-    val result = cmd.applyInternal
+    val result = cmd.applyInternal()
 
     result.canDo should be(false)
     result.permissions should be(Seq(pd1, pd2))
@@ -159,7 +159,7 @@ class PermissionsHelperCommandTest extends TestBase with Mockito {
 
     securityService.can(isA[CurrentUser], isEq(Permissions.Assignment.Archive), isEq(dept)) returns (true)
 
-    val result = cmd.applyInternal
+    val result = cmd.applyInternal()
 
     result.canDo should be(true)
     result.permissions should be(Seq(pd1, pd2))
@@ -197,7 +197,7 @@ class PermissionsHelperCommandTest extends TestBase with Mockito {
 
     securityService.can(isA[CurrentUser], isEq(Permissions.Assignment.Archive), isNull[PermissionsTarget]) returns (false)
 
-    val result = cmd.applyInternal
+    val result = cmd.applyInternal()
 
     result.canDo should be(false)
     result.permissions should be(Seq(pd1, pd2))

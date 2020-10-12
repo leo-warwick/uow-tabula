@@ -9,7 +9,6 @@ import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
 import uk.ac.warwick.tabula.helpers.LazyMaps
 import uk.ac.warwick.tabula.helpers.StringUtils._
-import uk.ac.warwick.tabula.helpers.marks.ValidGradesForMark
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.marks._
 import uk.ac.warwick.tabula.system.BindListener
@@ -28,7 +27,7 @@ object ProcessModuleMarksCommand {
 
   type SprCode = ModuleOccurrenceCommands.SprCode
   class StudentModuleMarksItem extends ModuleOccurrenceCommands.StudentModuleMarksItem with OptionalMarksItem {
-    def this(sprCode: SprCode) {
+    def this(sprCode: SprCode) = {
       this()
       this.sprCode = sprCode
     }

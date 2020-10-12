@@ -10,7 +10,7 @@ import org.joda.time.DateTime
   new NamedQuery(name = "course.code", query = "select course from Course course where code = :code")))
 class Course {
 
-  def this(code: String = null, name: String = null) {
+  def this(code: String = null, name: String = null) = {
     this()
     this.code = code
     this.name = name

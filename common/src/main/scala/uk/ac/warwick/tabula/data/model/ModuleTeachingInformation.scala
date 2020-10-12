@@ -9,7 +9,7 @@ import uk.ac.warwick.tabula.JavaImports._
 @Access(AccessType.FIELD)
 class ModuleTeachingInformation extends GeneratedId with Serializable {
 
-  def this(m: Module, d: Department, p: JBigDecimal) {
+  def this(m: Module, d: Department, p: JBigDecimal) = {
     this()
     module = m
     department = d

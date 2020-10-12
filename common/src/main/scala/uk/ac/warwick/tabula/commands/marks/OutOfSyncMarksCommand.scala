@@ -1,14 +1,14 @@
 package uk.ac.warwick.tabula.commands.marks
 
 import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.commands.marks.OutOfSyncMarksCommand._
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.commands.marks.OutOfSyncMarksCommand._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
 import uk.ac.warwick.tabula.helpers.LazyMaps
 import uk.ac.warwick.tabula.helpers.StringUtils._
-import uk.ac.warwick.tabula.services.marks._
 import uk.ac.warwick.tabula.services._
+import uk.ac.warwick.tabula.services.marks._
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 
 import scala.jdk.CollectionConverters._
@@ -30,7 +30,7 @@ object OutOfSyncMarksCommand {
   }
 
   class StudentComponentMarkItem(val universityID: UniversityID, val resitSequence: String) {
-    def this(universityID: UniversityID) {
+    def this(universityID: UniversityID) = {
       this(universityID, "")
     }
 

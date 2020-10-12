@@ -3,15 +3,13 @@ package uk.ac.warwick.tabula.services.elasticsearch
 import java.io.Closeable
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.sksamuel.elastic4s.analyzers.AnalyzerDefinition
-import com.sksamuel.elastic4s.http.ElasticClient
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.mappings.FieldDefinition
-import com.sksamuel.elastic4s.searches.sort.SortOrder
-import com.sksamuel.elastic4s.{Index, IndexAndType, Indexable}
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.analysis.Analysis
+import com.sksamuel.elastic4s.requests.mappings.FieldDefinition
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder
+import com.sksamuel.elastic4s.{ElasticClient, Index, Indexable}
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.{Autowired, Value}
-import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.Identifiable
 import uk.ac.warwick.tabula.helpers.DateTimeOrdering._
 import uk.ac.warwick.tabula.helpers.ExecutionContexts.global
@@ -25,7 +23,6 @@ import scala.util.Success
 abstract class AbstractIndexService[A <: Identifiable]
   extends ElasticsearchClientComponent
     with ElasticsearchIndexName
-    with ElasticsearchIndexType
     with ElasticsearchIndexInitialisation
     with ElasticsearchConfig
     with ElasticsearchIndexing[A] {
@@ -39,13 +36,6 @@ trait ElasticsearchIndexName {
     * The name of the index that this service writes to
     */
   def index: Index
-}
-
-trait ElasticsearchIndexType {
-  /**
-    * The object type that this service writes
-    */
-  def indexType: String
 }
 
 trait ElasticsearchIndexable[A] extends Indexable[A] {
@@ -65,27 +55,26 @@ trait ElasticsearchIndexEnsure {
 trait ElasticsearchIndexInitialisation extends ElasticsearchIndexEnsure {
   self: ElasticsearchClientComponent
     with ElasticsearchIndexName
-    with ElasticsearchIndexType
     with ElasticsearchConfig =>
 
   def ensureIndexExists(): Future[Boolean] = {
     // Initialise the index if it doesn't already exist
-    def exists() = client.execute {
+    def exists(): Future[Boolean] = client.execute {
       indexExists(index.name)
     }.map(_.result.isExists)
 
-    def aliasExists() = client.execute {
+    def aliasExists(): Future[Boolean] = client.execute {
       indexExists(s"${index.name}-alias")
     }.map(_.result.isExists)
 
-    def create() = client.execute {
+    def create(): Future[Boolean] = client.execute {
       createIndex(index.name)
-        .mappings(mapping(indexType).fields(fields))
-        .analysis(analysers)
+        .mapping(properties(fields))
+        .analysis(analysis)
     }.map(_.result.acknowledged)
 
-    def createAlias() = client.execute {
-      addAlias(s"${index.name}-alias").on(index.name)
+    def createAlias(): Future[Boolean] = client.execute {
+      addAlias(s"${index.name}-alias", index.name)
     }.map(_.result.acknowledged)
 
     exists().flatMap {
@@ -101,25 +90,23 @@ trait ElasticsearchIndexInitialisation extends ElasticsearchIndexEnsure {
 }
 
 trait ElasticsearchConfig {
-  def analysers: Seq[AnalyzerDefinition]
-
+  def analysis: Analysis = Analysis(analyzers = List.empty)
   def fields: Seq[FieldDefinition]
 }
 
 object ElasticsearchIndexingResult {
-  def empty = ElasticsearchIndexingResult(0, 0, 0.millis, None)
+  def empty: ElasticsearchIndexingResult = ElasticsearchIndexingResult(0, 0, 0.millis, None)
 }
 
 case class ElasticsearchIndexingResult(successful: Int, failed: Int, timeTaken: Duration, maxUpdatedDate: Option[DateTime]) {
-  def +(other: ElasticsearchIndexingResult) =
+  def +(other: ElasticsearchIndexingResult): ElasticsearchIndexingResult =
     ElasticsearchIndexingResult(successful + other.successful, failed + other.failed, timeTaken + other.timeTaken, (maxUpdatedDate.toSeq ++ other.maxUpdatedDate.toSeq).sorted.lastOption)
 }
 
 trait ElasticsearchIndexing[A <: Identifiable] extends Logging {
   self: ElasticsearchIndexEnsure
     with ElasticsearchClientComponent
-    with ElasticsearchIndexName
-    with ElasticsearchIndexType =>
+    with ElasticsearchIndexName =>
 
   implicit val indexable: ElasticsearchIndexable[A]
 
@@ -133,11 +120,11 @@ trait ElasticsearchIndexing[A <: Identifiable] extends Logging {
   /**
     * Indexes a specific given list of items.
     */
-  def indexItems(items: TraversableOnce[A]): Future[ElasticsearchIndexingResult] = {
+  def indexItems(items: IterableOnce[A]): Future[ElasticsearchIndexingResult] = {
     doIndexItems(items)
   }
 
-  def indexItemsWithoutNewTransaction(items: TraversableOnce[A]): Future[ElasticsearchIndexingResult] = {
+  def indexItemsWithoutNewTransaction(items: IterableOnce[A]): Future[ElasticsearchIndexingResult] = {
     doIndexItems(items)
   }
 
@@ -160,7 +147,7 @@ trait ElasticsearchIndexing[A <: Identifiable] extends Logging {
     }
   }
 
-  protected def indexByQueryFrom(query: (DateTime, Int) => TraversableOnce[A])(startDate: DateTime): Future[ElasticsearchIndexingResult] =
+  protected def indexByQueryFrom(query: (DateTime, Int) => IterableOnce[A])(startDate: DateTime): Future[ElasticsearchIndexingResult] =
     guardMultipleIndexes {
       ensureIndexExists().flatMap { _ =>
         // Keep going until we run out
@@ -198,11 +185,11 @@ trait ElasticsearchIndexing[A <: Identifiable] extends Logging {
   def indexFrom(startDate: DateTime): Future[ElasticsearchIndexingResult] =
     indexByQueryFrom(listNewerThan)(startDate)
 
-  protected def doIndexItems(in: TraversableOnce[A]): Future[ElasticsearchIndexingResult] = {
+  protected def doIndexItems(in: IterableOnce[A]): Future[ElasticsearchIndexingResult] = {
     if (in.isEmpty) {
       Future.successful(ElasticsearchIndexingResult.empty)
     } else {
-      logger.debug(s"Writing to the $index/$indexType index")
+      logger.debug(s"Writing to the $index index")
 
       // ID to item
       val items = in.map { i => i.id.toString -> i }.toMap
@@ -210,8 +197,7 @@ trait ElasticsearchIndexing[A <: Identifiable] extends Logging {
 
       val upserts =
         items.map { case (id, item) =>
-          update(id)
-            .in(IndexAndType(index.name, indexType))
+          updateById(index, id)
             .docAsUpsert(true)
             .doc(item)
         }
@@ -240,5 +226,5 @@ trait ElasticsearchIndexing[A <: Identifiable] extends Logging {
     }
   }
 
-  protected def listNewerThan(startDate: DateTime, batchSize: Int): TraversableOnce[A]
+  protected def listNewerThan(startDate: DateTime, batchSize: Int): IterableOnce[A]
 }

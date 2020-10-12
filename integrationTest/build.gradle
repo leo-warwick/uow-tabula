@@ -12,10 +12,6 @@ configurations {
   }
 }
 
-ext {
-  seleniumVersion = '4.0.0-alpha-3'
-}
-
 dependencies {
   compile project(':common')
   testCompile project(path: ':common', configuration: 'testArtifacts')
@@ -23,7 +19,7 @@ dependencies {
   cucumber 'org.jruby:jruby-complete:9.2.9.0'
   cucumber 'ch.qos.logback:logback-classic:1.2.3'
 
-  testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+  testCompile "org.scalatestplus:selenium-3-141_${scalaMajorVersion}:3.2.2.0"
 }
 
 test {

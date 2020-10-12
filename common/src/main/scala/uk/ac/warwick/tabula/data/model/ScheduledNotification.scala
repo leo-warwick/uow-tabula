@@ -19,7 +19,7 @@ class ScheduledNotification[A >: Null <: ToEntityReference](
   var scheduledDate: DateTime
 ) extends GeneratedId with Serializable {
 
-  def this() {
+  def this() = {
     this(null, null, null)
   }
 

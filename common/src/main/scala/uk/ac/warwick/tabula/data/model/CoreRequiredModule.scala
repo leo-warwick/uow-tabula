@@ -13,7 +13,7 @@ import scala.collection.mutable
 @Proxy
 class CoreRequiredModule extends GeneratedId {
 
-  def this(route: Route, academicYear: AcademicYear, yearOfStudy: Int, module: Module) {
+  def this(route: Route, academicYear: AcademicYear, yearOfStudy: Int, module: Module) = {
     this()
     this.route = route
     this.academicYear = academicYear

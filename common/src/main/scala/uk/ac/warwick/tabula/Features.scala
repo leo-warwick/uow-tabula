@@ -189,7 +189,7 @@ class FeaturesImpl extends Features
 class FeaturesMessage {
   // Warning: If you make this more complicated, you may break the Jackson auto-JSON stuff for the FeaturesController
 
-  def this(features: Features) {
+  def this(features: Features) = {
     this()
 
     val bean = new BeanWrapperImpl(this)

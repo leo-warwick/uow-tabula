@@ -29,7 +29,7 @@ object ProgressionResult {
 }
 
 sealed abstract class FinalYearGrade(val description: String, val lowerBound: BigDecimal, val upperBound: BigDecimal, val details: Option[String] = None) {
-  def this(description: String, min: Double, max: Double) {
+  def this(description: String, min: Double, max: Double) = {
     this(description, FinalYearGrade.toBigDecimal(min), FinalYearGrade.toBigDecimal(max), None)
   }
 

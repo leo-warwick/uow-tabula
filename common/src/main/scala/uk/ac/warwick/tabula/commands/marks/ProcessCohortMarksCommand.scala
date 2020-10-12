@@ -38,7 +38,7 @@ object ProcessCohortMarksCommand {
 
   class StudentCohortMarksItem extends ModuleOccurrenceCommands.StudentModuleMarksItem with OptionalMarksItem {
 
-    def this(sprCode: SprCode) {
+    def this(sprCode: SprCode) = {
       this()
       this.sprCode = sprCode
     }

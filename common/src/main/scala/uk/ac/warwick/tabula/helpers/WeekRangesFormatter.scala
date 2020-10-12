@@ -29,7 +29,7 @@ object WeekRangesFormatter {
     * Year's Day, so Monday of that week is in the vacation, but Thursday is week 1 of term 2.
     */
   def format(ranges: Seq[WeekRange], dayOfWeek: DayOfWeek, year: AcademicYear, numberingSystem: String): String =
-    formatterMap.retrieve(year) format(ranges, dayOfWeek, numberingSystem)
+    formatterMap.retrieve(year).format(ranges, dayOfWeek, numberingSystem)
 
   class WeekRangesFormatterCache {
     private val map = JConcurrentMap[AcademicYear, WeekRangesFormatter]()
@@ -82,9 +82,9 @@ class WeekRangesFormatter(year: AcademicYear) extends WeekRanges(year: AcademicY
         case vac: Vacation =>
           // Date range
           if (startDate.equals(endDate))
-            "%s, %s" format(vac.periodType.toString, IntervalFormatter.formatDate(startDate))
+            "%s, %s".format(vac.periodType.toString, IntervalFormatter.formatDate(startDate))
           else
-            "%s, %s" format(vac.periodType.toString, IntervalFormatter.formatDate(startDate, endDate))
+            "%s, %s".format(vac.periodType.toString, IntervalFormatter.formatDate(startDate, endDate))
         case term: Term =>
           // Convert week numbers to the correct style
           val termNumber = term.periodType match {
@@ -100,8 +100,8 @@ class WeekRangesFormatter(year: AcademicYear) extends WeekRanges(year: AcademicY
               case WeekRange.NumberingSystem.Cumulative => term.weekForDate(date).cumulativeWeekNumber
             }
 
-          if (weekRange.isSingleWeek) "Term %d, week %d" format(termNumber, weekNumber(startDate))
-          else "Term %d, weeks %d-%d" format(termNumber, weekNumber(startDate), weekNumber(endDate))
+          if (weekRange.isSingleWeek) "Term %d, week %d".format(termNumber, weekNumber(startDate))
+          else "Term %d, weeks %d-%d".format(termNumber, weekNumber(startDate), weekNumber(endDate))
       }
     }
   }
@@ -288,28 +288,28 @@ class WholeWeekFormatter(year: AcademicYear) extends WeekRanges(year: AcademicYe
         case vac: Vacation if numberingSystem == WeekRange.NumberingSystem.Academic =>
           if (short) {
             if (weekRange.isSingleWeek) weekRange.minWeek.toString
-            else "%d-%d" format(weekRange.minWeek, weekRange.maxWeek)
+            else "%d-%d".format(weekRange.minWeek, weekRange.maxWeek)
           } else {
-            if (weekRange.isSingleWeek) "%s, week %d" format(vac.periodType.toString, weekRange.minWeek)
-            else "%s, weeks %d-%d" format(vac.periodType.toString, weekRange.minWeek, weekRange.maxWeek)
+            if (weekRange.isSingleWeek) "%s, week %d".format(vac.periodType.toString, weekRange.minWeek)
+            else "%s, weeks %d-%d".format(vac.periodType.toString, weekRange.minWeek, weekRange.maxWeek)
           }
         case vac: Vacation =>
           if (weekRange.isSingleWeek) {
             if (short) startDate.toString("dd/MM")
-            else "%s, w/c %s" format(
+            else "%s, w/c %s".format(
               vac.periodType.toString,
               IntervalFormatter.formatDate(start = startDate)
             )
           } else {
             // Date range
             if (short)
-              "%s, %s-%s" format(
+              "%s, %s-%s".format(
                 vac.periodType.toString,
                 startDate.toString("dd/MM"),
                 endDate.toString("dd/MM")
               )
             else
-              "%s, %s" format(
+              "%s, %s".format(
                 vac.periodType.toString,
                 IntervalFormatter.formatDate(
                   start = startDate,
@@ -335,10 +335,10 @@ class WholeWeekFormatter(year: AcademicYear) extends WeekRanges(year: AcademicYe
 
           if (short) {
             if (weekRange.isSingleWeek) weekNumber(startDate).toString
-            else "Term %d, %d-%d" format(termNumber, weekNumber(startDate), weekNumber(endDate))
+            else "Term %d, %d-%d".format(termNumber, weekNumber(startDate), weekNumber(endDate))
           } else {
-            if (weekRange.isSingleWeek) "Term %d, week %d" format(termNumber, weekNumber(startDate))
-            else "Term %d, weeks %d-%d" format(termNumber, weekNumber(startDate), weekNumber(endDate))
+            if (weekRange.isSingleWeek) "Term %d, week %d".format(termNumber, weekNumber(startDate))
+            else "Term %d, weeks %d-%d".format(termNumber, weekNumber(startDate), weekNumber(endDate))
           }
       }
     }

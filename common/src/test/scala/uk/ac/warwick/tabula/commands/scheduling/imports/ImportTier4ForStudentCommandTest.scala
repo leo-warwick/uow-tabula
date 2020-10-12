@@ -31,7 +31,7 @@ class ImportTier4ForStudentCommandTest extends TestBase with Mockito with Loggin
       command.casUsageImporter = casUsageImporter
       command.tier4VisaImporter = tier4VisaImporter
       command.studentCourseYearDetailsDao = smartMock[StudentCourseYearDetailsDao]
-      command.applyInternal
+      command.applyInternal()
 
       studentMember.casUsed should be(Some(false))
       studentMember.hasTier4Visa should be(Some(false))
@@ -60,7 +60,7 @@ class ImportTier4ForStudentCommandTest extends TestBase with Mockito with Loggin
       command.casUsageImporter = casUsageImporter
       command.tier4VisaImporter = tier4VisaImporter
       command.studentCourseYearDetailsDao = smartMock[StudentCourseYearDetailsDao]
-      command.applyInternal
+      command.applyInternal()
 
       studentMember.casUsed should be(Some(true))
       studentMember.hasTier4Visa should be(Some(true))

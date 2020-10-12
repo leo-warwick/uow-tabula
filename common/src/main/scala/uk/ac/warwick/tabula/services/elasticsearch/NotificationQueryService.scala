@@ -1,9 +1,9 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
+import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.SearchHit
-import com.sksamuel.elastic4s.searches.sort.SortOrder
+import com.sksamuel.elastic4s.requests.searches.SearchHit
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.stereotype.Service
@@ -25,7 +25,6 @@ trait NotificationQueryMethods {
 
 @Service
 class NotificationQueryServiceImpl extends AbstractQueryService
-  with NotificationIndexType
   with NotificationQueryService
   with NotificationQueryMethodsImpl
   with NotificationDaoComponent {

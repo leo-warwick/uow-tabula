@@ -2,7 +2,8 @@ package uk.ac.warwick.tabula.services.elasticsearch
 
 import java.io.File
 
-import com.sksamuel.elastic4s.http.{ElasticClient, ElasticProperties}
+import com.sksamuel.elastic4s.http.JavaClient
+import com.sksamuel.elastic4s.{ElasticClient, ElasticProperties}
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
@@ -22,7 +23,7 @@ class ElasticsearchClientFactoryBean extends ScalaFactoryBean[ElasticClient] {
     if (localJvmCluster) {
       throw new IllegalStateException("Sorry, local JVM cluster ElasticSearch is no longer supported.")
     } else {
-      ElasticClient(ElasticProperties(if (tls) s"https://${nodes.mkString(",")}" else s"http://${nodes.mkString(",")}"))
+      ElasticClient(JavaClient(ElasticProperties(if (tls) s"https://${nodes.mkString(",")}" else s"http://${nodes.mkString(",")}")))
     }
   }
 

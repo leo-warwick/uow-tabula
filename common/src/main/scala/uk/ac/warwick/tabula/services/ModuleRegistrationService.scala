@@ -245,7 +245,7 @@ abstract class AbstractModuleRegistrationService extends ModuleRegistrationServi
       val coreModules = validRecords.filter(mr =>
         mr.selectionStatus == ModuleSelectionStatus.Core
       )
-      val subsets = validRecords.toSet.subsets.toSeq
+      val subsets = validRecords.toSet.subsets().toSeq
       val validSubsets = subsets.filter(_.nonEmpty).filter { modRegs =>
         val (forceMajeureModRegs, modRegsWithoutForceMajeure) = modRegs.partition(_.firstDefinedGrade.contains(GradeBoundary.ForceMajeureMissingComponentGrade))
         val forceMajeureCats = forceMajeureModRegs.toSeq.map(mr => mr.safeCats.getOrElse(BigDecimal(0))).sum

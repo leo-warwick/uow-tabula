@@ -18,7 +18,7 @@ class RecordedResit extends GeneratedId
   with HibernateVersioned
   with ToString with Serializable {
 
-  def this(mr: StudentMarkRecord, sprCode: String) {
+  def this(mr: StudentMarkRecord, sprCode: String) = {
     this()
     val uag = mr.upstreamAssessmentGroupMember.upstreamAssessmentGroup
     val ac = uag.assessmentComponent

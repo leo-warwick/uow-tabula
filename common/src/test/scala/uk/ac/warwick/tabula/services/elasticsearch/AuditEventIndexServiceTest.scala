@@ -1,16 +1,14 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.Response
-import com.sksamuel.elastic4s.http.get.GetResponse
-import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.searches.sort.SortOrder
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.requests.get.GetResponse
+import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder
 import com.sksamuel.elastic4s.testkit.IndexMatchers
-import com.sksamuel.elastic4s.{Index, IndexAndType}
+import com.sksamuel.elastic4s.{Index, Response}
 import org.hibernate.Session
 import org.joda.time.DateTime
 import org.junit.After
-import org.scalatest.time.{Millis, Seconds, Span}
 import org.springframework.transaction.annotation.Transactional
 import uk.ac.warwick.tabula.data.SessionComponent
 import uk.ac.warwick.tabula.data.model.AuditEvent
@@ -26,7 +24,6 @@ import scala.concurrent.Future
 class AuditEventIndexServiceTest extends PersistenceTestBase with Mockito with TestElasticsearchClient with IndexMatchers {
 
   val index = Index("audit")
-  val indexType = "auditEvent"
 
   private trait Fixture {
     val service: AuditEventServiceImpl = new AuditEventServiceImpl with SessionComponent {
@@ -65,7 +62,7 @@ class AuditEventIndexServiceTest extends PersistenceTestBase with Mockito with T
 
       // University ID is the ID field so it isn't in the doc source
       val doc: GetResponse = client.execute {
-        get(event.id.toString).from(IndexAndType(index.name, indexType))
+        get(index, event.id.toString)
       }.futureValue.result
 
       doc.source should be(Map(

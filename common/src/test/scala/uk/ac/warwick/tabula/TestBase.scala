@@ -15,8 +15,8 @@ import org.jclouds.blobstore.BlobStoreContext
 import org.joda.time.{DateTime, DateTimeUtils, ReadableInstant}
 import org.junit.rules.Timeout
 import org.junit.{After, Before, Rule}
-import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.matchers.{BePropertyMatchResult, BePropertyMatcher}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatestplus.junit.{AssertionsForJUnit, JUnitSuite}
@@ -54,7 +54,7 @@ abstract class TestBase extends JUnitSuite with Matchers with ScalaFutures with 
   @Rule def timeoutRule: Timeout = minuteTimeout
 
   @After
-  def tearDownTestLoggers: Unit = {
+  def tearDownTestLoggers(): Unit = {
     TestLoggerFactory.tearDown()
   }
 
@@ -183,7 +183,7 @@ trait TestHelpers extends TestFixtures {
 
     // Create a Stream that will generate random files forever, then take the first 10.
     // The Iterator will only calculate its elements on demand so it won't always generate 10 Files.
-    Iterator.continually(randomTempFile).take(10)
+    Iterator.continually(randomTempFile()).take(10)
       .find(!_.exists)
       .getOrElse(throw new IllegalStateException("Couldn't find unique filename!"))
   }
@@ -247,7 +247,7 @@ trait TestHelpers extends TestFixtures {
       fn
     } finally {
       currentUser = user
-      RequestInfo.close
+      RequestInfo.close()
     }
   }
 

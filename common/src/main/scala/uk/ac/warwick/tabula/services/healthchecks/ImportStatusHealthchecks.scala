@@ -84,7 +84,7 @@ abstract class AbstractImportStatusHealthcheck(name: String)
       LocalDateTime.now(DateTimeUtils.CLOCK_IMPLEMENTATION),
       message,
       Seq[ServiceHealthcheck.PerformanceData[_]](
-        new ServiceHealthcheck.PerformanceData("last_successful_hours", lastSuccessfulHoursAgo, WarningThreshold.toHours, ErrorThreshold.toHours)
+        new ServiceHealthcheck.PerformanceData("last_successful_hours", lastSuccessfulHoursAgo, WarningThreshold.toHours.toDouble, ErrorThreshold.toHours.toDouble)
       ).asJava
     )
   }

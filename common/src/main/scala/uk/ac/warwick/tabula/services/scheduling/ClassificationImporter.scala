@@ -65,7 +65,7 @@ class SitsClassificationImporter extends ClassificationImporter {
 
   lazy val classificationsQuery = new ClassificationsQuery(sits)
 
-  def getImportCommands: Seq[ImportClassificationCommand] = {
+  def getImportCommands(): Seq[ImportClassificationCommand] = {
     classificationsQuery.execute.asScala.toSeq
   }
 }

@@ -26,7 +26,7 @@ class RecordedAssessmentComponentStudent extends GeneratedId
   with HibernateVersioned
   with ToString {
 
-  def this(uagm: UpstreamAssessmentGroupMember) {
+  def this(uagm: UpstreamAssessmentGroupMember) = {
     this()
     this.moduleCode = uagm.upstreamAssessmentGroup.moduleCode
     this.assessmentGroup = uagm.upstreamAssessmentGroup.assessmentGroup

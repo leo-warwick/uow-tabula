@@ -89,7 +89,7 @@ class JobInstanceImpl() extends JobInstance with GeneratedId with PostLoadBehavi
     json = map
   }
 
-  override def postLoad: Unit = {
+  override def postLoad(): Unit = {
     val map = jsonMapper.readValue(data, classOf[Map[String, Any]])
     json = map
 

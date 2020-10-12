@@ -14,7 +14,7 @@ import uk.ac.warwick.tabula.timetables.{EventOccurrence, TimetableEvent}
 @DiscriminatorValue("scheduled")
 class ScheduledMeetingRecord extends AbstractMeetingRecord {
 
-  def this(creator: Member, relationships: Seq[StudentRelationship]) {
+  def this(creator: Member, relationships: Seq[StudentRelationship]) = {
     this()
     this.creator = creator
     this.relationships = relationships

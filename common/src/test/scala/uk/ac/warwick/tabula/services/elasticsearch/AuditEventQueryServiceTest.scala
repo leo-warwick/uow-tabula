@@ -4,23 +4,21 @@ import java.util.UUID
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
-import com.sksamuel.elastic4s.{Index, IndexAndType}
-import com.sksamuel.elastic4s.http.ElasticDsl._
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.Index
 import org.joda.time.DateTime
 import org.junit.{After, Before}
-import org.scalatest.time.{Millis, Seconds, Span}
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.Stopwatches._
 import uk.ac.warwick.tabula.services.AuditEventService
 import uk.ac.warwick.tabula.{ElasticsearchTestBase, Fixtures, MockUserLookup, Mockito}
 
-import scala.jdk.CollectionConverters._
 import scala.collection.immutable.IndexedSeq
+import scala.jdk.CollectionConverters._
 
 class AuditEventQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
   val index = Index("audit")
-  val indexType: String = new AuditEventIndexType {}.indexType
 
   private trait Fixture {
     val queryService = new AuditEventQueryServiceImpl
@@ -45,7 +43,7 @@ class AuditEventQueryServiceTest extends ElasticsearchTestBase with Mockito {
   @Before def setUp(): Unit = {
     new AuditEventElasticsearchConfig {
       client.execute {
-        createIndex(index.name).mappings(mapping(indexType).fields(fields)).analysis(analysers)
+        createIndex(index.name).mapping(properties(fields)).analysis(analysis)
       }.await.result.acknowledged should be(true)
     }
     blockUntilIndexExists(index.name)
@@ -96,7 +94,7 @@ class AuditEventQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
       // Index the audit event
       client.execute {
-        indexInto(IndexAndType(index.name, indexType)).source(auditEvent).id(auditEvent.id.toString)
+        indexInto(index).source(auditEvent).id(auditEvent.id.toString)
       }
       blockUntilCount(1, index.name)
 
@@ -142,7 +140,7 @@ class AuditEventQueryServiceTest extends ElasticsearchTestBase with Mockito {
 
       // Index the audit event
       client.execute {
-        indexInto(IndexAndType(index.name, indexType)).source(auditEvent).id(auditEvent.id.toString)
+        indexInto(index).source(auditEvent).id(auditEvent.id.toString)
       }
       blockUntilCount(1, index.name)
 
@@ -245,7 +243,7 @@ class AuditEventQueryServiceTest extends ElasticsearchTestBase with Mockito {
       // Index the audit event
       beforeEvents.foreach { auditEvent =>
         client.execute {
-          indexInto(IndexAndType(index.name, indexType)).source(auditEvent).id(auditEvent.id.toString)
+          indexInto(index).source(auditEvent).id(auditEvent.id.toString)
         }
       }
 
@@ -320,7 +318,7 @@ class AuditEventQueryServiceTest extends ElasticsearchTestBase with Mockito {
       // Index the audit event
       events.foreach { auditEvent =>
         client.execute {
-          indexInto(IndexAndType(index.name, indexType)).source(auditEvent).id(auditEvent.id.toString)
+          indexInto(index).source(auditEvent).id(auditEvent.id.toString)
         }
       }
 

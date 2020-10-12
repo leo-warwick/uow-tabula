@@ -31,7 +31,7 @@ class CreateAttendancePointsFromTemplateController extends AttendanceController 
   ): Mav = {
     Mav("attendance/manage/templates",
       "schemes" -> cmd.schemes,
-      "templates" -> cmd.templateSchemeItems,
+      "templates" -> cmd.templateSchemeItems(),
       "returnTo" -> getReturnTo(Routes.Manage.addPointsToExistingSchemes(department, academicYear))
     ).crumbs(
       Breadcrumbs.Manage.HomeForYear(academicYear),
@@ -50,7 +50,7 @@ class CreateAttendancePointsFromTemplateController extends AttendanceController 
     if (errors.hasErrors) {
       Mav("attendance/manage/templates",
         "schemes" -> cmd.schemes,
-        "templates" -> cmd.templateSchemeItems,
+        "templates" -> cmd.templateSchemeItems(),
         "returnTo" -> getReturnTo(Routes.Manage.addPointsToExistingSchemes(department, academicYear)),
         "errors" -> errors
       ).crumbs(

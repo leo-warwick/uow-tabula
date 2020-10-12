@@ -2,8 +2,8 @@ package uk.ac.warwick.tabula.services.elasticsearch
 
 import java.util.concurrent.TimeoutException
 
+import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.stereotype.Service
@@ -41,7 +41,6 @@ trait ProfileQueryMethods {
 
 @Service
 class ProfileQueryServiceImpl extends AbstractQueryService
-  with ProfileIndexType
   with ProfileQueryService
   with ProfileQueryMethodsImpl
   with ProfileServiceComponent {

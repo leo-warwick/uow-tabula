@@ -138,7 +138,7 @@ object CalculateModuleMarksCommand {
 
   type SprCode = ModuleOccurrenceCommands.SprCode
   class StudentModuleMarksItem extends ModuleOccurrenceCommands.StudentModuleMarksItem {
-    def this(sprCode: SprCode) {
+    def this(sprCode: SprCode) = {
       this()
       this.sprCode = sprCode
     }

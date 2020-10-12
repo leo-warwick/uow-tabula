@@ -147,7 +147,7 @@ class Assignment
   @transient
   var assessmentMembershipService: AssessmentMembershipService = Wire[AssessmentMembershipService]("assignmentMembershipService")
 
-  def this(_module: Module) {
+  def this(_module: Module) = {
     this()
     this.module = _module
   }

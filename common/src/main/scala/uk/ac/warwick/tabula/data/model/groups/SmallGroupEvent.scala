@@ -6,12 +6,12 @@ import org.hibernate.annotations.{Proxy, Type}
 import org.hibernate.validator.constraints.URL
 import org.joda.time.{LocalDate, LocalDateTime, LocalTime}
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.{AcademicYear, ToString}
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.StringUtils
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.permissions.PermissionsService
+import uk.ac.warwick.tabula.{AcademicYear, ToString}
 
 object SmallGroupEvent {
 
@@ -50,7 +50,7 @@ class SmallGroupEvent extends GeneratedId with ToString with PermissionsTarget w
   // FIXME this isn't really optional, but testing is a pain unless it's made so
   @transient var smallGroupService: Option[SmallGroupService with SmallGroupMembershipHelpers] = Wire.option[SmallGroupService with SmallGroupMembershipHelpers]
 
-  def this(_group: SmallGroup) {
+  def this(_group: SmallGroup) = {
     this()
     this.group = _group
   }

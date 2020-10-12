@@ -8,8 +8,8 @@ import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.model.StudentCourseYearDetails.YearOfStudy
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 @Entity
 @Proxy
@@ -18,7 +18,7 @@ import scala.collection.mutable
   new NamedQuery(name = "route.adminDepartment", query = "select r from Route r where adminDepartment = :adminDepartment")))
 class Route extends GeneratedId with Serializable with PermissionsTarget {
 
-  def this(code: String = null, adminDepartment: Department = null) {
+  def this(code: String = null, adminDepartment: Department = null) = {
     this()
     this.code = code
     this.adminDepartment = adminDepartment

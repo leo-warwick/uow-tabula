@@ -6,16 +6,13 @@ import javax.validation.constraints.NotNull
 import org.hibernate.annotations.{BatchSize, Filter, FilterDef, Proxy, Type}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.data.PostLoadBehaviour
 import uk.ac.warwick.tabula.data.model._
-import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.services.{SmallGroupMembershipHelpers, SmallGroupService, UserGroupCacheManager}
 import uk.ac.warwick.tabula.{AcademicYear, ToString}
 import uk.ac.warwick.userlookup.User
 
 import scala.jdk.CollectionConverters._
-import scala.collection.mutable
 
 object DepartmentSmallGroupSet {
   final val NotDeletedFilter = "notDeleted"
@@ -50,7 +47,7 @@ class DepartmentSmallGroupSet
   // FIXME this isn't really optional, but testing is a pain unless it's made so
   @transient var smallGroupService: Option[SmallGroupService with SmallGroupMembershipHelpers] = Wire.option[SmallGroupService with SmallGroupMembershipHelpers]
 
-  def this(_department: Department) {
+  def this(_department: Department) = {
     this()
     this.department = _department
   }

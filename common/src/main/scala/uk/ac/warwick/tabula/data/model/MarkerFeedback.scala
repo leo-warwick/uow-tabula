@@ -23,7 +23,7 @@ class MarkerFeedback extends GeneratedId
   with CanBeDeleted {
   type Entity = MarkerFeedback
 
-  def this(parent: Feedback) {
+  def this(parent: Feedback) = {
     this()
     feedback = parent
   }

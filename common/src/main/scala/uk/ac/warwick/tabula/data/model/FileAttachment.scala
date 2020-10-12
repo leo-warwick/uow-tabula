@@ -16,9 +16,9 @@ import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.services.objectstore.{ObjectStorageService, RichByteSource}
 import uk.ac.warwick.tabula.services.turnitintca.TcaSubmissionStatus.{Complete, Created, Processing}
 
-import scala.jdk.CollectionConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
 import scala.util.matching.Regex
 
@@ -144,7 +144,7 @@ class FileAttachment extends GeneratedId {
     _name = Option(n).map(sanitisedFilename).orNull
   }
 
-  def this(n: String) {
+  def this(n: String) = {
     this()
     name = n
   }

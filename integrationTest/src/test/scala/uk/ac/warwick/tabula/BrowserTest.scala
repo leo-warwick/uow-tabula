@@ -15,6 +15,8 @@ import org.openqa.selenium.{OutputType, TakesScreenshot, WebDriver, WebElement}
 import org.scalatest._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.exceptions.TestFailedException
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span, SpanSugar}
 import org.scalatestplus.junit._
 import org.scalatestplus.selenium.WebBrowser
@@ -31,7 +33,7 @@ import scala.util.{Success, Try}
   */
 @RunWith(classOf[JUnitRunner])
 abstract class BrowserTest
-  extends FlatSpec
+  extends AnyFlatSpec
     with Matchers
     with BeforeAndAfter
     with SpanSugar

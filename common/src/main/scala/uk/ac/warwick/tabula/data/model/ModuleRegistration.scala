@@ -65,7 +65,7 @@ object ModuleRegistration {
 @Access(AccessType.FIELD)
 class ModuleRegistration extends GeneratedId with PermissionsTarget with CanBeDeleted with Ordered[ModuleRegistration] with Serializable {
 
-  def this(sprCode: String, module: Module, cats: JBigDecimal, sitsModuleCode: String, academicYear: AcademicYear, occurrence: String, marksCode: String) {
+  def this(sprCode: String, module: Module, cats: JBigDecimal, sitsModuleCode: String, academicYear: AcademicYear, occurrence: String, marksCode: String) = {
     this()
     this.sprCode = sprCode
     this.module = module

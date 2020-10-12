@@ -23,7 +23,7 @@ class AccreditedPriorLearning() extends GeneratedId with PermissionsTarget with 
     academicYear: AcademicYear,
     cats: JBigDecimal,
     level: Level,
-    reason: String) {
+    reason: String) = {
     this()
     this.studentCourseDetails = studentCourseDetails
     this.award = award

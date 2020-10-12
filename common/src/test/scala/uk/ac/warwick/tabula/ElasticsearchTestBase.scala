@@ -1,11 +1,12 @@
 package uk.ac.warwick.tabula
 
-import com.sksamuel.elastic4s.embedded.LocalNode
-import com.sksamuel.elastic4s.http.index.admin.RefreshIndexResponse
-import com.sksamuel.elastic4s.http.{ElasticClient, ElasticDsl}
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.JavaClient
+import com.sksamuel.elastic4s.requests.indexes.admin.RefreshIndexResponse
 import com.sksamuel.elastic4s.testkit.{ClientProvider, IndexMatchers, SearchMatchers}
-import com.sksamuel.elastic4s.{IndexAndTypes, Indexes}
+import com.sksamuel.elastic4s._
 import org.junit.{After, Before}
+import org.testcontainers.elasticsearch.ElasticsearchContainer
 import uk.ac.warwick.tabula.helpers.Logging
 
 import scala.util.Try
@@ -19,16 +20,21 @@ abstract class ElasticsearchTestBase
 trait TestElasticsearchClient extends ElasticSugar with ClientProvider {
   self: TestHelpers with Logging =>
 
+  private lazy val elastic =
+    new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.9.2")
+      .withEnv("cluster.name", "tabula-unit-tests")
+
   private var localClient: ElasticClient = _
 
   @Before def createClient(): Unit = {
+    elastic.start()
     localClient =
-      LocalNode(getClass.getSimpleName, createTemporaryDirectory().getAbsolutePath)
-        .client(shutdownNodeOnClose = true)
+      ElasticClient(JavaClient(ElasticProperties(s"http://${elastic.getHttpHostAddress}")))
   }
 
   @After def closeClient(): Unit = {
     localClient.close()
+    elastic.stop()
   }
 
   override implicit def client: ElasticClient = localClient
@@ -38,8 +44,6 @@ trait TestElasticsearchClient extends ElasticSugar with ClientProvider {
 // Copied from elastic4s but doesn't unnecessary extend ElasticDsl (which brings in its own logging)
 trait ElasticSugar {
   self: ClientProvider with Logging =>
-
-  import com.sksamuel.elastic4s.http.ElasticDsl._
 
   // refresh all indexes
   def refreshAll(): RefreshIndexResponse = refresh(Indexes.All)
@@ -111,11 +115,11 @@ trait ElasticSugar {
     blockUntilEmpty(index)
   }
 
-  def blockUntilDocumentExists(id: String, index: String, `type`: String): Unit =
+  def blockUntilDocumentExists(id: String, index: String): Unit =
     blockUntil(s"Expected to find document $id") { () =>
       client
         .execute {
-          get(id).from(index / `type`)
+          get(index, id)
         }
         .await
         .result
@@ -133,36 +137,13 @@ trait ElasticSugar {
       expected <= result.totalHits
     }
 
-  def blockUntilCount(expected: Long, indexAndTypes: IndexAndTypes): Unit =
-    blockUntil(s"Expected count of $expected") { () =>
-      val result = client
-        .execute {
-          search(indexAndTypes).matchAllQuery().size(0)
-        }
-        .await
-        .result
-      expected <= result.totalHits
-    }
+  def blockUntilCount(expected: Long, index: Index): Unit = blockUntilCount(expected, index.name)
 
-  /**
-    * Will block until the given index and optional types have at least the given number of documents.
-    */
-  def blockUntilCount(expected: Long, index: String, types: String*): Unit =
-    blockUntil(s"Expected count of $expected") { () =>
-      val result = client
-        .execute {
-          search(index / types).matchAllQuery().size(0)
-        }
-        .await
-        .result
-      expected <= result.totalHits
-    }
-
-  def blockUntilExactCount(expected: Long, index: String, types: String*): Unit =
+  def blockUntilExactCount(expected: Long, index: String): Unit =
     blockUntil(s"Expected count of $expected") { () =>
       expected == client
         .execute {
-          search(index / types).size(0)
+          search(index).size(0)
         }
         .await
         .result
@@ -190,11 +171,11 @@ trait ElasticSugar {
       !doesIndexExists(index)
     }
 
-  def blockUntilDocumentHasVersion(index: String, `type`: String, id: String, version: Long): Unit =
+  def blockUntilDocumentHasVersion(index: String, id: String, version: Long): Unit =
     blockUntil(s"Expected document $id to have version $version") { () =>
       client
         .execute {
-          get(id).from(index / `type`)
+          get(index, id)
         }
         .await
         .result

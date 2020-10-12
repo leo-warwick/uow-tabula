@@ -14,7 +14,7 @@ import uk.ac.warwick.userlookup.User
 @Proxy
 class RecipientNotificationInfo extends GeneratedId {
 
-  def this(notification: Notification[_, _], recipient: User) {
+  def this(notification: Notification[_, _], recipient: User) = {
     this()
     this.notification = notification
     this.recipient = recipient

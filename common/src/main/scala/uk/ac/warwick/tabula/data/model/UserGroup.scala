@@ -42,7 +42,7 @@ class UserGroup private(val universityIds: Boolean)
     with Daoisms {
 
   /* For Hibernate xx */
-  def this() {
+  def this() = {
     this(false)
   }
 

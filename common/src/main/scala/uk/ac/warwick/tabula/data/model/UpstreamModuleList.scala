@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters._
 @Proxy
 class UpstreamModuleList {
 
-  def this(code: String, name:String, shortName: String, academicYear: AcademicYear, route: Route, yearOfStudy: Integer) {
+  def this(code: String, name:String, shortName: String, academicYear: AcademicYear, route: Route, yearOfStudy: Integer) = {
     this()
     this.code = code
     this.name = name

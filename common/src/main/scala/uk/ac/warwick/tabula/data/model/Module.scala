@@ -12,8 +12,8 @@ import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.roles.{ModuleAssistantRoleDefinition, ModuleManagerRoleDefinition}
 import uk.ac.warwick.tabula.services.permissions.PermissionsService
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
 
 @Entity
@@ -23,7 +23,7 @@ import scala.util.matching.Regex
   new NamedQuery(name = "module.adminDepartment", query = "select m from Module m where adminDepartment = :adminDepartment")))
 class Module extends GeneratedId with PermissionsTarget with Serializable {
 
-  def this(code: String = null, adminDepartment: Department = null) {
+  def this(code: String = null, adminDepartment: Department = null) = {
     this()
     this.code = code
     this.adminDepartment = adminDepartment

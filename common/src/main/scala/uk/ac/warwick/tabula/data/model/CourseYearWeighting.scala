@@ -30,7 +30,7 @@ object CourseYearWeighting {
 @Proxy
 class CourseYearWeighting extends GeneratedId with ToString {
 
-  def this(course: Course, academicYear: AcademicYear, yearOfStudy: YearOfStudy, weightingAsPercentage: BigDecimal) {
+  def this(course: Course, academicYear: AcademicYear, yearOfStudy: YearOfStudy, weightingAsPercentage: BigDecimal) = {
     this()
     this.course = course
     this.sprStartAcademicYear = academicYear

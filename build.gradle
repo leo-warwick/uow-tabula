@@ -28,8 +28,7 @@ ext {
   jacksonVersion = "2.9.10"
   jacksonDatabindVersion = "2.9.10.1"
   jacksonScalaModuleVersion = "2.9.10"
-  elasticsearchVersion = "6.7.2"
-  elastic4sVersion = "6.7.3"
+  elastic4sVersion = "7.9.1"
   poiVersion = "4.1.1-warwick"
   tilesVersion = "3.0.8"
   jcloudsVersion = "2.2.0"
@@ -157,9 +156,8 @@ subprojects {
     providedCompile 'commons-logging:commons-logging:1.2'
     /* ******* */
 
-    testCompile 'junit:junit:4.12'
     testCompile "org.specs2:specs2-mock_${scalaMajorVersion}:4.8.0"
-    testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.8"
+    testCompile "org.scalatestplus:junit-4-13_${scalaMajorVersion}:3.2.2.0"
   }
 
   tasks.withType(ScalaCompile) {

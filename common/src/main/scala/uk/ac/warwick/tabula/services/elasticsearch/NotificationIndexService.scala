@@ -1,9 +1,8 @@
 package uk.ac.warwick.tabula.services.elasticsearch
 
+import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.analyzers.AnalyzerDefinition
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.mappings.FieldDefinition
+import com.sksamuel.elastic4s.requests.mappings.FieldDefinition
 import javax.persistence.DiscriminatorValue
 import org.hibernate.ObjectNotFoundException
 import org.joda.time.DateTime
@@ -50,8 +49,7 @@ object NotificationIndexService {
 class NotificationIndexService
   extends AbstractIndexService[IndexedNotification]
     with NotificationDaoComponent
-    with NotificationElasticsearchConfig
-    with NotificationIndexType {
+    with NotificationElasticsearchConfig {
 
   override implicit val indexable: ElasticsearchIndexable[IndexedNotification] = NotificationIndexService.IndexedNotificationIndexable
 
@@ -86,10 +84,6 @@ class NotificationIndexService
 
 }
 
-trait NotificationIndexType extends ElasticsearchIndexType {
-  final val indexType = "notification"
-}
-
 trait NotificationElasticsearchConfig extends ElasticsearchConfig {
   override def fields: Seq[FieldDefinition] = Seq(
     doubleField("priority"),
@@ -97,6 +91,4 @@ trait NotificationElasticsearchConfig extends ElasticsearchConfig {
     keywordField("notificationType"),
     dateField("created").format("strict_date_time_no_millis")
   )
-
-  override def analysers: Seq[AnalyzerDefinition] = Seq() // default standard analyzer
 }

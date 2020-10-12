@@ -31,7 +31,7 @@ abstract class Best90MA2CATSColumnOption(isResultRequired: Boolean = false, colu
     records: Seq[ModuleRegistration]
   ): Seq[(BigDecimal, Seq[ModuleRegistration])] = {
     //get all valid subsets
-    val validSubsets = records.toSet.subsets.toSeq.filter(_.nonEmpty).filter(modRegs =>
+    val validSubsets = records.toSet.subsets().toSeq.filter(_.nonEmpty).filter(modRegs =>
       // CATS total of 90 subsets
       modRegs.toSeq.map(mr => mr.safeCats.getOrElse(BigDecimal(0))).sum == 90
     )

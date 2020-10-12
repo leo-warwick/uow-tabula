@@ -1,10 +1,11 @@
 package uk.ac.warwick.tabula
 
 import org.openqa.selenium.WebDriver
+import org.scalatest.Assertions
 import org.scalatest.concurrent.Eventually
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.SpanSugar._
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{Assertions, Matchers}
 import org.scalatestplus.selenium.WebBrowser
 import uk.ac.warwick.tabula.WebsignonMethods._
 

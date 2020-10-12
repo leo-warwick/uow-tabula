@@ -12,7 +12,7 @@ import org.hibernate.annotations.Proxy
 @Proxy
 class UpstreamModuleListEntry extends GeneratedId {
 
-  def this(list: UpstreamModuleList, globString: String) {
+  def this(list: UpstreamModuleList, globString: String) = {
     this()
     this.list = list
     setMatchString(globString)

@@ -48,7 +48,7 @@ class DisabilityFundingStatusUserType extends AbstractBasicUserType[DisabilityFu
 @Entity
 @Proxy
 class Disability {
-  def this(code: String = null, definition: String = null) {
+  def this(code: String = null, definition: String = null) = {
     this()
     this.code = code
     this.sitsDefinition = definition

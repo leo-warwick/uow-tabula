@@ -2,7 +2,6 @@ package uk.ac.warwick.tabula.commands.mitcircs.submission
 
 import org.joda.time.{DateTime, LocalDate}
 import org.springframework.validation.{BindingResult, Errors}
-import uk.ac.warwick.tabula.{AcademicYear, FeaturesComponent}
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.mitcircs.submission.CreateMitCircsSubmissionCommand._
@@ -22,6 +21,7 @@ import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceCompon
 import uk.ac.warwick.tabula.system.BindListener
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.validators.DateWithinYears
+import uk.ac.warwick.tabula.{AcademicYear, FeaturesComponent}
 import uk.ac.warwick.userlookup.User
 
 import scala.beans.BeanProperty
@@ -288,7 +288,7 @@ trait MitCircsSubmissionState {
 }
 
 class AffectedAssessmentItem {
-  def this(assessment: MitigatingCircumstancesAffectedAssessment) {
+  def this(assessment: MitigatingCircumstancesAffectedAssessment) = {
     this()
     this.selected = true
     this.moduleCode = assessment.moduleCode
