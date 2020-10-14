@@ -85,8 +85,8 @@ class StudentRelationshipType extends PermissionsTarget with PermissionsSelector
     * whether it is hidden when empty, or displayed with a prompt to add.
     */
   def displayIfEmpty(studentCourseDetails: StudentCourseDetails): Boolean = {
-    // if a sub-department matches this student check the settings from that department rather than the parent
-    val departmentToCheck = Option(studentCourseDetails.department).map(d => d.subDepartmentsContaining(studentCourseDetails.student).lastOption.getOrElse(d))
+    // if a sub-department (not including root/import departments) matches this student check the settings from that department rather than the parent
+    val departmentToCheck = Option(studentCourseDetails.department).map(d => d.subDepartmentsContaining(studentCourseDetails.student).filterNot(_.isImportDepartment).lastOption.getOrElse(d))
 
     studentCourseDetails.courseType match {
       case Some(courseType: CourseType) => courseType match {
