@@ -148,17 +148,19 @@ abstract class ViewStudentEventsCommandInternal(val member: StudentMember, curre
 
 abstract class ViewStaffEventsCommandInternal(val member: StaffMember, currentUser: CurrentUser)
   extends CommandInternal[ReturnType]
-    with ViewMemberEventsRequest with MemberTimetableCommand {
+    with ViewMemberEventsRequest with MemberTimetableCommand with TaskBenchmarking {
 
   self: StaffTimetableEventSourceComponent with EventOccurrenceSourceComponent with EventOccurrenceServiceComponent =>
 
   def applyInternal(): ReturnType = {
-    val timetableOccurrences =
+    val timetableOccurrences = benchmark("timetableOccurrences") {
       staffTimetableEventSource.eventsFor(member, currentUser, TimetableEvent.Context.Staff)
         .map(eventsToOccurrences)
+    }
 
-    val meetingOccurrences =
+    val meetingOccurrences = benchmark("meetingOccurrences") {
       eventOccurrenceSource.occurrencesFor(member, currentUser, TimetableEvent.Context.Staff, start, end)
+    }
 
     Try(Await.result(
       Futures.combine(Seq(timetableOccurrences, meetingOccurrences), EventOccurrenceList.combine), ViewMemberEventsCommand.Timeout
