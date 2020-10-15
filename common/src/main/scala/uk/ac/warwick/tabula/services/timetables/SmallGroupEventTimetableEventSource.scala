@@ -1,5 +1,6 @@
 package uk.ac.warwick.tabula.services.timetables
 
+import uk.ac.warwick.tabula.commands.TaskBenchmarking
 import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEvent, WeekRange}
 import uk.ac.warwick.tabula.data.model.{Module, StaffMember, StudentMember}
@@ -41,9 +42,9 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
 
   }
 
-  trait SmallGroupEventTimetableEventSource {
+  trait SmallGroupEventTimetableEventSource extends TaskBenchmarking {
 
-    protected def eventsFor(user: User, currentUser: CurrentUser): EventList = {
+    protected def eventsFor(user: User, currentUser: CurrentUser): EventList = benchmark("SGT events") {
       /* Include SGT teaching responsibilities for students (mainly PGR) and students for staff (e.g. Chemistry) */
       val allEvents = studentEvents(user, currentUser) ++ tutorEvents(user, currentUser)
 
@@ -73,36 +74,40 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
       EventList.fresh(autoTimetableEvents ++ manualTimetableEvents)
     }
 
-    private def studentEvents(user: User, currentUser: CurrentUser) = smallGroupService.findSmallGroupsByStudent(user).filter {
-      group =>
-        !group.groupSet.deleted &&
-          group.events.nonEmpty &&
-          (
-            // The set is visible to students; OR
-            group.groupSet.visibleToStudents ||
+    private def studentEvents(user: User, currentUser: CurrentUser) = benchmarkTask("studentEvents") {
+      smallGroupService.findSmallGroupsByStudent(user).filter {
+        group =>
+          !group.groupSet.deleted &&
+            group.events.nonEmpty &&
+            (
+              // The set is visible to students; OR
+              group.groupSet.visibleToStudents ||
 
-              // I have permission to view the membership of the set anyway
-              securityService.can(currentUser, Permissions.SmallGroups.ReadMembership, group)
-            )
-    }.flatMap(group => group.events).filterNot(_.isUnscheduled)
+                // I have permission to view the membership of the set anyway
+                securityService.can(currentUser, Permissions.SmallGroups.ReadMembership, group)
+              )
+      }.flatMap(group => group.events).filterNot(_.isUnscheduled)
+    }
 
-    private def tutorEvents(user: User, currentUser: CurrentUser) = smallGroupService.findSmallGroupEventsByTutor(user).filter {
-      event =>
-        !event.group.groupSet.deleted &&
-          !event.isUnscheduled &&
-          (
-            // The set is visible to tutors; OR
-            event.group.groupSet.releasedToTutors ||
+    private def tutorEvents(user: User, currentUser: CurrentUser) = benchmarkTask("tutorEvents") {
+      smallGroupService.findSmallGroupEventsByTutor(user).filter {
+        event =>
+          !event.group.groupSet.deleted &&
+            !event.isUnscheduled &&
+            (
+              // The set is visible to tutors; OR
+              event.group.groupSet.releasedToTutors ||
 
-              // I have permission to view the membership of the set anyway
-              securityService.can(currentUser, Permissions.SmallGroups.ReadMembership, event)
-            )
+                // I have permission to view the membership of the set anyway
+                securityService.can(currentUser, Permissions.SmallGroups.ReadMembership, event)
+              )
+      }
     }
 
   }
 
-  class ModuleSmallGroupEventTimetableEventSource extends ModuleTimetableEventSource {
-    override def eventsFor(module: Module, academicYear: AcademicYear, currentUser: CurrentUser, sources: Seq[TimetableEventSource]): Future[EventList] = {
+  class ModuleSmallGroupEventTimetableEventSource extends ModuleTimetableEventSource with TaskBenchmarking {
+    override def eventsFor(module: Module, academicYear: AcademicYear, currentUser: CurrentUser, sources: Seq[TimetableEventSource]): Future[EventList] = benchmarkTask("moduleEvents") {
       Future.successful {
         if (sources.contains(TimetableEventSource.SmallGroups)) {
           val sets = smallGroupService.getSmallGroupSets(module, academicYear).filterNot(_.archived)

@@ -274,7 +274,7 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
       case Failure(e) =>
         logger.warn(s"Request for ${req.getURI.toString} failed: ${e.getMessage}")
 
-      case _ =>
+      case _ => logger.info(s"Received timetable data from ${req.getURI.toString}")
     }
 
     result
