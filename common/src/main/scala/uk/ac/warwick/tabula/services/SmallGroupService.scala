@@ -68,6 +68,8 @@ trait SmallGroupService {
 
   def findSmallGroupEventsByTutor(user: User): Seq[SmallGroupEvent]
 
+  def findSmallGroupEventsByTutor(user: User, years: Seq[AcademicYear]): Seq[SmallGroupEvent]
+
   def findSmallGroupsByTutor(user: User): Seq[SmallGroup]
 
   def removeUserFromGroup(user: User, smallGroup: SmallGroup): Unit
@@ -85,6 +87,8 @@ trait SmallGroupService {
   def getAllSmallGroupSets(year: AcademicYear, maxResults: Int, startResult: Int): Seq[SmallGroupSet]
 
   def findSmallGroupsByStudent(student: User): Seq[SmallGroup]
+
+  def findSmallGroupsByStudent(student: User, years: Seq[AcademicYear]): Seq[SmallGroup]
 
   def findSmallGroupSetsByMember(user: User): Seq[SmallGroupSet]
 
@@ -221,6 +225,9 @@ abstract class AbstractSmallGroupService extends SmallGroupService {
 
   def findSmallGroupEventsByTutor(user: User): Seq[SmallGroupEvent] = eventTutorsHelper.findBy(user)
 
+  def findSmallGroupEventsByTutor(user: User, years: Seq[AcademicYear]): Seq[SmallGroupEvent] = eventTutorsHelper.findBy(user)
+    .filter { sge => years.contains(sge.academicYear)}
+
   def findSmallGroupsByTutor(user: User): Seq[SmallGroup] = findSmallGroupEventsByTutor(user)
     .groupBy(_.group).keys.toSeq
     .filterNot { sg => sg.groupSet.deleted || sg.groupSet.archived }
@@ -257,6 +264,10 @@ abstract class AbstractSmallGroupService extends SmallGroupService {
       }
       (groups ++ linkedGroups).distinct
     }
+  }
+
+  def findSmallGroupsByStudent(user: User, years:Seq[AcademicYear]): Seq[SmallGroup] = {
+    findSmallGroupsByStudent(user).filter { group => years.contains(group.academicYear) }
   }
 
   def deleteAttendance(studentId: String, event: SmallGroupEvent, weekNumber: Int, isPermanent: Boolean = false): Unit = {

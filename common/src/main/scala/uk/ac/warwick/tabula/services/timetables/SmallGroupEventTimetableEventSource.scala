@@ -75,11 +75,10 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
     }
 
     private def studentEvents(user: User, currentUser: CurrentUser) = benchmarkTask("studentEvents") {
-      smallGroupService.findSmallGroupsByStudent(user).filter {
+      smallGroupService.findSmallGroupsByStudent(user, AcademicYear.now().yearsSurrounding(1, 1)).filter {
         group =>
           !group.groupSet.deleted &&
             group.events.nonEmpty &&
-            group.groupSet.academicYear == AcademicYear.now() &&
             (
               // The set is visible to students; OR
               group.groupSet.visibleToStudents ||
@@ -91,10 +90,9 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
     }
 
     private def tutorEvents(user: User, currentUser: CurrentUser) = benchmarkTask("tutorEvents") {
-      smallGroupService.findSmallGroupEventsByTutor(user).filter {
+      smallGroupService.findSmallGroupEventsByTutor(user, AcademicYear.now().yearsSurrounding(1, 1)).filter {
         event =>
           !event.group.groupSet.deleted &&
-          event.group.groupSet.academicYear == AcademicYear.now() &&
             !event.isUnscheduled &&
             (
               // The set is visible to tutors; OR
