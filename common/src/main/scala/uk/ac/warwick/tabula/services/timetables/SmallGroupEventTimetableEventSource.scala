@@ -12,8 +12,8 @@ import uk.ac.warwick.tabula.timetables.TimetableEvent
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 import uk.ac.warwick.userlookup.User
 
-import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
+import scala.jdk.CollectionConverters._
 
 trait SmallGroupEventTimetableEventSourceComponent {
   val studentGroupEventSource: StudentTimetableEventSource
@@ -44,7 +44,7 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
 
   trait SmallGroupEventTimetableEventSource extends TaskBenchmarking {
 
-    protected def eventsFor(user: User, currentUser: CurrentUser): EventList = benchmark("SGT events") {
+    protected def eventsFor(user: User, currentUser: CurrentUser): EventList = benchmarkTask("SGT events") {
       /* Include SGT teaching responsibilities for students (mainly PGR) and students for staff (e.g. Chemistry) */
       val allEvents = studentEvents(user, currentUser) ++ tutorEvents(user, currentUser)
 
@@ -75,7 +75,7 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
     }
 
     private def studentEvents(user: User, currentUser: CurrentUser) = benchmarkTask("studentEvents") {
-      smallGroupService.findSmallGroupsByStudent(user).filter {
+      smallGroupService.findSmallGroupsByStudent(user, AcademicYear.now().yearsSurrounding(1, 1)).filter {
         group =>
           !group.groupSet.deleted &&
             group.events.nonEmpty &&
@@ -90,7 +90,7 @@ trait SmallGroupEventTimetableEventSourceComponentImpl extends SmallGroupEventTi
     }
 
     private def tutorEvents(user: User, currentUser: CurrentUser) = benchmarkTask("tutorEvents") {
-      smallGroupService.findSmallGroupEventsByTutor(user).filter {
+      smallGroupService.findSmallGroupEventsByTutor(user, AcademicYear.now().yearsSurrounding(1, 1)).filter {
         event =>
           !event.group.groupSet.deleted &&
             !event.isUnscheduled &&

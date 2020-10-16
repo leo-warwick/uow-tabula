@@ -4,7 +4,7 @@ import com.google.common.collect.{Range => GRange}
 import org.joda.time.LocalDate
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.commands.timetables.ViewMemberEventsCommand.ReturnType
+import uk.ac.warwick.tabula.commands.timetables.ViewMemberEventsCommand.{ReturnType, TimetableCommand}
 import uk.ac.warwick.tabula.data.model.{Member, StaffMember, StudentMember}
 import uk.ac.warwick.tabula.helpers.ExecutionContexts.timetable
 import uk.ac.warwick.tabula.helpers.{DateRange, Futures, Logging}
@@ -153,12 +153,12 @@ abstract class ViewStaffEventsCommandInternal(val member: StaffMember, currentUs
   self: StaffTimetableEventSourceComponent with EventOccurrenceSourceComponent with EventOccurrenceServiceComponent =>
 
   def applyInternal(): ReturnType = {
-    val timetableOccurrences = benchmark("timetableOccurrences") {
+    val timetableOccurrences = benchmarkTask("timetableOccurrences") {
       staffTimetableEventSource.eventsFor(member, currentUser, TimetableEvent.Context.Staff)
         .map(eventsToOccurrences)
     }
 
-    val meetingOccurrences = benchmark("meetingOccurrences") {
+    val meetingOccurrences = benchmarkTask("meetingOccurrences") {
       eventOccurrenceSource.occurrencesFor(member, currentUser, TimetableEvent.Context.Staff, start, end)
     }
 
@@ -209,7 +209,7 @@ class ViewStaffMemberEventsCommandFactoryImpl(currentUser: CurrentUser, source: 
     this(currentUser, Some(source))
   }
 
-  def apply(staffMember: StaffMember) = source match {
+  def apply(staffMember: StaffMember): TimetableCommand = source match {
     case Some(staffTimetableEventSource) =>
       ViewMemberEventsCommand(
         staffMember,
