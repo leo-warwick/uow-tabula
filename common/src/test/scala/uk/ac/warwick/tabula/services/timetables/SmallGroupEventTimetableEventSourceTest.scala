@@ -5,7 +5,7 @@ import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.data.model.{Module, NamedLocation, StudentMember}
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.timetables.{TimetableEvent, TimetableEventType}
-import uk.ac.warwick.tabula.{Fixtures, Mockito, TestBase}
+import uk.ac.warwick.tabula.{AcademicYear, Fixtures, Mockito, TestBase}
 import uk.ac.warwick.userlookup.User
 
 class SmallGroupEventTimetableEventSourceTest extends TestBase with Mockito {
@@ -43,8 +43,8 @@ class SmallGroupEventTimetableEventSourceTest extends TestBase with Mockito {
 
   @Test
   def translatesFromSmallGroupEventToTimetableEvent(): Unit = {
-    mockSmallGroupService.findSmallGroupsByStudent(any[User]) returns Seq(group)
-    mockSmallGroupService.findSmallGroupEventsByTutor(any[User]) returns Nil
+    mockSmallGroupService.findSmallGroupsByStudent(any[User], any[Seq[AcademicYear]]) returns Seq(group)
+    mockSmallGroupService.findSmallGroupEventsByTutor(any[User], any[Seq[AcademicYear]]) returns Nil
     mockSmallGroupService.findManuallyAddedAttendance(any[String]) returns Nil
     mockSmallGroupService.findStudentAttendanceInEvents(any[String], any[Seq[SmallGroupEvent]]) returns Nil
     val events = eventSource.eventsFor(student, currentUser, TimetableEvent.Context.Student).futureValue.events
