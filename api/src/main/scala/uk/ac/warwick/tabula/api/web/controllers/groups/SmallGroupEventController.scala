@@ -2,16 +2,18 @@ package uk.ac.warwick.tabula.api.web.controllers.groups
 
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
-
 import org.joda.time.LocalTime
 import org.springframework.http.{HttpStatus, MediaType}
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation._
-import uk.ac.warwick.tabula.JavaImports._
+import uk.ac.warwick.tabula.CurrentUser
+import uk.ac.warwick.tabula.JavaImports.{JMap, _}
 import uk.ac.warwick.tabula.api.commands.JsonApiRequest
 import uk.ac.warwick.tabula.api.web.controllers.groups.SmallGroupEventController.{DeleteSmallGroupEventCommand, ModifySmallGroupEventCommand}
-import uk.ac.warwick.tabula.commands.Appliable
+import uk.ac.warwick.tabula.commands.{Appliable, MemberOrUser}
+import uk.ac.warwick.tabula.commands.groups.RecordAttendanceCommand.UniversityId
+import uk.ac.warwick.tabula.commands.groups.{RecordAttendanceCommand, SmallGroupAttendanceState}
 import uk.ac.warwick.tabula.commands.groups.admin._
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.groups._
@@ -109,6 +111,34 @@ trait DeleteSmallGroupEventApi {
   }
 }
 
+@Controller
+@RequestMapping(Array("/v1/module/{module}/groups/{smallGroupSet}/groups/{smallGroup}/events/{smallGroupEvent}/register"))
+class RecordSmallGroupEventAttendanceControllerForApi extends SmallGroupSetController with RecordSmallGroupAttendanceApi
+
+trait RecordSmallGroupAttendanceApi {
+  self: SmallGroupSetController =>
+
+  @ModelAttribute("recordAttendanceCommand")
+  def recordAttendanceCommand(@PathVariable smallGroupEvent: SmallGroupEvent, @RequestParam week: Int, user: CurrentUser): RecordAttendanceCommand.Command =
+    RecordAttendanceCommand(mandatory(smallGroupEvent), week, user)
+
+  @RequestMapping(method = Array(PUT), consumes = Array(MediaType.APPLICATION_JSON_VALUE), produces = Array("application/json"))
+  def recordAttendance(@RequestBody request: SmallGroupAttendanceRequest, @Valid @ModelAttribute("recordAttendanceCommand") command: RecordAttendanceCommand.Command, errors: Errors): Mav = {
+    request.copyTo(command, errors)
+    globalValidator.validate(command, errors)
+    command.validate(errors)
+    if (errors.hasErrors) {
+      Mav(new JSONErrorView(errors))
+    } else {
+      command.apply()
+      Mav(new JSONView(Map(
+        "success" -> true,
+        "status" -> "ok"
+      )))
+    }
+  }
+}
+
 
 class SmallGroupEventRequest extends JsonApiRequest[ModifySmallGroupEventCommand] {
   @BeanProperty var title: String = _
@@ -128,5 +158,15 @@ class SmallGroupEventRequest extends JsonApiRequest[ModifySmallGroupEventCommand
     Option(endTime).foreach(state.endTime = _)
     Option(location).foreach(state.location = _)
     state.useNamedLocation = true
+  }
+}
+
+class SmallGroupAttendanceRequest extends JsonApiRequest[RecordAttendanceCommand.Command] {
+  @BeanProperty var attendance: JMap[UniversityId, SmallGroupAttendanceState] = _
+  @BeanProperty var members: Seq[MemberOrUser] = _
+
+  override def copyTo(state: RecordAttendanceCommand.Command, errors: Errors): Unit = {
+    state.studentsState.putAll(attendance)
+    state.members.concat(members)
   }
 }
