@@ -65,8 +65,8 @@ class MitCircsPanelDaoImpl extends MitCircsPanelDao
 
   override def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel] = {
     getPanels(user)
-      .filterNot(panel => panel.date.isEmpty || panel.endDate.isEmpty ||
-        (panel.date.get.toLocalDate.isBefore(startInclusive) || panel.endDate.get.toLocalDate.isAfter(endInclusive)))
+      .filterNot(panel =>
+        panel.date.forall(_.toLocalDate.isBefore(startInclusive)) || panel.endDate.forall(_.toLocalDate.isAfter(endInclusive)))
   }
 
 }
