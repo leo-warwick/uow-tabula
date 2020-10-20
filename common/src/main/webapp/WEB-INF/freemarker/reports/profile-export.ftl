@@ -297,7 +297,7 @@
     <tbody>
     <tr>
       <td>Title</td>
-      <td>${note.title}</td>
+      <td>${note.title!""}</td>
     </tr>
     <tr>
       <td>Created</td>
