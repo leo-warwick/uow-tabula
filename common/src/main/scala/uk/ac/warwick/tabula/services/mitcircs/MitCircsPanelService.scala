@@ -1,5 +1,6 @@
 package uk.ac.warwick.tabula.services.mitcircs
 
+import org.joda.time.LocalDate
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
@@ -18,6 +19,7 @@ trait MitCircsPanelService {
   def list(department: Department, academicYear: AcademicYear): Seq[MitigatingCircumstancesPanel]
   def panels(user: CurrentUser): Set[MitigatingCircumstancesPanel]
   def getPanels(user: MemberOrUser): Set[MitigatingCircumstancesPanel]
+  def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel]
 }
 
 abstract class AbstractMitCircsPanelService extends MitCircsPanelService {
@@ -47,6 +49,11 @@ abstract class AbstractMitCircsPanelService extends MitCircsPanelService {
   def getPanels(user: MemberOrUser): Set[MitigatingCircumstancesPanel] = transactional(readOnly = true) {
     mitCircsPanelDao.getPanels(user)
       .map(HibernateHelpers.initialiseAndUnproxy) // :ytho:
+  }
+
+  def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel] = transactional(readOnly = true) {
+    mitCircsPanelDao.getPanels(user, startInclusive, endInclusive)
+      .map(HibernateHelpers.initialiseAndUnproxy)
   }
 }
 

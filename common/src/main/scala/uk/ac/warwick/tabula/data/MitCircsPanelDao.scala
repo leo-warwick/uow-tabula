@@ -1,7 +1,8 @@
 package uk.ac.warwick.tabula.data
 
-import org.springframework.stereotype.Repository
 import org.hibernate.criterion.Order._
+import org.joda.time.LocalDate
+import org.springframework.stereotype.Repository
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands.{MemberOrUser, TaskBenchmarking}
@@ -23,6 +24,7 @@ trait MitCircsPanelDao {
   def saveOrUpdate(submission: MitigatingCircumstancesPanel): MitigatingCircumstancesPanel
   def list(department: Department, academicYear: AcademicYear): Seq[MitigatingCircumstancesPanel]
   def getPanels(user: MemberOrUser): Set[MitigatingCircumstancesPanel]
+  def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel]
 }
 
 @Repository
@@ -59,6 +61,24 @@ class MitCircsPanelDaoImpl extends MitCircsPanelDao
       """)
       .setString("userId", user.usercode)
       .seq.map(_.scope).toSet
+  }
+
+  override def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel] = {
+    session.newQuery[GrantedRole[MitigatingCircumstancesPanel]](s"""
+      select distinct r from GrantedRole r
+        inner join r._users ug
+        left join ug.staticIncludeUsers static on static = :userId
+        left join ug.includeUsers include on include = :userId
+        left join ug.excludeUsers exclude on exclude = :userId
+      where
+        r.scopeType = 'MitigatingCircumstancesPanel' and (static is not null or include is not null) and exclude is null
+      """)
+      .setString("userId", user.usercode)
+      .seq.map(_.scope)
+      .filterNot(panel => (Option(panel.date).isEmpty && Option(panel.endDate).isEmpty
+        && panel.date.get.toLocalDate.isBefore(startInclusive) && panel.endDate.get.toLocalDate.isAfter(endInclusive)))
+      .toSet
+
   }
 
 }
