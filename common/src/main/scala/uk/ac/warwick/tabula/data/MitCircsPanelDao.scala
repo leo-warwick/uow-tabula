@@ -64,21 +64,9 @@ class MitCircsPanelDaoImpl extends MitCircsPanelDao
   }
 
   override def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel] = {
-    session.newQuery[GrantedRole[MitigatingCircumstancesPanel]](s"""
-      select distinct r from GrantedRole r
-        inner join r._users ug
-        left join ug.staticIncludeUsers static on static = :userId
-        left join ug.includeUsers include on include = :userId
-        left join ug.excludeUsers exclude on exclude = :userId
-      where
-        r.scopeType = 'MitigatingCircumstancesPanel' and (static is not null or include is not null) and exclude is null
-      """)
-      .setString("userId", user.usercode)
-      .seq.map(_.scope)
-      .filterNot(panel => (Option(panel.date).isEmpty && Option(panel.endDate).isEmpty
-        && panel.date.get.toLocalDate.isBefore(startInclusive) && panel.endDate.get.toLocalDate.isAfter(endInclusive)))
-      .toSet
-
+    getPanels(user)
+      .filterNot(panel => panel.date.isEmpty || panel.endDate.isEmpty ||
+        (panel.date.get.toLocalDate.isBefore(startInclusive) || panel.endDate.get.toLocalDate.isAfter(endInclusive)))
   }
 
 }
