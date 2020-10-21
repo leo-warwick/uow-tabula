@@ -203,7 +203,7 @@ class FeaturesMessage {
   // without the Scala module.
   @BeanProperty var timetableFeedCurrentAcademicYear = true
   @BeanProperty var timetableIncludeLectureFeedWBS = false
-  @BeanProperty var timetableIncludeMitCircsPanelEvents = false
+  @BeanProperty var timetableIncludeMitCircsPanelEvents = true
 
   @BeanProperty var emailStudents = false
   @BeanProperty var activityStreams = true
