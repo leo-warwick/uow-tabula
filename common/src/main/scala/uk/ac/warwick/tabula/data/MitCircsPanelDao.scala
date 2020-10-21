@@ -1,7 +1,8 @@
 package uk.ac.warwick.tabula.data
 
-import org.springframework.stereotype.Repository
 import org.hibernate.criterion.Order._
+import org.joda.time.LocalDate
+import org.springframework.stereotype.Repository
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands.{MemberOrUser, TaskBenchmarking}
@@ -23,6 +24,7 @@ trait MitCircsPanelDao {
   def saveOrUpdate(submission: MitigatingCircumstancesPanel): MitigatingCircumstancesPanel
   def list(department: Department, academicYear: AcademicYear): Seq[MitigatingCircumstancesPanel]
   def getPanels(user: MemberOrUser): Set[MitigatingCircumstancesPanel]
+  def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel]
 }
 
 @Repository
@@ -59,6 +61,12 @@ class MitCircsPanelDaoImpl extends MitCircsPanelDao
       """)
       .setString("userId", user.usercode)
       .seq.map(_.scope).toSet
+  }
+
+  override def getPanels(user: MemberOrUser, startInclusive: LocalDate, endInclusive: LocalDate): Set[MitigatingCircumstancesPanel] = {
+    getPanels(user)
+      .filterNot(panel =>
+        panel.date.forall(_.toLocalDate.isBefore(startInclusive)) || panel.endDate.forall(_.toLocalDate.isAfter(endInclusive)))
   }
 
 }
