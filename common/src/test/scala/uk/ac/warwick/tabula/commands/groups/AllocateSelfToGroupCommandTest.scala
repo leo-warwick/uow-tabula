@@ -4,9 +4,9 @@ import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.{Manual, StudentSignUp}
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, SmallGroupSet}
 import uk.ac.warwick.tabula.permissions.Permissions
-import uk.ac.warwick.tabula.services.UserLookupService
+import uk.ac.warwick.tabula.services.{SmallGroupService, SmallGroupServiceComponent, UserLookupService}
 import uk.ac.warwick.tabula.system.permissions.PermissionsChecking
-import uk.ac.warwick.tabula.{Mockito, SmallGroupBuilder, SmallGroupSetBuilder, TestBase}
+import uk.ac.warwick.tabula.{CurrentUser, Mockito, SmallGroupBuilder, SmallGroupSetBuilder, TestBase}
 import uk.ac.warwick.userlookup.{AnonymousUser, User}
 
 class AllocateSelfToGroupCommandTest extends TestBase with Mockito {
@@ -16,6 +16,7 @@ class AllocateSelfToGroupCommandTest extends TestBase with Mockito {
     val testGroup: SmallGroup = new SmallGroupBuilder().withUserLookup(userLookup).build
     val user = new User("abcde")
     user.setWarwickId("01234")
+    val currentUser: CurrentUser = new CurrentUser(user, user)
 
     val userDatabase = Seq(user)
     userLookup.usersByWarwickUniIds(any[Seq[String]]) answers { ids: Any =>
@@ -28,10 +29,12 @@ class AllocateSelfToGroupCommandTest extends TestBase with Mockito {
     }
 
     val testGroupSet: SmallGroupSet = new SmallGroupSetBuilder().withId("set1").withGroups(Seq(testGroup)).build
-    val allocateCommand = new AllocateSelfToGroupCommand(user, testGroupSet)
+    val allocateCommand = new AllocateSelfToGroupCommand(currentUser, testGroupSet) with SmallGroupServiceComponent {
+      override val smallGroupService: SmallGroupService = smartMock[SmallGroupService]
+    }
     allocateCommand.group = testGroup
 
-    val deallocateCommand = new DeallocateSelfFromGroupCommand(user, testGroupSet)
+    val deallocateCommand = new DeallocateSelfFromGroupCommand(currentUser, testGroupSet)
     deallocateCommand.group = testGroup
   }
 
@@ -102,11 +105,11 @@ class AllocateSelfToGroupCommandTest extends TestBase with Mockito {
 
   private trait ValidatorFixture extends Fixture {
     val signUpValidator = new AllocateSelfToGroupValidator with StudentSignUpCommandState {
-      val user: User = null
+      val user: CurrentUser = null
       val groupSet: SmallGroupSet = null
     }
     val unsignUpValidator = new DeallocateSelfFromGroupValidator with StudentSignUpCommandState {
-      val user: User = null
+      val user: CurrentUser = null
       val groupSet: SmallGroupSet = null
     }
 

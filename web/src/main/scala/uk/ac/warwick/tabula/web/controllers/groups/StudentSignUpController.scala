@@ -23,7 +23,7 @@ class StudentSignUpController extends GroupsController {
 
   @ModelAttribute("command")
   def command(@PathVariable("set_id") groupSet: SmallGroupSet, user: CurrentUser): Appliable[SmallGroupSet] = {
-    AllocateSelfToGroupCommand(user.apparentUser, groupSet)
+    AllocateSelfToGroupCommand(user, groupSet)
   }
 
   @RequestMapping(method = Array(GET, HEAD))
@@ -59,7 +59,7 @@ class StudentUnSignUpController extends GroupsController {
 
   @ModelAttribute("command")
   def command(@PathVariable("set_id") groupSet: SmallGroupSet, user: CurrentUser): Appliable[SmallGroupSet] = {
-    DeallocateSelfFromGroupCommand(user.apparentUser, groupSet)
+    DeallocateSelfFromGroupCommand(user, groupSet)
   }
 
   @RequestMapping(method = Array(GET, HEAD))
