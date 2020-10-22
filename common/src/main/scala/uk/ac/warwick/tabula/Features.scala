@@ -44,7 +44,7 @@ abstract class Features {
 
   @Value("${features.timetableFeedCurrentAcademicYear:true}") var timetableFeedCurrentAcademicYear: Boolean = defaults.timetableFeedCurrentAcademicYear
   @Value("${features.timetableIncludeLectureFeedWBS:false}") var timetableIncludeLectureFeedWBS: Boolean = defaults.timetableIncludeLectureFeedWBS
-  @Value("${features.timetableIncludeMitCircsPanelEvents:false}") var timetableIncludeMitCircsPanelEvents: Boolean = defaults.timetableIncludeMitCircsPanelEvents
+  @Value("${features.timetableIncludeMitCircsPanelEvents:true}") var timetableIncludeMitCircsPanelEvents: Boolean = defaults.timetableIncludeMitCircsPanelEvents
 
   @Value("${features.emailStudents:false}") var emailStudents: Boolean = defaults.emailStudents
   @Value("${features.collectRatings:true}") var collectRatings: Boolean = defaults.collectRatings
