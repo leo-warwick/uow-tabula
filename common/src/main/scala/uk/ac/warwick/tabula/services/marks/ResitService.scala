@@ -6,8 +6,9 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model.{RecordedResit, UpstreamAssessmentGroup}
 import uk.ac.warwick.tabula.data.{AutowiringResitDaoComponent, AutowiringTransactionalComponent, ResitDaoComponent, TransactionalComponent}
+import uk.ac.warwick.tabula.services.healthchecks.SitsQueueService
 
-trait ResitService {
+trait ResitService extends SitsQueueService {
   def saveOrUpdate(resit: RecordedResit): RecordedResit
   def getAllResits(uag: UpstreamAssessmentGroup): Seq[RecordedResit]
   def getAllResitsByGroup(groups: Seq[UpstreamAssessmentGroup]): Map[UpstreamAssessmentGroup, Seq[RecordedResit]]

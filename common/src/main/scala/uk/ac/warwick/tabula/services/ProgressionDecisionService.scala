@@ -9,7 +9,8 @@ import uk.ac.warwick.tabula.data.{AutowiringProgressionDecisionDaoComponent, Aut
 trait ProgressionDecisionService {
   def saveOrUpdate(pd: ProgressionDecision): Unit
   def delete(pd: ProgressionDecision): Unit
-  def getByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision]
+  def getAgreedByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision]
+  def getAgreedByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision]
   def getByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision]
 }
 
@@ -25,8 +26,12 @@ abstract class DatabaseProgressionDecisionService extends ProgressionDecisionSer
     progressionDecisionDao.delete(pd)
   }
 
-  override def getByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision] = transactional(readOnly = true) {
-    progressionDecisionDao.getByAcademicYears(academicYears)
+  override def getAgreedByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision] = transactional(readOnly = true) {
+    progressionDecisionDao.getAgreedByAcademicYears(academicYears)
+  }
+
+  override def getAgreedByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision] = transactional(readOnly = true) {
+    progressionDecisionDao.getAgreedByUniversityIds(universityIds)
   }
 
   override def getByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision] = transactional(readOnly = true) {

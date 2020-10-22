@@ -5,6 +5,7 @@ import org.hibernate.annotations.{Proxy, Type}
 import org.joda.time.DateTime
 import uk.ac.warwick.tabula.JavaImports.JInteger
 import uk.ac.warwick.tabula.commands.marks.ListAssessmentComponentsCommand.StudentMarkRecord
+import uk.ac.warwick.tabula.services.healthchecks.WriteToSits
 import uk.ac.warwick.tabula.{AcademicYear, SprCode, ToString}
 import uk.ac.warwick.userlookup.User
 
@@ -16,6 +17,7 @@ import uk.ac.warwick.userlookup.User
 @Access(AccessType.FIELD)
 class RecordedResit extends GeneratedId
   with HibernateVersioned
+  with WriteToSits
   with ToString with Serializable {
 
   def this(mr: StudentMarkRecord, sprCode: String) = {

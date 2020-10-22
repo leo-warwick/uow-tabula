@@ -429,7 +429,11 @@
                   <ul class="dropdown-menu">
                     <li>
                       <#assign processUrl><@routes.marks.cohort_process department academicYear /></#assign>
-                      <button type="submit" formaction="${processUrl}">Process marks for this cohort</button>
+                      <button type="submit" name="courseSelected" formaction="${processUrl}">Process marks for this cohort</button>
+                    </li>
+                    <li>
+                      <#assign decisionUrl><@routes.marks.cohort_outcomes department academicYear /></#assign>
+                      <button type="submit" name="courseSelected" formaction="${decisionUrl}">Record decisions for this cohort</button>
                     </li>
                   </ul>
                 </div>

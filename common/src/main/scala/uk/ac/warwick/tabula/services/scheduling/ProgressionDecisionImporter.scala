@@ -12,13 +12,15 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports.{JList, JMap}
 import uk.ac.warwick.tabula.commands.TaskBenchmarking
 import uk.ac.warwick.tabula.data.Daoisms
-import uk.ac.warwick.tabula.data.model.{DegreeType, ProgressionDecision, ProgressionDecisionOutcome}
+import uk.ac.warwick.tabula.data.model.{DegreeType, ProgressionDecision, ProgressionDecisionOutcome, ProgressionDecisionProcessStatus}
+import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.sandbox.SandboxData
 import uk.ac.warwick.tabula.services.scheduling.ProgressionDecisionImporter.{ProgressionDecisionsByAcademicYearsQuery, ProgressionDecisionsByUniversityIdsQuery}
 import uk.ac.warwick.tabula.{AcademicYear, AutowiringFeaturesComponent, Features, ToString}
 
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try}
 
 /**
  * Import progression decisions from SITS.
@@ -75,9 +77,10 @@ class SandboxProgressionDecisionImporter extends ProgressionDecisionImporter {
             sequence = "%03d".format(index + 1),
             resitPeriod = false,
             academicYear = academicYear,
-            outcome = ProgressionDecisionOutcome.UndergraduateProceedHonours,
+            outcome = Some(ProgressionDecisionOutcome.UndergraduateProceedHonours),
             notes = None,
             minutes = None,
+            status = ProgressionDecisionProcessStatus.Complete.code
           )
         }
       }
@@ -85,7 +88,7 @@ class SandboxProgressionDecisionImporter extends ProgressionDecisionImporter {
   }
 }
 
-object ProgressionDecisionImporter {
+object ProgressionDecisionImporter extends Logging {
   val sitsSchema: String = Wire.property("${schema.sits}")
 
   var features: Features = Wire[Features]
@@ -99,26 +102,36 @@ object ProgressionDecisionImporter {
       |   spi.spi_payr as academic_year_period, -- Period of study this applies to, so for resits it would be the previous year
       |   spi.spi_pit1 as agreed_outcome,
       |   spi.spi_note as notes,
-      |   spi.spi_mint as minutes
+      |   spi.spi_mint as minutes,
+      |   spi.spi_prcs as status
       |from $sitsSchema.cam_spi spi
-      |where spi.spi_prcs = 2                   -- Process completed only
       |""".stripMargin
 
   final def ProgressionDecisionsForAcademicYearSql =
-    s"$BaseSql and spi.spi_payr in (:academicYears)"
+    s"$BaseSql where spi.spi_payr in (:academicYears)"
 
   final def ProgressionDecisionsForUniversityIdsSql =
-    s"$BaseSql and SUBSTR(spi.spi_sprc, 0, 7) in (:universityIds)"
+    s"$BaseSql where SUBSTR(spi.spi_sprc, 0, 7) in (:universityIds)"
 
   def mapResultSet(rs: ResultSet): ProgressionDecisionRow = {
+    val sprCode = rs.getString("spr_code")
+    val sequence = rs.getString("sequence")
     new ProgressionDecisionRow(
-      sprCode = rs.getString("spr_code"),
-      sequence = rs.getString("sequence"),
+      sprCode = sprCode,
+      sequence = sequence,
       resitPeriod = rs.getString("scope_period").maybeText.contains("S"),
       academicYear = AcademicYear.parse(rs.getString("academic_year_period")),
-      outcome = ProgressionDecisionOutcome.forPitCode(rs.getString("agreed_outcome")),
+      outcome = rs.getString("agreed_outcome").maybeText.flatMap(pc =>
+        Try(ProgressionDecisionOutcome.forPitCode(pc)) match {
+          case Success(o) => Some(o)
+          case Failure(_) =>
+            logger.warn(s"Unable to import decision for $sprCode, $sequence - $pc isn't a recognised agreed pit code")
+            None
+        }
+      ),
       notes = rs.getString("notes").maybeText,
-      minutes = rs.getString("minutes").maybeText
+      minutes = rs.getString("minutes").maybeText,
+      status = rs.getInt("status")
     )
   }
 
@@ -153,9 +166,10 @@ class ProgressionDecisionRow(
   var sprCode: String,
   var sequence: String,
   var academicYear: AcademicYear,
-  var outcome: ProgressionDecisionOutcome,
+  var outcome: Option[ProgressionDecisionOutcome],
   var notes: Option[String],
   var minutes: Option[String],
+  var status: Int,
   var resitPeriod: Boolean,
 ) extends ToString {
   def toProgressionDecision: ProgressionDecision = {
@@ -167,6 +181,7 @@ class ProgressionDecisionRow(
     pd.notes = notes
     pd.minutes = minutes
     pd.resitPeriod = resitPeriod
+    pd.status = ProgressionDecisionProcessStatus.forCode(status)
     pd
   }
 
@@ -179,6 +194,7 @@ class ProgressionDecisionRow(
       .append(notes)
       .append(minutes)
       .append(resitPeriod)
+      .append(status)
       .build()
 
   override def equals(obj: Any): Boolean = obj match {
@@ -191,6 +207,7 @@ class ProgressionDecisionRow(
         .append(notes, other.notes)
         .append(minutes, other.minutes)
         .append(resitPeriod, other.resitPeriod)
+        .append(status, other.status)
         .build()
   }
 
@@ -201,6 +218,7 @@ class ProgressionDecisionRow(
     "outcome" -> outcome,
     "notes" -> notes,
     "minutes" -> minutes,
-    "resitPeriod" -> resitPeriod
+    "resitPeriod" -> resitPeriod,
+    "status" -> status
   )
 }

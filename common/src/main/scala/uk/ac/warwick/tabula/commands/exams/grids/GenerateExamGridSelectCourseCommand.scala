@@ -136,6 +136,13 @@ trait GenerateExamGridSelectCourseCommandRequest {
 
   def isLevelGrid: Boolean = levelCode != null
 
+  // true if none of the course filter parameters have been selected
+  def isEmptyRequest: Boolean = courses.isEmpty &&
+    courseOccurrences.isEmpty &&
+    routes.isEmpty &&
+    yearOfStudy == null &&
+    levelCode == null
+
   // parses undergrad level codes into year of study as if the degree was being taken full time - otherwise returns 1 as other courses don't have multiple levels
   def studyYearByLevelOrBlock: JInteger = {
     JInteger(Option(yearOfStudy).map(_.toInt).orElse(Option(levelCode).map(Level.toYearOfStudy)))

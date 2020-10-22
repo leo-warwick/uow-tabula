@@ -7,20 +7,19 @@
       <#return selectCourseCommand />
   </#function>
 
-  <@fmt.id7_deptheader title="Process marks for ${department.name}" route_function=route_function />
+  <@fmt.id7_deptheader title="${selectCourseActionTitle} for ${department.name}" route_function=route_function />
 
   <h2>Select courses</h2>
 
-  <#assign processUrl><@routes.marks.cohort_process department academicYear /></#assign>
   <#assign cancelUrl><@routes.marks.adminhome department academicYear /></#assign>
-  <form method="get" action="${processUrl}" class="form-inline select-course">
+  <form method="get" action="${selectCourseAction}" class="form-inline select-course">
     <@csrf_macros.csrfHiddenInputField />
     <#assign chooseYears=false />
     <#include "../../exams/grids/generate/_select_course_fields.ftl" />
     <@bs3form.errors path="selectCourseCommand" />
 
     <div class="submit-buttons fix-footer">
-      <input type="submit" class="btn btn-primary" value="View marks" />
+      <input name="courseSelected" type="submit" class="btn btn-primary" value="${selectCourseActionLabel}" />
       <a class="btn btn-default dirty-check-ignore" href="${cancelUrl}">Cancel</a>
     </div>
   </form>
