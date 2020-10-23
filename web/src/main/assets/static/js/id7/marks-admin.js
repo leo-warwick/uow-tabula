@@ -113,6 +113,8 @@ $(() => {
     });
   });
 
+  // cohort processing scripts
+
   $('.module-mark-modal').on('show.bs.modal', (e) => {
     const $modal = $(e.target);
     $modal.find('.auto-grade-modal[data-mark][data-generate-url]').not('[data-grades-initialised]').each(autoGradeSelect);
@@ -174,6 +176,36 @@ $(() => {
   $('input[type=hidden][name$="process"][value=true]').closest('tr.student').find('.process-checkbox')
     .prop('checked', true)
     .each((i, checkbox) => { updateProcess(checkbox); });
+
+  // cohort progression decision scripts
+
+  $('select[name$="decision"]').on('change', (e) => {
+    const $decision = $(e.target).find('option:selected');
+    const $notes = $decision.closest('tr').find('textarea[name$="notes"]');
+    if ($decision.data('mandatory-notes')) {
+      const notesHelp = $decision.data('notes-help');
+      if (!$notes.data('o-height')) $notes.data('o-height', $notes.get(0).scrollHeight);
+      $notes.animate({ height: '8em' }, 500, () => {
+        $notes.siblings('.help-block').remove();
+        $(`<div class="help-block">
+            Comments are mandatory for this decision
+            <span class="tabula-tooltip" data-title="${notesHelp}">
+              <i class="fa-fw fad fa-question-circle" aria-hidden="true"></i>
+              <span class="sr-only">${notesHelp}</span>
+            </span>
+          </div>
+        `)
+          .hide()
+          .appendTo($notes.closest('.form-group'))
+          .fadeIn(500);
+      });
+    } else {
+      $notes.animate({ height: `${$notes.data('o-height')}` }, 500, () => {
+        $notes.height('auto');
+      });
+      $notes.closest('.form-group').find('.help-block').fadeOut(500).remove();
+    }
+  }).trigger('change');
 
   // This is intentionally at the end, after we've messed around with things
   $('.table-sortable').sortableTable({

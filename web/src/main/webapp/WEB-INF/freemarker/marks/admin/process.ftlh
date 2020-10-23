@@ -2,7 +2,6 @@
 <#import "*/_profile_link.ftl" as pl />
 <#import "*/marks_components.ftlh" as components />
 <#import "/WEB-INF/freemarker/generated_grades_macros.ftlh" as gg />
-<#import "/WEB-INF/freemarker/exams/grids/generate/form_fields.ftl" as gf />
 
 <#assign courses><#list selectCourseCommand.courses as course >${course.code}<#if course_has_next>, </#if></#list></#assign>
 <div class="deptheader">

@@ -23,6 +23,13 @@ object Routes {
     def home(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}"
     def outOfSyncMarks(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/out-of-sync-marks"
 
+    // actions that apply to a group of students
+    object Cohorts {
+      def apply(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/cohort"
+      def processMarks(department: Department, academicYear: AcademicYear): String = s"${apply(department, academicYear)}/process"
+      def examBoardOutcomes(department: Department, academicYear: AcademicYear): String = s"${apply(department, academicYear)}/outcomes"
+    }
+
     object AssessmentComponents {
       def apply(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/assessment-components"
       def recordMarks(assessmentComponent: AssessmentComponent, upstreamAssessmentGroup: UpstreamAssessmentGroup): String = s"$context/admin/assessment-component/${assessmentComponent.id}/${upstreamAssessmentGroup.id}/marks"

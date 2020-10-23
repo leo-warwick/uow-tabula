@@ -166,7 +166,7 @@ class StudentAssessmentCommandInternal(val studentCourseDetails: StudentCourseDe
         .filter(_.isVisibleToStudent)
 
     // Are there any UA* type progression decisions
-    val uaProgressionDecisions = progressionDecisions.exists(_.outcome.hasAward)
+    val uaProgressionDecisions = progressionDecisions.flatMap(_.outcome).exists(_.hasAward)
 
     lazy val pgtAwardDisplay = studentCourseDetails.courseType.contains(CourseType.PGT) &&
       (features.ignoreResultRelease || MarkState.resultsReleasedToStudents(academicYear, Some(studentCourseDetails), MarkState.DecisionReleaseTime))

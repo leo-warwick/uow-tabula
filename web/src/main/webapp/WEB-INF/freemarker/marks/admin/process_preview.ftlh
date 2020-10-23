@@ -28,8 +28,8 @@
 
     <div class="fix-area">
       <@f.form method="post" modelAttribute="processCohortMarksCommand" cssClass="marks-form">
-          <@gf.select_course_fields />
-          <@f.hidden name="confirm" value="true" />
+        <@gf.select_course_fields />
+        <@f.hidden name="confirm" value="true" />
 
         <table class="table table-striped table-sortable">
           <thead>

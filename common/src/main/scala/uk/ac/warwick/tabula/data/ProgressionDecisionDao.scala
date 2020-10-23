@@ -6,12 +6,13 @@ import org.springframework.stereotype.Repository
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.Daoisms._
-import uk.ac.warwick.tabula.data.model.ProgressionDecision
+import uk.ac.warwick.tabula.data.model.{ProgressionDecision, ProgressionDecisionProcessStatus}
 
 trait ProgressionDecisionDao {
   def saveOrUpdate(pd: ProgressionDecision): Unit
   def delete(pd: ProgressionDecision): Unit
-  def getByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision]
+  def getAgreedByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision]
+  def getAgreedByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision]
   def getByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision]
 }
 
@@ -22,20 +23,28 @@ abstract class HibernateProgressionDecisionDao extends ProgressionDecisionDao wi
 
   override def delete(pd: ProgressionDecision): Unit = session.delete(pd)
 
-  override def getByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision] =
+  override def getAgreedByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision] =
     safeInSeq(() => {
       session.newCriteria[ProgressionDecision]
+        .add(is("status", ProgressionDecisionProcessStatus.Complete))
         .addOrder(asc("sprCode"))
         .addOrder(asc("sequence"))
     }, "academicYear", academicYears)
 
+  private def byUniversityIdCriteria = session.newCriteria[ProgressionDecision]
+    .createAlias("_allStudentCourseDetails", "studentCourseDetails")
+    .add(isNull("studentCourseDetails.missingFromImportSince"))
+    .addOrder(asc("sprCode"))
+    .addOrder(asc("sequence"))
+
+  override def getAgreedByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision] =
+    safeInSeq(() => {
+      byUniversityIdCriteria.add(is("status", ProgressionDecisionProcessStatus.Complete))
+    }, "studentCourseDetails.student.universityId", universityIds).distinct
+
   override def getByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision] =
     safeInSeq(() => {
-      session.newCriteria[ProgressionDecision]
-        .createAlias("_allStudentCourseDetails", "studentCourseDetails")
-        .add(isNull("studentCourseDetails.missingFromImportSince"))
-        .addOrder(asc("sprCode"))
-        .addOrder(asc("sequence"))
+      byUniversityIdCriteria
     }, "studentCourseDetails.student.universityId", universityIds).distinct
 }
 

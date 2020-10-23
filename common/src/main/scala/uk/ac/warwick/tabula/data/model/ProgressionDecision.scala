@@ -8,7 +8,8 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.model.forms.FormattedHtml
 import uk.ac.warwick.tabula.helpers.StringUtils._
-import uk.ac.warwick.tabula.{AcademicYear, Features, ToString}
+import uk.ac.warwick.tabula.system.EnumTwoWayConverter
+import uk.ac.warwick.tabula.{AcademicYear, Features, ItemNotFoundException, ToString}
 
 import scala.jdk.CollectionConverters._
 
@@ -44,8 +45,12 @@ class ProgressionDecision extends GeneratedId with ToString {
   var academicYear: AcademicYear = _
 
   @Type(`type` = "uk.ac.warwick.tabula.data.model.ProgressionDecisionOutcomeUserType")
+  var outcome: Option[ProgressionDecisionOutcome] = _
+
+  @Type(`type` = "uk.ac.warwick.tabula.data.model.ProgressionDecisionProcessStatusUserType")
   @Column(nullable = false)
-  var outcome: ProgressionDecisionOutcome = _
+  var status: ProgressionDecisionProcessStatus = _
+
 
   /**
    * These are *NOT* visible to students
@@ -114,9 +119,83 @@ object ProgressionDecisionOutcome extends Enum[ProgressionDecisionOutcome] {
   case object RequiredToRestart extends ProgressionDecisionOutcome(Set("RS"), "Required to restart", message = FormattedHtml("Your results indicate that you are not eligible to proceed to the next year of your degree. The Board of Examiners have decided that you should restart your 1st year. You will receive an email containing further details which will set our what you need to do next. Support is available to you as always either through your Personal Tutor or through Wellbeing Services."))
 
   def forPitCode(pitCode: String): ProgressionDecisionOutcome =
-    values.find(_.pitCodes.contains(pitCode)).getOrElse(throw new NoSuchElementException)
+    values.find(_.pitCodes.contains(pitCode)).getOrElse(throw new NoSuchElementException(s"$pitCode is not a recognised PIT code"))
 
   override def values: IndexedSeq[ProgressionDecisionOutcome] = findValues
 }
 
-class ProgressionDecisionOutcomeUserType extends EnumUserType(ProgressionDecisionOutcome)
+class ProgressionDecisionOutcomeUserType extends OptionEnumUserType(ProgressionDecisionOutcome)
+
+sealed abstract class ActualProgressionDecision(
+  val pitCode: String,
+  val description: String,
+  val finalistDescription: Option[String],
+  val notesHelp: Option[String] = None
+) extends EnumEntry {
+  def validForFinalists: Boolean = finalistDescription.isDefined
+  def notesRequired: Boolean = notesHelp.isDefined
+}
+
+object ActualProgressionDecision extends Enum[ActualProgressionDecision] {
+  case object Proceed extends ActualProgressionDecision("D1", "Proceed to next year of Honours Degree", None)
+
+  case object First extends ActualProgressionDecision (
+    pitCode = "D1-01",
+    description ="Proceed to next year of Honours – First so far",
+    finalistDescription = Some("Award – First")
+  )
+  case object UpperSecond extends ActualProgressionDecision (
+    pitCode = "D1-21",
+    description = "Proceed to next year of Honours - Upper Second so far",
+    Some("Award – Upper Second")
+  )
+  case object LowerSecond extends ActualProgressionDecision (
+    pitCode = "D1-22",
+    description = "Proceed to next year of Honours - Lower Second so far",
+    Some("Award – Lower Second")
+  )
+  case object Third extends ActualProgressionDecision (
+    pitCode = "D1-03",
+    description = "Proceed to next year of Honours – Third so far",
+    Some("Award - Third")
+  )
+  case object Pass extends ActualProgressionDecision (
+    pitCode = "D3",
+    description = "Proceed to Pass",
+    Some("Pass Degree")
+  )
+  case object Resit extends ActualProgressionDecision (
+    pitCode = "D4",
+    description = "Resit / Further First Attempt",
+    Some("Resit / Further First Attempt"),
+    notesHelp = Some("For each resit please include: the module code, list the assessments that are to be resat, when the resits will take place and if the resits are further first attempts or resits.")
+  )
+  case object Withdraw extends ActualProgressionDecision (
+    pitCode = "D5",
+    description = "Fail: Required to Withdraw",
+    Some("Fail: Required to Withdraw"),
+    notesHelp = Some("Please state why the student is required to withdraw (failed laboratory tests or failed resit examanations).")
+  )
+
+  override def values: IndexedSeq[ActualProgressionDecision] = findValues
+}
+
+class ActualProgressionDecisionUserType extends EnumUserType(ActualProgressionDecision)
+class ActualProgressionDecisionConverter extends EnumTwoWayConverter(ActualProgressionDecision)
+
+sealed abstract class ProgressionDecisionProcessStatus (val code: Int) extends EnumEntry
+
+object ProgressionDecisionProcessStatus extends Enum[ProgressionDecisionProcessStatus] {
+  case object Incomplete extends ProgressionDecisionProcessStatus (0)
+  case object Held extends ProgressionDecisionProcessStatus (1)
+  case object Complete extends ProgressionDecisionProcessStatus (2)
+  case object Agreed extends ProgressionDecisionProcessStatus (3)
+
+  override def values: IndexedSeq[ProgressionDecisionProcessStatus] = findValues
+
+  def forCode(code: Int): ProgressionDecisionProcessStatus = values.find(_.code == code)
+    .getOrElse(throw new ItemNotFoundException(s"$code is not a valid ProgressionDecisionProcessStatus"))
+}
+class ProgressionDecisionProcessStatusUserType extends EnumUserType(ProgressionDecisionProcessStatus)
+
+
