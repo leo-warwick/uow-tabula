@@ -18,7 +18,7 @@
   <p>Once these decisions are agreed, you will not be able to change them without the involvement of Student Records.</p>
 
   <#if notifications?size != 0>
-    <div class="alert alert-info"><i class="fa fa-envelope"></i> Some decisions are being updated. Student records will be notified of these changes.</div>
+    <div class="alert alert-info"><i class="fa fa-envelope"></i> Some decisions are being updated. Student Records will be notified of these changes.</div>
   </#if>
 
   <div class="fix-area">
