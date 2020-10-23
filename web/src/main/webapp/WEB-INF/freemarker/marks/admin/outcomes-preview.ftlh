@@ -46,7 +46,7 @@
                 <@f.hidden path="students[${sprCode}].record" />
                 <@pl.profile_link student.universityId /> ${sprCode}
                 <#if student.existing??>
-                  <#assign tooltip>Student records will be notified about these changes.</#assign>
+                  <#assign tooltip>Student Records will be notified about these changes.</#assign>
                   <span class="tabula-tooltip" data-title="${tooltip}">
                     <i class="fa-fw fad fa-envelope" aria-hidden="true"></i>
                     <span class="sr-only">${tooltip}</span>
