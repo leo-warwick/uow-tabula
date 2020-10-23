@@ -5,7 +5,7 @@
 <#import "/WEB-INF/freemarker/exams/grids/generate/form_fields.ftl" as gf />
 
 <#macro agreed>
-  <#assign tooltip>Decision has been agreed. To make changes contact student records.</#assign>
+  <#assign tooltip>Decision has been agreed. To make changes contact Student Records.</#assign>
   <span tabindex="0" class="tabula-tooltip" data-title="${tooltip}">
     <span class="label label-success">Agreed</span>
     <span class="sr-only">${tooltip}</span>
