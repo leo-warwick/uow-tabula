@@ -301,9 +301,7 @@ class SandboxProfileImporter extends ProfileImporter with AutowiringProfileServi
           case _ => null
         }),
         "special_exam_arrangements_hourly_rest_minutes" -> (member.universityId.toLong % 100 match {
-          case 1 => "15"
-          case 4 => "20"
-          case 5 => "30"
+          case 5 => "15"
           case _ => null
         }),
         "mst_type" -> "L",
