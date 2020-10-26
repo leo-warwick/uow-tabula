@@ -53,6 +53,7 @@ trait UpstreamAssessmentsAndExamsToJsonConverter {
               Map("name" -> name, "locationId" -> locationId) ++ syllabusPlusName.map(n => Map("syllabusPlusName" -> n)).getOrElse(Map())
           }.orNull,
           "specialExamArrangementsExtraTime" -> student.studentCourseDetails.flatMap(scd => Option(scd.specialExamArrangementsExtraTime)).map(_.toString).orNull,
+          "specialExamArrangementsHourlyRestMinutes" -> student.studentCourseDetails.flatMap(scd => Option(scd.specialExamArrangementsHourlyRestMinutes)).map(_.toString).orNull,
         )
       }
     )

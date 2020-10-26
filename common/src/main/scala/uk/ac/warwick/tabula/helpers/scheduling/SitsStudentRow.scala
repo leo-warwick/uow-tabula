@@ -112,6 +112,12 @@ class SitsStudentRow(resultSet: ResultSet)
       .map(Duration.standardMinutes(_))
       .orNull
   } else null
+  this.specialExamArrangementsHourlyRestMinutes = if (this.specialExamArrangements) {
+    Try(resultSet.getString("special_exam_arrangements_hourly_rest_minutes").toInt).toOption
+      .filter(_ > 0)
+      .map(Duration.standardMinutes(_))
+      .orNull
+  } else null
 
   // data from the result set which will be used by ImportStudentCourseYearCommand to create
   // StudentCourseYearDetails.  The data needs to be extracted in this command while the result set is accessible.
