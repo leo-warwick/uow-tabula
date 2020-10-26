@@ -1,29 +1,32 @@
 package uk.ac.warwick.tabula.commands.groups
 
+import org.springframework.validation.Errors
+import uk.ac.warwick.tabula.CurrentUser
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.StudentSignUp
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, SmallGroupSet}
 import uk.ac.warwick.tabula.data.model.notifications.groups.OpenSmallGroupSetsStudentSignUpNotification
 import uk.ac.warwick.tabula.events.NotificationHandling
-import uk.ac.warwick.userlookup.User
-import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, RequiresPermissionsChecking}
 import uk.ac.warwick.tabula.permissions.Permissions
-import org.springframework.validation.Errors
-import uk.ac.warwick.tabula.data.model.groups.SmallGroupAllocationMethod.StudentSignUp
+import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, SmallGroupServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, RequiresPermissionsChecking}
+
 import scala.jdk.CollectionConverters._
 
 object AllocateSelfToGroupCommand {
-  def apply(user: User, groupSet: SmallGroupSet): AllocateSelfToGroupCommand with ComposableCommand[SmallGroupSet] with StudentSignupCommandPermissions with StudentSignUpCommandDescription with AllocateSelfToGroupValidator with AllocateSelfToGroupNotificationCompletion = {
+  def apply(user: CurrentUser, groupSet: SmallGroupSet): AllocateSelfToGroupCommand with ComposableCommand[SmallGroupSet] with StudentSignupCommandPermissions with StudentSignUpCommandDescription with AllocateSelfToGroupValidator with AllocateSelfToGroupNotificationCompletion = {
     new AllocateSelfToGroupCommand(user, groupSet)
       with ComposableCommand[SmallGroupSet]
       with StudentSignupCommandPermissions
       with StudentSignUpCommandDescription
       with AllocateSelfToGroupValidator
       with AllocateSelfToGroupNotificationCompletion
+      with AutowiringSmallGroupServiceComponent
   }
 }
 
 object DeallocateSelfFromGroupCommand {
-  def apply(user: User, groupSet: SmallGroupSet): DeallocateSelfFromGroupCommand with ComposableCommand[SmallGroupSet] with StudentSignupCommandPermissions with StudentSignUpCommandDescription with DeallocateSelfFromGroupValidator = {
+  def apply(user: CurrentUser, groupSet: SmallGroupSet): DeallocateSelfFromGroupCommand with ComposableCommand[SmallGroupSet] with StudentSignupCommandPermissions with StudentSignUpCommandDescription with DeallocateSelfFromGroupValidator = {
     new DeallocateSelfFromGroupCommand(user, groupSet)
       with ComposableCommand[SmallGroupSet]
       with StudentSignupCommandPermissions
@@ -72,23 +75,29 @@ trait DeallocateSelfFromGroupValidator extends SelfValidating {
 }
 
 trait StudentSignUpCommandState {
-  val user: User
+  val user: CurrentUser
   val groupSet: SmallGroupSet
   var group: SmallGroup = _
 }
 
-class AllocateSelfToGroupCommand(val user: User, val groupSet: SmallGroupSet) extends CommandInternal[SmallGroupSet] with StudentSignUpCommandState {
+class AllocateSelfToGroupCommand(val user: CurrentUser, val groupSet: SmallGroupSet) extends CommandInternal[SmallGroupSet] with StudentSignUpCommandState {
+
+  self: SmallGroupServiceComponent =>
 
   def applyInternal(): SmallGroupSet = {
-    group.students.add(user)
+
+    if(!group.students.includesUser(user.apparentUser)) {
+      smallGroupService.backFillAttendance(user.apparentUser.getWarwickId, smallGroupService.findAttendanceByGroup(group), user)
+    }
+    group.students.add(user.apparentUser)
     group.groupSet
   }
 }
 
-class DeallocateSelfFromGroupCommand(val user: User, val groupSet: SmallGroupSet) extends CommandInternal[SmallGroupSet] with StudentSignUpCommandState {
+class DeallocateSelfFromGroupCommand(val user: CurrentUser, val groupSet: SmallGroupSet) extends CommandInternal[SmallGroupSet] with StudentSignUpCommandState {
 
   def applyInternal(): SmallGroupSet = {
-    group.students.remove(user)
+    group.students.remove(user.apparentUser)
     group.groupSet
   }
 }
@@ -118,10 +127,10 @@ trait AllocateSelfToGroupNotificationCompletion extends CompletesNotifications[S
     val notifications = notificationService.findActionRequiredNotificationsByEntityAndType[OpenSmallGroupSetsStudentSignUpNotification](groupSet)
 
     def needsSignUp(set: SmallGroupSet) = {
-      set.allStudents.contains(user) && !set.groups.asScala.exists(_.students.includesUser(user))
+      set.allStudents.contains(user.apparentUser) && !set.groups.asScala.exists(_.students.includesUser(user.apparentUser))
     }
 
-    val notificationsToClear = notifications.filter(_.isRecipient(user)).filter(n =>
+    val notificationsToClear = notifications.filter(_.isRecipient(user.apparentUser)).filter(n =>
       n.notificationItems.asScala.forall(entityRef =>
         entityRef.entity match {
           case set: SmallGroupSet =>
@@ -131,7 +140,7 @@ trait AllocateSelfToGroupNotificationCompletion extends CompletesNotifications[S
         }
       )
     )
-    CompletesNotificationsResult(notificationsToClear, user)
+    CompletesNotificationsResult(notificationsToClear, user.apparentUser)
   }
 
 }
