@@ -36,7 +36,7 @@
         </thead>
         <tbody>
         <#list modules as module>
-          <tr ${module.hasUnreleasedGroupSets(academicYear)?string("","class='use-tooltip' title='Groups for this module have already been published'")}
+          <tr <#if !module.hasUnreleasedGroupSets(academicYear)> class='use-tooltip' title='Groups for this module have already been published'</#if>
                   data-container="#tooltip-container">
             <td>
               <@f.checkbox

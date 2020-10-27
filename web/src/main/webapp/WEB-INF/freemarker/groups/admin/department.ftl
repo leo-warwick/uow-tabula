@@ -99,7 +99,7 @@
           <li class="divider"></li>
 
           <#if features.smallGroupTeachingStudentSignUp>
-            <li ${hasOpenableGroupsets?string(''," class='disabled use-tooltip' title='There are no self-signup groups to open' ")}>
+            <li <#if !hasOpenableGroupsets> class='disabled use-tooltip' title='There are no self-signup groups to open' </#if>>
               <#assign open_url><@routes.groups.batchopen department adminCommand.academicYear /></#assign>
               <@fmt.permission_button
               permission='SmallGroups.Update'
@@ -110,7 +110,7 @@
                 Open
               </@fmt.permission_button>
             </li>
-            <li ${hasCloseableGroupsets?string(''," class='disabled use-tooltip' title='There are no self-signup groups to close' ")}>
+            <li <#if !hasCloseableGroupsets> class='disabled use-tooltip' title='There are no self-signup groups to close'</#if>>
               <#assign close_url><@routes.groups.batchclose department adminCommand.academicYear /></#assign>
               <@fmt.permission_button
               permission='SmallGroups.Update'
@@ -123,7 +123,7 @@
             </li>
           </#if>
 
-          <li ${hasUnreleasedGroupsets?string(''," class='disabled use-tooltip' title='All modules already published' ")} >
+          <li <#if !hasUnreleasedGroupsets> class='disabled use-tooltip' title='All modules already published'</#if>>
             <#assign notify_url><@routes.groups.batchnotify department viewedAcademicYear /></#assign>
             <@fmt.permission_button
             permission='SmallGroups.Update'

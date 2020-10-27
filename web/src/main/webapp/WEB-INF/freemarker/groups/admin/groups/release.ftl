@@ -18,12 +18,12 @@
 
         <@bs3form.checkbox "notifyStudents">
           <@f.checkbox path="notifyStudents" disabled=smallGroupSet.releasedToStudents />
-          <span tabindex="0" class="${smallGroupSet.releasedToStudents?string('disabled use-tooltip" title="Already published','') }">Students</span>
+          <span tabindex="0" <#if smallGroupSet.releasedToStudents>class='disabled use-tooltip' title='Already published'</#if>>Students</span>
         </@bs3form.checkbox>
 
         <@bs3form.checkbox "notifyTutors">
           <@f.checkbox path="notifyTutors" disabled=smallGroupSet.releasedToTutors />
-          <span class="${smallGroupSet.releasedToTutors?string('disabled','')}">Tutors</span>
+          <span <#if smallGroupSet.releasedToTutors>class='disabled use-tooltip' title='Already published to tutors'</#if>>Tutors</span>
         </@bs3form.checkbox>
 
         <p class="help-block">

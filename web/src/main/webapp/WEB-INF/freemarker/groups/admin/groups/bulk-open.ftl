@@ -39,7 +39,7 @@
         </thead>
         <tbody>
         <#list groupSets as set>
-          <tr ${(set.openForSignups == stateChange)?string("class='use-tooltip' title='This group is already ${setState}${pastTense} for sign-ups'","")} >
+          <tr <#if set.openForSignups == stateChange> class='use-tooltip' title='This group is already ${setState}${pastTense} for sign-ups'</#if> >
             <td>
               <@f.checkbox
               class=(set.openForSignups == stateChange)?string('','collection-checkbox')
