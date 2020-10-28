@@ -605,7 +605,7 @@
     <div class="event">
       <h3>${smallGroupData[eventId]?first.title}</h3>
       <p>
-        ${smallGroupData[eventId]?first.day}s
+        <#if smallGroupData[eventId]?first.day?has_content>${smallGroupData[eventId]?first.day}s</#if>
         <#if smallGroupData[eventId]?first.tutors?has_content><br />Tutors: ${smallGroupData[eventId]?first.tutors}</#if>
         <#if smallGroupData[eventId]?first.location?has_content><br />Location: ${smallGroupData[eventId]?first.location}</#if>
       </p>
