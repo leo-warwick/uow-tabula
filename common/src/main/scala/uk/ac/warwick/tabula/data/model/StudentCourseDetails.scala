@@ -80,7 +80,7 @@ class StudentCourseDetails
   @BatchSize(size = 200)
   val _moduleRegistrations: JSet[ModuleRegistration] = JHashSet()
 
-  def moduleRegistrations: Seq[ModuleRegistration] = _moduleRegistrations.asScala.toSeq.sortBy { reg => reg.module.code }
+  def moduleRegistrations: Seq[ModuleRegistration] = _moduleRegistrations.asScala.filterNot(_.deleted).toSeq.sortBy { reg => reg.module.code }
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "_allStudentCourseDetails")
   @BatchSize(size = 200)
