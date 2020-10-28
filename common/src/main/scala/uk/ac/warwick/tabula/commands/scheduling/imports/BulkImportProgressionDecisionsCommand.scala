@@ -4,7 +4,7 @@ import org.springframework.beans.PropertyAccessorFactory
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.scheduling.imports.BulkImportProgressionDecisionsCommand._
-import uk.ac.warwick.tabula.data.model.ProgressionDecision
+import uk.ac.warwick.tabula.data.model.{ProgressionDecision, ProgressionDecisionProcessStatus}
 import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
 import uk.ac.warwick.tabula.helpers.scheduling.PropertyCopying
 import uk.ac.warwick.tabula.services.scheduling.{AutowiringProgressionDecisionImporterComponent, ProgressionDecisionImporterComponent, ProgressionDecisionRow}
@@ -50,7 +50,7 @@ abstract class BulkImportProgressionDecisionsCommandInternal extends CommandInte
     with TransactionalComponent =>
 
   private val properties = Set(
-    "academicYear", "resitPeriod", "status"
+    "academicYear", "resitPeriod"
   )
 
   private def copyProperties(row: ProgressionDecisionRow, decision: ProgressionDecision): Boolean = {
@@ -60,7 +60,8 @@ abstract class BulkImportProgressionDecisionsCommandInternal extends CommandInte
     copyBasicProperties(properties, rowBean, progressionDecisionBean) |
     copyOptionProperty(progressionDecisionBean,"outcome", row.outcome) |
     copyOptionProperty(progressionDecisionBean, "notes", row.notes) |
-      copyOptionProperty(progressionDecisionBean, "minutes", row.minutes)
+    copyOptionProperty(progressionDecisionBean, "minutes", row.minutes) |
+    copyObjectProperty("status", row.status.toString, progressionDecisionBean, Some(ProgressionDecisionProcessStatus.forCode(row.status)))
   }
 
   override def applyInternal(): Result = transactional() {
