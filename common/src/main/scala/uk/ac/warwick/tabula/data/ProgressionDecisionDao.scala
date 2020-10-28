@@ -11,6 +11,7 @@ import uk.ac.warwick.tabula.data.model.{ProgressionDecision, ProgressionDecision
 trait ProgressionDecisionDao {
   def saveOrUpdate(pd: ProgressionDecision): Unit
   def delete(pd: ProgressionDecision): Unit
+  def getByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision]
   def getAgreedByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision]
   def getAgreedByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision]
   def getByUniversityIds(universityIds: Seq[String]): Seq[ProgressionDecision]
@@ -23,12 +24,18 @@ abstract class HibernateProgressionDecisionDao extends ProgressionDecisionDao wi
 
   override def delete(pd: ProgressionDecision): Unit = session.delete(pd)
 
+  private def byAcademicYearsCriteria: ScalaCriteria[ProgressionDecision] = session.newCriteria[ProgressionDecision]
+    .addOrder(asc("sprCode"))
+    .addOrder(asc("sequence"))
+
+  override def getByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision] =
+    safeInSeq(() => {
+      byAcademicYearsCriteria
+    }, "academicYear", academicYears)
+
   override def getAgreedByAcademicYears(academicYears: Seq[AcademicYear]): Seq[ProgressionDecision] =
     safeInSeq(() => {
-      session.newCriteria[ProgressionDecision]
-        .add(is("status", ProgressionDecisionProcessStatus.Complete))
-        .addOrder(asc("sprCode"))
-        .addOrder(asc("sequence"))
+      byAcademicYearsCriteria.add(is("status", ProgressionDecisionProcessStatus.Complete))
     }, "academicYear", academicYears)
 
   private def byUniversityIdCriteria = session.newCriteria[ProgressionDecision]

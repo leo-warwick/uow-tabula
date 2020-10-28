@@ -118,7 +118,7 @@ trait BulkImportProgressionDecisionsForAcademicYearRequest extends BulkImportPro
   lazy val allRows: Seq[ProgressionDecisionRow] = progressionDecisionImporter.getProgressionDecisionRowsForAcademicYears(yearsToImport)
 
   lazy val existingProgressionDecisions: Map[(String, String), ProgressionDecision] = benchmarkTask("Fetching existing progression decisions") {
-    progressionDecisionService.getAgreedByAcademicYears(yearsToImport)
+    progressionDecisionService.getByAcademicYears(yearsToImport)
       .map { pd => (pd.sprCode, pd.sequence) -> pd }
       .toMap
   }
