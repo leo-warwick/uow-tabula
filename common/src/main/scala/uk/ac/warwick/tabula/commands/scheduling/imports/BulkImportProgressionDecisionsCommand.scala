@@ -50,7 +50,7 @@ abstract class BulkImportProgressionDecisionsCommandInternal extends CommandInte
     with TransactionalComponent =>
 
   private val properties = Set(
-    "academicYear", "resitPeriod"
+    "academicYear", "resitPeriod", "status"
   )
 
   private def copyProperties(row: ProgressionDecisionRow, decision: ProgressionDecision): Boolean = {
