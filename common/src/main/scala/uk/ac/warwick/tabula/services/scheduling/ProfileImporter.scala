@@ -300,6 +300,10 @@ class SandboxProfileImporter extends ProfileImporter with AutowiringProfileServi
           case 5 => "30"
           case _ => null
         }),
+        "special_exam_arrangements_hourly_rest_minutes" -> (member.universityId.toLong % 100 match {
+          case 5 => "15"
+          case _ => null
+        }),
         "mst_type" -> "L",
         "sce_agreed_mark" -> new JBigDecimal((member.universityId ++ member.universityId).toCharArray.map(char =>
           char.toString.toInt * member.universityId.toCharArray.apply(0).toString.toInt * thisYearOfStudy
@@ -536,6 +540,7 @@ object ProfileImporter extends Logging {
       spr.spr_udf5 as special_exam_arrangements_room_code,
       rom.rom_name as special_exam_arrangements_room_name,
       spr.spr_udf6 as special_exam_arrangements_extra_time,
+      spr.spr_udf3 as special_exam_arrangements_hourly_rest_minutes,
 
 			scj.scj_code as scj_code,
 			scj.scj_begd as begin_date,

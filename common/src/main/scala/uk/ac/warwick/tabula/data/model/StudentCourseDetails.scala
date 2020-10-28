@@ -271,6 +271,11 @@ trait BasicStudentCourseProperties {
   @Type(`type` = "org.jadira.usertype.dateandtime.joda.PersistentDurationAsString")
   @Column(nullable = true, name = "special_exam_arrangements_extra_time")
   var specialExamArrangementsExtraTime: Duration = _
+
+  @Restricted(Array("Profiles.Read.StudentCourseDetails.SpecialExamArrangements"))
+  @Type(`type` = "org.jadira.usertype.dateandtime.joda.PersistentDurationAsString")
+  @Column(nullable = true, name = "special_exam_arrangements_hourly_rest_minutes")
+  var specialExamArrangementsHourlyRestMinutes: Duration = _
 }
 
 trait StudentCourseProperties extends BasicStudentCourseProperties {

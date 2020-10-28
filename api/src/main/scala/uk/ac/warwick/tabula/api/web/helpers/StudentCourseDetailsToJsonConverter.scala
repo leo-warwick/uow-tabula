@@ -60,6 +60,11 @@ trait StudentCourseDetailsToJsonConverter
         .filter(_ => canViewProperty(scd, "specialExamArrangementsExtraTime"))
         .map(d => "specialExamArrangementsExtraTime" -> d.toString)
     },
+    fieldRestriction.restrict("specialExamArrangementsHourlyRestMinutes") {
+      Option(scd.specialExamArrangementsHourlyRestMinutes)
+        .filter(_ => canViewProperty(scd, "specialExamArrangementsHourlyRestMinutes"))
+        .map(d => "specialExamArrangementsHourlyRestMinutes" -> d.toString)
+    },
     fieldRestriction.nested("course").flatMap { restriction =>
       if (canViewProperty(scd, "course"))
         Some("course", courseToJson(scd.course, restriction))
