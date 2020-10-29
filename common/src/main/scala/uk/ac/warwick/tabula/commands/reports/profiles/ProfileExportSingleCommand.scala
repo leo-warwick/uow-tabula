@@ -405,7 +405,7 @@ class ProfileExportSingleCommandInternal(val student: StudentMember, val academi
         Option(attendance.occurrence.event.group.name),
         Option(attendance.occurrence.event.title)
       ).flatten.mkString(", "),
-      attendance.occurrence.event.day.name,
+      Option(attendance.occurrence.event.day).map(_.name).getOrElse(""),
       Option(attendance.occurrence.event.location).map(_.name).getOrElse(""),
       attendance.occurrence.event.tutors.users.map(_.getFullName).mkString(", "),
       attendance.occurrence.week,
