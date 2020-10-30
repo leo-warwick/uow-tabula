@@ -69,7 +69,8 @@ class ProgressionDecision extends GeneratedId with ToString {
   var resitPeriod: Boolean = _
 
   @transient var features: Features = Wire[Features]
-  def isVisibleToStudent: Boolean = features.ignoreResultRelease || MarkState.resultsReleasedToStudents(academicYear, studentCourseDetails, MarkState.DecisionReleaseTime)
+  def isVisibleToStudent: Boolean = ((features.ignoreResultRelease || MarkState.resultsReleasedToStudents(academicYear, studentCourseDetails, MarkState.DecisionReleaseTime))
+    && status == ProgressionDecisionProcessStatus.Complete)
 
   override def toStringProps: Seq[(String, Any)] = Seq(
     "sprCode" -> sprCode,
