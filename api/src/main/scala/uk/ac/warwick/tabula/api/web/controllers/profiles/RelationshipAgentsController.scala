@@ -7,20 +7,13 @@ import uk.ac.warwick.tabula.api.web.controllers.ApiController
 import uk.ac.warwick.tabula.commands.{Command, ReadOnly, Unaudited}
 import uk.ac.warwick.tabula.data.model.{Department, StudentRelationshipType}
 import uk.ac.warwick.tabula.permissions.{Permission, Permissions, PermissionsTarget}
-import uk.ac.warwick.tabula.services.RelationshipService
+import uk.ac.warwick.tabula.services.{AutowiringRelationshipServiceComponent, RelationshipService, RelationshipServiceComponent}
 import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.views.JSONView
 
-@Controller
-@RequestMapping(Array("/v1/relationships/agents/{studentRelationshipType}", "/v1/relationships/agents/{department}/{studentRelationshipType}"))
-class RelationshipAgentsController extends ApiController {
-
-  @Autowired var relationshipsService: RelationshipService = _
-
-  @ModelAttribute("getCommand")
-  def getCommand(@PathVariable studentRelationshipType: StudentRelationshipType, @PathVariable(required = false) department: Department): ViewRelationshipAgentsCommand =
-    new ViewRelationshipAgentsCommand(Permissions.Profiles.StudentRelationship.Read(studentRelationshipType), Option(department).getOrElse(PermissionsTarget.Global), mandatory(studentRelationshipType))
-
+abstract class AbstractRelationshipAgentsController
+  extends ApiController {
+  self: RelationshipServiceComponent =>
 
   @RequestMapping(method = Array(GET), produces = Array("application/json"))
   def index(@ModelAttribute("getCommand") cmd: ViewRelationshipAgentsCommand): Mav = {
@@ -41,12 +34,29 @@ class RelationshipAgentsController extends ApiController {
     PermissionCheck(permission, permissionsTarget)
 
     override def applyInternal(): Seq[Array[Object]] = permissionsTarget match {
-      case dept: Department => relationshipsService.listCurrentStudentRelationshipsByDepartment(relationshipType, dept).groupBy(_.agent).filter(sr => sr._2.head.agentMember.isDefined).map(sr =>
+      case dept: Department => relationshipService.listCurrentStudentRelationshipsByDepartment(relationshipType, dept).groupBy(_.agent).filter(sr => sr._2.head.agentMember.isDefined).map(sr =>
         Seq(sr._1, sr._2.head.agentMember.map(am => am.firstName).orNull, sr._2.head.agentLastName).toArray.asInstanceOf[Array[Object]]
       ).toSeq
-      case PermissionsTarget.Global => relationshipsService.listCurrentRelationshipsGlobally(relationshipType)
+      case PermissionsTarget.Global => relationshipService.listCurrentRelationshipsGlobally(relationshipType)
       case _ => throw new IllegalArgumentException("Unsupported permissionsTarget")
     }
   }
+}
 
+@Controller
+@RequestMapping(Array("/v1/relationships/agents/{department}/{studentRelationshipType}"))
+class RelationshipAgentsForDepartmentController extends AbstractRelationshipAgentsController
+  with AutowiringRelationshipServiceComponent {
+  @ModelAttribute("getCommand")
+  def getCommand(@PathVariable studentRelationshipType: StudentRelationshipType, @PathVariable department: Department): ViewRelationshipAgentsCommand =
+    new ViewRelationshipAgentsCommand(Permissions.Profiles.StudentRelationship.Read(studentRelationshipType), mandatory(department), mandatory(studentRelationshipType))
+}
+
+@Controller
+@RequestMapping(Array("/v1/relationships/agents/{studentRelationshipType}"))
+class RelationshipAgentsGlobalController extends AbstractRelationshipAgentsController
+  with AutowiringRelationshipServiceComponent {
+  @ModelAttribute("getCommand")
+  def getCommand(@PathVariable studentRelationshipType: StudentRelationshipType): ViewRelationshipAgentsCommand =
+    new ViewRelationshipAgentsCommand(Permissions.Profiles.StudentRelationship.Read(studentRelationshipType), PermissionsTarget.Global, mandatory(studentRelationshipType))
 }
