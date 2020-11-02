@@ -65,7 +65,7 @@
     </#if>
   </div>
 
-  <h2>Submission receipt for ${submission.universityId}</h2>
+  <h2>Submission receipt for ${submission.studentIdentifier}</h2>
 
   <div class="submission-receipt">
     <p>Submission received <@fmt.date date=submission.submittedDate at=true seconds=true relative=false showLocal=true showLocalStyle="extended" /> (<#compress>
