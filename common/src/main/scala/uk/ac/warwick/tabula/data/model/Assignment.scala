@@ -157,9 +157,6 @@ class Assignment
   @Column(nullable = false)
   var academicYear: AcademicYear = AcademicYear.now()
 
-  @Type(`type` = "uk.ac.warwick.tabula.data.model.StringListUserType")
-  var fileExtensions: Seq[String] = _
-
   var attachmentLimit: Int = 1
 
   var name: String = _
@@ -414,10 +411,6 @@ class Assignment
   def hasWorkflow: Boolean = cm2MarkingWorkflow != null
 
   def hasModeration: Boolean = Option(HibernateHelpers.initialiseAndUnproxy(cm2MarkingWorkflow)).exists(_.isInstanceOf[ModeratedWorkflow])
-
-  def setAllFileTypesAllowed(): Unit = {
-    fileExtensions = Nil
-  }
 
   /**
     * Before we allow customising of assignment submission forms, we just want the basic
