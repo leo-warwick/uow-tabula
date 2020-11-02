@@ -1,4 +1,4 @@
-Dear ${recipient.firstName},
+Dear ${recipient.firstName!},
 
 ${content?trim}
 

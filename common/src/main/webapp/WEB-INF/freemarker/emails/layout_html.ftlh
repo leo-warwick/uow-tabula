@@ -114,7 +114,7 @@
                   <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                     <tr>
                       <td style="font-family: sans-serif; font-size: 16px; vertical-align: top;">
-                        <p style="font-family: sans-serif; font-size: 16px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Dear ${recipient.firstName},</p>
+                        <p style="font-family: sans-serif; font-size: 16px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Dear ${recipient.firstName!},</p>
                         <h5 style="font-family: sans-serif; font-size: 20px; font-weight: normal; margin: 0; Margin-bottom: 15px;"><#if priority gte 0.5>⚠️<#else>ⓘ</#if> <a href="${url}" target="_blank">${title}</a></h5>
                         ${content}
                         <#if actionRequired>
