@@ -21,8 +21,8 @@ trait GetMemberRelationshipsApi {
   self: ApiController with RelationshipServiceComponent =>
 
   @ModelAttribute("viewStudentRelationshipsCommand")
-  def getCommand(@PathVariable member: Member, @RequestParam(defaultValue = "") typeConstraint: String): ViewMemberRelationshipsCommand.CommandType = {
-    val tc = typeConstraint match {
+  def getCommand(@PathVariable member: Member, @RequestParam(defaultValue = "") relationshipType: String): ViewMemberRelationshipsCommand.CommandType = {
+    val tc = relationshipType match {
       case "" => None
       case other: String => Some(other)
     }
