@@ -149,7 +149,7 @@ class StudentCourseDetails
     else Some(SpecificCourseType.fromCourseCode(course.code))
   }
 
-  @OneToMany(mappedBy = "studentCourseDetails", fetch = FetchType.LAZY, cascade = Array(CascadeType.PERSIST))
+  @OneToMany(mappedBy = "studentCourseDetails", fetch = FetchType.LAZY, cascade = Array(CascadeType.PERSIST), orphanRemoval = true)
   @Restricted(Array("Profiles.Read.StudentCourseDetails.Core"))
   @BatchSize(size = 200)
   var allRelationships: JSet[StudentRelationship] = JHashSet()
