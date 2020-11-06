@@ -36,7 +36,8 @@ trait StudentCourseDetailsToJsonConverter
     str("occurrence", reg, "occurrence", fieldRestriction),
     double("mark", reg, "agreedMark", fieldRestriction),
     str("grade", reg, "agreedGrade", fieldRestriction),
-    str("status", reg, "selectionStatus.description", fieldRestriction)
+    str("status", reg, "selectionStatus.description", fieldRestriction),
+    str("sitsModuleCode", reg, "sitsModuleCode", fieldRestriction)
   ).flatten.toMap
 
   def jsonStudentCourseDetailsObject(scd: StudentCourseDetails, fieldRestriction: APIFieldRestriction): Map[String, Any] = Seq(
