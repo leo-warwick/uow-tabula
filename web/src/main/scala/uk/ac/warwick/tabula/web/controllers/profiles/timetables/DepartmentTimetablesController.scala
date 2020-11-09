@@ -51,13 +51,8 @@ class DepartmentTimetablesController extends ProfilesController
     @PathVariable department: Department
   ): Mav = {
     val result = cmd.apply()
-    val (invalidEvents, validEvents) = result._1.events.partition { eventOccurrence => eventOccurrence.start.isAfter(eventOccurrence.end) }
-    val errors = if (invalidEvents.size > 0) {
-      result._2 ++ Seq(s"${invalidEvents.size} Syllabus+ events have been excluded, as their start date is after their end date.", s"Event details: ${invalidEvents.map(_.name).mkString(", ")}")
-    } else result._2
-
-    val calendarEvents = FullCalendarEvent.colourEvents(validEvents.map(FullCalendarEvent(_, userLookup)))
-    Mav(new JSONView(Map("events" -> calendarEvents, "lastUpdated" -> result._1.lastUpdated, "errors" -> errors)))
+    val calendarEvents = FullCalendarEvent.colourEvents(result._1.events.map(FullCalendarEvent(_, userLookup)))
+    Mav(new JSONView(Map("events" -> calendarEvents, "lastUpdated" -> result._1.lastUpdated, "errors" -> result._2)))
   }
 
 }

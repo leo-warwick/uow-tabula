@@ -129,9 +129,13 @@ class DepartmentEventsCommandInternal(
     val filtered =
       if (eventTypes.asScala.isEmpty) occurrences
       else occurrences.filter { o => eventTypes.contains(o.eventType) }
-
+    val (invalidEvents, validEvents) = filtered.events.partition { eventOccurrence => eventOccurrence.start.isAfter(eventOccurrence.end) }
+    if (invalidEvents.size > 0) {
+      errors.appendAll(Seq(s"${invalidEvents.size} Syllabus+ events have been excluded, as their start date is after their end date.", s"Event details: ${invalidEvents.map(_.name).mkString(", ")}"))
+    }
+    val filteredWithValidDates = filtered.copy(validEvents)
     import uk.ac.warwick.tabula.helpers.DateTimeOrdering._
-    (filtered.map(_.sortBy(_.start)), errors.toSeq)
+    (filteredWithValidDates.map(_.sortBy(_.start)), errors.toSeq)
   }
 
   private def eventsToOccurrences(events: EventList) = EventOccurrenceList(
