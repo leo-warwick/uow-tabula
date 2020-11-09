@@ -53,7 +53,7 @@ class DepartmentTimetablesController extends ProfilesController
     val result = cmd.apply()
     val (invalidEvents, validEvents) = result._1.events.partition { eventOccurrence => eventOccurrence.start.isAfter(eventOccurrence.end) }
     val errors = if (invalidEvents.size > 0) {
-      result._2 ++ Seq(s"Some Syllabus+ events have start date set after the end date which have been excluded. Total events found: ${invalidEvents.size}", s"Event details: ${invalidEvents.map(_.name).mkString(", ")}")
+      result._2 ++ Seq(s"${invalidEvents.size} Syllabus+ events have been excluded, as their start date is after their end date.", s"Event details: ${invalidEvents.map(_.name).mkString(", ")}")
     } else result._2
 
     val calendarEvents = FullCalendarEvent.colourEvents(validEvents.map(FullCalendarEvent(_, userLookup)))
