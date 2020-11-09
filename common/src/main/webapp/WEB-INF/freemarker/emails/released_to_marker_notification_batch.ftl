@@ -3,7 +3,7 @@
 <#assign feedbacksCount = notification['feedbacksCount'] />
 <#assign workflowVerb = notification['workflowVerb'] />
 <#if assignment.collectSubmissions>
-  <#assign feedbackDeadlineDate = notification['feedbackDeadlineDate'] />
+  <#if notification['feedbackDeadlineDate']??><#assign feedbackDeadlineDate = notification['feedbackDeadlineDate'] /></#if>
   <#assign allocatedStudentsCount = notification['allocatedStudentsCount'] />
   <#assign studentsAtStagesCount = notification['studentsAtStagesCount'] />
   <#assign submissionsCount = notification['submissionsCount'] />
