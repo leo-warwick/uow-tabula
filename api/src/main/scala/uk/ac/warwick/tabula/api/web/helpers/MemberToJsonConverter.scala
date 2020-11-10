@@ -29,7 +29,6 @@ trait MemberToJsonConverter
       str("homeEmail", member, "homeEmail", fieldRestriction),
       str("fullFirstName", member, "firstName", fieldRestriction), // fullFirstName no longer supported - TAB-6621
       str("title", member, "title", fieldRestriction),
-      str("gender", member, "gender.description", fieldRestriction),
       str("inUseFlag", member, "inUseFlag", fieldRestriction),
       str("jobTitle", member, "jobTitle", fieldRestriction),
       str("phoneNumber", member, "phoneNumber", fieldRestriction),
