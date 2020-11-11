@@ -415,6 +415,13 @@ class StudentMember extends Member with StudentProperties {
     studentCourseDetails.add(detailsToAdd)
   }
 
+  def attachAllStudentCourseDetails(allDetailsToAdd: Seq[StudentCourseDetails]): Unit = {
+    for (scd <- allDetailsToAdd) {
+      studentCourseDetails.remove(scd)
+      studentCourseDetails.add(scd)
+    }
+  }
+
   /**
     * Get all modules this this student is registered on, including historically.
     * TODO consider caching based on getLastUpdatedDate

@@ -43,7 +43,7 @@ class ExamGridStudentCheckCommandInternal(val department: Department, val academ
 
   def applyInternal(): StudentCheckInfo = {
     val scyds = student.allFreshStudentCourseYearDetailsForYear(academicYear)
-    val test = scyds.exists(_.enrolledOrCompleted)
+
     StudentCheckInfo(
       scyds.exists(_.enrolledOrCompleted),
       scyds.exists(scyd => courses.asScala.contains(scyd.studentCourseDetails.course)),

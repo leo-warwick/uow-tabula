@@ -469,7 +469,7 @@ object Department {
     }
 
     def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = member match {
-      case s: StudentMember =>   scd match {
+      case s: StudentMember => scd match {
         case Some(scd) => matches(Option(scd.currentRoute))
         case _ => matches(s.mostSignificantCourseDetails.flatMap(cd => Option(cd.currentRoute)))
       }
@@ -491,7 +491,7 @@ object Department {
     }
 
     def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = member match {
-      case s: StudentMember =>   scd match {
+      case s: StudentMember => scd match {
         case Some(scd) => matches(Option(scd.currentRoute))
         case _ => matches(s.mostSignificantCourseDetails.flatMap(cd => Option(cd.currentRoute)))
       }
@@ -538,9 +538,9 @@ object Department {
 
     def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = member match {
       case s: StudentMember => scd match {
-          case Some(scd) => Option(scd.currentRoute).exists { r => department.contains(r.adminDepartment) }
-          case _ => s.mostSignificantCourseDetails.flatMap { cd => Option(cd.currentRoute) }.exists { r => department.contains(r.adminDepartment) }
-        }
+        case Some(scd) => Option(scd.currentRoute).exists(r => department.contains(r.adminDepartment))
+        case _ => s.mostSignificantCourseDetails.flatMap(cd => Option(cd.currentRoute)).exists(r => department.contains(r.adminDepartment))
+      }
       case _ => false
     }
 
