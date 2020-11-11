@@ -18,7 +18,7 @@ class StudentCheckController extends ExamsController {
 
   validatesSelf[SelfValidating]
 
-  type SelectCourseCommand = Appliable[Seq[ExamGridEntity]] with GenerateExamGridSelectCourseCommandRequest with GenerateExamGridSelectCourseCommandState
+  type SelectCourseCommand = Appliable[StudentCheckInfo] with GenerateExamGridSelectCourseCommandRequest with GenerateExamGridSelectCourseCommandState
 
   @ModelAttribute("command")
   def command(@PathVariable department: Department, @PathVariable academicYear: AcademicYear) =

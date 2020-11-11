@@ -351,12 +351,12 @@ abstract class AbstractRelationshipService extends RelationshipService with Logg
       scd => !scd.permanentlyWithdrawn && !scd.stale)
   }
 
-  def studentDepartmentFilterMatches(department: Department)(member: StudentMember): Boolean = department.filterRule.matches(member, Option(department))
+  def studentDepartmentFilterMatches(department: Department)(member: StudentMember): Boolean = department.filterRule.matches(member, Option(department), None)
 
   def studentNotPermanentlyWithdrawn(member: StudentMember): Boolean = !member.permanentlyWithdrawn
 
   def studentDepartmentMatchesAndExpectedToHaveRelationship(relationshipType: StudentRelationshipType, department: Department)(member: StudentMember): Boolean = {
-    department.filterRule.matches(member, Option(department)) &&
+    department.filterRule.matches(member, Option(department), None) &&
       member.freshStudentCourseDetails
         .filter(scd => Option(scd.currentRoute).exists(route => route.adminDepartment == department || route.adminDepartment == department.rootDepartment)) // there needs to be an SCD for the right department ...
         .filter(_.mostSignificant)
@@ -416,7 +416,7 @@ abstract class AbstractRelationshipService extends RelationshipService with Logg
     benchmarkTask("listScheduledRelationshipChanges") {
       relationshipDao.getScheduledRelationshipChangesByDepartment(relationshipType, department.rootDepartment)
         .filter(rel =>
-          department.filterRule.matches(rel.studentCourseDetails.student, Option(department)) &&
+          department.filterRule.matches(rel.studentCourseDetails.student, Option(department), Some(rel.studentCourseDetails)) &&
             Option(rel.studentCourseDetails.currentRoute).exists(route => route.adminDepartment == department || route.adminDepartment == department.rootDepartment)
         )
     }

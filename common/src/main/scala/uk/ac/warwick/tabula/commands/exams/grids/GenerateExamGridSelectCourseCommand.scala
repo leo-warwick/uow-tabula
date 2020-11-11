@@ -41,7 +41,7 @@ class GenerateExamGridSelectCourseCommandInternal(val department: Department, va
         studentCourseYearDetailsDao.findByCourseRoutesYear(academicYear, courses.asScala.toSeq, courseOccurrences.asScala.toSeq, routes.asScala.toSeq, yearOfStudy, includeTempWithdrawn, resitOnly, eagerLoad = true, disableFreshFilter = true, includePermWithdrawn = includePermWithdrawn)
       } else {
         studentCourseYearDetailsDao.findByCourseRoutesLevel(academicYear, courses.asScala.toSeq, courseOccurrences.asScala.toSeq, routes.asScala.toSeq, levelCode, includeTempWithdrawn, resitOnly, eagerLoad = true, disableFreshFilter = true, includePermWithdrawn = includePermWithdrawn)
-      }.filter(scyd => department.includesMember(scyd.studentCourseDetails.student, Some(department)))
+      }.filter(scyd => department.includesMember(scyd.studentCourseDetails.student, Some(department), Some(scyd.studentCourseDetails)))
     }
     val sorted = benchmarkTask("sorting") {
       scyds.sortBy(_.studentCourseDetails.scjCode)

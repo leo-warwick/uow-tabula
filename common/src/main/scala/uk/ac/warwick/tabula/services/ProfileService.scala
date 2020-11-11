@@ -259,7 +259,7 @@ abstract class AbstractProfileService extends ProfileService with Logging {
   def save(member: Member): Unit = memberDao.saveOrUpdate(member)
 
   def countStudentsByDepartment(department: Department): Int = transactional(readOnly = true) {
-    memberDao.getStudentsByDepartment(department.rootDepartment).count(s => department.filterRule.matches(s, Option(department)))
+    memberDao.getStudentsByDepartment(department.rootDepartment).count(s => department.filterRule.matches(s, Option(department), None))
   }
 
   def getStudentsByRoute(route: Route): Seq[StudentMember] = transactional(readOnly = true) {
@@ -283,7 +283,7 @@ abstract class AbstractProfileService extends ProfileService with Logging {
   def getStudentCourseDetailsBySprCode(sprCode: String): Seq[StudentCourseDetails] =
     studentCourseDetailsDao.getBySprCode(sprCode)
 
-  private def studentDepartmentFilterMatches(department: Department)(member: StudentMember) = department.filterRule.matches(member, Option(department))
+  private def studentDepartmentFilterMatches(department: Department)(member: StudentMember) = department.filterRule.matches(member, Option(department), None)
 
   /**
     * this returns a tuple of the startResult (offset into query) actually returned, with the resultset itself
