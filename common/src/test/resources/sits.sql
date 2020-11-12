@@ -240,13 +240,13 @@ VALUES ('CH130-15', 'Y', '11/12', 'A');
 INSERT INTO CAM_MAV
 VALUES ('CH130-20', 'Y', '11/12', 'A');
 INSERT INTO CAM_MAB
-VALUES ('CH130-15', 'A01', 'Chem 130 A01', 'A', 'E', 'Y', null, 'CH1300', 'X', 50, null, 'Y');
+VALUES ('CH130-15', 'A01', 'Chem 130 A01', 'A', 'E', 'Y', null, null, null, 'CH1300', 'X', 50, null, 'Y');
 INSERT INTO CAM_MAD
 VALUES ('CH130-15', 'Y', '11/12', 'A', 'CH130-15', 'A01', '2020-07-01');
 INSERT INTO CAM_WSM
 VALUES ('EXJUN-12', '11/12', 'CH130-15', 'CH1300');
 INSERT INTO CAM_MAB
-VALUES ('CH130-20', 'A01', 'Chem 130 A01 (20 CATS)', 'A', 'E', 'Y', null, 'CH1300', 'X', 50, null, 'Y');
+VALUES ('CH130-20', 'A01', 'Chem 130 A01 (20 CATS)', 'A', 'E', 'Y', null, null, null, 'CH1300', 'X', 50, null, 'Y');
 INSERT INTO CAM_MAD
 VALUES ('CH130-20', 'Y', '11/12', 'A', 'CH130-20', 'A01', '2020-07-01');
 INSERT INTO CAM_WSM
@@ -259,7 +259,7 @@ VALUES ('CH1300', 'X', '1900-01-01 01:30:00', null);
 -- some more items that don't have corresponding students,
 -- but don't have the right data in other tables to form a complete entry
 INSERT INTO CAM_MAB
-VALUES ('XX100-30', 'A01', 'Mystery Meat', 'A', 'E', 'Y', null, 'XX1000', 'X', 50, '1900-01-01 01:30:00', 'Y');
+VALUES ('XX100-30', 'A01', 'Mystery Meat', 'A', 'E', 'Y', null, null, null, 'XX1000', 'X', 50, '1900-01-01 01:30:00', 'Y');
 INSERT INTO CAM_MAV
 VALUES ('XX100-30', 'Y', '11/12', 'A');
 INSERT INTO CAM_MAD
@@ -271,7 +271,7 @@ VALUES ('XX1000', 'Mystery Meat', 'OPEN');
 INSERT INTO CAM_ADV
 VALUES ('XX1000', 'X', '1900-01-01 01:30:00', '1900-01-01 00:20:00');
 INSERT INTO CAM_MAB
-VALUES ('XX101-30', 'A01', 'Danger Zone', 'A', 'E', 'Y', null, 'XX1010', 'X', 50, '1900-01-01 01:30:00', 'Y');
+VALUES ('XX101-30', 'A01', 'Danger Zone', 'A', 'E', 'Y', null, null, null, 'XX1010', 'X', 50, '1900-01-01 01:30:00', 'Y');
 INSERT INTO CAM_MAV
 VALUES ('XX101-30', 'Y', '11/12', 'A');
 INSERT INTO CAM_MAD
@@ -284,7 +284,7 @@ INSERT INTO CAM_ADV
 VALUES ('XX1010', 'X', '1900-01-01 01:30:00', '1900-01-01 00:20:00');
 
 INSERT INTO CAM_MAB
-VALUES ('CH115-30', 'A01', 'Chemicals Essay', 'A', 'E', 'Y', null, 'CH1150', 'X', 50, '1900-01-01 01:30:00', 'Y');
+VALUES ('CH115-30', 'A01', 'Chemicals Essay', 'A', 'E', 'Y', null, null, null, 'CH1150', 'X', 50, '1900-01-01 01:30:00', 'Y');
 INSERT INTO CAM_MAV
 VALUES ('CH115-30', 'Y', '11/12', 'A');
 INSERT INTO CAM_MAD
@@ -297,7 +297,7 @@ INSERT INTO CAM_ADV
 VALUES ('CH1150', 'X', '1900-01-01 01:30:00', null);
 
 INSERT INTO CAM_MAB
-VALUES ('CH120-15', 'A01', 'Chemistry Dissertation', 'A', 'E', 'Y', null, 'CH1200', 'X', 50, null, 'Y');
+VALUES ('CH120-15', 'A01', 'Chemistry Dissertation', 'A', 'E', 'Y', null, null, null, 'CH1200', 'X', 50, null, 'Y');
 INSERT INTO CAM_MAV
 VALUES ('CH120-15', 'Y', '11/12', 'A');
 INSERT INTO CAM_MAD
