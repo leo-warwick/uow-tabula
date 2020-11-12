@@ -5,8 +5,8 @@ import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.JavaImports.JMap
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.exams.grids.ExamGridEntity
+import uk.ac.warwick.tabula.commands.marks.CohortCommand.SprCode
 import uk.ac.warwick.tabula.commands.marks.ExamBoardOutcomesCommand._
-import uk.ac.warwick.tabula.commands.marks.ProcessModuleMarksCommand.SprCode
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.{ActualProgressionDecision, Department, ProgressionDecision, ProgressionDecisionProcessStatus, RecordedDecision, StudentAward}
 import uk.ac.warwick.tabula.helpers.LazyMaps
@@ -36,8 +36,6 @@ object ExamBoardOutcomesCommand {
     val isResitting: Boolean = progressionDecision.resitPeriod
     val isAgreed: Boolean = progressionDecision.status == ProgressionDecisionProcessStatus.Complete
   }
-
-  type SprCode = String
 
   class ExamBoardOutcomeItem {
     def this(sprCode: SprCode) {
@@ -146,15 +144,13 @@ trait ExamBoardOutcomesDescription extends Describable[Result] {
   }
 }
 
-trait ExamBoardOutcomesState {
+trait ExamBoardOutcomesState extends CohortState {
 
-  self: DecisionServiceComponent with ProgressionDecisionServiceComponent with StudentAwardServiceComponent =>
+  self: CohortState with DecisionServiceComponent with ProgressionDecisionServiceComponent with StudentAwardServiceComponent =>
 
   val currentUser: CurrentUser
   val department: Department
   val academicYear: AcademicYear
-
-  var entities: Seq[ExamGridEntity] = _
 
   lazy val entitiesBySprCode: SortedMap[SprCode, ExamGridEntity] = SortedMap(entities.flatMap { e =>
     e.validYears.lastOption.map(_._2).flatMap(_.studentCourseYearDetails).map(_.studentCourseDetails.sprCode).map(_ -> e)
@@ -203,7 +199,7 @@ trait ExamBoardOutcomesState {
 }
 
 trait ExamBoardOutcomesRequest {
-  var students: JMap[SprCode, ExamBoardOutcomeItem] = LazyMaps.create { sprCode: SprCode => new ExamBoardOutcomeItem(sprCode)}.asJava
+  var students: JMap[SprCode, ExamBoardOutcomeItem] = LazyMaps.create { sprCode: SprCode => new ExamBoardOutcomeItem(sprCode) }.asJava
 
   def studentsToRecord: Map[SprCode, ExamBoardOutcomeItem] = students.asScala.filter(_._2.record).toMap
 }

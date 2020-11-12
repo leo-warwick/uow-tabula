@@ -577,7 +577,9 @@ object AssignmentImporter {
       null as exam_paper_duration,
       null as exam_paper_reading_time,
       null as exam_paper_type,
-      'Y' as final_chronological_assessment
+      'Y' as final_chronological_assessment,
+      null as reassessment_group,
+      null as assessment_replaced
       from $sitsSchema.cam_sms sms
         join $sitsSchema.cam_ssn ssn -- SSN table holds module registration status
           on sms.spr_code = ssn.ssn_sprc and ssn.ssn_ayrc = sms.ayr_code and ssn.ssn_mrgs != 'CON' -- mrgs = "Module Registration Status"
@@ -600,7 +602,9 @@ object AssignmentImporter {
       null as exam_paper_duration,
       null as exam_paper_reading_time,
       null as exam_paper_type,
-      'Y' as final_chronological_assessment
+      'Y' as final_chronological_assessment,
+      null as reassessment_group,
+      null as assessment_replaced
       from $sitsSchema.cam_smo smo
         left outer join $sitsSchema.cam_ssn ssn
           on smo.spr_code = ssn.ssn_sprc and ssn.ssn_ayrc = smo.ayr_code
@@ -625,7 +629,9 @@ object AssignmentImporter {
       coalesce(mab.mab_hohm, adv.adv_dura) as exam_paper_duration,
       adv.adv_rdtm as exam_paper_reading_time,
       ${castToString("apa.apa_aptc")} as exam_paper_type,
-      ${castToString("mab.mab_fayn")} as final_chronological_assessment
+      ${castToString("mab.mab_fayn")} as final_chronological_assessment,
+      ${castToString("mab.mab_udf8")} as reassessment_group,
+      ${castToString("mab.mab_udf3")} as assessment_replaced
       from $sitsSchema.cam_mab mab -- Module Assessment Body, containing assessment components
         join $sitsSchema.cam_mav mav -- Module Availability which indicates which modules are avaiable in the year
           on mab.map_code = mav.mod_code and
@@ -1028,6 +1034,8 @@ object AssignmentImporter {
         case "Y" | "y" => true
         case _ => false
       }
+      a.reassessmentGroup = Option(rs.getString("reassessment_group"))
+      a.assessmentReplaced = Option(rs.getString("assessment_replaced"))
       a
     }
   }

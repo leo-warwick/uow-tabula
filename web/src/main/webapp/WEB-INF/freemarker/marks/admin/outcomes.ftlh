@@ -1,7 +1,6 @@
 <#import "*/modal_macros.ftlh" as modal />
 <#import "*/_profile_link.ftl" as pl />
 <#import "*/marks_components.ftlh" as components />
-<#import "/WEB-INF/freemarker/generated_grades_macros.ftlh" as gg />
 <#import "/WEB-INF/freemarker/exams/grids/generate/form_fields.ftl" as gf />
 
 <#macro agreed>
@@ -37,27 +36,6 @@
       <tbody>
         <#list entities?keys as sprCode>
           <#assign student = mapGet(entities, sprCode) />
-<#--          <#if student.resitting && student.agreedDecision??>-->
-<#--            &lt;#&ndash; Show the decision from the summer period &ndash;&gt;-->
-<#--            <tr class="student">-->
-<#--              <td>-->
-<#--                <@agreed />-->
-<#--              </td>-->
-<#--              <td data-sortby="${sprCode}"> <@pl.profile_link student.universityId /> ${sprCode}</td>-->
-<#--              <td>${student.firstName}</td>-->
-<#--              <td>${student.lastName}</td>-->
-<#--              <td><span class="label label-info">Summer exam period</span></td>-->
-<#--              <td>-->
-<#--                  ${student.agreedDecision.outcome.description}-->
-<#--                  <#if student.agreedDecision.outcome.hasAward && student.studentAwards?has_content>-->
-<#--                    <#list student.studentAwards as studentAward>-->
-<#--                      <p>${studentAward.award.name}<#if studentAward.classification?has_content> &mdash; ${studentAward.classification.name}</#if></p>-->
-<#--                    </#list>-->
-<#--                  </#if>-->
-<#--              </td>-->
-<#--              <td>${student.agreedDecision.notes!""} ${student.agreedDecision.minutes!""}</td>-->
-<#--            </tr>-->
-<#--          </#if>-->
           <tr class="student">
             <td>
               <#if student.agreed>

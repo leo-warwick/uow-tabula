@@ -4,11 +4,11 @@ import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.exams.grids.{ExamGridEntity, GenerateExamGridSelectCourseCommandRequest}
+import uk.ac.warwick.tabula.commands.marks.CohortCommand._
 import uk.ac.warwick.tabula.commands.marks.ListAssessmentComponentsCommand.StudentMarkRecord
 import uk.ac.warwick.tabula.commands.marks.MarksDepartmentHomeCommand.StudentModuleMarkRecord
 import uk.ac.warwick.tabula.commands.marks.ModuleOccurrenceCommands.OptionalMarksItem
 import uk.ac.warwick.tabula.commands.marks.ProcessCohortMarksCommand._
-import uk.ac.warwick.tabula.commands.marks.ProcessModuleMarksCommand.SprCode
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.{AutowiringTransactionalComponent, TransactionalComponent}
 import uk.ac.warwick.tabula.helpers.LazyMaps
@@ -32,8 +32,6 @@ object ProcessCohortMarksCommand {
     with ProcessCohortMarksFetchValidGrades
     with PopulateOnForm
 
-  type ModuleCode = String
-  type Occurrence = String
   type SelectCourseCommand = Appliable[Seq[ExamGridEntity]] with GenerateExamGridSelectCourseCommandRequest
 
   class StudentCohortMarksItem extends ModuleOccurrenceCommands.StudentModuleMarksItem with OptionalMarksItem {
@@ -144,7 +142,7 @@ trait ProcessCohortMarksPopulateOnForm extends PopulateOnForm {
 
 }
 
-trait ProcessCohortMarksState {
+trait ProcessCohortMarksState extends CohortState with CohortModuleMarksRecords {
 
   self: ModuleRegistrationMarksServiceComponent
     with AssessmentMembershipServiceComponent
@@ -154,27 +152,6 @@ trait ProcessCohortMarksState {
   val currentUser: CurrentUser
   val academicYear: AcademicYear
   val department: Department
-
-  var entities: Seq[ExamGridEntity] = _
-
-  lazy val entitiesBySprCode: SortedMap[SprCode, (ExamGridEntity, Seq[ModuleRegistration])] = SortedMap(entities.flatMap { e =>
-    val entityYear = e.validYears.lastOption.map(_._2)
-    entityYear.map { ey =>
-      ey.studentCourseYearDetails.map(_.studentCourseDetails.sprCode).orNull -> (e, ey.moduleRegistrations)
-    }
-  }.sortBy(_._1): _*)
-
-  lazy val moduleRegistrations: Seq[ModuleRegistration] = entitiesBySprCode.values.flatMap(_._2).toSeq
-
-  lazy val studentModuleMarkRecords: Map[ModuleCode, Map[Occurrence, Seq[StudentModuleMarkRecord]]] = moduleRegistrations
-    .groupBy(_.sitsModuleCode)
-    .view.mapValues(_.groupBy(_.occurrence))
-    .toMap
-    .map { case (moduleCode, occurrences) => moduleCode ->
-      occurrences.map { case (occ, mr) => occ ->
-        MarksDepartmentHomeCommand.studentModuleMarkRecords(moduleCode, academicYear, occ, mr, moduleRegistrationMarksService, assessmentMembershipService)
-      }
-    }
 
   lazy val recordsByStudent: Map[SprCode, Map[ModuleCode, Map[Occurrence, Seq[StudentModuleMarkRecord]]]] =
     studentModuleMarkRecords.values.flatMap(_.values).flatten.toSeq

@@ -11,7 +11,7 @@ import uk.ac.warwick.tabula.commands.marks.MarksDepartmentHomeCommand.StudentMod
 import uk.ac.warwick.tabula.commands.marks.ModuleOccurrenceCommands.SprCode
 import uk.ac.warwick.tabula.commands.marks.ProcessCohortMarksCommand
 import uk.ac.warwick.tabula.data.model.{Department, MarkState, ModuleResult}
-import uk.ac.warwick.tabula.marks.web.Routes
+import uk.ac.warwick.tabula.web.Routes
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 
 import scala.collection.SortedMap
@@ -24,7 +24,7 @@ class ProcessCohortMarksController extends BaseCohortController
 
   validatesSelf[SelfValidating]
 
-  override val selectCourseAction: (Department, AcademicYear) => String = Routes.Admin.Cohorts.processMarks
+  override val selectCourseAction: (Department, AcademicYear) => String = Routes.marks.Admin.Cohorts.processMarks
   override val selectCourseActionLabel: String = "View marks"
   override val selectCourseActionTitle: String = "Process marks"
 
@@ -37,16 +37,6 @@ class ProcessCohortMarksController extends BaseCohortController
 
   @ModelAttribute("moduleResultsDescriptions")
   def moduleResultsDescriptions(): Map[String, String] = ModuleResult.values.map(mr => mr.dbValue -> mr.description).toMap
-
-  @GetMapping
-  def selectCohort(
-    @ModelAttribute("selectCourseCommand") selectCourseCommand: SelectCourseCommand,
-    selectCourseErrors: Errors,
-    model: ModelMap,
-    @PathVariable department: Department,
-    @PathVariable academicYear: AcademicYear
-  ): String = selectCourseRender(model, department, academicYear)
-
 
   @GetMapping(Array("process"))
   def processSummary(
@@ -67,12 +57,14 @@ class ProcessCohortMarksController extends BaseCohortController
         selectCourseRender(model, department, academicYear)
       } else {
         processCohortMarksCommand.entities = cohort
-        processCohortMarksCommand.fetchValidGrades
+        processCohortMarksCommand.fetchValidGrades()
         if (!processCohortMarksErrors.hasErrors) {
           processCohortMarksCommand.populate()
         }
         model.addAttribute("entities", processCohortMarksCommand.entitiesBySprCode)
         model.addAttribute("recordsByStudent", processCohortMarksCommand.recordsByStudent)
+        model.addAttribute("breadcrumbs", Seq(MarksBreadcrumbs.Admin.HomeForYear(department, academicYear, active = true)))
+        model.addAttribute("secondBreadcrumbs", academicYearBreadcrumbs(academicYear)(Routes.marks.Admin.home(department, _)))
         "marks/admin/process"
       }
     }
@@ -126,6 +118,8 @@ class ProcessCohortMarksController extends BaseCohortController
         model.addAttribute("entities", processCohortMarksCommand.entitiesBySprCode)
         model.addAttribute("changes", SortedMap(changes.view.mapValues(_.map(_._1)).toSeq.sortBy(_._1): _*))
         model.addAttribute("notificationDepartments", departmentalStudents(changes.values.flatten.filter(_._2).map(_._1).toSeq))
+        model.addAttribute("breadcrumbs", Seq(MarksBreadcrumbs.Admin.HomeForYear(department, academicYear, active = true)))
+        model.addAttribute("secondBreadcrumbs", academicYearBreadcrumbs(academicYear)(Routes.marks.Admin.home(department, _)))
         "marks/admin/process_preview"
       }
     }
@@ -149,7 +143,7 @@ class ProcessCohortMarksController extends BaseCohortController
       processSummary(selectCourseCommand, selectCourseErrors, processCohortMarksCommand, processCohortMarksErrors, model, department, academicYear)
     } else {
       processCohortMarksCommand.apply()
-      RedirectFlashing(Routes.Admin.home(department, academicYear), "flash__success" -> "flash.cohort.marksProcessed")
+      RedirectFlashing(Routes.marks.Admin.home(department, academicYear), "flash__success" -> "flash.cohort.marksProcessed")
     }
   }
 }

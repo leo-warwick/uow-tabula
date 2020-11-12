@@ -3,6 +3,7 @@ package uk.ac.warwick.tabula.commands.marks
 import org.springframework.validation.{BindingResult, Errors}
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.commands.marks.CohortCommand._
 import uk.ac.warwick.tabula.commands.marks.ModuleOccurrenceCommands.OptionalMarksItem
 import uk.ac.warwick.tabula.commands.marks.ProcessModuleMarksCommand._
 import uk.ac.warwick.tabula.data.model._
@@ -25,7 +26,6 @@ object ProcessModuleMarksCommand {
     with BindListener
     with PopulateOnForm
 
-  type SprCode = ModuleOccurrenceCommands.SprCode
   class StudentModuleMarksItem extends ModuleOccurrenceCommands.StudentModuleMarksItem with OptionalMarksItem {
     def this(sprCode: SprCode) = {
       this()
