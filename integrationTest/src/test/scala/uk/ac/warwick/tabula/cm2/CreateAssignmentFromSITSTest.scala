@@ -1,7 +1,8 @@
 package uk.ac.warwick.tabula.cm2
 
+import org.joda.time.LocalDate
 import org.openqa.selenium.By
-import uk.ac.warwick.tabula.{AcademicYear, BrowserTest}
+import uk.ac.warwick.tabula.{AcademicYear, BrowserTest, DateFormats}
 
 import scala.jdk.CollectionConverters._
 
@@ -111,50 +112,51 @@ class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
     eventually {
       click on datesButton
     }
-    var openDate = id("main").webElement.findElement(By.id("modal-open-date"))
+    val openDate = id("main").webElement.findElement(By.id("modal-open-date"))
     eventually {
       Then("The modal screen for Set dates opens")
       openDate.isDisplayed should be(true)
     }
+    val assignmentOpenDate: LocalDate = LocalDate.now().plusDays(15)
     When("I change the open date")
-    openDate.click()
-
+    val openDateCalendarIcon = openDate.findElement(By.xpath("..//*[contains(@class, \"fa-calendar\")]"))
+    click on openDateCalendarIcon
     eventually {
-      val datePicker = className("datetimepicker").findAllElements.filter(_.isDisplayed).next()
+      className("datetimepicker").findAllElements.filter(_.isDisplayed).next()
+      textField("openDate").value = DateFormats.DatePickerFormatter.print(assignmentOpenDate)
+      openDate.getAttribute("value") should be(DateFormats.DatePickerFormatter.print(assignmentOpenDate))
+    }
 
-      click on datePicker.underlying.findElement(By.className("datetimepicker-days")).findElements(By.className("fa-arrow-left")).asScala.filter(_.isDisplayed).head
-      datePicker.underlying.findElements(By.className("switch")).asScala.filter(_.isDisplayed).head.getText should be("August 2017")
+    click on openDateCalendarIcon
+    When("I click on the Save dates button")
+    val saveDatesButton = id("main").webElement.findElements(By.xpath("//*[contains(text(),'Save dates')]")).get(0)
+    click on saveDatesButton
+    eventually {
+      Then("The modal screen for Set dates closes")
+      id("sharedAssignmentPropertiesForm").webElement.isDisplayed should be(false)
+    }
 
-      click on datePicker.underlying.findElement(By.className("datetimepicker-days")).findElements(By.className("day")).asScala.filter { el => el.isDisplayed && el.getText == "2" }.head
+    Then("I check those dates have been saved")
+    And("I click on the Set dates button again")
+    eventually {
+      click on datesButton
+    }
+    eventually {
+      Then("The modal screen for Set dates opens")
+      openDate.isDisplayed should be(true)
     }
 
     Then("The open date should be the new value")
-    openDate.getAttribute("value") should be("02-Aug-2017")
-
-    val closeDate = id("main").webElement.findElement(By.id("modal-close-date"))
-    When("I change the close date")
-    closeDate.click()
-
+    click on openDateCalendarIcon
     eventually {
-      val datePicker = className("datetimepicker").findAllElements.filter(_.isDisplayed).toSeq.last
-
-      click on datePicker.underlying.findElement(By.className("datetimepicker-days")).findElements(By.className("fa-arrow-left")).asScala.filter(_.isDisplayed).head
-      datePicker.underlying.findElements(By.className("switch")).asScala.filter(_.isDisplayed).head.getText should be("August 2017")
-
-      click on datePicker.underlying.findElement(By.className("datetimepicker-days")).findElements(By.className("day")).asScala.filter { el => el.isDisplayed && el.getText == "8" }.head
-      click on datePicker.underlying.findElement(By.className("datetimepicker-hours")).findElements(By.className("hour")).asScala.filter { el => el.isDisplayed && el.getText == "12:00" }.head
-      click on datePicker.underlying.findElement(By.className("datetimepicker-minutes")).findElements(By.className("minute")).asScala.filter { el => el.isDisplayed && el.getText == "12:00" }.head
-
-      // eventually { click on datePicker.underlying.findElement(By.xpath(s"//span[@class='hour active']")) }
-      // eventually { click on datePicker.underlying.findElement(By.xpath(s"//span[@class='minute active']")) }
+      val dateTimePicker = className("datetimepicker").findAllElements.filter(_.isDisplayed).next()
+      dateTimePicker.underlying.findElements(By.className("switch")).asScala.filter(_.isDisplayed).head.getText should be(assignmentOpenDate.toString("MMMM yyyy"))
+      openDate.getAttribute("value") should be(DateFormats.DatePickerFormatter.print(assignmentOpenDate))
+      click on dateTimePicker.underlying.findElement(By.className("datetimepicker-days")).findElements(By.className("day")).asScala.filter { el => el.isDisplayed && el.getText == assignmentOpenDate.toString("d") }.head
     }
 
-    Then("The close date should be the new value")
-    closeDate.getAttribute("value") should be("08-Aug-2017 12:00:00")
-
-    When("I click on the Set dates button")
-    val setDatesButton = id("main").webElement.findElements(By.xpath("//*[contains(text(),'Save dates')]")).get(0)
-    click on setDatesButton
+    When("I click on the Save dates button to close the modal")
+    click on saveDatesButton
     eventually {
       Then("The modal screen for Set dates closes")
       id("sharedAssignmentPropertiesForm").webElement.isDisplayed should be(false)
