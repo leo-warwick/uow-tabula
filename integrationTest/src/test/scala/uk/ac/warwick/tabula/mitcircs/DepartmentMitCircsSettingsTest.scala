@@ -10,6 +10,8 @@ class DepartmentMitCircsSettingsTest extends BrowserTest with GivenWhenThen with
   }
 
   "Department admin" should "be able to enable mit circs for a department" in as(P.Admin2) {
+    When("I go to the department admin page")
+    go to Path("/admin/department/xxx")
     openDepartmentSettings()
 
     // Default settings
