@@ -29,7 +29,7 @@ abstract class IntEnumUserType[E <: IntEnumEntry : ClassTag](enum: IntEnum[E]) e
   override def convertToObject(i: JInteger): E = enum.withValue(i)
   override def convertToValue(e: E): JInteger = e.value
 
-  override def sqlTypes(): Array[Int] = Array(Types.SMALLINT)
+  override def sqlTypes(): Array[Int] = Array(Types.INTEGER)
 }
 
 abstract class OptionEnumUserType[E <: EnumEntry : ClassTag](enum: Enum[E]) extends AbstractBasicUserType[Option[E], String] {

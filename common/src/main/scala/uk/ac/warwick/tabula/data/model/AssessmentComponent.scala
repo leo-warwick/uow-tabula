@@ -102,11 +102,12 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
   @transient lazy val variableAssessmentWeightingRules: Seq[VariableAssessmentWeightingRule] =
     membershipService.getVariableAssessmentWeightingRules(moduleCode, assessmentGroup)
 
-  @transient lazy val allComponentsForAssessmentGroup: Seq[AssessmentComponent] = {
+  private def assessmentComponentsForModule: Seq[AssessmentComponent] =
     RequestLevelCache.cachedBy("AssessmentMembershipService.getAssessmentComponents", moduleCode) {
       membershipService.getAssessmentComponents(moduleCode, inUseOnly = false)
-    }.filter(_.assessmentGroup == assessmentGroup)
-  }
+    }
+
+  @transient lazy val allComponentsForAssessmentGroup: Seq[AssessmentComponent] = assessmentComponentsForModule.filter(_.assessmentGroup == assessmentGroup)
 
   /**
    * Calculate the weighting for the student that the UpstreamAssessmentGroupMembers represent, taking into account any
@@ -210,9 +211,7 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
   def reassessmentGroup_=(code: Option[String]): Unit = _reassessmentGroup = code.orNull
 
   def reassessmentComponents: Seq[AssessmentComponent] = Option(_reassessmentGroup).map { rg =>
-    RequestLevelCache.cachedBy("AssessmentMembershipService.getAssessmentComponents", moduleCode) {
-      membershipService.getAssessmentComponents(moduleCode, inUseOnly = false)
-    }.filter(_.assessmentGroup == rg)
+    assessmentComponentsForModule.filter(_.assessmentGroup == rg)
   }.getOrElse(Nil)
 
   // If this is defined then this assessment represents a change in assessment method for a resit - this property is the sequence of the assessment component that _this_ replaces
@@ -223,9 +222,7 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
   def assessmentReplaced_=(code: Option[String]): Unit = _assessmentReplaced = code.orNull
 
   // if this component is to be reassessed by a different method this returns the new component
-  def replacedBy: Option[AssessmentComponent] = RequestLevelCache.cachedBy("AssessmentMembershipService.getAssessmentComponents", moduleCode) {
-    membershipService.getAssessmentComponents(moduleCode, inUseOnly = false)
-  }.find(_.assessmentReplaced.contains(sequence))
+  def replacedBy: Option[AssessmentComponent] = assessmentComponentsForModule.find(_.assessmentReplaced.contains(sequence))
 
   /**
    * Whether this assessment component represents the final chronological assessment for this assessment group. This
