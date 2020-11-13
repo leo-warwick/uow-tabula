@@ -373,13 +373,13 @@ class Department extends GeneratedId
   @Column(name = "FilterRuleName")
   var filterRule: FilterRule = AllMembersFilterRule
 
-  def includesMember(m: Member, d: Option[Department]): Boolean = Option(parent) match {
-    case None => filterRule.matches(m, d)
-    case Some(p) => filterRule.matches(m, d) && p.includesMember(m, d)
+  def includesMember(m: Member, d: Option[Department], scd: Option[StudentCourseDetails]): Boolean = Option(parent) match {
+    case None => filterRule.matches(m, d, scd)
+    case Some(p) => filterRule.matches(m, d, scd) && p.includesMember(m, d, scd)
   }
 
   def subDepartmentsContaining(member: Member): LazyList[Department] = {
-    if (!includesMember(member, Option(this))) {
+    if (!includesMember(member, Option(this), None)) {
       LazyList.empty // no point looking further down the tree if this level doesn't contain the required member
     } else {
       this #:: children.asScala.flatMap(child => child.subDepartmentsContaining(member)).to(LazyList)
@@ -451,7 +451,7 @@ object Department {
     val name: String
     val courseTypes: Seq[CourseType]
 
-    def matches(member: Member, department: Option[Department]): Boolean
+    def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean
 
     def getName: String = name // for Spring
     def value: String = name
@@ -463,10 +463,15 @@ object Department {
     val name = "UG"
     val courseTypes: Seq[CourseType] = CourseType.ugCourseTypes
 
-    def matches(member: Member, department: Option[Department]): Boolean = member match {
-      case s: StudentMember => s.mostSignificantCourseDetails.flatMap { cd => Option(cd.currentRoute) }.flatMap { route => Option(route.degreeType) } match {
-        case Some(DegreeType.Undergraduate) => true
-        case _ => false
+    private def matches(currentRoute: Option[Route]): Boolean = currentRoute.flatMap(route => Option(route.degreeType)) match {
+      case Some(DegreeType.Undergraduate) => true
+      case _ => false
+    }
+
+    def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = member match {
+      case s: StudentMember => scd match {
+        case Some(scd) => matches(Option(scd.currentRoute))
+        case _ => matches(s.mostSignificantCourseDetails.flatMap(cd => Option(cd.currentRoute)))
       }
       case _ => false
     }
@@ -480,10 +485,15 @@ object Department {
     val name = "PG"
     val courseTypes: Seq[CourseType] = CourseType.pgCourseTypes
 
-    def matches(member: Member, department: Option[Department]): Boolean = member match {
-      case s: StudentMember => s.mostSignificantCourseDetails.flatMap { cd => Option(cd.currentRoute) }.flatMap { route => Option(route.degreeType) } match {
-        case Some(DegreeType.Undergraduate) => false
-        case _ => true
+    private def matches(currentRoute: Option[Route]): Boolean = currentRoute.flatMap(route => Option(route.degreeType)) match {
+      case Some(DegreeType.Undergraduate) => false
+      case _ => true
+    }
+
+    def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = member match {
+      case s: StudentMember => scd match {
+        case Some(scd) => matches(Option(scd.currentRoute))
+        case _ => matches(s.mostSignificantCourseDetails.flatMap(cd => Option(cd.currentRoute)))
       }
       case _ => false
     }
@@ -497,7 +507,7 @@ object Department {
     val name = "All"
     val courseTypes: Seq[CourseType] = CourseType.all
 
-    def matches(member: Member, department: Option[Department]) = true
+    def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = true
 
     def restriction(aliasPaths: Map[String, Seq[(String, AliasAndJoinType)]], department: Option[Department] = None): Option[ScalaRestriction] = {
       None
@@ -509,8 +519,11 @@ object Department {
     val name = s"Y$year"
     val courseTypes: Seq[CourseType] = CourseType.all
 
-    def matches(member: Member, department: Option[Department]): Boolean = member match {
-      case s: StudentMember => s.mostSignificantCourseDetails.exists(_.latestStudentCourseYearDetails.yearOfStudy == year)
+    def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = member match {
+      case s: StudentMember => scd match {
+        case Some(scd) => Option(scd).exists(_.latestStudentCourseYearDetails.yearOfStudy == year)
+        case _ => s.mostSignificantCourseDetails.exists(_.latestStudentCourseYearDetails.yearOfStudy == year)
+      }
       case _ => false
     }
 
@@ -523,8 +536,11 @@ object Department {
     val name = "DepartmentRoutes"
     val courseTypes: Seq[CourseType] = CourseType.all
 
-    def matches(member: Member, department: Option[Department]): Boolean = member match {
-      case s: StudentMember => s.mostSignificantCourseDetails.flatMap { cd => Option(cd.currentRoute) }.exists { r => department.contains(r.adminDepartment) }
+    def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = member match {
+      case s: StudentMember => scd match {
+        case Some(scd) => Option(scd.currentRoute).exists(r => department.contains(r.adminDepartment))
+        case _ => s.mostSignificantCourseDetails.flatMap(cd => Option(cd.currentRoute)).exists(r => department.contains(r.adminDepartment))
+      }
       case _ => false
     }
 
@@ -537,7 +553,7 @@ object Department {
     val name: String = rules.map(_.name).mkString(",")
     val courseTypes: Seq[CourseType] = CourseType.all
 
-    def matches(member: Member, department: Option[Department]): Boolean = rules.forall(_.matches(member, department))
+    def matches(member: Member, department: Option[Department], scd: Option[StudentCourseDetails]): Boolean = rules.forall(_.matches(member, department, scd))
 
     def restriction(aliasPaths: Map[String, Seq[(String, AliasAndJoinType)]], department: Option[Department] = None): Option[ScalaRestriction] = {
       val restrictions = rules.flatMap(_.restriction(aliasPaths, department))

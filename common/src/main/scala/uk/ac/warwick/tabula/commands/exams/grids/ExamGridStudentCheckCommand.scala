@@ -48,7 +48,7 @@ class ExamGridStudentCheckCommandInternal(val department: Department, val academ
       scyds.exists(_.enrolledOrCompleted),
       scyds.exists(scyd => courses.asScala.contains(scyd.studentCourseDetails.course)),
       scyds.exists(scyd => courseOccurrences.asScala.contains(scyd.blockOccurrence)),
-      !scyds.exists(_.enrolmentStatus.code.startsWith("T")),
+      scyds.exists(_.enrolmentStatus.code.startsWith("T")),
       scyds.exists(scyd => routes.contains(scyd.studentCourseDetails.currentRoute)),
       assessmentMembershipService.getUpstreamAssessmentGroups(student, academicYear, resitOnly = true).nonEmpty,
       if (isLevelGrid) scyds.exists(_.studyLevel == levelCode) else scyds.exists(_.yearOfStudy == yearOfStudy),

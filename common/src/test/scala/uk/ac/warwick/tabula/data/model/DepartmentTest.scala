@@ -104,6 +104,22 @@ class DepartmentTest extends TestBase with Mockito {
       m.attachStudentCourseDetails(scd)
       m.mostSignificantCourse = scd
     })
+
+    val postgraduate1Scd1 = new StudentCourseDetails().tap(s => {
+      s.mostSignificant = false
+      s.attachStudentCourseYearDetails(new StudentCourseYearDetails().tap(_.yearOfStudy = 1))
+      s.currentRoute = ugRoute
+    })
+
+    val postgraduate1: StudentMember = new StudentMember().tap(m => {
+      val postgraduate1Scd2 = new StudentCourseDetails().tap(s => {
+        s.mostSignificant = true
+        s.attachStudentCourseYearDetails(new StudentCourseYearDetails().tap(_.yearOfStudy = 1))
+        s.currentRoute = pgRoute
+      })
+      m.attachAllStudentCourseDetails(Seq(postgraduate1Scd1, postgraduate1Scd2))
+      m.mostSignificantCourse = postgraduate1Scd2
+    })
     val postgraduate: StudentMember = new StudentMember().tap(m => {
       val scd = new StudentCourseDetails().tap(s => {
         s.mostSignificant = true
@@ -121,9 +137,9 @@ class DepartmentTest extends TestBase with Mockito {
   def AllMembersFilterRuleLetsAnyoneIn(): Unit = {
     new FilterRuleFixture {
       val rule = AllMembersFilterRule
-      rule.matches(notStudentMember, None) should be (true)
-      rule.matches(undergraduate, None) should be (true)
-      rule.matches(postgraduate, None) should be (true)
+      rule.matches(notStudentMember, None, None) should be (true)
+      rule.matches(undergraduate, None, None) should be (true)
+      rule.matches(postgraduate, None, None) should be (true)
     }
   }
 
@@ -135,16 +151,16 @@ class DepartmentTest extends TestBase with Mockito {
   def UGFilterRuleAllowsUndergrads(): Unit = {
     new FilterRuleFixture {
       val rule = UndergraduateFilterRule
-      rule.matches(notStudentMember, None) should be (false)
-      rule.matches(undergraduate, None) should be (true)
-      rule.matches(postgraduate, None) should be (false)
+      rule.matches(notStudentMember, None, None) should be (false)
+      rule.matches(undergraduate, None, None) should be (true)
+      rule.matches(postgraduate, None, None) should be (false)
 
       // test the various remaining different route types
       postgraduate.mostSignificantCourseDetails.get.currentRoute.degreeType = DegreeType.InService
-      rule.matches(postgraduate, None) should be (false)
+      rule.matches(postgraduate, None, None) should be (false)
 
       postgraduate.mostSignificantCourseDetails.get.currentRoute.degreeType = DegreeType.PGCE
-      rule.matches(postgraduate, None) should be (false)
+      rule.matches(postgraduate, None, None) should be (false)
     }
   }
 
@@ -152,16 +168,16 @@ class DepartmentTest extends TestBase with Mockito {
   def PGFilterRuleAllowsPostgrads(): Unit = {
     new FilterRuleFixture {
       val rule = PostgraduateFilterRule
-      rule.matches(notStudentMember, None) should be (false)
-      rule.matches(undergraduate, None) should be (false)
-      rule.matches(postgraduate, None) should be (true)
+      rule.matches(notStudentMember, None, None) should be (false)
+      rule.matches(undergraduate, None, None) should be (false)
+      rule.matches(postgraduate, None, None) should be (true)
 
       // test the various remaining different course types
       postgraduate.mostSignificantCourseDetails.get.currentRoute.degreeType = DegreeType.InService
-      rule.matches(postgraduate, None) should be (true)
+      rule.matches(postgraduate, None, None) should be (true)
 
       postgraduate.mostSignificantCourseDetails.get.currentRoute.degreeType = DegreeType.PGCE
-      rule.matches(postgraduate, None) should be (true)
+      rule.matches(postgraduate, None, None) should be (true)
 
     }
   }
@@ -171,14 +187,14 @@ class DepartmentTest extends TestBase with Mockito {
     new FilterRuleFixture {
       val firstYearRule = new InYearFilterRule(1)
       val secondYearRule = new InYearFilterRule(2)
-      firstYearRule.matches(undergraduate, None) should be (true)
-      firstYearRule.matches(postgraduate, None) should be (false)
-      firstYearRule.matches(notStudentMember, None) should be (false)
+      firstYearRule.matches(undergraduate, None, None) should be (true)
+      firstYearRule.matches(postgraduate, None, None) should be (false)
+      firstYearRule.matches(notStudentMember, None, None) should be (false)
 
-      secondYearRule.matches(undergraduate, None) should be (false)
+      secondYearRule.matches(undergraduate, None, None) should be (false)
       undergraduate.mostSignificantCourseDetails.get.latestStudentCourseYearDetails.yearOfStudy = 2
-      secondYearRule.matches(undergraduate, None) should be (true)
-      firstYearRule.matches(undergraduate, None) should be (false)
+      secondYearRule.matches(undergraduate, None, None) should be (true)
+      firstYearRule.matches(undergraduate, None, None) should be (false)
     }
   }
 
@@ -186,13 +202,20 @@ class DepartmentTest extends TestBase with Mockito {
   def DepartmentRoutesRuleAllowsStudentInRoute(): Unit = {
     new FilterRuleFixture {
       val deptRoutesRule = DepartmentRoutesFilterRule
-      deptRoutesRule.matches(undergraduate, Option(department)) should be (true)
-      deptRoutesRule.matches(postgraduate, Option(department)) should be (false)
-      deptRoutesRule.matches(notStudentMember, Option(department)) should be (false)
+      deptRoutesRule.matches(undergraduate, Option(department), None) should be (true)
+      deptRoutesRule.matches(postgraduate, Option(department), None) should be (false)
+      deptRoutesRule.matches(notStudentMember, Option(department), None) should be (false)
 
-      deptRoutesRule.matches(undergraduate, Option(otherDepartment)) should be (false)
-      deptRoutesRule.matches(postgraduate, Option(otherDepartment)) should be (true)
-      deptRoutesRule.matches(notStudentMember, Option(otherDepartment)) should be (false)
+      deptRoutesRule.matches(undergraduate, Option(otherDepartment), None) should be (false)
+      deptRoutesRule.matches(postgraduate, Option(otherDepartment), None) should be (true)
+      deptRoutesRule.matches(notStudentMember, Option(otherDepartment), None) should be (false)
+
+      deptRoutesRule.matches(undergraduate, Option(department), Option(undergraduate.mostSignificantCourse)) should be (true)
+
+      deptRoutesRule.matches(postgraduate1, Option(department), Option(postgraduate1Scd1)) should be (true)
+      deptRoutesRule.matches(postgraduate1, Option(otherDepartment), Option(postgraduate1.mostSignificantCourse)) should be (true)
+      deptRoutesRule.matches(postgraduate1, Option(otherDepartment), None) should be (true)
+      deptRoutesRule.matches(postgraduate1, Option(department), None) should be (false)
 
     }
   }

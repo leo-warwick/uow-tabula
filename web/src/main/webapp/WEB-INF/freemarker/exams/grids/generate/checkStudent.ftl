@@ -31,7 +31,7 @@
     <#if !check.courseMatches>
       <@fail>This student isn't on a course that's been selected. The student is taking <#list command.student.freshStudentCourseDetails as scd>${scd.course.code}<#if scd_has_next> and </#if></#list>.</@fail>
     </#if>
-    <#if !command.includeTempWithdrawn && !check.temporarilyWithdrawn>
+    <#if !command.includeTempWithdrawn && check.temporarilyWithdrawn>
       <@fail>The student is marked as temporarily withdrawn for ${academicYear.toString}. You can re-generate this grid and choose to include temporarily withdrawn students.</@fail>
     </#if>
     <#if command.routes?has_content && !check.routeMatches>
