@@ -147,7 +147,8 @@ class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
     }
 
     Then("The open date should be the new value")
-    click on openDateCalendarIcon
+    val newOpenDateCalendarIcon = openDate.findElement(By.xpath("..//*[contains(@class, \"fa-calendar\")]"))
+    click on newOpenDateCalendarIcon
     eventually {
       val dateTimePicker = className("datetimepicker").findAllElements.filter(_.isDisplayed).next()
       dateTimePicker.underlying.findElements(By.className("switch")).asScala.filter(_.isDisplayed).head.getText should be(assignmentOpenDate.toString("MMMM yyyy"))
@@ -156,7 +157,8 @@ class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
     }
 
     When("I click on the Save dates button to close the modal")
-    click on saveDatesButton
+    val newSaveDatesButton = id("main").webElement.findElements(By.xpath("//*[contains(text(),'Save dates')]")).get(0)
+    click on newSaveDatesButton
     eventually {
       Then("The modal screen for Set dates closes")
       id("sharedAssignmentPropertiesForm").webElement.isDisplayed should be(false)
