@@ -225,7 +225,7 @@ private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: Scient
       val initialEndTime = new LocalTime((activity \\ "end").text)
 
       //TAB-8848 -Some 20/21 S+ events have been set with start time  > end time(23pm-0am slots) but they belong to 8-9 am slot.
-      val (startTime, endTime) = if (initialStartTime.isAfter(initialEndTime) && initialStartTime.getHourOfDay == 23 && (name.contains("8am-9am") || name.contains("8-9am"))) {
+      val (startTime, endTime) = if (initialStartTime.getHourOfDay == 23) {
         logger.info(s"Changed start/end time to 8-9 am slot for S+ invalid event: $name, startTime:$initialStartTime: endTime:$initialEndTime")
         (initialStartTime.withHourOfDay(8), initialEndTime.withHourOfDay(9))
       } else (initialStartTime, initialEndTime)
