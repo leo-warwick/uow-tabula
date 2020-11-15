@@ -147,13 +147,13 @@ class CreateAssignmentFromSITSTest extends BrowserTest with CourseworkFixtures {
     }
 
     Then("The open date should be the new value")
-    val newOpenDateCalendarIcon = openDate.findElement(By.xpath("..//*[contains(@class, \"fa-calendar\")]"))
-    click on newOpenDateCalendarIcon
     eventually {
-      val dateTimePicker = className("datetimepicker").findAllElements.filter(_.isDisplayed).next()
-      dateTimePicker.underlying.findElements(By.className("switch")).asScala.filter(_.isDisplayed).head.getText should be(assignmentOpenDate.toString("MMMM yyyy"))
-      openDate.getAttribute("value") should be(DateFormats.DatePickerFormatter.print(assignmentOpenDate))
-      click on dateTimePicker.underlying.findElement(By.className("datetimepicker-days")).findElements(By.className("day")).asScala.filter { el => el.isDisplayed && el.getText == assignmentOpenDate.toString("d") }.head
+      val newOpenDateCalendarIcon = eventually {openDate.findElement(By.xpath("..//*[contains(@class, \"fa-calendar\")]"))}
+      click on newOpenDateCalendarIcon
+        val dateTimePicker = className("datetimepicker").findAllElements.filter(_.isDisplayed).next()
+        dateTimePicker.underlying.findElements(By.className("switch")).asScala.filter(_.isDisplayed).head.getText should be(assignmentOpenDate.toString("MMMM yyyy"))
+        openDate.getAttribute("value") should be(DateFormats.DatePickerFormatter.print(assignmentOpenDate))
+        click on dateTimePicker.underlying.findElement(By.className("datetimepicker-days")).findElements(By.className("day")).asScala.filter { el => el.isDisplayed && el.getText == assignmentOpenDate.toString("d") }.head
     }
 
     When("I click on the Save dates button to close the modal")
