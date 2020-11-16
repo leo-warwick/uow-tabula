@@ -312,7 +312,9 @@ object Fixtures extends Mockito {
   def studentCourseDetails(member: StudentMember,
     courseDepartment: Department,
     sprStatus: SitsStatus = null,
-    scjCode: String = null): StudentCourseDetails = {
+    scjCode: String = null,
+    academicYear: Option[AcademicYear] = None
+  ): StudentCourseDetails = {
     val scjCodeToUse = scjCode match {
       case null => member.universityId + "/1"
       case _ => scjCode
@@ -327,7 +329,7 @@ object Fixtures extends Mockito {
 
     scd.statusOnRoute = sprStatus
 
-    val scyd = studentCourseYearDetails()
+    val scyd = studentCourseYearDetails(academicYear.getOrElse(AcademicYear.now()))
     scyd.enrolmentDepartment = courseDepartment
     scyd.yearOfStudy = 1
     scyd.studyLevel = "1"

@@ -2,7 +2,7 @@ package uk.ac.warwick.tabula.data.model.notifications.marks
 
 import uk.ac.warwick.tabula.data.model.{ModuleRegistration, ModuleSelectionStatus, Notification, RecordedModuleRegistration}
 import uk.ac.warwick.tabula.services.ProfileService
-import uk.ac.warwick.tabula.{Fixtures, Mockito, TestBase}
+import uk.ac.warwick.tabula.{AcademicYear, Fixtures, Mockito, TestBase}
 import uk.ac.warwick.tabula.web.views.{FreemarkerRendering, ScalaFreemarkerConfiguration}
 
 class ConfirmedModuleMarkChangedNotificationTest extends TestBase with Mockito with FreemarkerRendering {
@@ -101,4 +101,30 @@ class ConfirmedModuleMarkChangedNotificationTest extends TestBase with Mockito w
         |""".stripMargin)
   }
 
+
+  @Test def courseChange(): Unit = withUser("cuscav") {
+    val dept = Fixtures.department("cs")
+    val student1 = Fixtures.student(universityId = "8347243", courseDepartment = dept)
+    val scd1 = student1.mostSignificantCourse
+    scd1.mostSignificant = false
+
+    // the student has moved onto a new course - the notification about the mark change relating to the previous course should still work
+    Fixtures.studentCourseDetails(student1, dept, null, student1.universityId + "/2", academicYear = Some(AcademicYear.now().next))
+
+    val academicYear = scd1.latestStudentCourseYearDetails.academicYear
+
+    val module1 = Fixtures.module("in101")
+    val moduleRegistration1 = new ModuleRegistration(scd1.sprCode, module1, BigDecimal(30).underlying, "IN101-30", academicYear, "A", "WMR")
+    moduleRegistration1._allStudentCourseDetails.add(scd1)
+    moduleRegistration1.assessmentGroup = "A1"
+    moduleRegistration1.selectionStatus = ModuleSelectionStatus.OptionalCore
+    val recordedModuleRegistration = new RecordedModuleRegistration(moduleRegistration1)
+
+    val department = Fixtures.department("in")
+
+    val notification = Notification.init(new ConfirmedModuleMarkChangedNotification, currentUser.apparentUser, recordedModuleRegistration, department)
+    notification.profileService = smartMock[ProfileService]
+    notification.profileService.getStudentCourseDetailsBySprCode(scd1.sprCode) returns student1.freshOrStaleStudentCourseDetails.toSeq
+    notification.studentList.length should be (1)
+  }
 }
