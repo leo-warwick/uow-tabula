@@ -222,7 +222,7 @@ trait StudentModuleRegistrationAndComponents extends Logging {
         ModuleRegistrationAndComponents(
           moduleRegistration = mr,
           markState = recordedModuleRegistration.flatMap(_.latestState),
-          markRecord = StudentModuleMarkRecord(mr, recordedModuleRegistration, gradeBoundary.exists(_.generatesResit)),
+          markRecord = StudentModuleMarkRecord(mr, recordedModuleRegistration, gradeBoundary),
           components = components.map { case (ug, uagm, weighting) =>
             val recordedAssessmentComponentStudent: Option[RecordedAssessmentComponentStudent] = assessmentComponentMarksService.getRecordedStudent(uagm)
             val resit: Option[RecordedResit] = studentsResits.filter(r => r.sprCode == mr.sprCode && r.sequence == ug.sequence)
@@ -250,7 +250,7 @@ trait StudentModuleRegistrationAndComponents extends Logging {
                 uagm,
                 recordedAssessmentComponentStudent,
                 resit,
-                gradeBoundary.exists(_.generatesResit)
+                gradeBoundary
               ),
             )
           },

@@ -23,6 +23,7 @@ object ListAssessmentComponentsCommand {
     mark: Option[Int],
     grade: Option[String],
     requiresResit: Boolean, // the grade assigned indicates that further assessment is required
+    incrementsAttempt: Boolean, // the grade assigned indicates that the attempt should be incremented
     existingResit: Option[RecordedResit], // a new reassessment record for the next exam period
     needsWritingToSits: Boolean,
     outOfSync: Boolean,
@@ -41,10 +42,12 @@ object ListAssessmentComponentsCommand {
       member: UpstreamAssessmentGroupMember,
       recordedStudent: Option[RecordedAssessmentComponentStudent],
       existingResit: Option[RecordedResit],
-      requiresResit: Boolean
+      gradeBoundary: Option[GradeBoundary]
     ): StudentMarkRecord = {
       val reassessment = member.isReassessment
       val isAgreedSITS = recordedStudent.forall(!_.needsWritingToSits) && (member.agreedMark.nonEmpty || member.agreedGrade.nonEmpty)
+      val requiresResit: Boolean = gradeBoundary.exists(_.generatesResit)
+      val incrementsAttempt: Boolean = gradeBoundary.exists(_.incrementsAttempt)
 
       StudentMarkRecord(
         universityId = member.universityId,
@@ -69,6 +72,7 @@ object ListAssessmentComponentsCommand {
           case _ => None
         },
         requiresResit,
+        incrementsAttempt,
         existingResit,
         needsWritingToSits = recordedStudent.exists(_.needsWritingToSits),
         outOfSync =
@@ -132,7 +136,7 @@ object ListAssessmentComponentsCommand {
         val grade = recordedStudent.flatMap(_.latestGrade)
         grade.flatMap(g => gradeBoundaries.find(gb => gb.grade == g && gb.process == process))
       }
-      StudentMarkRecord(info, member, recordedStudent, existingResit, gradeBoundary.exists(_.generatesResit))
+      StudentMarkRecord(info, member, recordedStudent, existingResit, gradeBoundary)
     }
 
   case class AssessmentComponentInfo(
@@ -236,7 +240,7 @@ trait ListAssessmentComponentsForModulesWithPermission extends TaskBenchmarking 
         .mapValues { resits =>
           resits.filter(_.universityId.nonEmpty).groupBy(r => (r.universityId.get, r.sequence))
             .view
-            .mapValues(_.maxBy(_.currentResitAttempt))
+            .mapValues(_.maxBy(_.currentResitAttempt.value))
             .toMap
         }.toMap
     }

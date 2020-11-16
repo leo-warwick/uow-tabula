@@ -59,10 +59,13 @@ object MarksDepartmentHomeCommand {
     history: Seq[RecordedModuleMark], // Most recent first
     moduleRegistration: ModuleRegistration,
     requiresResit: Boolean,
+    incrementsAttempt: Boolean,
   )
   object StudentModuleMarkRecord {
-    def apply(moduleRegistration: ModuleRegistration, recordedModuleRegistration: Option[RecordedModuleRegistration], requiresResit: Boolean): StudentModuleMarkRecord = {
+    def apply(moduleRegistration: ModuleRegistration, recordedModuleRegistration: Option[RecordedModuleRegistration], gradeBoundary: Option[GradeBoundary]): StudentModuleMarkRecord = {
       val isAgreedSITS = recordedModuleRegistration.forall(!_.needsWritingToSits) && (moduleRegistration.agreedMark.nonEmpty || moduleRegistration.agreedGrade.nonEmpty)
+      val requiresResit: Boolean = gradeBoundary.exists(_.generatesResit)
+      val incrementsAttempt: Boolean = gradeBoundary.exists(_.incrementsAttempt)
 
       StudentModuleMarkRecord(
         sprCode = moduleRegistration.sprCode,
@@ -106,7 +109,8 @@ object MarksDepartmentHomeCommand {
         recordedStudent = recordedModuleRegistration,
         history = recordedModuleRegistration.map(_.marks.distinct).getOrElse(Seq.empty),
         moduleRegistration = moduleRegistration,
-        requiresResit = requiresResit
+        requiresResit = requiresResit,
+        incrementsAttempt = incrementsAttempt,
       )
     }
   }
@@ -146,7 +150,7 @@ object MarksDepartmentHomeCommand {
       val process = if (currentResitAttempt.getOrElse(moduleRegistration, None).nonEmpty) GradeBoundaryProcess.Reassessment else GradeBoundaryProcess.StudentAssessment
       val grade = recordedModuleRegistration.flatMap(_.latestGrade)
       val gradeBoundary = grade.flatMap(g => gradeBoundaries.getOrElse(moduleRegistration.marksCode, Seq.empty).find(gb => gb.grade == g && gb.process == process))
-      StudentModuleMarkRecord(moduleRegistration, recordedModuleRegistration, gradeBoundary.exists(_.generatesResit))
+      StudentModuleMarkRecord(moduleRegistration, recordedModuleRegistration, gradeBoundary)
     }
 
   type Command = Appliable[Result]

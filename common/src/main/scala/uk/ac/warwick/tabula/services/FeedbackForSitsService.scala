@@ -205,7 +205,7 @@ abstract class ExportFeedbackToSitsCommandInternal(feedback: Feedback, upstreamA
         member = upstreamAssessmentGroupMember,
         recordedStudent = recordedStudent,
         existingResit = None,
-        requiresResit = false,
+        gradeBoundary = None,
       )
 
     val isUnchanged = {

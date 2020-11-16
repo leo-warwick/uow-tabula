@@ -141,7 +141,7 @@ class RecordedResitsParameterGetter(resit: RecordedResit) {
     "resitSequence" -> rseq,
     "marksCode" -> resit.marksCode,
     "assessmentType" -> resit.assessmentType.astCode,
-    "attempt" -> resit.currentResitAttempt.toString,
+    "attempt" -> resit.currentResitAttempt.value.toString,
     "weighting" -> resit.weighting.toString,
   )
 
@@ -151,7 +151,7 @@ class RecordedResitsParameterGetter(resit: RecordedResit) {
     "moduleCode" -> resit.moduleCode,
     "resitSequence" -> resit.resitSequence.orNull,
     "assessmentType" -> resit.assessmentType.astCode,
-    "attempt" -> resit.currentResitAttempt.toString,
+    "attempt" -> resit.currentResitAttempt.value.toString,
     "weighting" -> resit.weighting.toString,
   )
 }

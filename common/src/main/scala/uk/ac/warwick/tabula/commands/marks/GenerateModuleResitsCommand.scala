@@ -112,7 +112,7 @@ class GenerateModuleResitsCommandInternal(val sitsModuleCode: String, val module
           val recordedResit = cm.existingResit.getOrElse(new RecordedResit(cm, sprCode))
           recordedResit.assessmentType = resitItem.assessmentType
           recordedResit.weighting = resitItem.weighting.toInt
-          recordedResit.currentResitAttempt = resitItem.attempt.toInt
+          recordedResit.currentResitAttempt = Attempt.withValue(resitItem.attempt.toInt)
           recordedResit.needsWritingToSitsSince = Some(DateTime.now)
           recordedResit.updatedBy = currentUser.apparentUser
           recordedResit.updatedDate = DateTime.now
@@ -144,7 +144,7 @@ trait GenerateModuleResitsValidation extends SelfValidating {
 
   def validate(errors: Errors): Unit = {
 
-    if (resitsToCreate.values.flatten.isEmpty) errors.reject("moduleMarks.resit.noneSelected")
+    if (resitsToCreate.values.flatten.isEmpty) errors.reject("resit.noneSelected")
 
     for (
       (sprCode, resits) <- resitsToCreate;
@@ -155,21 +155,21 @@ trait GenerateModuleResitsValidation extends SelfValidating {
         .flatMap(_.components.find(_._1.sequence == sequence).flatMap(_._2.existingResit))
 
       if (resit.create && existingResit.isDefined && !canUpdateResits) {
-        errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "moduleMarks.resit.noEdit")
+        errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "resit.noEdit")
       }
 
       if (!resit.weighting.hasText) {
-        errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "moduleMarks.resit.weighting.missing")
+        errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "resit.weighting.missing")
       } else if (resit.weighting.toIntOption.isEmpty) {
-        errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "moduleMarks.resit.weighting.nonInt")
+        errors.rejectValue(s"resits[$sprCode][$sequence].weighting", "resit.weighting.nonInt")
       }
 
       if (!resit.attempt.hasText) {
-        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "moduleMarks.resit.attempt.missing")
+        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "resit.attempt.missing")
       } else if (resit.attempt.toIntOption.isEmpty) {
-        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "moduleMarks.resit.attempt.nonInt")
+        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "resit.attempt.nonInt")
       } else if (resit.attempt.toInt < 1 || resit.attempt.toInt > 3 ) {
-        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "moduleMarks.resit.attempt.outOfRange")
+        errors.rejectValue(s"resits[$sprCode][$sequence].attempt", "resit.attempt.outOfRange")
       }
     }
   }

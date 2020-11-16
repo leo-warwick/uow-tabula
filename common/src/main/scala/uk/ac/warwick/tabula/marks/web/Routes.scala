@@ -28,6 +28,7 @@ object Routes {
       def apply(department: Department, academicYear: AcademicYear): String = s"$context/admin/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/cohort"
       def processMarks(department: Department, academicYear: AcademicYear): String = s"${apply(department, academicYear)}/process"
       def examBoardOutcomes(department: Department, academicYear: AcademicYear): String = s"${apply(department, academicYear)}/outcomes"
+      def resits(department: Department, academicYear: AcademicYear): String = s"${apply(department, academicYear)}/resits"
     }
 
     object AssessmentComponents {

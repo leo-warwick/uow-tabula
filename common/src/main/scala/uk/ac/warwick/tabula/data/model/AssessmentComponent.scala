@@ -102,11 +102,12 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
   @transient lazy val variableAssessmentWeightingRules: Seq[VariableAssessmentWeightingRule] =
     membershipService.getVariableAssessmentWeightingRules(moduleCode, assessmentGroup)
 
-  @transient lazy val allComponentsForAssessmentGroup: Seq[AssessmentComponent] = {
+  private def assessmentComponentsForModule: Seq[AssessmentComponent] =
     RequestLevelCache.cachedBy("AssessmentMembershipService.getAssessmentComponents", moduleCode) {
       membershipService.getAssessmentComponents(moduleCode, inUseOnly = false)
-    }.filter(_.assessmentGroup == assessmentGroup)
-  }
+    }
+
+  @transient lazy val allComponentsForAssessmentGroup: Seq[AssessmentComponent] = assessmentComponentsForModule.filter(_.assessmentGroup == assessmentGroup)
 
   /**
    * Calculate the weighting for the student that the UpstreamAssessmentGroupMembers represent, taking into account any
@@ -201,6 +202,28 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
   def examPaperType: Option[ExaminationType] = Option(_examPaperType)
   def examPaperType_=(examPaperType: Option[ExaminationType]): Unit = _examPaperType = examPaperType.orNull
 
+  // If the parent module is to be reassessed by a different set of components then this property identifies the assessment group containing the new components
+  // If this is defined then the parent module has Reassessment model - Model B
+  // populated from MAB_UDF8
+  @Column(name = "reassessment_group")
+  private var _reassessmentGroup: String = _
+  def reassessmentGroup: Option[String] = Option(_reassessmentGroup)
+  def reassessmentGroup_=(code: Option[String]): Unit = _reassessmentGroup = code.orNull
+
+  def reassessmentComponents: Seq[AssessmentComponent] = Option(_reassessmentGroup).map { rg =>
+    assessmentComponentsForModule.filter(_.assessmentGroup == rg)
+  }.getOrElse(Nil)
+
+  // If this is defined then this assessment represents a change in assessment method for a resit - this property is the sequence of the assessment component that _this_ replaces
+  // populated from MAB_UDF3
+  @Column(name = "assessment_replaced")
+  private var _assessmentReplaced: String = _
+  def assessmentReplaced: Option[String] = Option(_assessmentReplaced)
+  def assessmentReplaced_=(code: Option[String]): Unit = _assessmentReplaced = code.orNull
+
+  // if this component is to be reassessed by a different method this returns the new component
+  def replacedBy: Option[AssessmentComponent] = assessmentComponentsForModule.find(_.assessmentReplaced.contains(sequence))
+
   /**
    * Whether this assessment component represents the final chronological assessment for this assessment group. This
    * will (should) be set to true for exactly one AssessmentComponent for a combination of [[moduleCode]] and [[assessmentGroup]].
@@ -236,7 +259,9 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
     this.examPaperDuration != other.examPaperDuration ||
     this.examPaperReadingTime != other.examPaperReadingTime ||
     this.examPaperType != other.examPaperType ||
-    this.finalChronologicalAssessment != other.finalChronologicalAssessment
+    this.finalChronologicalAssessment != other.finalChronologicalAssessment ||
+    this.reassessmentGroup != other.reassessmentGroup ||
+    this.assessmentReplaced != other.assessmentReplaced
 
   override def preSave(newRecord: Boolean): Unit = {
     ensureNotNull("name", name)
@@ -264,6 +289,8 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
     examPaperReadingTime = other.examPaperReadingTime
     examPaperType = other.examPaperType
     finalChronologicalAssessment = other.finalChronologicalAssessment
+    reassessmentGroup = other.reassessmentGroup
+    assessmentReplaced = other.assessmentReplaced
   }
 
   override def toStringProps: Seq[(String, Any)] = Seq(
@@ -282,7 +309,9 @@ class AssessmentComponent extends GeneratedId with PreSaveBehaviour with Seriali
     "examPaperDuration" -> examPaperDuration,
     "examPaperReadingTime" -> examPaperReadingTime,
     "examPaperType" -> examPaperType,
-    "finalChronologicalAssessment" -> finalChronologicalAssessment
+    "finalChronologicalAssessment" -> finalChronologicalAssessment,
+    "reassessmentGroup" -> reassessmentGroup,
+    "assessmentReplaced" -> assessmentReplaced
   )
 
   def upstreamAssessmentGroups(year: AcademicYear): Seq[UpstreamAssessmentGroup] = membershipService.getUpstreamAssessmentGroups(this, year)

@@ -222,6 +222,7 @@
     <bean class="uk.ac.warwick.tabula.commands.marks.ConfirmModuleMarksActionConverter" />
     <bean class="uk.ac.warwick.tabula.exams.grids.columns.ExamGridYearMarksToUseConverter" />
     <bean class="uk.ac.warwick.tabula.data.model.ActualProgressionDecisionConverter" />
+    <bean class="uk.ac.warwick.tabula.data.model.AttemptConverter" />
 
   </util:list>
 

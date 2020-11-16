@@ -636,7 +636,7 @@ object ClearRecordedModuleMarks {
         recordedModuleRegistration.latestResult.nonEmpty
       }
 
-    if (isNonEmpty) Some(StudentModuleMarkRecord(moduleRegistration, existingRecordedModuleRegistration, requiresResit = false))
+    if (isNonEmpty) Some(StudentModuleMarkRecord(moduleRegistration, existingRecordedModuleRegistration, None))
     else None
   }
 }
