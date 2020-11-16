@@ -3,6 +3,7 @@ package uk.ac.warwick.tabula.data.model.notifications.marks
 import javax.persistence.{DiscriminatorValue, Entity}
 import org.hibernate.annotations.Proxy
 import uk.ac.warwick.spring.Wire
+import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.exams.web.Routes
 import uk.ac.warwick.tabula.helpers.Logging
@@ -19,14 +20,13 @@ object ConfirmedModuleMarkChangedNotification {
 @DiscriminatorValue("ConfirmModuleMarkChanged")
 class ConfirmedModuleMarkChangedNotification
   extends BatchedNotificationWithTarget[RecordedModuleRegistration, Department, ConfirmedModuleMarkChangedNotification](ConfirmedModuleMarkChangedBatchedNotificationHandler)
-    with SingleItemNotification[RecordedModuleRegistration]
     with MyWarwickNotification
     with Logging {
 
   @transient var profileService: ProfileService = Wire[ProfileService]
   @transient var topLevelUrl: String = Wire.property("${toplevel.url}")
   @transient lazy val department: Department = target.entity
-  @transient lazy val recordedModuleRegistrations = entities
+  @transient lazy val recordedModuleRegistrations: Seq[RecordedModuleRegistration] = entities
 
   override def onPreSave(isNew: Boolean): Unit = {
     priority = NotificationPriority.Info
@@ -34,14 +34,15 @@ class ConfirmedModuleMarkChangedNotification
 
   def verb = "modified"
 
-  def academicYear = recordedModuleRegistrations.head.academicYear
+  def academicYear: AcademicYear = recordedModuleRegistrations.head.academicYear
 
-  def module = recordedModuleRegistrations.head.sitsModuleCode
+  def module: String = recordedModuleRegistrations.head.sitsModuleCode
 
   def studentList: Seq[StudentCourseYearDetails] = entities.flatMap { rmr =>
-    profileService.getStudentCourseDetailsBySprCode(rmr.sprCode).filter(_.mostSignificant).flatMap(_.freshStudentCourseYearDetailsForYear(academicYear))
+    profileService.getStudentCourseDetailsBySprCode(rmr.sprCode)
+      .flatMap(_.freshStudentCourseYearDetailsForYear(academicYear))
+      .sortBy(_.studentCourseDetails.mostSignificant).reverse.headOption // if the most significant course has a scyd for this year prefer that over alternatives
   }.sortBy(_.studentCourseDetails.scjCode)
-
 
   override def title: String = s"$module: Confirmed module marks have been changed"
 
