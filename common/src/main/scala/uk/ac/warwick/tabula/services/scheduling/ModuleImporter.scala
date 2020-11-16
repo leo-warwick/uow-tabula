@@ -147,9 +147,9 @@ object ModuleImporter {
   var sitsSchema: String = Wire.property("${schema.sits}")
 
   final val GetModulesSql =
-    """
+    s"""
 		select substr(mod.mod_code,0,5) as code, max(mod.mod_name) as name, max(mod.mod_snam) as short_name, max(mod.sch_code) as scheme_code, max(mod.mot_code) as status
-		  from ins_mod mod
+		  from $sitsSchema.ins_mod mod
 		  where
 		    mod.mod_code like '_____-%' and
 		    mod.dpt_code = :department_code and
@@ -175,25 +175,25 @@ object ModuleImporter {
 		"""
 
   final def GetRoutesSql =
-    """
+    s"""
 		select
 		  pwy.pwy_code as code,
 		  pwy.pwy_name as name,
 		  pwy.pwy_pwtc as degree_type,
 		  pwy.pwy_iuse as in_use
-		from ins_pwy pwy
+		from $sitsSchema.ins_pwy pwy
 		where
 		  pwy.pwy_pwgc = :department_code and
 		  pwy.pwy_pwtc in ('UG', 'PG', 'PGCE', 'IS')
 		"""
 
   final val GetRouteTeachingDepartmentsSql =
-    """
+    s"""
 		select
 			psd.psd_pwyc as code,
 			psd.psd_dptc as department_code,
 			psd.psd_perc as percentage
-		from ins_psd psd
+		from $sitsSchema.ins_psd psd
 		where
 			psd.psd_pwyc = :route_code
 		"""
