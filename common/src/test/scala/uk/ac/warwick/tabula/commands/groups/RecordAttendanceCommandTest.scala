@@ -3,9 +3,8 @@ package uk.ac.warwick.tabula.commands.groups
 import org.springframework.validation.BindException
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula._
-import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, SmallGroupEvent, SmallGroupEventOccurrence, SmallGroupSet}
-import uk.ac.warwick.tabula.data.model.{Department, Module, UserGroup}
+import uk.ac.warwick.tabula.data.model.{Module, UserGroup}
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.attendancemonitoring.{AttendanceMonitoringEventAttendanceService, AttendanceMonitoringEventAttendanceServiceComponent}
 import uk.ac.warwick.userlookup.User
@@ -48,10 +47,10 @@ class RecordAttendanceCommandTest extends TestBase with Mockito {
 
     val command = new RecordAttendanceCommand(event, week, currentUser) with CommandTestSupport
     command.smallGroupService.getOrCreateSmallGroupEventOccurrence(event, week) returns Option(occurrence)
-    command.studentsState.put("1234567", AttendanceState.Attended)
+    command.studentsState.put("1234567", SmallGroupAttendanceState.Attended)
     command.applyInternal()
     verify(command.userLookup, times(0)).getUsersByUserIds(Seq("abcde").asJava)
-    verify(command.smallGroupService, times(1)).saveOrUpdateAttendance("1234567", event, week, AttendanceState.Attended, currentUser)
+    verify(command.smallGroupService, times(1)).saveOrUpdateAttendance("1234567", event, week, SmallGroupAttendanceState.Attended, currentUser)
   }
 
   trait Fixture {
@@ -95,8 +94,8 @@ class RecordAttendanceCommandTest extends TestBase with Mockito {
   def validateInvalid() = withCurrentUser(mockCurrentUser) {
     new Fixture {
       command.studentsState = JHashMap()
-      command.studentsState.put(invalidUser.getWarwickId, AttendanceState.Attended)
-      command.studentsState.put(validUser.getWarwickId, AttendanceState.Attended)
+      command.studentsState.put(invalidUser.getWarwickId, SmallGroupAttendanceState.Attended)
+      command.studentsState.put(validUser.getWarwickId, SmallGroupAttendanceState.Attended)
 
       val errors = new BindException(command, "command")
       command.validate(errors)
@@ -109,8 +108,8 @@ class RecordAttendanceCommandTest extends TestBase with Mockito {
   def validateMissing() = withCurrentUser(mockCurrentUser) {
     new Fixture {
       command.studentsState = JHashMap()
-      command.studentsState.put(missingUser.getWarwickId, AttendanceState.Attended)
-      command.studentsState.put(validUser.getWarwickId, AttendanceState.Attended)
+      command.studentsState.put(missingUser.getWarwickId, SmallGroupAttendanceState.Attended)
+      command.studentsState.put(validUser.getWarwickId, SmallGroupAttendanceState.Attended)
 
       val errors = new BindException(command, "command")
       command.validate(errors)
@@ -122,7 +121,7 @@ class RecordAttendanceCommandTest extends TestBase with Mockito {
   def validateValid() = withCurrentUser(mockCurrentUser) {
     new Fixture {
       command.studentsState = JHashMap()
-      command.studentsState.put(validUser.getWarwickId, AttendanceState.Attended)
+      command.studentsState.put(validUser.getWarwickId, SmallGroupAttendanceState.Attended)
 
       val errors = new BindException(command, "command")
       command.validate(errors)
