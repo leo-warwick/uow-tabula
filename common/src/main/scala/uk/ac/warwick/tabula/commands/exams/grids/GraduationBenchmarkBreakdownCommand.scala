@@ -80,11 +80,11 @@ class GraduationBenchmarkBreakdownCommandInternal(val studentCourseDetails: Stud
     with AssessmentMembershipServiceComponent =>
 
   override def applyInternal(): Either[UGGraduationBenchmarkBreakdown, PGGraduationBenchmarkBreakdown] = {
-    val moduleRegistrations = studentCourseYearDetails.moduleRegistrations
-    val modules = moduleRegistrations.map { mr => mr -> moduleRegistrationService.benchmarkComponentsAndMarks(mr) }.toMap
-    val excludedModules = moduleRegistrations.map { mr => mr -> moduleRegistrationService.componentsAndMarksExcludedFromBenchmark(mr)}.toMap
-    if (studentCourseDetails.student.isUG) {
 
+    if (studentCourseDetails.student.isUG) {
+      val moduleRegistrations = studentCourseYearDetails.moduleRegistrations
+      val modules = moduleRegistrations.map { mr => mr -> moduleRegistrationService.benchmarkComponentsAndMarks(mr) }.toMap
+      val excludedModules = moduleRegistrations.map { mr => mr -> moduleRegistrationService.componentsAndMarksExcludedFromBenchmark(mr)}.toMap
       val weightedAssessmentMark = moduleRegistrationService.benchmarkWeightedAssessmentMark(studentCourseYearDetails.moduleRegistrations)
 
       val percentageOfAssessmentTaken = moduleRegistrationService.percentageOfAssessmentTaken(studentCourseYearDetails.moduleRegistrations, normalLoad).setScale(1, RoundingMode.HALF_UP)
@@ -113,6 +113,8 @@ class GraduationBenchmarkBreakdownCommandInternal(val studentCourseDetails: Stud
         benchmarkErrors = yearMarksAndWeightings.swap.toSeq ++ benchmark.swap.toSeq
       ))
     } else {
+      // PGT courses are all level M1 so fetch module registrations from all years of study
+      val moduleRegistrations = studentCourseYearDetails.studentCourseDetails.freshOrStaleStudentCourseYearDetails.flatMap(_.moduleRegistrations).toSeq
       val minCatsToConsider = progressionService.numberCatsToConsiderPG(studentCourseYearDetails)
       val (bestPGModules, catsConsidered) = progressionService.bestPGModules(moduleRegistrations, minCatsToConsider)
       val usedModulesWithCumulativeSums: Seq[CumulativeCatsAndMarks] = bestPGModules
