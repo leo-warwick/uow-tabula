@@ -87,6 +87,7 @@ abstract class AllSmallGroupEventAttendanceReportCommand(val department: Departm
 
       val attendedStates: Set[SmallGroupAttendanceState] = Set(
         SmallGroupAttendanceState.Attended,
+        SmallGroupAttendanceState.AttendedRemotely,
         SmallGroupAttendanceState.MissedAuthorised,
         SmallGroupAttendanceState.MissedUnauthorised
       )

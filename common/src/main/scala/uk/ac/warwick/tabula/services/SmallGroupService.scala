@@ -3,7 +3,7 @@ package uk.ac.warwick.tabula.services
 import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.groups.RemoveUserFromSmallGroupCommand
+import uk.ac.warwick.tabula.commands.groups.{RemoveUserFromSmallGroupCommand, SmallGroupAttendanceState}
 import uk.ac.warwick.tabula.commands.{Appliable, TaskBenchmarking}
 import uk.ac.warwick.tabula.data._
 import uk.ac.warwick.tabula.data.model._
@@ -94,7 +94,7 @@ trait SmallGroupService {
 
   def backFillAttendance(studentId: String, occurrences: Seq[SmallGroupEventOccurrence], user: CurrentUser): Seq[SmallGroupEventAttendance]
 
-  def saveOrUpdateAttendance(studentId: String, event: SmallGroupEvent, weekNumber: Int, state: AttendanceState, user: CurrentUser): SmallGroupEventAttendance
+  def saveOrUpdateAttendance(studentId: String, event: SmallGroupEvent, weekNumber: Int, state: SmallGroupAttendanceState, user: CurrentUser): SmallGroupEventAttendance
 
   def deleteAttendance(studentId: String, event: SmallGroupEvent, weekNumber: Int, isPermanent: Boolean = false): Unit
 
@@ -309,7 +309,7 @@ abstract class AbstractSmallGroupService extends SmallGroupService {
     studentId: String,
     event: SmallGroupEvent,
     weekNumber: Int,
-    state: AttendanceState,
+    state: SmallGroupAttendanceState,
     user: CurrentUser
   ): SmallGroupEventAttendance = {
     val occurrence = getOrCreateSmallGroupEventOccurrence(event, weekNumber).getOrElse(throw new IllegalArgumentException(
@@ -323,7 +323,8 @@ abstract class AbstractSmallGroupService extends SmallGroupService {
       newAttendance
     })
 
-    attendance.state = state
+    attendance.state = SmallGroupAttendanceState.to(state)
+    attendance.onlineAttendance = state == SmallGroupAttendanceState.AttendedRemotely
 
     attendance.updatedBy = user.userId
     attendance.updatedDate = DateTime.now

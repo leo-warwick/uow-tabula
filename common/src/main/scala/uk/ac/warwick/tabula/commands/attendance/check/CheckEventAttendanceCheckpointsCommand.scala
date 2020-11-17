@@ -2,6 +2,7 @@ package uk.ac.warwick.tabula.commands.attendance.check
 
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.commands.groups.SmallGroupAttendanceState
 import uk.ac.warwick.tabula.data.model.StudentMember
 import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEventAttendance, SmallGroupEventOccurrence}
@@ -37,7 +38,7 @@ class CheckEventAttendanceCheckpointsCommandInternal(val occurrence: SmallGroupE
     val attendanceList = attendances.asScala.map { case (universityId, state) =>
       val attendance = new SmallGroupEventAttendance
       attendance.occurrence = occurrence
-      attendance.state = state
+      attendance.state = SmallGroupAttendanceState.to(state)
       attendance.universityId = universityId
       attendance
     }.toSeq
@@ -71,5 +72,5 @@ trait CheckEventAttendanceCheckpointsPermissions extends RequiresPermissionsChec
 trait CheckEventAttendanceCheckpointsCommandState {
   def occurrence: SmallGroupEventOccurrence
 
-  var attendances: JMap[String, AttendanceState] = JHashMap()
+  var attendances: JMap[String, SmallGroupAttendanceState] = JHashMap()
 }

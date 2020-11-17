@@ -7,38 +7,52 @@ import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupEventOccurrence.WeekNumber
 import uk.ac.warwick.tabula.data.model.groups.WeekRange.Week
-import uk.ac.warwick.tabula.data.model.groups._
+import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEventAttendance, _}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services._
+import uk.ac.warwick.tabula.system.EnumTwoWayConverter
 import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.userlookup.User
 
 import scala.collection.immutable.SortedMap
 import scala.jdk.CollectionConverters._
 
-sealed abstract class SmallGroupAttendanceState extends EnumEntry {
+sealed abstract class SmallGroupAttendanceState(val code:String, val description: String) extends EnumEntry {
+  override val entryName: String = code
   def getName: String = entryName
 }
 
 object SmallGroupAttendanceState extends Enum[SmallGroupAttendanceState] {
-  case object Attended extends SmallGroupAttendanceState
-  case object MissedAuthorised extends SmallGroupAttendanceState
-  case object MissedUnauthorised extends SmallGroupAttendanceState
-  case object NotRecorded extends SmallGroupAttendanceState
-  case object Late extends SmallGroupAttendanceState
-  case object NotExpected extends SmallGroupAttendanceState // The user is no longer in the group so is not expected to attend
-  case object NotExpectedPast extends SmallGroupAttendanceState // The user wasn't in the group when this event took place
+  case object Attended extends SmallGroupAttendanceState(AttendanceState.Attended.dbValue, AttendanceState.Attended.description)
+  case object AttendedRemotely extends SmallGroupAttendanceState("attended-remotely", AttendanceState.Attended.description)
+  case object MissedAuthorised extends SmallGroupAttendanceState(AttendanceState.MissedAuthorised.dbValue, AttendanceState.MissedUnauthorised.description)
+  case object MissedUnauthorised extends SmallGroupAttendanceState(AttendanceState.MissedUnauthorised.dbValue, AttendanceState.MissedUnauthorised.description)
+  case object NotRecorded extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description)
+  case object Late extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description)
+  case object NotExpected extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description) // The user is no longer in the group so is not expected to attend
+  case object NotExpectedPast extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description) // The user wasn't in the group when this event took place
 
   override def values: IndexedSeq[SmallGroupAttendanceState] = findValues
 
   def from(attendance: Option[SmallGroupEventAttendance]): SmallGroupAttendanceState = attendance.map(_.state) match {
-    case Some(AttendanceState.Attended) => Attended
+    case Some(AttendanceState.Attended) if !attendance.get.onlineAttendance => Attended
+    case Some(AttendanceState.Attended) => AttendedRemotely
     case Some(AttendanceState.MissedAuthorised) => MissedAuthorised
     case Some(AttendanceState.MissedUnauthorised) => MissedUnauthorised
     case Some(AttendanceState.NotRecorded) if attendance.exists(a => !a.expectedToAttend) => NotExpectedPast
     case _ => NotRecorded // null
   }
+
+  def to(attendanceState: SmallGroupAttendanceState): AttendanceState = attendanceState match {
+    case SmallGroupAttendanceState.Attended => AttendanceState.Attended
+    case SmallGroupAttendanceState.AttendedRemotely => AttendanceState.Attended
+    case SmallGroupAttendanceState.MissedAuthorised => AttendanceState.MissedAuthorised
+    case SmallGroupAttendanceState.MissedUnauthorised => AttendanceState.MissedUnauthorised
+    case _ => AttendanceState.NotRecorded // null
+  }
 }
+
+class SmallGroupAttendanceStateConverter extends EnumTwoWayConverter(SmallGroupAttendanceState)
 
 object ViewSmallGroupAttendanceCommand {
   type EventInstance = (SmallGroupEvent, SmallGroupEventOccurrence.WeekNumber)

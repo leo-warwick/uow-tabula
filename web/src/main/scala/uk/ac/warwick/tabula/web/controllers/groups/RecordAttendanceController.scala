@@ -104,7 +104,7 @@ class RecordAttendanceController extends GroupsController with AutowiringAuditEv
   def form(command: RecordAttendanceCommand.Command): Mav =
     Mav("groups/attendance/form",
       "command" -> command,
-      "allCheckpointStates" -> AttendanceState.values,
+      "allCheckpointStates" -> SmallGroupAttendanceState.values,
       "eventInFuture" -> command.isFutureEvent,
       "returnTo" -> getReturnTo(Routes.tutor.mygroups))
 

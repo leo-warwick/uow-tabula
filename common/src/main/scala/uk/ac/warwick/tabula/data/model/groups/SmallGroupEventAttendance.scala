@@ -30,6 +30,9 @@ class SmallGroupEventAttendance extends GeneratedId with PermissionsTarget with 
   @Type(`type` = "uk.ac.warwick.tabula.data.model.attendance.AttendanceStateUserType")
   var state: AttendanceState = _
 
+  @Column(name = "online_attendance")
+  var onlineAttendance: Boolean = _
+
   var updatedDate: DateTime = _
 
   // TAB-7353 - joinedOn is non-null only if the student joined the parent group after this occurrence was due to take place
