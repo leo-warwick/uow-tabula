@@ -490,23 +490,35 @@ class SandboxAssignmentImporter extends AssignmentImporter
       moduleCode <- route.moduleCodes
       module <- d.modules.get(moduleCode).toSeq
       year <- yearsToImport
-    } yield (module, year)).distinct.zipWithIndex.map { case ((module, year), index) =>
-      val a = new AssessmentComponentExamSchedule
-      a.moduleCode = module.fullModuleCode
-      a.assessmentComponentSequence = "E01" // TODO we don't schedule the resit currently
-      a.examProfileCode = s"EXSUM${year.endYear % 100}"
-      a.slotId = f"${(index / 5) + 1}%03d"
-      a.sequence = f"${(index % 5) + 1}%03d" // Five exams per slot
-      a.locationSequence = "001"
-      a.academicYear = year
-      a.startTime =
-        new LocalDate(year.endYear, DateTimeConstants.APRIL, 27)
-          .plusDays(index / 10)
-          .toDateTime(if (index % 10 < 5) new LocalTime(9, 0) else new LocalTime(14, 0))
-      a.examPaperCode = s"${module.code.toUpperCase}0"
-      a.examPaperSection = Some("n/a")
-      a.location = Some(NamedLocation("Panorama Room"))
-      a
+    } yield (module, year)).distinct.zipWithIndex.flatMap { case ((module, year), index) =>
+      Seq("WIN", "SUM").map { examPeriod =>
+        val a = new AssessmentComponentExamSchedule
+        a.moduleCode = module.fullModuleCode
+        a.assessmentComponentSequence = "E01" // TODO we don't schedule the resit currently
+        a.examProfileCode = examPeriod match {
+          case "WIN" => s"EXWIN${year.startYear % 100}"
+          case "SUM" => s"EXSUM${year.endYear % 100}"
+        }
+        a.slotId = f"${(index / 5) + 1}%03d"
+        a.sequence = f"${(index % 5) + 1}%03d" // Five exams per slot
+        a.locationSequence = "001"
+        a.academicYear = year
+        a.startTime = examPeriod match {
+          case "WIN" =>
+            new LocalDate(year.startYear, DateTimeConstants.NOVEMBER, 27)
+              .plusDays(index / 10)
+              .toDateTime(if (index % 10 < 5) new LocalTime(9, 0) else new LocalTime(14, 0))
+
+          case "SUM" =>
+            new LocalDate(year.endYear, DateTimeConstants.APRIL, 27)
+              .plusDays(index / 10)
+              .toDateTime(if (index % 10 < 5) new LocalTime(9, 0) else new LocalTime(14, 0))
+        }
+        a.examPaperCode = s"${module.code.toUpperCase}0"
+        a.examPaperSection = Some("n/a")
+        a.location = Some(NamedLocation("Panorama Room"))
+        a
+      }
     }
 
   override def getScheduledExamStudents(schedule: AssessmentComponentExamSchedule): Seq[AssessmentComponentExamScheduleStudent] =
@@ -530,7 +542,7 @@ class SandboxAssignmentImporter extends AssignmentImporter
     }
 
   override def publishedExamProfiles(yearsToImport: Seq[AcademicYear]): Seq[String] =
-    yearsToImport.map(year => s"EXSUM${year.endYear % 100}")
+    yearsToImport.flatMap(year => Seq(s"EXWIN${year.startYear % 100}", s"EXSUM${year.endYear % 100}"))
 }
 
 
