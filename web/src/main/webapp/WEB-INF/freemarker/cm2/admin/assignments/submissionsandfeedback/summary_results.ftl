@@ -30,13 +30,9 @@
         <thead class="fix-header">
         <tr>
           <th class="for-check-all"><input type="checkbox" class="collection-check-all" title="Select all/none" /></th>
-          <#if department.showStudentName>
-            <th class="student-col sortable">First name</th>
-            <th class="student-col sortable">Last name</th>
-          </#if>
-
+          <th class="student-col sortable">First name</th>
+          <th class="student-col sortable">Last name</th>
           <th class="student-col sortable">University ID</th>
-
           <#if assignment.showSeatNumbers>
             <th class="student-col sortable">Seat number</th>
           </#if>
@@ -138,14 +134,10 @@
           <tr class="itemContainer<#if !enhancedSubmission??> awaiting-submission</#if>" <#if enhancedSubmission?? && submission.suspectPlagiarised> data-plagiarised="true"</#if>
               data-contentid="${identifier}">
             <td class="check-col"><@bs3form.selector_check_row "students" student.user.userId /></td>
-
-            <#if department.showStudentName>
-              <td class="student toggle-cell toggle-icon" data-profile="${identifier}">
-                ${student.user.firstName!}
-              </td>
-              <td class="student toggle-cell">${student.user.lastName!}</td>
-            </#if>
-
+            <td class="student toggle-cell toggle-icon" data-profile="${identifier}">
+              ${student.user.firstName!}
+            </td>
+            <td class="student toggle-cell">${student.user.lastName!}</td>
             <td class="id toggle-cell<#if !department.showStudentName> toggle-icon</#if>">
               ${identifier} <@pl.profile_link identifier />
             </td>

@@ -108,10 +108,8 @@
           </tr>
           <tr>
             <th class="student"></th>
-            <#if department.showStudentName>
-              <th class="student sortable">First name</th>
-              <th class="student sortable">Last name</th>
-            </#if>
+            <th class="student sortable">First name</th>
+            <th class="student sortable">Last name</th>
             <th class="student sortable">University ID</th>
             <#if assignment.showSeatNumbers>
               <th class="student sortable">Seat number</th>
@@ -165,10 +163,8 @@
 
             <tr class="itemContainer<#if !enhancedSubmission??> awaiting-submission</#if>" <#if enhancedSubmission?? && submission.suspectPlagiarised> data-plagiarised="true" </#if> >
               <td><@bs3form.selector_check_row "students" submissionfeedbackinfo.user.userId /></td>
-              <#if department.showStudentName>
-                <td class="student">${submissionfeedbackinfo.user.firstName!}</td>
-                <td class="student">${submissionfeedbackinfo.user.lastName!}</td>
-              </#if>
+              <td class="student">${submissionfeedbackinfo.user.firstName!}</td>
+              <td class="student">${submissionfeedbackinfo.user.lastName!}</td>
               <td class="id">
                 <#local identifier><@studentIdentifier submissionfeedbackinfo.user coursework /></#local>
                 ${identifier}
