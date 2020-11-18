@@ -29,7 +29,7 @@ abstract class BaseCohortController extends BaseController
     model.addAttribute("selectCourseAction", selectCourseAction(department, academicYear))
     model.addAttribute("selectCourseActionLabel", selectCourseActionLabel)
     model.addAttribute("selectCourseActionTitle", selectCourseActionTitle)
-    model.addAttribute("breadcrumbs", MarksBreadcrumbs.Admin.HomeForYear(department, academicYear, active = true))
+    model.addAttribute("breadcrumbs", Seq(MarksBreadcrumbs.Admin.HomeForYear(department, academicYear, active = true)))
     model.addAttribute("secondBreadcrumbs", academicYearBreadcrumbs(academicYear)(Routes.marks.Admin.home(department, _)))
     "marks/admin/selectCourse"
   }
