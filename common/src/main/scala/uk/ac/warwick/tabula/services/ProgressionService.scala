@@ -291,7 +291,16 @@ abstract class AbstractProgressionService extends ProgressionService {
       val finalYear = finalYearOfStudy(scyd, groupByLevel)
       if (yearOfStudy >= finalYear) {
         lazy val entityPerYear = ProgressionService.getEntityPerYear(scyd, groupByLevel, finalYear)
-        lazy val markPerYear = getMarkPerYear(entityPerYear, finalYear, normalLoad, routeRulesPerYear, yearMarksToUse, weightings, markForFinalYear = false)
+        lazy val markPerYear = {
+          val mpy = getMarkPerYear(entityPerYear, finalYear, normalLoad, routeRulesPerYear, yearMarksToUse, weightings, markForFinalYear = false)
+          val yearMarkKeys = entityPerYear.keys.toSeq.sorted.init
+          mpy match {
+            case Right(mpyMap) if mpyMap.size < yearMarkKeys.size =>
+              val missingYears = yearMarkKeys.toSet diff mpyMap.keys.toSet
+              Left(s"Unable to find year marks for year(s): ${missingYears.mkString(", ")}")
+            case _ => mpy
+          }
+        }
         lazy val yearWeightings = getWeightingsPerYear(scyd, weightings, entityPerYear.keys.toSeq)
         for (mpy <- markPerYear; yw <- yearWeightings) yield {
           calculateBenchmark(entityPerYear, mpy, yw, normalLoad)
@@ -478,7 +487,7 @@ abstract class AbstractProgressionService extends ProgressionService {
   ): Either[String, Map[Int, BigDecimal]] = {
 
     val markPerYear = entityPerYear
-      .filter { case (year, entityYear) => entityYear != null && (markForFinalYear || year < finalYearOfStudy)}
+      .filter { case (year, entityYear) => entityYear != null && (markForFinalYear || year < finalYearOfStudy) }
       .map { case (year, entityYear) =>
         year -> entityYear.studentCourseYearDetails.map { thisScyd =>
           lazy val uploadedYearMark: Option[BigDecimal] = entityYear.agreedMark
