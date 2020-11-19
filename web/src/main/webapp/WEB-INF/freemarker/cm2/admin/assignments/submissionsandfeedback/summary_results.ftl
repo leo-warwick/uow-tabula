@@ -30,8 +30,11 @@
         <thead class="fix-header">
         <tr>
           <th class="for-check-all"><input type="checkbox" class="collection-check-all" title="Select all/none" /></th>
-          <th class="student-col sortable">First name</th>
-          <th class="student-col sortable">Last name</th>
+          <#if alwaysSeeName || assignment.anonymity.equals(AssignmentAnonymity.NameAndID)>
+            <th class="student-col sortable">First name</th>
+            <th class="student-col sortable">Last name</th>
+          </#if>
+
           <th class="student-col sortable">University ID</th>
           <#if assignment.showSeatNumbers>
             <th class="student-col sortable">Seat number</th>
@@ -134,10 +137,14 @@
           <tr class="itemContainer<#if !enhancedSubmission??> awaiting-submission</#if>" <#if enhancedSubmission?? && submission.suspectPlagiarised> data-plagiarised="true"</#if>
               data-contentid="${identifier}">
             <td class="check-col"><@bs3form.selector_check_row "students" student.user.userId /></td>
-            <td class="student toggle-cell toggle-icon" data-profile="${identifier}">
-              ${student.user.firstName!}
-            </td>
-            <td class="student toggle-cell">${student.user.lastName!}</td>
+
+            <#if alwaysSeeName || assignment.anonymity.equals(AssignmentAnonymity.NameAndID)>
+              <td class="student toggle-cell toggle-icon" data-profile="${identifier}">
+                ${student.user.firstName!}
+              </td>
+              <td class="student toggle-cell">${student.user.lastName!}</td>
+            </#if>
+
             <td class="id toggle-cell<#if !department.showStudentName> toggle-icon</#if>">
               ${identifier} <@pl.profile_link identifier />
             </td>

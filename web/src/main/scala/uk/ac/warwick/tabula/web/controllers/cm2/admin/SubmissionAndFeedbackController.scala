@@ -1,7 +1,6 @@
 package uk.ac.warwick.tabula.web.controllers.cm2.admin
 
 import javax.validation.Valid
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Controller
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable, RequestMapping}
@@ -9,6 +8,7 @@ import uk.ac.warwick.tabula.cm2.web.Routes
 import uk.ac.warwick.tabula.commands.cm2.assignments.SubmissionAndFeedbackCommand
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.helpers.cm2.{SubmissionAndFeedbackInfoFilter, SubmissionAndFeedbackInfoFilters}
+import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.AutowiringAssessmentMembershipServiceComponent
 import uk.ac.warwick.tabula.web.Mav
 import uk.ac.warwick.tabula.web.controllers.cm2.CourseworkController
@@ -16,7 +16,9 @@ import uk.ac.warwick.tabula.{AcademicYear, AutowiringFeaturesComponent}
 
 @Controller
 @RequestMapping(Array("/coursework/admin/assignments/{assignment}"))
-class SubmissionAndFeedbackController extends CourseworkController with AutowiringFeaturesComponent with AutowiringAssessmentMembershipServiceComponent {
+class SubmissionAndFeedbackController extends CourseworkController
+  with AutowiringFeaturesComponent
+  with AutowiringAssessmentMembershipServiceComponent {
 
   @ModelAttribute("submissionAndFeedbackCommand")
   def command(@PathVariable assignment: Assignment): SubmissionAndFeedbackCommand.CommandType =
@@ -58,6 +60,11 @@ class SubmissionAndFeedbackController extends CourseworkController with Autowiri
   @ModelAttribute("module") def module(@PathVariable assignment: Assignment): Module = assignment.module
 
   @ModelAttribute("academicYear") def academicYear(@PathVariable assignment: Assignment): AcademicYear = assignment.academicYear
+
+  @ModelAttribute("AssignmentAnonymity") def assignmentAnonymity: AssignmentAnonymity.type = AssignmentAnonymity
+
+  @ModelAttribute("alwaysSeeName") def alwaysSeeName(@PathVariable assignment: Assignment): Boolean =
+    securityService.can(user, Permissions.Assignment.Update, assignment)
 
   @RequestMapping(Array("/summary"))
   def summary(@ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): Mav =
