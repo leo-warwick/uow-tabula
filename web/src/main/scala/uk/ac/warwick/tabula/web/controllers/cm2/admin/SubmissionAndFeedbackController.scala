@@ -63,20 +63,17 @@ class SubmissionAndFeedbackController extends CourseworkController
 
   @ModelAttribute("AssignmentAnonymity") def assignmentAnonymity: AssignmentAnonymity.type = AssignmentAnonymity
 
-  @ModelAttribute("alwaysSeeName") def alwaysSeeName(@PathVariable assignment: Assignment): Boolean =
-    securityService.can(user, Permissions.Assignment.Update, assignment)
-
   @RequestMapping(Array("/summary"))
   def summary(@ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): Mav =
     if (!features.assignmentProgressTable) Redirect(Routes.admin.assignment.submissionsandfeedback.table(assignment))
     else if (ajax) Mav("cm2/admin/assignments/submissionsandfeedback/summary_results", "results" -> command.apply()).noLayout()
-    else Mav("cm2/admin/assignments/submissionsandfeedback/summary")
+    else Mav("cm2/admin/assignments/submissionsandfeedback/summary", "alwaysSeeName" -> securityService.can(user, Permissions.Assignment.Update, assignment))
       .crumbsList(Breadcrumbs.assignment(assignment, active = true))
 
   @RequestMapping(Array("/table"))
   def table(@ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): Mav =
     if (ajax) Mav("cm2/admin/assignments/submissionsandfeedback/table_results", "results" -> command.apply()).noLayout()
-    else Mav("cm2/admin/assignments/submissionsandfeedback/table")
+    else Mav("cm2/admin/assignments/submissionsandfeedback/table", "alwaysSeeName" -> securityService.can(user, Permissions.Assignment.Update, assignment))
       .crumbsList(Breadcrumbs.assignment(assignment, active = true))
 
 }
