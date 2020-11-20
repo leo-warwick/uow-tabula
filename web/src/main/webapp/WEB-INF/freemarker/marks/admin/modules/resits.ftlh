@@ -138,7 +138,7 @@
                           </td>
                           <td>
                             <#if componentRecord.existingResit?has_content && !canUpdateResits>
-                              ${componentRecord.existingResit.currentResitAttempt}
+                              ${componentRecord.existingResit.currentResitAttempt.value}
                             <#elseif sitsResit?has_content && !componentRecord.existingResit?has_content>
                               ${sitsResit.currentResitAttempt!1}
                             <#else>

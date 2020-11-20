@@ -122,7 +122,7 @@ trait GenerateCohortResitsCommandPopulateOnForm extends PopulateOnForm {
   override def populate(): Unit = {
     for ((sprCode, modules) <- requiresResit;  module <- modules; rc <- module.reassessmentComponents) {
       val item = new ResitItem(sprCode, module.moduleCode, rc.component.sequence, rc.existingResit.map(_.currentResitAttempt).getOrElse(rc.newAttempt))
-      item.create = rc.existingResit.isDefined
+      item.create = false
       resits.get(sprCode).get(module.moduleCode).put(rc.component.sequence, item)
     }
   }
