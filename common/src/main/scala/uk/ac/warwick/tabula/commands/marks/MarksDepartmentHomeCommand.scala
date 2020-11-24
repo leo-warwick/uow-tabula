@@ -90,7 +90,7 @@ object MarksDepartmentHomeCommand {
           case _ => Option(moduleRegistration.moduleResult)
         },
         needsWritingToSits = recordedModuleRegistration.exists(_.needsWritingToSits),
-        outOfSync = recordedModuleRegistration.exists(!_.needsWritingToSits) && (
+        outOfSync = recordedModuleRegistration.exists(rmr => !rmr.needsWritingToSits && rmr.lastSitsWriteErrorDate.isEmpty) && (
           recordedModuleRegistration.flatMap(_.latestState).exists {
             // State is agreed but MR has no agreed marks
             case MarkState.Agreed if recordedModuleRegistration.exists(r => r.latestMark.nonEmpty || r.latestGrade.nonEmpty) =>

@@ -76,7 +76,7 @@ object ListAssessmentComponentsCommand {
         existingResit,
         needsWritingToSits = recordedStudent.exists(_.needsWritingToSits),
         outOfSync =
-          recordedStudent.exists(!_.needsWritingToSits) && (
+          recordedStudent.exists(rs => !rs.needsWritingToSits && rs.lastSitsWriteErrorDate.isEmpty) && (
             recordedStudent.flatMap(_.latestState).exists {
               // State is agreed and we have a mark or grade but UAGM has no agreed marks
               case MarkState.Agreed if recordedStudent.exists(r => r.latestMark.nonEmpty || r.latestGrade.nonEmpty) =>
