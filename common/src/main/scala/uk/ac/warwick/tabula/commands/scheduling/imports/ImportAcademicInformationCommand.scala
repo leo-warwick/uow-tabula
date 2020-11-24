@@ -406,7 +406,13 @@ trait ImportRoutes {
             route.sitsDepartmentCode = dept.code
           }
 
-          if (nameChanged || activeChanged || sitsDepartmentChanged) {
+          val degreeTypeChanged = rot.degreeType != route.degreeType
+          if (degreeTypeChanged) {
+            logger.info("Updating degreeType of %s to %s".format(rot.degreeType, route.degreeType))
+            route.degreeType = rot.degreeType
+          }
+
+          if (nameChanged || activeChanged || sitsDepartmentChanged || degreeTypeChanged) {
             courseAndRouteService.save(route)
             ImportResult(changed = 1)
           } else {
