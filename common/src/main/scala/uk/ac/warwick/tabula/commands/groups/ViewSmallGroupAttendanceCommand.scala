@@ -17,20 +17,20 @@ import uk.ac.warwick.userlookup.User
 import scala.collection.immutable.SortedMap
 import scala.jdk.CollectionConverters._
 
-sealed abstract class SmallGroupAttendanceState(val code:String, val description: String) extends EnumEntry {
+sealed abstract class SmallGroupAttendanceState(val code:String, val description: String, val attendanceState: AttendanceState) extends EnumEntry {
   override val entryName: String = code
   def getName: String = entryName
 }
 
 object SmallGroupAttendanceState extends Enum[SmallGroupAttendanceState] {
-  case object Attended extends SmallGroupAttendanceState(AttendanceState.Attended.dbValue, AttendanceState.Attended.description)
-  case object AttendedRemotely extends SmallGroupAttendanceState("attended-remotely", AttendanceState.Attended.description)
-  case object MissedAuthorised extends SmallGroupAttendanceState(AttendanceState.MissedAuthorised.dbValue, AttendanceState.MissedUnauthorised.description)
-  case object MissedUnauthorised extends SmallGroupAttendanceState(AttendanceState.MissedUnauthorised.dbValue, AttendanceState.MissedUnauthorised.description)
-  case object NotRecorded extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description)
-  case object Late extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description)
-  case object NotExpected extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description) // The user is no longer in the group so is not expected to attend
-  case object NotExpectedPast extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description) // The user wasn't in the group when this event took place
+  case object Attended extends SmallGroupAttendanceState(AttendanceState.Attended.dbValue, AttendanceState.Attended.description, AttendanceState.Attended)
+  case object AttendedRemotely extends SmallGroupAttendanceState("attended-remotely", AttendanceState.Attended.description, AttendanceState.Attended)
+  case object MissedAuthorised extends SmallGroupAttendanceState(AttendanceState.MissedAuthorised.dbValue, AttendanceState.MissedAuthorised.description, AttendanceState.MissedAuthorised)
+  case object MissedUnauthorised extends SmallGroupAttendanceState(AttendanceState.MissedUnauthorised.dbValue, AttendanceState.MissedUnauthorised.description, AttendanceState.MissedUnauthorised)
+  case object NotRecorded extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description, AttendanceState.NotRecorded)
+  case object Late extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description, AttendanceState.NotRecorded)
+  case object NotExpected extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description, AttendanceState.NotRecorded) // The user is no longer in the group so is not expected to attend
+  case object NotExpectedPast extends SmallGroupAttendanceState(AttendanceState.NotRecorded.dbValue, AttendanceState.NotRecorded.description, AttendanceState.NotRecorded) // The user wasn't in the group when this event took place
 
   override def values: IndexedSeq[SmallGroupAttendanceState] = findValues
 
@@ -41,14 +41,6 @@ object SmallGroupAttendanceState extends Enum[SmallGroupAttendanceState] {
     case Some(AttendanceState.MissedUnauthorised) => MissedUnauthorised
     case Some(AttendanceState.NotRecorded) if attendance.exists(a => !a.expectedToAttend) => NotExpectedPast
     case _ => NotRecorded // null
-  }
-
-  def to(attendanceState: SmallGroupAttendanceState): AttendanceState = attendanceState match {
-    case SmallGroupAttendanceState.Attended => AttendanceState.Attended
-    case SmallGroupAttendanceState.AttendedRemotely => AttendanceState.Attended
-    case SmallGroupAttendanceState.MissedAuthorised => AttendanceState.MissedAuthorised
-    case SmallGroupAttendanceState.MissedUnauthorised => AttendanceState.MissedUnauthorised
-    case _ => AttendanceState.NotRecorded // null
   }
 }
 

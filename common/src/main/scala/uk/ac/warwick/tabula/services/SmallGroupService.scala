@@ -309,27 +309,27 @@ abstract class AbstractSmallGroupService extends SmallGroupService {
     studentId: String,
     event: SmallGroupEvent,
     weekNumber: Int,
-    state: SmallGroupAttendanceState,
+    eventAttendanceState: SmallGroupAttendanceState,
     user: CurrentUser
   ): SmallGroupEventAttendance = {
     val occurrence = getOrCreateSmallGroupEventOccurrence(event, weekNumber).getOrElse(throw new IllegalArgumentException(
       s"Week number $weekNumber is not valid for event ${event.id}"
     ))
 
-    val attendance = smallGroupDao.getAttendance(studentId, occurrence).getOrElse({
+    val sgeAttendance = smallGroupDao.getAttendance(studentId, occurrence).getOrElse({
       val newAttendance = new SmallGroupEventAttendance
       newAttendance.occurrence = occurrence
       newAttendance.universityId = studentId
       newAttendance
     })
 
-    attendance.state = SmallGroupAttendanceState.to(state)
-    attendance.onlineAttendance = state == SmallGroupAttendanceState.AttendedRemotely
+    sgeAttendance.state = eventAttendanceState.attendanceState
+    sgeAttendance.onlineAttendance = eventAttendanceState == SmallGroupAttendanceState.AttendedRemotely
 
-    attendance.updatedBy = user.userId
-    attendance.updatedDate = DateTime.now
-    smallGroupDao.saveOrUpdate(attendance)
-    attendance
+    sgeAttendance.updatedBy = user.userId
+    sgeAttendance.updatedDate = DateTime.now
+    smallGroupDao.saveOrUpdate(sgeAttendance)
+    sgeAttendance
   }
 
   def findAttendanceByGroup(smallGroup: SmallGroup): Seq[SmallGroupEventOccurrence] = {
