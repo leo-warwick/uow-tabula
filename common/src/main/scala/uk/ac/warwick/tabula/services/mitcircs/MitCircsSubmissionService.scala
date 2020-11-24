@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model.mitcircs.{AssessmentSpecificRecommendation, MitCircsExamBoardRecommendation, MitigatingCircumstancesAffectedAssessment, MitigatingCircumstancesMessage, MitigatingCircumstancesNote, MitigatingCircumstancesSubmission}
-import uk.ac.warwick.tabula.data.model.{Department, StudentMember}
+import uk.ac.warwick.tabula.data.model.{Department, Module, StudentMember}
 import uk.ac.warwick.tabula.data.{AutowiringMitCircsSubmissionDaoComponent, MitCircsSubmissionDaoComponent, MitigatingCircumstancesSubmissionFilter, ScalaRestriction}
 import uk.ac.warwick.tabula.services.UserLookupService.UniversityId
 
@@ -24,6 +24,7 @@ trait MitCircsSubmissionService {
   def create(note: MitigatingCircumstancesNote): MitigatingCircumstancesNote
   def delete(note: MitigatingCircumstancesNote): MitigatingCircumstancesNote
   def notesForSubmission(submission: MitigatingCircumstancesSubmission): Seq[MitigatingCircumstancesNote]
+  def affectedModulesForDepartment(department: Department): Seq[Module]
 }
 
 abstract class AbstractMitCircsSubmissionService extends MitCircsSubmissionService {
@@ -89,6 +90,10 @@ abstract class AbstractMitCircsSubmissionService extends MitCircsSubmissionServi
 
   override def notesForSubmission(submission: MitigatingCircumstancesSubmission): Seq[MitigatingCircumstancesNote] = transactional(readOnly = true) {
     mitCircsSubmissionDao.notesForSubmission(submission)
+  }
+
+  override def affectedModulesForDepartment(department: Department): Seq[Module] =  transactional(readOnly = true) {
+    mitCircsSubmissionDao.affectedModulesForDepartment(department)
   }
 }
 

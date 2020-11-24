@@ -7,6 +7,7 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.data.model.groups.SmallGroupSet
+import uk.ac.warwick.tabula.data.model.mitcircs.MitigatingCircumstancesAffectedAssessment
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.roles.{ModuleAssistantRoleDefinition, ModuleManagerRoleDefinition}
@@ -98,6 +99,11 @@ class Module extends GeneratedId with PermissionsTarget with Serializable {
   }
 
   var sitsDepartmentCode: String = _
+
+  // added to allow us to join in MitCircsSubmissionDao.affectedModulesForDepartment to get the set of modules that are impacted by mitcircs claims
+  // this _must_ remain lazy
+  @OneToMany(mappedBy = "_module", fetch = FetchType.LAZY)
+  private var _affectedAssessments: JList[MitigatingCircumstancesAffectedAssessment] = JArrayList()
 }
 
 object Module extends Logging {

@@ -104,6 +104,9 @@ trait AdminHomeCommandState {
 }
 
 trait AdminHomeCommandRequest extends FiltersStudents with AdminHomeCommandState {
+
+  self : MitCircsSubmissionServiceComponent =>
+
   // This is for filtering the student who has made the submission
   var courseTypes: JList[CourseType] = JArrayList()
   var specificCourseTypes: JList[SpecificCourseType] = JArrayList()
@@ -125,6 +128,10 @@ trait AdminHomeCommandRequest extends FiltersStudents with AdminHomeCommandState
   var isUnread: Boolean = _
   var isCoronavirus: JBoolean = null
 
+  lazy val possibleModules: Seq[Module] = {
+    val affectedAssessmentModules = mitCircsSubmissionService.affectedModulesForDepartment(department).toSet -- allModules
+    allModules ++ affectedAssessmentModules.toSeq.sortBy(_.code)
+  }
   override val defaultOrder: Seq[Order] = Seq(Order.desc("_lastModified"))
   override val sortOrder: JList[Order] = JArrayList() // Not used
   override val modules: JList[Module] = JArrayList() // Not used
