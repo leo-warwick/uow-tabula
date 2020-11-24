@@ -16,7 +16,8 @@ case object StaffRoleDefinition extends UnassignableBuiltInRoleDefinition {
   GeneratesSubRole(SSOStaffRoleDefinition)
 
   GrantsScopedPermission(
-    Profiles.Read.Disability // TAB-4386
+    Profiles.Read.Disability, // TAB-4386
+    Profiles.Read.Gender
   )
 }
 

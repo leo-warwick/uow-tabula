@@ -278,6 +278,7 @@ object Permissions {
 
       /* We can split these back into DateOfBirth, Nationality and HomeEmail if any role requires a subset */
       case object PrivateDetails extends Permission("View a member's date of birth, nationality, and alternative email address")
+      case object Gender extends Permission("View a member's gender")
       case object NextOfKin extends Permission("View a member's next of kin")
       case object HomeAndTermTimeAddresses extends Permission("View a member's home and term-time addresses")
       case object TelephoneNumber extends Permission("View a member's telephone number")
