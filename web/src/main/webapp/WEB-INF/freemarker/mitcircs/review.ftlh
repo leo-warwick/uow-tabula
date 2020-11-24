@@ -243,7 +243,9 @@
                   </#if>
                 </td>
                 <td class="deadline-col <#if extension.approved>approved<#else>very-subtle</#if>">
-                  <@fmt.date date=extension.assignment.submissionDeadline(extension.usercode) shortMonth=true excludeCurrentYear=true />
+                  <#if extension.assignment.submissionDeadline(extension.usercode)?has_content>
+                      <@fmt.date date=extension.assignment.submissionDeadline(extension.usercode) shortMonth=true excludeCurrentYear=true />
+                  </#if>
                 </td>
               </tr>
             </#list>
