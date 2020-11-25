@@ -3,7 +3,7 @@ package uk.ac.warwick.tabula.services
 import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 import org.springframework.stereotype.Service
 import uk.ac.warwick.spring.Wire
-import uk.ac.warwick.tabula.commands.groups.RemoveUserFromSmallGroupCommand
+import uk.ac.warwick.tabula.commands.groups.{RemoveUserFromSmallGroupCommand, SmallGroupAttendanceState}
 import uk.ac.warwick.tabula.commands.{Appliable, TaskBenchmarking}
 import uk.ac.warwick.tabula.data._
 import uk.ac.warwick.tabula.data.model._
@@ -94,7 +94,7 @@ trait SmallGroupService {
 
   def backFillAttendance(studentId: String, occurrences: Seq[SmallGroupEventOccurrence], user: CurrentUser): Seq[SmallGroupEventAttendance]
 
-  def saveOrUpdateAttendance(studentId: String, event: SmallGroupEvent, weekNumber: Int, state: AttendanceState, user: CurrentUser): SmallGroupEventAttendance
+  def saveOrUpdateAttendance(studentId: String, event: SmallGroupEvent, weekNumber: Int, state: SmallGroupAttendanceState, user: CurrentUser): SmallGroupEventAttendance
 
   def deleteAttendance(studentId: String, event: SmallGroupEvent, weekNumber: Int, isPermanent: Boolean = false): Unit
 
@@ -309,26 +309,27 @@ abstract class AbstractSmallGroupService extends SmallGroupService {
     studentId: String,
     event: SmallGroupEvent,
     weekNumber: Int,
-    state: AttendanceState,
+    eventAttendanceState: SmallGroupAttendanceState,
     user: CurrentUser
   ): SmallGroupEventAttendance = {
     val occurrence = getOrCreateSmallGroupEventOccurrence(event, weekNumber).getOrElse(throw new IllegalArgumentException(
       s"Week number $weekNumber is not valid for event ${event.id}"
     ))
 
-    val attendance = smallGroupDao.getAttendance(studentId, occurrence).getOrElse({
+    val sgeAttendance = smallGroupDao.getAttendance(studentId, occurrence).getOrElse({
       val newAttendance = new SmallGroupEventAttendance
       newAttendance.occurrence = occurrence
       newAttendance.universityId = studentId
       newAttendance
     })
 
-    attendance.state = state
+    sgeAttendance.state = eventAttendanceState.attendanceState
+    sgeAttendance.onlineAttendance = eventAttendanceState == SmallGroupAttendanceState.AttendedRemotely
 
-    attendance.updatedBy = user.userId
-    attendance.updatedDate = DateTime.now
-    smallGroupDao.saveOrUpdate(attendance)
-    attendance
+    sgeAttendance.updatedBy = user.userId
+    sgeAttendance.updatedDate = DateTime.now
+    smallGroupDao.saveOrUpdate(sgeAttendance)
+    sgeAttendance
   }
 
   def findAttendanceByGroup(smallGroup: SmallGroup): Seq[SmallGroupEventOccurrence] = {

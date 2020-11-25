@@ -66,6 +66,12 @@ class SmallGroupAttendanceFormatter extends BaseTemplateMethodModelEx
           status = FormattedHtml(s"${user.fullName.getOrElse(user.universityId)} attended: ${formatEvent(event, week)}"),
         )
 
+      case SmallGroupAttendanceState.AttendedRemotely =>
+        result.copy(
+          iconClass = "fa fa-check attended",
+          status = FormattedHtml(s"${user.fullName.getOrElse(user.universityId)} attended remotely: ${formatEvent(event, week)}"),
+        )
+
       case SmallGroupAttendanceState.MissedAuthorised =>
         result.copy(
           iconClass = "fa fa-times-circle-o authorised",

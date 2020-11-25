@@ -2,6 +2,7 @@ package uk.ac.warwick.tabula.commands.attendance.check
 
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
+import uk.ac.warwick.tabula.commands.groups.SmallGroupAttendanceState
 import uk.ac.warwick.tabula.data.model.StudentMember
 import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEventAttendance, SmallGroupEventOccurrence}
@@ -34,12 +35,20 @@ class CheckEventAttendanceCheckpointsCommandInternal(val occurrence: SmallGroupE
   self: CheckEventAttendanceCheckpointsCommandState with AttendanceMonitoringEventAttendanceServiceComponent =>
 
   override def applyInternal(): CheckpointResult = {
-    val attendanceList = attendances.asScala.map { case (universityId, state) =>
-      val attendance = new SmallGroupEventAttendance
-      attendance.occurrence = occurrence
-      attendance.state = state
-      attendance.universityId = universityId
-      attendance
+
+    def setSGTEventAttendance(universityId:String, attendanceState: AttendanceState): SmallGroupEventAttendance = {
+      val smallGroupEventAttendance = new SmallGroupEventAttendance
+      smallGroupEventAttendance.occurrence = occurrence
+      smallGroupEventAttendance.universityId = universityId
+      smallGroupEventAttendance.state = attendanceState
+      smallGroupEventAttendance
+    }
+
+    val attendanceList = attendances.asScala.map {
+      case (universityId, sgaState:SmallGroupAttendanceState ) =>
+        setSGTEventAttendance(universityId, sgaState.attendanceState)
+      case (universityId, _ ) =>
+        setSGTEventAttendance(universityId, AttendanceState.NotRecorded)
     }.toSeq
     val studentListWithCheckpoints = attendanceMonitoringEventAttendanceService.getCheckpoints(attendanceList).map(a => a.student).distinct
     if (occurrence.event.group.groupSet.module.adminDepartment.autoMarkMissedMonitoringPoints) {
@@ -71,5 +80,5 @@ trait CheckEventAttendanceCheckpointsPermissions extends RequiresPermissionsChec
 trait CheckEventAttendanceCheckpointsCommandState {
   def occurrence: SmallGroupEventOccurrence
 
-  var attendances: JMap[String, AttendanceState] = JHashMap()
+  var attendances: JMap[String, SmallGroupAttendanceState] = JHashMap()
 }

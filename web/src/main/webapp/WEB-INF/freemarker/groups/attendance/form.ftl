@@ -51,6 +51,10 @@
                 title="You can only record authorised absence for future events</#if>" data-state="attended" aria-label="Set to 'Attended'">
           <i class="fa fa-fw fa-check" title="Set to 'Attended'"></i>
         </button>
+        <button type="button" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip" data-container="body"
+                title="You can only record authorised absence for future events</#if>" data-state="attended-remotely" aria-label="Set to 'Attended'">
+          <i class="fa fa-fw fa-laptop-house" title="Set to 'Attended - remotely'"></i>
+        </button>
       </div>
     </div>
 
@@ -235,7 +239,7 @@
               <select id="studentsState-${student.universityId}" name="studentsState[${student.universityId}]" data-universityid="${student.universityId}">
                 <option value="" <#if !hasState>selected</#if>>Not recorded</option>
                 <#list allCheckpointStates as state>
-                  <option value="${state.dbValue}" <#if hasState && currentState.dbValue == state.dbValue>selected</#if>>${state.description}</option>
+                  <option value="${state.code}" <#if hasState && currentState.code == state.code>selected</#if>>${state.description}</option>
                 </#list>
               </select>
               <#if features.attendanceMonitoringNote>
@@ -386,6 +390,7 @@
                       <p><i class="fa fa-times fa-fw unauthorised"></i> Missed (unauthorised)</p>
                       <p><i class="fa fa fa-times-circle-o fa-fw authorised"></i> Missed (authorised)</p>
                       <p><i class="fa fa-check fa-fw attended"></i> Attended</p>
+                      <p><i class="fa fa-laptop-house fa-fw attended-remotely"></i> Attended - remotely</p>
                     </#assign>
 										<a class="use-popover"
                        tabindex="0" role="button"
@@ -414,6 +419,10 @@
                     <button type="button" aria-label="Set all to 'Attended'" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip"
                             data-container="body" title="You can only record authorised absence for future events</#if>">
                       <i class="fa fa-check fa-fw" title="Set all to 'Attended'"></i>
+                    </button>
+                    <button type="button" aria-label="Set all to 'Attended - remotely'" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip"
+                            data-container="body" title="You can only record authorised absence for future events</#if>">
+                      <i class="fa fa-laptop-house fa-fw" title="Set all to 'Attended - remotely'"></i>
                     </button>
                   </div>
                   <#if features.attendanceMonitoringNote>

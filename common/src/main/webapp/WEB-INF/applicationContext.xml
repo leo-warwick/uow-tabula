@@ -164,6 +164,7 @@
     <bean class="uk.ac.warwick.tabula.data.convert.RouteCodeConverter"/>
     <bean class="uk.ac.warwick.tabula.data.convert.JodaLocalDateConverter"/>
     <bean class="uk.ac.warwick.tabula.data.convert.AttendanceStateConverter"/>
+    <bean class="uk.ac.warwick.tabula.commands.groups.SmallGroupAttendanceStateConverter"/>
     <bean class="uk.ac.warwick.tabula.data.convert.ModeOfAttendanceCodeConverter"/>
     <bean class="uk.ac.warwick.tabula.data.convert.SitsStatusCodeConverter"/>
     <bean class="uk.ac.warwick.tabula.data.convert.HibernateOrderConverter"/>

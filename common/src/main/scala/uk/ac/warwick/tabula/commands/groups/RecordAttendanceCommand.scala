@@ -71,7 +71,7 @@ trait AddAdditionalStudent {
       .filterNot { member => members.exists(_.universityId == member.universityId) }
       .foreach { member =>
         val attendance = transactional() {
-          smallGroupService.saveOrUpdateAttendance(member.universityId, event, week, AttendanceState.NotRecorded, user)
+          smallGroupService.saveOrUpdateAttendance(member.universityId, event, week, SmallGroupAttendanceState.NotRecorded, user)
         }
 
         attendance.addedManually = true
@@ -90,7 +90,7 @@ trait AddAdditionalStudent {
                 smallGroupService.saveOrUpdate(replaced)
                 replaced
               case None =>
-                smallGroupService.saveOrUpdateAttendance(member.universityId, replacedEvent, replacedWeek, AttendanceState.MissedAuthorised, user)
+                smallGroupService.saveOrUpdateAttendance(member.universityId, replacedEvent, replacedWeek, SmallGroupAttendanceState.MissedAuthorised, user)
             }
           }
 
@@ -143,15 +143,15 @@ abstract class RecordAttendanceCommand(val event: SmallGroupEvent, val week: Int
     )
   }
 
-  lazy val initialState: Map[String, AttendanceState] = members.map { member =>
+  lazy val initialState: Map[String, SmallGroupAttendanceState] = members.map { member =>
     member.universityId ->
       occurrence.attendance.asScala
         .find(_.universityId == member.universityId)
-        .flatMap { a => Option(a.state) }.orNull
+        .flatMap { a => Option(SmallGroupAttendanceState.from(Option(a))) }.orNull
   }.toMap
 
-  var studentsState: JMap[UniversityId, AttendanceState] =
-    LazyMaps.create { member: UniversityId => null: AttendanceState }.asJava
+  var studentsState: JMap[UniversityId, SmallGroupAttendanceState] =
+    LazyMaps.create { member: UniversityId => null: SmallGroupAttendanceState }.asJava
 
   lazy val members: Seq[MemberOrUser] = {
     (event.group.students.users.map { user =>
@@ -239,7 +239,7 @@ trait RecordAttendanceCommandValidation extends SelfValidating {
     studentsState.asScala.foreach { case (studentId, state) =>
       errors.pushNestedPath(s"studentsState[$studentId]")
 
-      if (isFutureEvent && !(state == null || state == AttendanceState.MissedAuthorised || state == AttendanceState.NotRecorded)) {
+      if (isFutureEvent && !(state == null || state == SmallGroupAttendanceState.MissedAuthorised || state == SmallGroupAttendanceState.NotRecorded)) {
         errors.rejectValue("", "smallGroup.attendance.beforeEvent")
       }
 
@@ -261,7 +261,7 @@ trait RecordAttendanceState {
   val week: Int
   val user: CurrentUser
 
-  def studentsState: JMap[UniversityId, AttendanceState]
+  def studentsState: JMap[UniversityId, SmallGroupAttendanceState]
 
   def members: Seq[MemberOrUser]
 }
