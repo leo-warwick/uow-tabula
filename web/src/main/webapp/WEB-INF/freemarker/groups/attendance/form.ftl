@@ -49,7 +49,7 @@
         </button>
         <button type="button" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip" data-container="body"
                 title="You can only record authorised absence for future events</#if>" data-state="attended" aria-label="Set to 'Attended'">
-          <i class="fa fa-fw fa-check" title="Set to 'Attended'"></i>
+          <i class="fa fa-fw fa-user-check" title="Set to 'Attended'"></i>
         </button>
         <button type="button" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip" data-container="body"
                 title="You can only record authorised absence for future events</#if>" data-state="attended-remotely" aria-label="Set to 'Attended'">
@@ -418,7 +418,7 @@
                     </button>
                     <button type="button" aria-label="Set all to 'Attended'" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip"
                             data-container="body" title="You can only record authorised absence for future events</#if>">
-                      <i class="fa fa-check fa-fw" title="Set all to 'Attended'"></i>
+                      <i class="fa fa-user-check fa-fw" title="Set all to 'Attended'"></i>
                     </button>
                     <button type="button" aria-label="Set all to 'Attended - remotely'" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip"
                             data-container="body" title="You can only record authorised absence for future events</#if>">
