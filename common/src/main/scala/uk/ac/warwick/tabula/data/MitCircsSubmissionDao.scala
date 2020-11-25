@@ -36,6 +36,7 @@ trait MitCircsSubmissionDao {
   def create(note: MitigatingCircumstancesNote): MitigatingCircumstancesNote
   def delete(note: MitigatingCircumstancesNote): MitigatingCircumstancesNote
   def notesForSubmission(submission: MitigatingCircumstancesSubmission): Seq[MitigatingCircumstancesNote]
+  def affectedModulesForDepartment(department: Department): Seq[Module]
 }
 
 @Repository
@@ -186,6 +187,15 @@ class MitCircsSubmissionDaoImpl extends MitCircsSubmissionDao
       .add(is("submission", submission))
       .addOrder(Order.asc("_createdDate"))
       .seq
+
+  override def affectedModulesForDepartment(department: Department): Seq[Module] =
+    session.newCriteria[Module]
+      .createAlias("_affectedAssessments", "affectedAssessment")
+      .createAlias("affectedAssessment.mitigatingCircumstancesSubmission", "mitigatingCircumstancesSubmission")
+      .add(is("mitigatingCircumstancesSubmission.department", department))
+      .distinct
+      .seq
+
 }
 
 case class MitigatingCircumstancesSubmissionFilter(

@@ -101,7 +101,7 @@
               </div>
               </#assign>
               <#assign currentfilter><@filters.current_filter_value "affectedAssessmentModules" placeholder; module>${module.code?upper_case}</@filters.current_filter_value></#assign>
-              <@filters.filter name="modules" path="command.affectedAssessmentModules" placeholder=placeholder currentFilter=currentfilter allItems=command.allModules customPicker=modulesCustomPicker; module>
+              <@filters.filter name="modules" path="command.affectedAssessmentModules" placeholder=placeholder currentFilter=currentfilter allItems=command.possibleModules customPicker=modulesCustomPicker; module>
                 <input type="checkbox" name="${status.expression}"
                        value="${module.code}"
                        data-short-value="${module.code?upper_case}"
