@@ -1,7 +1,8 @@
 package uk.ac.warwick.tabula.roles
 
-import uk.ac.warwick.tabula.data.model.{StudentRelationshipType, Department}
 import uk.ac.warwick.tabula.JavaImports
+import uk.ac.warwick.tabula.data.model.{Department, StudentRelationshipType}
+import uk.ac.warwick.tabula.permissions.Permissions.Profiles
 import uk.ac.warwick.tabula.permissions.PermissionsSelector
 
 case class UserAccessManager(department: Department)
@@ -15,6 +16,8 @@ case object UserAccessMgrRoleDefinition
   GeneratesSubRole(DepartmentalAdministratorRoleDefinition)
   GeneratesSubRole(StudentRelationshipAgentRoleDefinition(PermissionsSelector.Any[StudentRelationshipType]))
   GeneratesSubRole(MitigatingCircumstancesOfficerRoleDefinition)
+
+  GrantsScopedPermission(Profiles.Read.Gender)
 
   def canDelegateThisRolesPermissions: JavaImports.JBoolean = true
 

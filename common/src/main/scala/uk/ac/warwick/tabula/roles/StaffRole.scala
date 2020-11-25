@@ -39,6 +39,7 @@ case object SSOStaffRoleDefinition extends UnassignableBuiltInRoleDefinition {
     Profiles.Search,
     Profiles.Read.Core, // As per discussion in TAB-753, anyone at the University can see anyone else's core information
     Profiles.Read.Photo,
+    Profiles.Read.Gender,
 
     // TAB-1619
     Profiles.Read.Usercode,

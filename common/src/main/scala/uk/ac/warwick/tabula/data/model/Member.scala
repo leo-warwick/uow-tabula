@@ -560,6 +560,7 @@ trait MemberProperties extends StringId {
   var userType: MemberUserType = _
 
   @deprecated("No systems should care about or display Gender", since = "2018.10.1")
+  @Restricted(Array("Profiles.Read.Gender"))
   @Type(`type` = "uk.ac.warwick.tabula.data.model.GenderUserType")
   var gender: Gender = _
 
