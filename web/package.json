@@ -48,8 +48,8 @@
     "webpack-stream": "5.2.1"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "5.13.0",
-    "@universityofwarwick/id7": "2.6.7",
+    "@fortawesome/fontawesome-free": "5.15.1",
+    "@universityofwarwick/id7": "2.8.1",
     "@universityofwarwick/serverpipe": "1.2.1",
     "@universityofwarwick/statuspage-widget": "0.0.2",
     "chart.js": "2.9.3",
