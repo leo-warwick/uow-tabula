@@ -7,6 +7,7 @@ import uk.ac.warwick.tabula.data.Transactions.transactional
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.forms.Extension
 import uk.ac.warwick.tabula.services._
+import uk.ac.warwick.userlookup.User
 
 import scala.jdk.CollectionConverters._
 
@@ -30,12 +31,12 @@ class MissedAssessmentsReportCommandInternal(val department: Department, val aca
     val assignments = assessmentService.getDepartmentAssignmentsClosingBetween(department, startDate, endDate)
       .filter(_.collectSubmissions)
 
-    val assignmentMembers = assignments.flatMap(assignment => assessmentMembershipService.determineMembershipUsers(assignment).map(user => (assignment, user)))
+    val assignmentUsers: Seq[(Assignment, User)] = assignments.flatMap(assignment => assessmentMembershipService.determineMembershipUsers(assignment).map(user => (assignment, user)))
 
-    val members = profileService.getAllMembersByUsers(assignmentMembers.map(_._2))
+    val members: Map[User, Option[Member]] = assignmentUsers.map(_._2).map(user => (user, profileService.getMemberByUser(user))).toMap
 
-    val entities = assignmentMembers.flatMap { case (assignment, user) =>
-      members.get(user).flatMap { student =>
+    val entities = assignmentUsers.flatMap { case (assignment, user) =>
+      members.get(user).flatMap { case Some(student) =>
         val submission = assignment.submissions.asScala.find(_.isForUser(user))
         val workingDaysLateIfSubmittedNow = assignment.workingDaysLateIfSubmittedNow(user.getUserId)
 
