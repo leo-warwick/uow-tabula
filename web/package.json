@@ -67,7 +67,7 @@
     "whatwg-fetch": "3.0.0"
   },
   "optionalDependencies": {
-    "@fortawesome/fontawesome-pro": "5.13.0"
+    "@fortawesome/fontawesome-pro": "5.15.1"
   },
   "scripts": {
     "watch": "NODE_ENV=development webpack --mode development --watch",
