@@ -67,8 +67,7 @@ class SubmissionAndFeedbackController extends CourseworkController
   def summary(@ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): Mav =
     if (!features.assignmentProgressTable) Redirect(Routes.admin.assignment.submissionsandfeedback.table(assignment))
     else if (ajax) Mav("cm2/admin/assignments/submissionsandfeedback/summary_results",
-      "results" -> command.apply(),
-      "alwaysSeeName" -> securityService.can(user, Permissions.Assignment.Update, assignment)
+      "results" -> command.apply()
     ).noLayout()
     else Mav("cm2/admin/assignments/submissionsandfeedback/summary", "alwaysSeeName" -> securityService.can(user, Permissions.Assignment.Update, assignment))
       .crumbsList(Breadcrumbs.assignment(assignment, active = true))
@@ -76,8 +75,7 @@ class SubmissionAndFeedbackController extends CourseworkController
   @RequestMapping(Array("/table"))
   def table(@ModelAttribute("submissionAndFeedbackCommand") command: SubmissionAndFeedbackCommand.CommandType, @PathVariable assignment: Assignment): Mav =
     if (ajax) Mav("cm2/admin/assignments/submissionsandfeedback/table_results",
-      "results" -> command.apply(),
-      "alwaysSeeName" -> securityService.can(user, Permissions.Assignment.Update, assignment)
+      "results" -> command.apply()
     ).noLayout()
     else Mav("cm2/admin/assignments/submissionsandfeedback/table")
       .crumbsList(Breadcrumbs.assignment(assignment, active = true))
