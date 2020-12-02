@@ -39,7 +39,7 @@ trait ProfileService {
 
   def getAllMembersWithUserIds(userIds: Seq[String], disableFilter: Boolean = false, eagerLoad: Boolean = false, activeOnly: Boolean = true): Seq[Member]
 
-  def getMemberByUser(user: User, disableFilter: Boolean = false, eagerLoad: Boolean = false): Option[Member]
+  def getMemberByUser(user: User, disableFilter: Boolean = false, eagerLoad: Boolean = false, activeOnly:Boolean = true): Option[Member]
 
   def getStudentBySprCode(sprCode: String): Option[StudentMember]
 
@@ -192,8 +192,8 @@ abstract class AbstractProfileService extends ProfileService with Logging {
     memberDao.getAllByUserIds(userIds, disableFilter, eagerLoad, activeOnly)
   }
 
-  def getMemberByUser(user: User, disableFilter: Boolean = false, eagerLoad: Boolean = false): Option[Member] = {
-    val allMembers = getAllMembersWithUserId(user.getUserId, disableFilter, eagerLoad)
+  def getMemberByUser(user: User, disableFilter: Boolean = false, eagerLoad: Boolean = false, activeOnly: Boolean = true): Option[Member] = {
+    val allMembers = getAllMembersWithUserId(user.getUserId, disableFilter, eagerLoad, activeOnly)
     val usercodeMatch =
       allMembers.find(_.universityId == user.getWarwickId)
         .orElse(allMembers.headOption) // TAB-1716

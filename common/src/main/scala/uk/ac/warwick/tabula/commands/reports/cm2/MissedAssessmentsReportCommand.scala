@@ -33,7 +33,7 @@ class MissedAssessmentsReportCommandInternal(val department: Department, val aca
 
     val assignmentUsers: Seq[(Assignment, User)] = assignments.flatMap(assignment => assessmentMembershipService.determineMembershipUsers(assignment).map(user => (assignment, user)))
 
-    val members: Map[User, Option[Member]] = assignmentUsers.map(_._2).map(user => (user, profileService.getMemberByUser(user))).toMap
+    val members: Map[User, Option[Member]] = assignmentUsers.map(_._2).map(user => (user, profileService.getMemberByUser(user, activeOnly = false))).toMap
 
     val entities = assignmentUsers.flatMap { case (assignment, user) =>
       members.get(user).flatMap { case Some(student) =>
