@@ -41,8 +41,6 @@ trait ProfileService {
 
   def getMemberByUser(user: User, disableFilter: Boolean = false, eagerLoad: Boolean = false): Option[Member]
 
-  def getAllMembersByUsers(users: Seq[User], disableFilter: Boolean = false, eagerLoad: Boolean = false): Map[User, Member]
-
   def getStudentBySprCode(sprCode: String): Option[StudentMember]
 
   def getMemberByTimetableHash(timetableHash: String): Option[Member]
@@ -206,31 +204,6 @@ abstract class AbstractProfileService extends ProfileService with Logging {
       // TAB-2014 look for a universityId match, but only return it if the email address matches
       getMemberByUniversityId(user.getWarwickId, disableFilter, eagerLoad)
         .filter(_.email.safeTrim.safeLowercase == user.getEmail.safeTrim.safeLowercase)
-    }
-  }
-
-  def getAllMembersByUsers(users: Seq[User], disableFilter: Boolean = false, eagerLoad: Boolean = false): Map[User, Member] = {
-    val allMembers = getAllMembersWithUserIds(users.map(_.getUserId), disableFilter, eagerLoad)
-
-    val usercodeMatches: Map[User, Member] = users.flatMap { user =>
-      allMembers.find(_.userId == user.getUserId.safeTrim.toLowerCase)
-        .orElse(allMembers.headOption) // TAB-1716
-        .map(user -> _)
-    }.toMap
-
-    val nonMatchingUsers = users.filter { user => !usercodeMatches.contains(user) && user.getWarwickId.hasText }
-    if (nonMatchingUsers.isEmpty) {
-      usercodeMatches
-    } else {
-      // TAB-2014 look for a universityId match, but only return it if the email address matches
-      val universityIdMembers: Seq[Member] = getAllMembersByUniversityIds(nonMatchingUsers.map(_.getWarwickId), disableFilter, eagerLoad)
-
-      val universityIdMatches: Map[User, Member] = nonMatchingUsers.flatMap { user =>
-        universityIdMembers.find { m => m.universityId == user.getWarwickId.safeTrim && m.email.safeTrim.safeLowercase == user.getEmail.safeTrim.safeLowercase }
-          .map(user -> _)
-      }.toMap
-
-      usercodeMatches ++ universityIdMatches
     }
   }
 
