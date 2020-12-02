@@ -30,7 +30,7 @@
         <thead class="fix-header">
         <tr>
           <th class="for-check-all"><input type="checkbox" class="collection-check-all" title="Select all/none" /></th>
-          <#if alwaysSeeName || assignment.anonymity.equals(AssignmentAnonymity.NameAndID)>
+          <#if department.showStudentName>
             <th class="student-col sortable">First name</th>
             <th class="student-col sortable">Last name</th>
           </#if>
@@ -138,7 +138,7 @@
               data-contentid="${identifier}">
             <td class="check-col"><@bs3form.selector_check_row "students" student.user.userId /></td>
 
-            <#if alwaysSeeName || assignment.anonymity.equals(AssignmentAnonymity.NameAndID)>
+            <#if department.showStudentName>
               <td class="student toggle-cell toggle-icon" data-profile="${identifier}">
                 ${student.user.firstName!}
               </td>
