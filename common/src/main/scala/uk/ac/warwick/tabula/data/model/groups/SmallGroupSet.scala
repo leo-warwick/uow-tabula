@@ -383,6 +383,9 @@ class SmallGroupSet
     newSet.defaultEndTime = defaultEndTime
     if (_defaultTutors != null) newSet._defaultTutors = _defaultTutors.duplicate()
     newSet.defaultLocation = defaultLocation
+    newSet.defaultDeliveryMethod = defaultDeliveryMethod
+    newSet.defaultOnlineDeliveryUrl = defaultOnlineDeliveryUrl
+    newSet.defaultOnlinePlatform = defaultOnlinePlatform
     newSet.linkedDepartmentSmallGroupSet = linkedDepartmentSmallGroupSet
     newSet.settings = Map() ++ settings
     newSet
