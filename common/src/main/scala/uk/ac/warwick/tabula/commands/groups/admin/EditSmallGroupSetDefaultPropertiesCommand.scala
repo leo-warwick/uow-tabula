@@ -1,5 +1,6 @@
 package uk.ac.warwick.tabula.commands.groups.admin
 
+import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.LocalTime
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.JavaImports._
@@ -43,6 +44,9 @@ trait EditSmallGroupSetDefaultPropertiesCommandState {
   var resetExistingEvents: Boolean = false
   var useNamedLocation: Boolean = _
   var defaultLocationAlias: String = _
+  var defaultDeliveryMethod: EventDeliveryMethod = _
+  var defaultOnlineDeliveryUrl: String = _
+  var defaultOnlinePlatform: OnlinePlatform = _
 
   def defaultWeekRanges: Seq[WeekRange] = Option(defaultWeeks) map { weeks => WeekRange.combine(weeks.asScala.toSeq.map(_.intValue))
   } getOrElse Seq()
@@ -72,6 +76,9 @@ class EditSmallGroupSetDefaultPropertiesCommandInternal(val module: Module, val 
         event.endTime = set.defaultEndTime
         event.location = set.defaultLocation
         event.tutors.copyFrom(set.defaultTutors)
+        event.deliveryMethod = set.defaultDeliveryMethod
+        event.onlineDeliveryUrl = set.defaultOnlineDeliveryUrl
+        event.onlinePlatform = Option(set.defaultOnlinePlatform)
       }
     }
 
@@ -95,6 +102,9 @@ class EditSmallGroupSetDefaultPropertiesCommandInternal(val module: Module, val 
     defaultDay = set.defaultDay
     defaultStartTime = set.defaultStartTime
     defaultEndTime = set.defaultEndTime
+    defaultDeliveryMethod = set.defaultDeliveryMethod
+    defaultOnlineDeliveryUrl = set.defaultOnlineDeliveryUrl
+    defaultOnlinePlatform = set.defaultOnlinePlatform
 
     if (set.defaultTutors != null) defaultTutors.addAll(set.defaultTutors.knownType.allIncludedIds.asJava)
   }
@@ -127,6 +137,10 @@ class EditSmallGroupSetDefaultPropertiesCommandInternal(val module: Module, val 
     set.defaultStartTime = defaultStartTime
     set.defaultEndTime = defaultEndTime
 
+    set.defaultDeliveryMethod = defaultDeliveryMethod
+    set.defaultOnlineDeliveryUrl = defaultOnlineDeliveryUrl
+    set.defaultOnlinePlatform = defaultOnlinePlatform
+
     if (set.defaultTutors == null) set.defaultTutors = UserGroup.ofUsercodes
     set.defaultTutors.knownType.includedUserIds = defaultTutors.asScala.toSet
   }
@@ -147,6 +161,13 @@ trait EditSmallGroupSetDefaultPropertiesValidation extends SelfValidating {
       errors.rejectValue("defaultEndTime", "smallGroupEvent.endTime.beforeStartTime")
 
     if (defaultLocation.hasText && !defaultLocationId.hasText && !useNamedLocation) errors.rejectValue("useNamedLocation", "smallGroupEvent.defaults.location.named")
+
+    if (defaultOnlineDeliveryUrl.hasText) {
+      if (!defaultOnlineDeliveryUrl.toLowerCase.startsWith("http://") && !defaultOnlineDeliveryUrl.toLowerCase.startsWith("https://")) {
+        defaultOnlineDeliveryUrl = s"http://$defaultOnlineDeliveryUrl"
+      }
+      if (!new UrlValidator().isValid(defaultOnlineDeliveryUrl)) errors.rejectValue("defaultOnlineDeliveryUrl", "smallGroupEvent.url.invalid")
+    }
   }
 }
 

@@ -224,7 +224,8 @@
     <bean class="uk.ac.warwick.tabula.exams.grids.columns.ExamGridYearMarksToUseConverter" />
     <bean class="uk.ac.warwick.tabula.data.model.ActualProgressionDecisionConverter" />
     <bean class="uk.ac.warwick.tabula.data.model.AttemptConverter" />
-
+    <bean class="uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethodConverter" />
+    <bean class="uk.ac.warwick.tabula.data.model.groups.OnlinePlatformConverter" />
   </util:list>
 
   <bean id="typeConverter"

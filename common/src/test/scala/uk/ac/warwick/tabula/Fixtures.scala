@@ -8,6 +8,7 @@ import uk.ac.warwick.tabula.data.model.StudentCourseYearDetails.YearOfStudy
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.attendance._
 import uk.ac.warwick.tabula.data.model.forms.Extension
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod.Hybrid
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.data.model.mitcircs.{MitigatingCircumstancesPanel, MitigatingCircumstancesSubmission}
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
@@ -142,6 +143,7 @@ object Fixtures extends Mockito {
     val s = new SmallGroupEvent
     s.smallGroupService = None
     s.title = title
+    s.deliveryMethod = Hybrid
     s
   }
 

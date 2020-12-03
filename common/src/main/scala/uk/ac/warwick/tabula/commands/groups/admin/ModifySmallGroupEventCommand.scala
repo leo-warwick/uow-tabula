@@ -1,6 +1,6 @@
 package uk.ac.warwick.tabula.commands.groups.admin
 
-import org.apache.commons.validator.UrlValidator
+import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.LocalTime
 import org.springframework.validation.{BindingResult, Errors}
 import uk.ac.warwick.tabula.AcademicYear
@@ -69,6 +69,10 @@ trait ModifySmallGroupEventCommandState {
   var useNamedLocation: Boolean = _
   var locationAlias: String = _
   var possibleMapLocations: Seq[WAI2GoLocation] = Nil
+
+  var deliveryMethod: EventDeliveryMethod = _
+  var onlineDeliveryUrl: String = _
+  var onlinePlatform: OnlinePlatform = _
 
   def weekRanges: Seq[WeekRange] = Option(weeks) map { weeks => WeekRange.combine(weeks.asScala.toSeq.map(_.intValue))
   } getOrElse Seq()
@@ -148,6 +152,9 @@ abstract class ModifySmallGroupEventCommandInternal
     }
 
     if (set.defaultTutors != null) tutors.addAll(set.defaultTutors.knownType.allIncludedIds.asJava)
+    if (set.defaultDeliveryMethod != null) deliveryMethod = set.defaultDeliveryMethod
+    if (set.defaultOnlineDeliveryUrl != null) onlineDeliveryUrl = set.defaultOnlineDeliveryUrl
+    if (set.defaultOnlinePlatform != null) onlinePlatform = set.defaultOnlinePlatform
   }
 
   def copyFrom(event: SmallGroupEvent): Unit = {
@@ -172,6 +179,10 @@ abstract class ModifySmallGroupEventCommandInternal
     relatedUrlTitle = event.relatedUrlTitle
 
     if (event.tutors != null) tutors.addAll(event.tutors.knownType.allIncludedIds.asJava)
+
+    deliveryMethod = event.deliveryMethod
+    onlineDeliveryUrl = event.onlineDeliveryUrl
+    onlinePlatform = event.onlinePlatform.orNull
   }
 
   def copyTo(event: SmallGroupEvent): Unit = {
@@ -208,6 +219,10 @@ abstract class ModifySmallGroupEventCommandInternal
 
     if (event.tutors == null) event.tutors = UserGroup.ofUsercodes
     event.tutors.knownType.includedUserIds = tutors.asScala.toSet
+
+    event.deliveryMethod = deliveryMethod
+    event.onlineDeliveryUrl = onlineDeliveryUrl
+    event.onlinePlatform = Option(onlinePlatform)
   }
 }
 
@@ -273,6 +288,17 @@ trait ModifySmallGroupEventValidation extends SelfValidating {
       if (academicYear.weeks(weekRanges.max.maxWeek).lastDay.getDayOfWeek < day.jodaDayOfWeek) {
         errors.rejectValue("weeks", "smallGroupEvent.weeks.invalidForThisYear", Array[Object](weekRanges.max.maxWeek: JInteger, day.name), s"There is no $day in week ${weekRanges.max.maxWeek} for this year")
       }
+    }
+
+    if (deliveryMethod == null) {
+      errors.rejectValue("deliveryMethod", "smallGroupEvent.deliveryMethod.NotEmpty")
+    }
+
+    if (onlineDeliveryUrl.hasText) {
+      if (!onlineDeliveryUrl.toLowerCase.startsWith("http://") && !onlineDeliveryUrl.toLowerCase.startsWith("https://")) {
+        onlineDeliveryUrl = s"http://$onlineDeliveryUrl"
+      }
+      if (!new UrlValidator().isValid(onlineDeliveryUrl)) errors.rejectValue("onlineDeliveryUrl", "smallGroupEvent.url.invalid")
     }
   }
 }

@@ -35,6 +35,12 @@ trait SmallGroupEventsController extends GroupsController {
       .sortBy { case (_, weekRange) => weekRange.minWeek }
       .map { case (term, weekRange) => NamedTerm(term.periodType.toString, term, weekRange) }
   }
+
+  @ModelAttribute("allDeliveryMethods")
+  def allDeliveryMethods: Seq[EventDeliveryMethod] = EventDeliveryMethod.values
+
+  @ModelAttribute("allOnlinePlatforms")
+  def allOnlinePlatforms: Seq[OnlinePlatform] = OnlinePlatform.values
 }
 
 abstract class AbstractCreateSmallGroupEventController extends SmallGroupEventsController {

@@ -208,6 +208,26 @@
       $locationAliasFormGroup.hide();
       $locationAliasFormGroup.find('input').val('');
     });
+
+    const $deliveryMethod = $('#deliveryMethod,#defaultDeliveryMethod');
+    $deliveryMethod.on('change', (e) => {
+      const value = $(e.target).val();
+      const isOnline = value === 'OnlineOnly' || value === 'Hybrid';
+      const isFaceToFace = value === 'FaceToFaceOnly' || value === 'Hybrid';
+      const toggleFields = (selector, condition) => {
+        $(selector)
+          .toggle(condition)
+          .find(':input').each((i, field) => {
+            if (condition) {
+              $(field).removeAttr('disabled');
+            } else {
+              $(field).attr('disabled', 'disabled');
+            }
+          });
+      };
+      toggleFields('.online-event-fields', isOnline);
+      toggleFields('.f2f-event-fields', isFaceToFace);
+    }).trigger('change');
   });
 
   function updateClearAllButton($el) {

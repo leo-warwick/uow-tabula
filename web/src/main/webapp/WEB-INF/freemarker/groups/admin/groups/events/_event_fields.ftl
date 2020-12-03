@@ -30,30 +30,58 @@
     </@bs3form.labelled_form_group>
   </div>
 
-  <@bs3form.labelled_form_group path="location" labelText="Location">
-    <@f.hidden path="locationId" />
-    <@f.input path="location" cssClass="form-control" />
-    <div class="help-block small">
-      <a href="#" id="showLocationAlias">Use a different name for this location</a>
-    </div>
+  <@bs3form.labelled_form_group path="deliveryMethod" labelText="Delivery method">
+    <@f.select path="deliveryMethod" cssClass="form-control">
+      <@f.option value="" label=""/>
+      <@f.options items=allDeliveryMethods itemLabel="description" itemValue="entryName" />
+    </@f.select>
   </@bs3form.labelled_form_group>
 
-  <div class="alert alert-info" id="namedLocationAlert" style="display: none">
-    <p>
-      This location couldn't be found on the campus map.
-    </p>
+  <div class="online-event-fields">
+    <@bs3form.labelled_form_group path="onlinePlatform" labelText="Online Platform">
+      <@f.select path="onlinePlatform" cssClass="form-control">
+        <@f.option value="" label=""/>
+        <@f.options items=allOnlinePlatforms itemLabel="entryName" itemValue="entryName" />
+      </@f.select>
+    </@bs3form.labelled_form_group>
 
-    <@bs3form.checkbox path="useNamedLocation">
-      <@f.checkbox path="useNamedLocation" /> Use this location anyway
-    </@bs3form.checkbox>
+    <#assign onlineDeliveryUrlHelpText>
+      <p>A 'Go to event' link that will be shown on the student's timetable. Use a direct link to the event wherever possible.</p>
+    </#assign>
+    <#assign onlineDeliveryUrlLabel>
+      Online delivery URL <@fmt.help_popover id="onlineDeliveryUrlHelp" content="${onlineDeliveryUrlHelpText}" html=true />
+    </#assign>
+    <@bs3form.labelled_form_group path="onlineDeliveryUrl" labelText=onlineDeliveryUrlLabel>
+        <@f.input path="onlineDeliveryUrl" cssClass="form-control" />
+    </@bs3form.labelled_form_group>
   </div>
 
-  <@bs3form.labelled_form_group path="locationAlias" labelText="Location display name" cssClass="location-alias-form-group">
-    <@f.input path="locationAlias" cssClass="form-control" />
-    <div class="help-block small">
-      <a href="#" id="removeLocationAlias">Use the standard location name</a>
+  <div class="f2f-event-fields">
+    <@bs3form.labelled_form_group path="location" labelText="Location">
+      <@f.hidden path="locationId" />
+      <@f.input path="location" cssClass="form-control" />
+      <div class="help-block small">
+        <a href="#" id="showLocationAlias">Use a different name for this location</a>
+      </div>
+    </@bs3form.labelled_form_group>
+
+    <div class="alert alert-info" id="namedLocationAlert" style="display: none">
+      <p>
+        This location couldn't be found on the campus map.
+      </p>
+
+      <@bs3form.checkbox path="useNamedLocation">
+        <@f.checkbox path="useNamedLocation" /> Use this location anyway
+      </@bs3form.checkbox>
     </div>
-  </@bs3form.labelled_form_group>
+
+    <@bs3form.labelled_form_group path="locationAlias" labelText="Location display name" cssClass="location-alias-form-group">
+      <@f.input path="locationAlias" cssClass="form-control" />
+      <div class="help-block small">
+        <a href="#" id="removeLocationAlias">Use the standard location name</a>
+      </div>
+    </@bs3form.labelled_form_group>
+  </div>
 
   <#assign moreDetailsHelpText>
     <p>An optional 'More Details' link to the specified webpage from the student's timetable.</p>

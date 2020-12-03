@@ -4,6 +4,7 @@ import org.joda.time.LocalTime
 import org.springframework.validation.BindException
 import uk.ac.warwick.tabula.data.model.Module
 import uk.ac.warwick.tabula.data.model.groups.DayOfWeek.Tuesday
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod.Hybrid
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.{Fixtures, TestBase}
 
@@ -24,6 +25,7 @@ class ModifySmallGroupEventTest extends TestBase  {
       startTime = LocalTime.parse("13:00:00")
       endTime = LocalTime.parse("14:00:00")
       weekRanges = Seq(WeekRange(1,1))
+      deliveryMethod = Hybrid
     }
   }
 
