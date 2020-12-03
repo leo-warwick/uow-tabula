@@ -1,7 +1,9 @@
 package uk.ac.warwick.tabula.data.model.groups
 
+import enumeratum.{Enum, EnumEntry}
 import javax.persistence.CascadeType._
 import javax.persistence._
+import javax.validation.constraints.NotNull
 import org.hibernate.annotations.{Proxy, Type}
 import org.hibernate.validator.constraints.URL
 import org.joda.time.{LocalDate, LocalDateTime, LocalTime}
@@ -11,7 +13,10 @@ import uk.ac.warwick.tabula.helpers.StringUtils
 import uk.ac.warwick.tabula.permissions.PermissionsTarget
 import uk.ac.warwick.tabula.services._
 import uk.ac.warwick.tabula.services.permissions.PermissionsService
+import uk.ac.warwick.tabula.system.EnumTwoWayConverter
 import uk.ac.warwick.tabula.{AcademicYear, ToString}
+
+import scala.collection.immutable
 
 object SmallGroupEvent {
 
@@ -19,7 +24,7 @@ object SmallGroupEvent {
 
   // Companion object is one of the places searched for an implicit Ordering, so
   // this will be the default when ordering a list of small group events.
-  implicit val defaultOrdering = new Ordering[SmallGroupEvent] {
+  implicit val defaultOrdering: Ordering[SmallGroupEvent] = new Ordering[SmallGroupEvent] {
     final val FirstInstanceOrdering: Ordering[SmallGroupEvent] = Ordering.by { event: SmallGroupEvent =>
       (Option(event.weekRanges).filter(_.nonEmpty).map {
         _.minBy {
@@ -81,6 +86,19 @@ class SmallGroupEvent extends GeneratedId with ToString with PermissionsTarget w
   @URL
   var relatedUrl: String = _
   var relatedUrlTitle: String = _
+
+  @NotNull // defaults to hybrid
+  @Type(`type` = "uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethodUserType")
+  var deliveryMethod: EventDeliveryMethod = _
+
+  @URL
+  var onlineDeliveryUrl: String = _
+
+  @Type(`type` = "uk.ac.warwick.tabula.data.model.groups.OnlinePlatformUserType")
+  @Column(name = "onlinePlatform")
+  private var _onlinePlatform: OnlinePlatform = _
+  def onlinePlatform: Option[OnlinePlatform] = Option(_onlinePlatform)
+  def onlinePlatform_=(platform: Option[OnlinePlatform]): Unit = _onlinePlatform = platform.orNull
 
   def isUnscheduled: Boolean = day == null || (startTime == null && endTime == null)
 
@@ -156,3 +174,32 @@ class SmallGroupEvent extends GeneratedId with ToString with PermissionsTarget w
 
   def department: Department = group.department
 }
+
+sealed abstract class EventDeliveryMethod(var description: String) extends EnumEntry
+object EventDeliveryMethod extends Enum[EventDeliveryMethod] {
+
+  case object OnlineOnly extends EventDeliveryMethod("Online only")
+  case object FaceToFaceOnly extends EventDeliveryMethod("Face to face only")
+  case object Hybrid extends EventDeliveryMethod("Hybrid (online and face to face)")
+
+  override val values: immutable.IndexedSeq[EventDeliveryMethod] = findValues
+}
+class EventDeliveryMethodUserType extends EnumUserType(EventDeliveryMethod)
+class EventDeliveryMethodConverter extends EnumTwoWayConverter(EventDeliveryMethod)
+
+sealed abstract class OnlinePlatform extends EnumEntry {
+  def getEntryName: String = entryName
+}
+object OnlinePlatform extends Enum[OnlinePlatform] {
+
+  case object Teams extends OnlinePlatform
+  case object Moodle extends OnlinePlatform
+  case object Blackboard extends OnlinePlatform
+  case object SkillsForge extends OnlinePlatform
+  case object Webinar extends OnlinePlatform
+  case object QuestionMark extends OnlinePlatform
+
+  override val values: immutable.IndexedSeq[OnlinePlatform] = findValues
+}
+class OnlinePlatformUserType extends EnumUserType(OnlinePlatform)
+class OnlinePlatformConverter extends EnumTwoWayConverter(OnlinePlatform)

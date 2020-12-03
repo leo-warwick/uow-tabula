@@ -4,6 +4,7 @@ import javax.persistence.CascadeType._
 import javax.persistence._
 import javax.validation.constraints.NotNull
 import org.hibernate.annotations.{BatchSize, Filter, FilterDef, Proxy, Type}
+import org.hibernate.validator.constraints.URL
 import org.joda.time.{LocalDate, LocalTime}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.JavaImports._
@@ -194,7 +195,7 @@ class SmallGroupSet
   @Column(name = "collect_attendance")
   var collectAttendance: Boolean = true
 
-  // Default properties for creating/applying to SGEs
+  // --- Default properties for creating/applying to SGEs ---
   @Type(`type` = "uk.ac.warwick.tabula.data.model.groups.WeekRangeListUserType")
   @Column(name = "default_weekranges")
   var defaultWeekRanges: Seq[WeekRange] = Nil
@@ -220,6 +221,17 @@ class SmallGroupSet
   @Type(`type` = "uk.ac.warwick.tabula.data.model.LocationUserType")
   @Column(name = "default_location")
   var defaultLocation: Location = _
+
+  @Type(`type` = "uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethodUserType")
+  var defaultDeliveryMethod: EventDeliveryMethod = _
+
+  @URL
+  var defaultOnlineDeliveryUrl: String = _
+
+  @Type(`type` = "uk.ac.warwick.tabula.data.model.groups.OnlinePlatformUserType")
+  var defaultOnlinePlatform: OnlinePlatform = _
+
+  // --- End of default properties for creating/applying to SGEs ---
 
   def showAttendanceReports: Boolean = !archived && !deleted && collectAttendance
 

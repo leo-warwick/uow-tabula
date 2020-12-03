@@ -1,10 +1,11 @@
 package uk.ac.warwick.tabula.services
 
 import uk.ac.warwick.tabula.AppContextTestBase
-import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, DayOfWeek, SmallGroupEvent}
+import uk.ac.warwick.tabula.data.model.groups.{DayOfWeek, SmallGroup, SmallGroupEvent}
 import uk.ac.warwick.userlookup.User
 import org.springframework.transaction.annotation.Transactional
 import org.joda.time.LocalTime
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod.Hybrid
 
 class UserGroupMembershipHelperTest extends AppContextTestBase {
 
@@ -28,6 +29,7 @@ class UserGroupMembershipHelperTest extends AppContextTestBase {
 
     def newEvent(tutors: Seq[String]) = {
       val event = new SmallGroupEvent()
+      event.deliveryMethod = Hybrid
       event.startTime = LocalTime.now()
       event.endTime = LocalTime.now()
       event.day = DayOfWeek.Thursday

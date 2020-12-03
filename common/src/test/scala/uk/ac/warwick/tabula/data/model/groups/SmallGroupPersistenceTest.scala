@@ -1,14 +1,16 @@
 package uk.ac.warwick.tabula.data.model.groups
 
 import uk.ac.warwick.tabula.data.model.{MapLocation, NamedLocation}
-import uk.ac.warwick.tabula.{FieldAccessByReflection, PersistenceTestBase, AcademicYear}
+import uk.ac.warwick.tabula.{AcademicYear, FieldAccessByReflection, PersistenceTestBase}
 import uk.ac.warwick.tabula.services.ModuleAndDepartmentService
 import org.springframework.transaction.annotation.Transactional
 import org.joda.time.LocalTime
+
 import scala.jdk.CollectionConverters._
 import org.joda.time.DateTime
 import uk.ac.warwick.tabula.data.ModuleDaoImpl
 import org.junit.Before
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod.Hybrid
 import uk.ac.warwick.userlookup.User
 
 class SmallGroupPersistenceTest extends PersistenceTestBase with FieldAccessByReflection {
@@ -68,6 +70,7 @@ class SmallGroupPersistenceTest extends PersistenceTestBase with FieldAccessByRe
       session.saveOrUpdate(group1)
 
       val event1 = new SmallGroupEvent(group1)
+      event1.deliveryMethod = Hybrid
       event1.title = "Event 1"
       event1.location = NamedLocation("A0.01")
       event1.weekRanges = Seq(WeekRange(1, 3), WeekRange(6), WeekRange(16, 24)) // Weeks 1, 2, 3, 6, 16, 17, 18, 19, 20, 21, 22, 23, 24
@@ -76,6 +79,7 @@ class SmallGroupPersistenceTest extends PersistenceTestBase with FieldAccessByRe
       event1.endTime = event1.startTime.plusHours(1) // 4pm
 
       val event2 = new SmallGroupEvent(group1)
+      event2.deliveryMethod = Hybrid
       event2.title = "Event 2"
       event2.location = MapLocation("A0.01", "12345")
       event2.weekRanges = Seq(WeekRange(1, 3), WeekRange(6), WeekRange(16, 24)) // Weeks 1, 2, 3, 6, 16, 17, 18, 19, 20, 21, 22, 23, 24
