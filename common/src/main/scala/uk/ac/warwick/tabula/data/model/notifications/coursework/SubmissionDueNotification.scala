@@ -28,6 +28,8 @@ trait SubmissionReminder extends RecipientCompletedActionRequiredNotification {
 
   def referenceDate: DateTime = created
 
+  def cantSubmit: Boolean = !assignment.allowLateSubmissions && deadline.exists(DateTime.now.isAfter)
+
   def daysLeft: Int = deadline.map(_.withTimeAtStartOfDay()).map { closeDate =>
     val now = referenceDate.withTimeAtStartOfDay()
     Days.daysBetween(now, closeDate).getDays
@@ -70,7 +72,7 @@ trait SubmissionReminder extends RecipientCompletedActionRequiredNotification {
     "assignment" -> assignment,
     "module" -> module,
     "timeStatement" -> timeStatement,
-    "cantSubmit" -> (!assignment.allowLateSubmissions && deadline.exists(DateTime.now.isAfter)),
+    "cantSubmit" -> cantSubmit,
     "deadlineDate" -> deadlineDate
   ))
 
@@ -213,7 +215,9 @@ class SubmissionDueWithExtensionNotification
       // Don't send if the user has submitted or if there's no expiry date on the extension (i.e. it's been rejected)
       // or if there is an extension with a later extended deadline for this user or if the extension deadline is earlier than the assignment's close date
       // or if the student is no longer a member of the assignment
-      if (hasSubmitted || !extension.approved || extension.expiryDate.isEmpty || !shouldSend || !isTheLatestApprovedExtension || !extension.relevant || !isAMemberOfTheAssignment) {
+      // or if the student's deadline is in the past, and this assignment doesn't allow submission after the deadline
+      if (hasSubmitted || !extension.approved || extension.expiryDate.isEmpty ||
+        !shouldSend || !isTheLatestApprovedExtension || !extension.relevant || !isAMemberOfTheAssignment || cantSubmit) {
         Nil
       } else {
         Seq(userLookup.getUserByUserId(extension.usercode))
