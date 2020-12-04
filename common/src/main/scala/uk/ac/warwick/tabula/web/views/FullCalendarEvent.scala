@@ -30,6 +30,7 @@ case class FullCalendarEvent(
   location: String = "",
   locationId: String = "", // for map links
   syllabusPlusName: Option[String] = None, // for events imported from S+
+  onlineDeliveryUrl: Option[String],
   name: String = "",
   description: String = "",
   shorterTitle: String = "", // used in the pop-up to display event details
@@ -86,6 +87,7 @@ object FullCalendarEvent {
         case _ => ""
       },
       syllabusPlusName = source.location.collect { case l: MapLocation => l }.flatMap(_.syllabusPlusName),
+      onlineDeliveryUrl = source.onlineDeliveryUrl,
       name = source.name,
       description = source.description,
       shorterTitle = source.parent.shortName.map(_ + " ").getOrElse("") + source.eventType.displayName,

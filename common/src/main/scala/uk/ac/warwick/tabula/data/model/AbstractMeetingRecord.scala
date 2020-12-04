@@ -194,6 +194,7 @@ abstract class AbstractMeetingRecord extends GeneratedId with PermissionsTarget 
         if (format == MeetingFormat.FaceToFace) None
         else Option(format).map(_.description).map(NamedLocation)
       },
+      onlineDeliveryUrl = None,
       parent = TimetableEvent.Parent(relationships.map(_.relationshipType).distinct),
       comments = None,
       staff = context match {

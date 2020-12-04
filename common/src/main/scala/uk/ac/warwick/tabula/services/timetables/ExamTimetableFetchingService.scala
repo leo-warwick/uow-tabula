@@ -160,6 +160,7 @@ object ExamTimetableHttpTimetableFetchingService extends Logging {
             startTime = timetableExam.startDateTime.toLocalTime,
             endTime = timetableExam.endDateTime.toLocalTime,
             location = None,
+            onlineDeliveryUrl = None, // TODO - AEP link?
             comments = Some(s"""More information available on the <a href="$topLevelUrl${Routes.Profile.examTimetable(universityId)}">exam timetable</a>"""),
             parent = TimetableEvent.Parent(),
             staff = Nil,

@@ -196,6 +196,7 @@ object CelcatHttpTimetableFetchingService {
         startTime = start.toLocalTime,
         endTime = end.toLocalTime,
         location = Option(event.getLocation).flatMap(_.getValue.maybeText).map(locationFetchingService.locationFor),
+        onlineDeliveryUrl = None,
         comments = None,
         parent = TimetableEvent.Parent(parseModuleCode(event).flatMap(code => moduleMap.get(code.toLowerCase))),
         staff = staff,
@@ -284,7 +285,7 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
     // If we run an identical event in separate weeks, combine the weeks for them
     val groupedEvents = events.groupBy { event =>
       (event.name, event.title, event.description, event.eventType, event.day, event.startTime, event.endTime,
-        event.location, event.parent.shortName, event.staff, event.students, event.year)
+        event.location, event.onlineDeliveryUrl, event.parent.shortName, event.staff, event.students, event.year)
     }.values.toSeq
 
     groupedEvents.map { eventSeq =>
@@ -304,6 +305,7 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
             event.startTime,
             event.endTime,
             event.location,
+            event.onlineDeliveryUrl,
             event.parent,
             event.comments,
             event.staff,
@@ -360,6 +362,7 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
             startTime = start.withZone(DateTimeZone.forID("Europe/London")).toLocalTime,
             endTime = end.withZone(DateTimeZone.forID("Europe/London")).toLocalTime,
             location = location,
+            onlineDeliveryUrl = None,
             comments = None,
             parent = parent,
             staff = Nil,
