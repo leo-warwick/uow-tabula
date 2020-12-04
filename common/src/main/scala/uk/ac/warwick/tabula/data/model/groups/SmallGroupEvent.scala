@@ -152,7 +152,9 @@ class SmallGroupEvent extends GeneratedId with ToString with PermissionsTarget w
     newEvent.title = title
     newEvent._tutors = _tutors.duplicate()
     newEvent.weekRanges = weekRanges
-
+    newEvent.deliveryMethod = deliveryMethod
+    newEvent.onlineDeliveryUrl = onlineDeliveryUrl
+    newEvent.onlinePlatform = onlinePlatform
     newEvent
   }
 
