@@ -1,7 +1,5 @@
 package uk.ac.warwick.tabula.data.model.markingworkflow
 
-import java.sql.Types
-
 import org.hibernate.`type`.{StandardBasicTypes, StringType}
 import uk.ac.warwick.tabula.CaseObjectEqualityFixes
 import uk.ac.warwick.tabula.cm2.web.Routes
@@ -11,6 +9,8 @@ import uk.ac.warwick.tabula.data.model.{AbstractBasicUserType, Assignment, Feedb
 import uk.ac.warwick.tabula.helpers.StringUtils
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.system.TwoWayConverter
+
+import java.sql.Types
 
 sealed abstract class MarkingWorkflowStage(val name: String, val order: Int) extends CaseObjectEqualityFixes[MarkingWorkflowStage] {
   override def getName: String = name
@@ -105,9 +105,9 @@ abstract class ModerationStage(name: String, order: Int) extends MarkingWorkflow
 }
 
 /**
-  * Stages model the steps in any given workflow.
-  * Stage names are exposed in URLs so don't use upper case characters
-  */
+ * Stages model the steps in any given workflow.
+ * Stage names are exposed in URLs so don't use upper case characters
+ */
 object MarkingWorkflowStage {
 
   val DefaultRole: String = "Marker"
@@ -300,7 +300,7 @@ object MarkingWorkflowStage {
 
   def unapply(code: String): Option[MarkingWorkflowStage] =
     code.maybeText.flatMap { code =>
-      values.find(_.name == code).orElse(values.find(_.allocationName == code))
+      values.find(_.name == code)
     }
 
   def fromAllocationName(allocationName: String, workflowType: MarkingWorkflowType): Option[MarkingWorkflowStage] =

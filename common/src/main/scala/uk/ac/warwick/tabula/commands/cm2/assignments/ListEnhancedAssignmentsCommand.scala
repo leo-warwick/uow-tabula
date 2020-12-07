@@ -1,8 +1,5 @@
 package uk.ac.warwick.tabula.commands.cm2.assignments
 
-import java.time.Duration
-import java.util.concurrent.TimeUnit
-
 import org.joda.time.{DateTime, LocalDate, Seconds}
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.WorkflowStages.StageProgress
@@ -24,6 +21,8 @@ import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, Permissions
 import uk.ac.warwick.util.cache._
 import uk.ac.warwick.util.collections.Pair
 
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
@@ -172,9 +171,9 @@ abstract class ListAssignmentsCommandInternal(val academicYear: AcademicYear, va
         BasicAssignmentInfo(assignment)
       }.filter { info =>
         (moduleFilters.asScala.isEmpty || moduleFilters.asScala.exists(_ (info))) &&
-        (workflowTypeFilters.asScala.isEmpty || workflowTypeFilters.asScala.exists(_ (info))) &&
-        (statusFilters.asScala.isEmpty || statusFilters.asScala.exists(_ (info))) &&
-        dueDateFilter(info)
+          (workflowTypeFilters.asScala.isEmpty || workflowTypeFilters.asScala.exists(_ (info))) &&
+          (statusFilters.asScala.isEmpty || statusFilters.asScala.exists(_ (info))) &&
+          dueDateFilter(info)
       }
     )
 }
@@ -247,8 +246,8 @@ object AssignmentProgressCache {
   final val CacheName: String = "AssignmentProgress"
 
   /**
-    * 7 days in seconds - we can cache this for a reasonably long time because we don't cache across deadline boundaries
-    */
+   * 7 days in seconds - we can cache this for a reasonably long time because we don't cache across deadline boundaries
+   */
   final val CacheExpiryTime: Duration = Duration.ofDays(7)
 }
 
@@ -372,14 +371,14 @@ trait CachedAssignmentProgress extends AssignmentProgress with AssignmentProgres
 
   private def fromJson(json: Json): EnhancedAssignmentInfo = {
     val map = JsonHelper.toMap[Any](json)
-
+    val assignment = assessmentService.getAssignmentById(map("assignment").asInstanceOf[String]).get
     EnhancedAssignmentInfo(
-      assignment = assessmentService.getAssignmentById(map("assignment").asInstanceOf[String]).get,
+      assignment = assignment,
       stages = map("stages").asInstanceOf[Seq[Map[String, Any]]].map { c =>
         AssignmentStageCategory(
           category = CM2WorkflowCategory.members.find(_.code == c("category").asInstanceOf[String]).get,
           stages = c("stages").asInstanceOf[Seq[Map[String, Any]]].map { s =>
-            val stage = CM2WorkflowStages.of(s("stage").asInstanceOf[String])
+            val stage = CM2WorkflowStages.of(s("stage").asInstanceOf[String], assignment.cm2MarkingWorkflow.workflowType)
 
             AssignmentStage(
               stage = stage,
@@ -405,7 +404,7 @@ trait CachedAssignmentProgress extends AssignmentProgress with AssignmentProgres
       },
       nextStages = map("nextStages").asInstanceOf[Seq[Map[String, Any]]].map { ns =>
         AssignmentNextStage(
-          stage = CM2WorkflowStages.of(ns("stage").asInstanceOf[String]),
+          stage = CM2WorkflowStages.of(ns("stage").asInstanceOf[String], assignment.cm2MarkingWorkflow.workflowType),
           url = ns.get("url").map(_.asInstanceOf[String]),
           count = ns("count").asInstanceOf[Int]
         )
@@ -539,12 +538,12 @@ object AssignmentInfoFilters {
 
       def apply(info: AssignmentInfo): Boolean =
         Option(info.assignment.cm2MarkingWorkflow).nonEmpty &&
-        info.assignment.allFeedback
-          .forall { f =>
-            f.allMarkerFeedback
-              .flatMap(_.marker.getUserId.maybeText)
-              .isEmpty
-          }
+          info.assignment.allFeedback
+            .forall { f =>
+              f.allMarkerFeedback
+                .flatMap(_.marker.getUserId.maybeText)
+                .isEmpty
+            }
     }
 
     case object ReleasedToStudents extends AssignmentInfoFilter {

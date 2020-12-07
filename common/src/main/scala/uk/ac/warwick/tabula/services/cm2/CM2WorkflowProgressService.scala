@@ -5,7 +5,7 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.WorkflowStageHealth._
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.cm2.web.Routes
-import uk.ac.warwick.tabula.data.model.markingworkflow.{FinalStage, MarkingWorkflowStage, ModerationStage}
+import uk.ac.warwick.tabula.data.model.markingworkflow.{FinalStage, MarkingWorkflowStage, MarkingWorkflowType, ModerationStage}
 import uk.ac.warwick.tabula.data.model.{Assignment, FeedbackForSits, FeedbackForSitsStatus}
 import uk.ac.warwick.tabula.helpers.RequestLevelCaching
 import uk.ac.warwick.tabula.helpers.StringUtils._
@@ -15,8 +15,8 @@ import uk.ac.warwick.tabula.services.IncludeType
 import scala.jdk.CollectionConverters._
 
 /**
-  * This isn't code for marking workflows. It drives the progress bar and next action on various coursework pages.
-  */
+ * This isn't code for marking workflows. It drives the progress bar and next action on various coursework pages.
+ */
 @Service
 class CM2WorkflowProgressService extends RequestLevelCaching[Assignment, Seq[CM2WorkflowStage]] {
 
@@ -144,16 +144,16 @@ object CM2WorkflowStages {
   private val ObjectClassPrefix = CM2WorkflowStages.getClass.getName
 
   /**
-    * Create an Permission from an action name (e.g. "Module.Create").
-    * Most likely useful in view templates, for permissions checking.
-    *
-    * Note that, like the templates they're used in, the correctness isn't
-    * checked at runtime.
-    */
-  def of(name: String): CM2WorkflowStage =
+   * Create an Permission from an action name (e.g. "Module.Create").
+   * Most likely useful in view templates, for permissions checking.
+   *
+   * Note that, like the templates they're used in, the correctness isn't
+   * checked at runtime.
+   */
+  def of(name: String, markingWorkflowType: MarkingWorkflowType = null): CM2WorkflowStage =
     name match {
       case r"""CM2MarkingWorkflowStage\((.+)${markingWorkflowStageCode}\)""" =>
-        CM2MarkingWorkflowStage(MarkingWorkflowStage.fromCode(markingWorkflowStageCode))
+        CM2MarkingWorkflowStage(MarkingWorkflowStage.fromCode(markingWorkflowStageCode, markingWorkflowType))
 
       case _ => try {
         // Go through the magical hierarchy
@@ -420,11 +420,11 @@ object CM2WorkflowStages {
         val actualFeedback = coursework.enhancedFeedback.map(_.feedback).get
 
         Option(feedbackForSits.dateOfUpload).nonEmpty &&
-        feedbackForSits.status != FeedbackForSitsStatus.UploadNotAttempted &&
-        (
-          feedbackForSits.actualMarkLastUploaded != actualFeedback.latestMark ||
-          feedbackForSits.actualGradeLastUploaded != actualFeedback.latestGrade
-        )
+          feedbackForSits.status != FeedbackForSitsStatus.UploadNotAttempted &&
+          (
+            feedbackForSits.actualMarkLastUploaded != actualFeedback.latestMark ||
+              feedbackForSits.actualGradeLastUploaded != actualFeedback.latestGrade
+            )
       }
 
       lazy val isManuallyAdded: Boolean =

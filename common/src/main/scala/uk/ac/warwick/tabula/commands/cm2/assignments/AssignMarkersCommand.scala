@@ -136,7 +136,7 @@ trait AssignMarkersBySpreadsheetBindListener extends BindListener {
               val stages = assignment.cm2MarkingWorkflow.allStages.filter(_.roleName == key)
               stages.map(s => s -> rowsToAllocations(rows))
             } else {
-              Seq(MarkingWorkflowStage.fromCode(key) -> rowsToAllocations(rows))
+              Seq(MarkingWorkflowStage.fromCode(key, assignment.cm2MarkingWorkflow.workflowType) -> rowsToAllocations(rows))
             }
           }
           validateConcurrentStages(_allocationMap, result)

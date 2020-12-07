@@ -1,8 +1,6 @@
 package uk.ac.warwick.tabula.web.controllers.cm2.admin.assignments
 
 
-import javax.validation.Valid
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Controller
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.{ModelAttribute, PathVariable, RequestMapping}
@@ -12,6 +10,7 @@ import uk.ac.warwick.tabula.commands.{Appliable, PopulateOnForm, SelfValidating}
 import uk.ac.warwick.tabula.data.model.Assignment
 import uk.ac.warwick.tabula.web.Mav
 
+import javax.validation.Valid
 import scala.jdk.CollectionConverters._
 
 @Controller
@@ -29,16 +28,14 @@ class ModifyAssignmentMarkersSmallGroupsController extends AbstractAssignmentCon
     smallGroupCommand.populate()
 
     val module = mandatory(assignment.module)
-    val allocations = smallGroupCommand.markerAllocations
     val workflow = assignment.cm2MarkingWorkflow
 
     Mav("cm2/admin/assignments/assignment_markers_smallgroups",
       "module" -> module,
       "sets" -> smallGroupCommand.setAllocations.map(_.set),
       "setsMap" -> smallGroupCommand.setAllocations.map(a => a.set.id -> a).toMap.asJava,
-      "allocations" -> allocations,
       "allocationOrder" -> workflow.allocationOrder,
-      "stageNames" -> workflow.allStages.groupBy(_.allocationName).mapValues(_.map(_.name)),
+      "stageNames" -> workflow.allStages.groupBy(_.allocationName).view.mapValues(_.map(_.name)),
       "mode" -> mode,
       "allocationWarnings" -> smallGroupCommand.allocationWarnings)
       .crumbsList(Breadcrumbs.assignment(assignment))
