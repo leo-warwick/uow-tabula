@@ -8,6 +8,7 @@ import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.data.Transactions._
 import uk.ac.warwick.tabula.data.model._
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod._
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.permissions.Permissions
@@ -187,27 +188,41 @@ abstract class ModifySmallGroupEventCommandInternal
 
   def copyTo(event: SmallGroupEvent): Unit = {
     event.title = title
+    event.deliveryMethod = deliveryMethod
 
-    // If the location name has changed, but the location ID hasn't, we're changing from a map location
-    // to a named location
-    Option(event.location).collect { case m: MapLocation => m }.foreach { mapLocation =>
-      if (location != mapLocation.name && locationId == mapLocation.locationId) {
-        locationId = null
-      }
+    if (event.deliveryMethod == FaceToFaceOnly) {
+      // clear online only fields
+      event.onlineDeliveryUrl = null
+      event.onlinePlatform = None
+    } else {
+      event.onlineDeliveryUrl = onlineDeliveryUrl
+      event.onlinePlatform = Option(onlinePlatform)
     }
 
-    if (location.hasText) {
-      if (locationId.hasText) {
-        if (locationAlias.hasText) {
-          event.location = AliasedMapLocation(locationAlias, MapLocation(location, locationId))
+    if (event.deliveryMethod == OnlineOnly) {
+      event.location = null
+    } else {
+      // If the location name has changed, but the location ID hasn't, we're changing from a map location
+      // to a named location
+      Option(event.location).collect { case m: MapLocation => m }.foreach { mapLocation =>
+        if (location != mapLocation.name && locationId == mapLocation.locationId) {
+          locationId = null
+        }
+      }
+
+      if (location.hasText) {
+        if (locationId.hasText) {
+          if (locationAlias.hasText) {
+            event.location = AliasedMapLocation(locationAlias, MapLocation(location, locationId))
+          } else {
+            event.location = MapLocation(location, locationId)
+          }
         } else {
-          event.location = MapLocation(location, locationId)
+          event.location = NamedLocation(location)
         }
       } else {
-        event.location = NamedLocation(location)
+        event.location = null
       }
-    } else {
-      event.location = null
     }
 
     event.weekRanges = weekRanges
@@ -220,9 +235,6 @@ abstract class ModifySmallGroupEventCommandInternal
     if (event.tutors == null) event.tutors = UserGroup.ofUsercodes
     event.tutors.knownType.includedUserIds = tutors.asScala.toSet
 
-    event.deliveryMethod = deliveryMethod
-    event.onlineDeliveryUrl = onlineDeliveryUrl
-    event.onlinePlatform = Option(onlinePlatform)
   }
 }
 
