@@ -50,6 +50,7 @@ abstract class TermBasedEventOccurrenceService extends EventOccurrenceService {
         start,
         end,
         event.location,
+        event.onlineDeliveryUrl,
         event.parent,
         event.comments,
         event.staff,
@@ -123,6 +124,8 @@ abstract class TermBasedEventOccurrenceService extends EventOccurrenceService {
       case Some(location: model.Location) => Some(location.name)
       case _ => None
     }).foreach(name => event.getProperties.add(new Location(name)))
+
+    eventOccurrence.onlineDeliveryUrl.foreach(url => event.getProperties.add(new Url(new java.net.URI(url))))
 
     event.getProperties.add(new Uid(eventOccurrence.uid))
     event.getProperties.add(Method.PUBLISH)

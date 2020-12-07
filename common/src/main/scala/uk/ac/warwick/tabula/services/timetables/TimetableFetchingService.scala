@@ -154,10 +154,10 @@ trait CombinedHttpTimetableFetchingServiceComponent extends CompleteTimetableFet
 object CombinedTimetableFetchingService {
   def mergeDuplicates(events: EventList): EventList = {
     // If an event runs on the same day, between the same times, in the same weeks, of the same type, on the same module,
-    // in the same location, with the same tutors, it is the same
+    // in the same location, with the same online URL, with the same tutors, it is the same
     events.map(events => events.groupBy { event =>
       (event.year, event.day, event.startTime, event.endTime, event.weekRanges,
-        event.eventType, event.parent.shortName, event.location.map(_.name), event.staff)
+        event.eventType, event.parent.shortName, event.location.map(_.name), event.onlineDeliveryUrl, event.staff)
     }
       .mapValues {
         // values are Seq so List cons (::) never matches
@@ -175,6 +175,7 @@ object CombinedTimetableFetchingService {
             event.startTime,
             event.endTime,
             groupedEvents.flatMap(_.location).headOption,
+            groupedEvents.flatMap(_.onlineDeliveryUrl).headOption,
             event.parent,
             groupedEvents.flatMap(_.comments).headOption,
             groupedEvents.flatMap(_.staff).distinct,

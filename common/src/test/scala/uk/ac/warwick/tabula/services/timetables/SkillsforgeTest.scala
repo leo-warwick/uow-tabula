@@ -81,6 +81,7 @@ class SkillsforgeTest extends TestBase {
       start = LocalDateTime.parse("2019-02-20T13:00:00.000"),
       end = LocalDateTime.parse("2019-02-20T17:00:00.000"),
       location = Some(NamedLocation("Seminar Room 1, Wolfson RE")),
+      onlineDeliveryUrl = None,
       parent = Parent(),
       comments = None,
       staff = Nil,

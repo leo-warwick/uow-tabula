@@ -34,6 +34,7 @@ trait EventOccurrenceToJsonConverter {
       case Some(l) => Map("name" -> l.name)
       case _ => null
     }),
+    "onlineDeliveryUrl" -> event.onlineDeliveryUrl.orNull,
     "context" -> event.parent.shortName,
     "parent" -> event.parent,
     "comments" -> event.comments.orNull,

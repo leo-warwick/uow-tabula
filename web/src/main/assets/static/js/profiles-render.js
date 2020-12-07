@@ -101,6 +101,15 @@ function renderCalendarEvent(event, element) {
     content = content + "</td></tr>";
   }
 
+  if (event.onlineDeliveryUrl && event.onlineDeliveryUrl.length > 0) {
+    const a = document.createElement('a');
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.href = event.onlineDeliveryUrl;
+    a.innerText = `Link to online session`;
+    content = content + `<tr><th></th><td>${a.outerHTML}</td><td>`;
+  }
+
   if (event.tutorNames.length > 0) {
     content = content + "<tr><th>Who</th><td> " + event.tutorNames + "</td></tr>";
   }
