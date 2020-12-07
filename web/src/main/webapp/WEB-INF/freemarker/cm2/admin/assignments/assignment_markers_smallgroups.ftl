@@ -75,7 +75,7 @@
                         <#-- list tutors from this group before tutors from other groups -->
                         <#list (group.tutors + group.otherTutors) as tutor>
                           <#assign groupMarkerAllocation = smallGroupCommand.setIdWithGroupMarkerAllocations[set.id][index] />
-                          <#-- even though all three below  are not null it somehow given ftl excpetion locally if we remove this if condition??? -->
+                          <#-- even though all three below  are not null it still gives ftl exception locally if we remove this if condition as part of validation screen.Perhaps something to do with lazy list??? -->
                           <#if groupMarkerAllocation?? && groupMarkerAllocation.marker?? && groupMarkerAllocation.marker.userId??>
                             <#assign selected = groupMarkerAllocation.marker.userId == tutor.userId/>
                           <#else>

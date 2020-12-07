@@ -54,7 +54,7 @@ class AssignMarkersSmallGroupsCommandInternal(val assignment: Assignment) extend
 
   def applyInternal(): Assignment = {
 
-    val command: Appliable[Assignment] with AssignMarkersState = AssignMarkersBySmallGroupsCommand(assignment, setIdWithGroupMarkerAllocations.get(smallGroupSet.id).asScala.toSeq)
+    val command: Appliable[Assignment] with AssignMarkersState = AssignMarkersBySmallGroupsCommand(assignment, markerAllocations)
 
     command.allowSameMarkerForSequentialStages = allowSameMarkerForSequentialStages
 
