@@ -35,6 +35,7 @@ class SmallGroupEventFixtureCommand extends CommandInternal[SmallGroupEvent] wit
       event.endTime = event.startTime.plusHours(1)
       event.location = NamedLocation(location)
       event.title = title
+      event.deliveryMethod = EventDeliveryMethod.Hybrid
 
       smallGroupDao.saveOrUpdate(group)
 
