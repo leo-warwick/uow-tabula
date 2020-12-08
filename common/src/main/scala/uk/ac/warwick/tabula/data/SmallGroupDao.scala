@@ -16,6 +16,8 @@ import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
 import uk.ac.warwick.userlookup.User
 
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod._
+
 trait SmallGroupDaoComponent {
   val smallGroupDao: SmallGroupDao
 }
@@ -180,7 +182,14 @@ class SmallGroupDaoImpl extends SmallGroupDao
 
   def saveOrUpdate(smallGroup: SmallGroup): Unit = session.saveOrUpdate(smallGroup)
 
-  def saveOrUpdate(smallGroupEvent: SmallGroupEvent): Unit = session.saveOrUpdate(smallGroupEvent)
+  def saveOrUpdate(smallGroupEvent: SmallGroupEvent): Unit = {
+    require(
+      smallGroupEvent.deliveryMethod == Hybrid ||
+      (smallGroupEvent.deliveryMethod == OnlineOnly && smallGroupEvent.location == null) ||
+      (smallGroupEvent.deliveryMethod == FaceToFaceOnly && smallGroupEvent.onlineDeliveryUrl == null && smallGroupEvent.onlinePlatform.isEmpty)
+    )
+    session.saveOrUpdate(smallGroupEvent)
+  }
 
   def saveOrUpdate(occurrence: SmallGroupEventOccurrence): Unit = session.saveOrUpdate(occurrence)
 
