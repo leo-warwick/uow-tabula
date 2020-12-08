@@ -183,7 +183,7 @@ class SmallGroupDaoImpl extends SmallGroupDao
   def saveOrUpdate(smallGroup: SmallGroup): Unit = session.saveOrUpdate(smallGroup)
 
   def saveOrUpdate(smallGroupEvent: SmallGroupEvent): Unit = {
-    assert(
+    require(
       smallGroupEvent.deliveryMethod == Hybrid ||
       (smallGroupEvent.deliveryMethod == OnlineOnly && smallGroupEvent.location == null) ||
       (smallGroupEvent.deliveryMethod == FaceToFaceOnly && smallGroupEvent.onlineDeliveryUrl == null && smallGroupEvent.onlinePlatform.isEmpty)
