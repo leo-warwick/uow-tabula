@@ -81,7 +81,7 @@ class GraduationBenchmarkBreakdownCommandInternal(val studentCourseDetails: Stud
 
   override def applyInternal(): Either[UGGraduationBenchmarkBreakdown, PGGraduationBenchmarkBreakdown] = {
 
-    if (studentCourseDetails.student.isUG) {
+    if (studentCourseDetails.courseType.contains(CourseType.UG)) {
       val moduleRegistrations = studentCourseYearDetails.moduleRegistrations
       val modules = moduleRegistrations.map { mr => mr -> moduleRegistrationService.benchmarkComponentsAndMarks(mr) }.toMap
       val excludedModules = moduleRegistrations.map { mr => mr -> moduleRegistrationService.componentsAndMarksExcludedFromBenchmark(mr)}.toMap
