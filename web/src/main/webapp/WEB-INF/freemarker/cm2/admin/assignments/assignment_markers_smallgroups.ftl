@@ -66,16 +66,23 @@
                     </ul>
                   </div>
                   <div class="col-md-7">
-                    <@bs3form.labelled_form_group path="markerAllocations[${index}]" labelText="Marker">
-                      <@f.hidden path="markerAllocations[${index}].group" value=group.id />
+                    <@bs3form.labelled_form_group path="setIdWithGroupMarkerAllocations[${set.id}][${index}]" labelText="Marker">
+                      <@f.hidden path="setIdWithGroupMarkerAllocations[${set.id}][${index}].group" value=group.id />
                       <#list stages as stage>
-                        <@f.hidden path="markerAllocations[${index}].stages" value=stage />
+                        <@f.hidden path="setIdWithGroupMarkerAllocations[${set.id}][${index}].stages" value=stage />
                       </#list>
-                      <@f.select path="markerAllocations[${index}].marker" cssClass="form-control marker-select">
-                      <#-- list tutors from this group before tutors from other groups -->
+                      <@f.select path="setIdWithGroupMarkerAllocations[${set.id}][${index}].marker" cssClass="form-control marker-select">
+                        <#-- list tutors from this group before tutors from other groups -->
                         <#list (group.tutors + group.otherTutors) as tutor>
-                          <#assign selected = smallGroupCommand.markerAllocations[index].marker.userId == tutor.userId>
+                          <#assign groupMarkerAllocation = smallGroupCommand.setIdWithGroupMarkerAllocations[set.id][index] />
+                          <#-- even though all three below  are not null it still gives ftl exception locally if we remove this if condition as part of validation screen.Perhaps something to do with lazy list??? -->
+                          <#if groupMarkerAllocation?? && groupMarkerAllocation.marker?? && groupMarkerAllocation.marker.userId??>
+                            <#assign selected = groupMarkerAllocation.marker.userId == tutor.userId/>
+                          <#else>
+                            <#assign selected = false />
+                          </#if>
                           <option value="${tutor.userId}"<#if selected> selected</#if>>${tutor.fullName}</option>
+
                         </#list>
                       </@f.select>
                     </@bs3form.labelled_form_group>

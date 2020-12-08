@@ -2,20 +2,19 @@ package uk.ac.warwick.tabula.commands.cm2.assignments
 
 import org.springframework.validation.Errors
 import uk.ac.warwick.tabula.AcademicYear
+import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
-import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
-import uk.ac.warwick.tabula.data.model.{Assignment, Module}
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroup, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage
+import uk.ac.warwick.tabula.data.model.{Assignment, Module}
+import uk.ac.warwick.tabula.helpers.{LazyLists, LazyMaps}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.{AssessmentMembershipServiceComponent, AutowiringAssessmentMembershipServiceComponent, AutowiringSmallGroupServiceComponent, SmallGroupServiceComponent}
+import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, PermissionsCheckingMethods, RequiresPermissionsChecking}
 import uk.ac.warwick.userlookup.User
 
-import scala.jdk.CollectionConverters._
-import uk.ac.warwick.tabula.JavaImports._
-import uk.ac.warwick.tabula.data.model.markingworkflow.MarkingWorkflowStage
-import uk.ac.warwick.tabula.helpers.LazyLists
-
 import scala.beans.BeanProperty
+import scala.jdk.CollectionConverters._
 
 case class SetAllocation(set: SmallGroupSet, allocations: Map[String, Seq[GroupAllocation]])
 
@@ -54,7 +53,8 @@ class AssignMarkersSmallGroupsCommandInternal(val assignment: Assignment) extend
   self: SmallGroupServiceComponent with AssessmentMembershipServiceComponent with AssignMarkersSmallGroupsState with AssignMarkersSmallGroupsCommandRequest =>
 
   def applyInternal(): Assignment = {
-    val command: Appliable[Assignment] with AssignMarkersState = AssignMarkersBySmallGroupsCommand(assignment, markerAllocations.asScala.toSeq)
+
+    val command: Appliable[Assignment] with AssignMarkersState = AssignMarkersBySmallGroupsCommand(assignment, markerAllocations)
 
     command.allowSameMarkerForSequentialStages = allowSameMarkerForSequentialStages
 
@@ -65,7 +65,7 @@ class AssignMarkersSmallGroupsCommandInternal(val assignment: Assignment) extend
 trait AssignMarkersSmallGroupsValidation extends SelfValidating {
   self: AssignMarkersSmallGroupsState with AssignMarkersSmallGroupsCommandRequest =>
   override def validate(errors: Errors): Unit = {
-    val command: SelfValidating with AssignMarkersState = AssignMarkersBySmallGroupsCommand(assignment, markerAllocations.asScala.toSeq)
+    val command: SelfValidating with AssignMarkersState = AssignMarkersBySmallGroupsCommand(assignment, markerAllocations)
 
     command.allowSameMarkerForSequentialStages = allowSameMarkerForSequentialStages
 
@@ -121,16 +121,17 @@ trait AssignMarkersSmallGroupsCommandPopulate extends PopulateOnForm {
     })
 
     // if any of a sets allocations have no valid tutors/markers then ignore the set entirely
-    val filteredSetAllocations = setAllocations.filter(_.allocations.values.flatten.toSeq.forall(_.tutors.nonEmpty))
+    val filteredSetAllocations: Seq[SetAllocation] = setAllocations.filter(_.allocations.values.flatten.toSeq.forall(_.tutors.nonEmpty))
 
     this.setAllocations = filteredSetAllocations
-
-    if (markerAllocations.isEmpty) {
-      markerAllocations = filteredSetAllocations.flatMap { set =>
-        set.allocations.flatMap { case (stageName, groups) =>
-          groups.map(group => GroupMarkerAllocation(group.group, MarkingWorkflowStage.fromCode(stageName), group.tutors.headOption.orNull))
-        }
-      }.asJava
+    if (setIdWithGroupMarkerAllocations.isEmpty) {
+      setIdWithGroupMarkerAllocations = filteredSetAllocations.map { setAllocation =>
+        setAllocation.set.id  -> setAllocation.allocations.flatMap { case (stageName, groups) =>
+          groups.map {group =>
+            GroupMarkerAllocation(group.group, MarkingWorkflowStage.fromCode(stageName, assignment.cm2MarkingWorkflow.workflowType), group.tutors.headOption.orNull)
+          }
+        }.toSeq.asJava
+      }.toMap.asJava
     }
   }
 }
@@ -142,5 +143,10 @@ trait AssignMarkersSmallGroupsState {
 
 trait AssignMarkersSmallGroupsCommandRequest extends AssignMarkersSequentialStageValidationState {
   var smallGroupSet: SmallGroupSet = _
-  var markerAllocations: JList[GroupMarkerAllocation] = LazyLists.create()
+  var setIdWithGroupMarkerAllocations: JMap[String, JList[GroupMarkerAllocation]] =
+    LazyMaps.create { _: String =>
+      LazyLists.create(): JList[GroupMarkerAllocation]
+    }.asJava
+  def markerAllocations: Seq[GroupMarkerAllocation] = setIdWithGroupMarkerAllocations.get(smallGroupSet.id).asScala.toSeq
 }
+
