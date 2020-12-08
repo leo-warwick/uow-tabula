@@ -122,6 +122,7 @@ class MitigatingCircumstancesPanel extends GeneratedId with StringId with Serial
         end = endDate.get.toLocalDateTime,
         location = location,
         onlineDeliveryUrl = None,
+        deliveryMethod = None,
         parent = TimetableEvent.Parent(department),
         comments = None,
         staff = viewers.toSeq,

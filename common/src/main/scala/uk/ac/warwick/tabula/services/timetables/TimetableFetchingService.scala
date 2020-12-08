@@ -30,7 +30,7 @@ object TimetableFetchingService {
   }
 
   object EventList {
-    val empty = EventList(Nil, None)
+    val empty: EventList = EventList(Nil, None)
 
     def fresh(events: Seq[TimetableEvent]): EventList = forDate(events, Some(DateTime.now))
 
@@ -64,7 +64,7 @@ object TimetableFetchingService {
   }
 
   object EventOccurrenceList {
-    val empty = EventOccurrenceList(Nil, None)
+    val empty: EventOccurrenceList = EventOccurrenceList(Nil, None)
 
     def fresh(events: Seq[EventOccurrence]): EventOccurrenceList = apply(events, Some(DateTime.now))
 
@@ -159,7 +159,7 @@ object CombinedTimetableFetchingService {
       (event.year, event.day, event.startTime, event.endTime, event.weekRanges,
         event.eventType, event.parent.shortName, event.location.map(_.name), event.onlineDeliveryUrl, event.staff)
     }
-      .mapValues {
+      .view.mapValues {
         // values are Seq so List cons (::) never matches
         case event +: Nil => event
         case groupedEvents =>
@@ -176,6 +176,7 @@ object CombinedTimetableFetchingService {
             event.endTime,
             groupedEvents.flatMap(_.location).headOption,
             groupedEvents.flatMap(_.onlineDeliveryUrl).headOption,
+            groupedEvents.flatMap(_.deliveryMethod).headOption,
             event.parent,
             groupedEvents.flatMap(_.comments).headOption,
             groupedEvents.flatMap(_.staff).distinct,

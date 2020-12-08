@@ -2,6 +2,7 @@ package uk.ac.warwick.tabula.web.views
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod
 import uk.ac.warwick.tabula.data.model.{AliasedMapLocation, MapLocation}
 import uk.ac.warwick.tabula.helpers.ConfigurableIntervalFormatter
 import uk.ac.warwick.tabula.helpers.ConfigurableIntervalFormatter.{Hour12OptionalMins, IncludeDays}
@@ -31,6 +32,7 @@ case class FullCalendarEvent(
   locationId: String = "", // for map links
   syllabusPlusName: Option[String] = None, // for events imported from S+
   onlineDeliveryUrl: Option[String],
+  deliveryMethod: Option[EventDeliveryMethod],
   name: String = "",
   description: String = "",
   shorterTitle: String = "", // used in the pop-up to display event details
@@ -88,6 +90,7 @@ object FullCalendarEvent {
       },
       syllabusPlusName = source.location.collect { case l: MapLocation => l }.flatMap(_.syllabusPlusName),
       onlineDeliveryUrl = source.onlineDeliveryUrl,
+      deliveryMethod = source.deliveryMethod,
       name = source.name,
       description = source.description,
       shorterTitle = source.parent.shortName.map(_ + " ").getOrElse("") + source.eventType.displayName,

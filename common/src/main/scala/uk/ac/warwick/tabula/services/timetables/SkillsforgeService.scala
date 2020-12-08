@@ -176,6 +176,7 @@ object Skillsforge {
       end = endDate,
       location = (obj \ "venue").asOpt[JsObject].map(toLocation),
       onlineDeliveryUrl = None,
+      deliveryMethod = None,
       parent = Parent(),
       comments = None,
       staff = Nil,

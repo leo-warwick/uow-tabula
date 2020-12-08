@@ -18,7 +18,7 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
   private trait Fixture {
     val module: Module = Fixtures.module("cs118")
     val studentId = "studentId"
-    val studentEvents: Seq[TimetableEvent] = Seq(TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map()))
+    val studentEvents: Seq[TimetableEvent] = Seq(TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map()))
     val delegate: CompleteTimetableFetchingService = mock[CompleteTimetableFetchingService]
 
     delegate.getTimetableForStudent(studentId) returns Future.successful(EventList.fresh(studentEvents))
@@ -51,7 +51,7 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
     // deliberately use the student ID to look up some staff events. The cache key should be the ID + the type of
     // request (staff, student, room, etc) so we should get different results back for student and staff
 
-    val staffEvents = Seq(TimetableEvent("test2", "test2", "test2", "test2", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map()))
+    val staffEvents = Seq(TimetableEvent("test2", "test2", "test2", "test2", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map()))
     delegate.getTimetableForStaff(studentId) returns Future.successful(EventList.fresh(staffEvents))
 
     cache.getTimetableForStudent(studentId).futureValue.events should be(studentEvents)
@@ -100,6 +100,7 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
         new LocalTime(17, 0),
         Some(NamedLocation("event 1 location")),
         onlineDeliveryUrl = None,
+        deliveryMethod = None,
         TimetableEvent.Parent(Some(module)),
         Some("Comments!"),
         Seq(tutor1, tutor2),
@@ -120,6 +121,7 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
         new LocalTime(14, 0),
         None,
         onlineDeliveryUrl = None,
+        deliveryMethod = None,
         TimetableEvent.Parent(None),
         None,
         Nil,

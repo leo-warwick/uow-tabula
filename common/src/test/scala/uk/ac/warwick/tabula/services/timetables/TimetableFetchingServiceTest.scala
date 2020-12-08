@@ -68,6 +68,7 @@ class TimetableFetchingServiceTest extends TestBase with Mockito {
       eventType = TimetableEventType.Lecture,
       location = Some(MapLocation("Lecture Theatre 5", "31389", Some("L5"))),
       onlineDeliveryUrl = None,
+      deliveryMethod= None,
       parent = TimetableEvent.Parent(Some(module)),
       comments = None,
       staff = Seq(tutor),
