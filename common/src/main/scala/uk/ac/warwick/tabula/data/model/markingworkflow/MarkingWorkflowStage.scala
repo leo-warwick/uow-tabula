@@ -306,6 +306,7 @@ object MarkingWorkflowStage {
   def fromAllocationName(allocationName: String, workflowType: MarkingWorkflowType): Option[MarkingWorkflowStage] =
     values.filter(workflowType.allStages.contains).find(_.allocationName == allocationName)
 
+  //WorkflowStage generated based on either MarkingWorkflowStage's allocation/role name (when MarkingWorkflowType non null)  or MarkingWorkflowStage's name (when marking workflow  as null)
   def fromCode(code: String, workflowType: MarkingWorkflowType = null): MarkingWorkflowStage = code match {
     case null => null
     case allocationName if workflowType != null => MarkingWorkflowStage.fromAllocationName(allocationName, workflowType).getOrElse(throw new IllegalArgumentException(s"Invalid allocation name for ${workflowType.name}: $code"))

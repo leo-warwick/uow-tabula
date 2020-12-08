@@ -5,7 +5,7 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.WorkflowStageHealth._
 import uk.ac.warwick.tabula._
 import uk.ac.warwick.tabula.cm2.web.Routes
-import uk.ac.warwick.tabula.data.model.markingworkflow.{FinalStage, MarkingWorkflowStage, MarkingWorkflowType, ModerationStage}
+import uk.ac.warwick.tabula.data.model.markingworkflow.{FinalStage, MarkingWorkflowStage, ModerationStage}
 import uk.ac.warwick.tabula.data.model.{Assignment, FeedbackForSits, FeedbackForSitsStatus}
 import uk.ac.warwick.tabula.helpers.RequestLevelCaching
 import uk.ac.warwick.tabula.helpers.StringUtils._
@@ -150,10 +150,10 @@ object CM2WorkflowStages {
    * Note that, like the templates they're used in, the correctness isn't
    * checked at runtime.
    */
-  def of(name: String, markingWorkflowType: MarkingWorkflowType = null): CM2WorkflowStage =
+  def of(name: String): CM2WorkflowStage =
     name match {
       case r"""CM2MarkingWorkflowStage\((.+)${markingWorkflowStageCode}\)""" =>
-        CM2MarkingWorkflowStage(MarkingWorkflowStage.fromCode(markingWorkflowStageCode, markingWorkflowType))
+        CM2MarkingWorkflowStage(MarkingWorkflowStage.fromCode(markingWorkflowStageCode))
 
       case _ => try {
         // Go through the magical hierarchy
