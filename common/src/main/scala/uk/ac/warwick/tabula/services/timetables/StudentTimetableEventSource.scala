@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.services.timetables
 
 import uk.ac.warwick.tabula.CurrentUser
-import uk.ac.warwick.tabula.data.model.{CourseType, StudentMember}
+import uk.ac.warwick.tabula.data.model.StudentMember
 import uk.ac.warwick.tabula.helpers.ExecutionContexts.timetable
 import uk.ac.warwick.tabula.helpers.{Futures, SystemClockComponent}
 import uk.ac.warwick.tabula.services.timetables.TimetableFetchingService.EventList
@@ -29,7 +29,7 @@ trait CombinedStudentTimetableEventSourceComponent extends StudentTimetableEvent
       val smallGroupEvents: Future[EventList] = studentGroupEventSource.eventsFor(student, currentUser, context)
 
       val staffEvents: Future[EventList] =
-        if (student.mostSignificantCourse.courseType.contains(CourseType.PGR)) {
+        if (student.isPGR) {
           timetableFetchingService.getTimetableForStaff(student.universityId)
         }
         else Future.successful(EventList.fresh(Nil))

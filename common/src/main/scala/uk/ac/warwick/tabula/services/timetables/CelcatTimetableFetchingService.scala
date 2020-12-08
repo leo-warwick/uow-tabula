@@ -14,7 +14,7 @@ import org.apache.http.{HttpEntity, HttpStatus}
 import org.joda.time.{DateTime, DateTimeZone}
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.data.model.groups.{DayOfWeek, WeekRange}
-import uk.ac.warwick.tabula.data.model.{CourseType, Module, StudentMember}
+import uk.ac.warwick.tabula.data.model.{Module, StudentMember}
 import uk.ac.warwick.tabula.helpers.ExecutionContexts.timetable
 import uk.ac.warwick.tabula.helpers.StringUtils._
 import uk.ac.warwick.tabula.helpers.{ApacheHttpClientUtils, FoundUser, Logging}
@@ -242,7 +242,7 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
 
   def getTimetableForStudent(universityId: UniversityId): Future[EventList] = {
     val member = profileService.getMemberByUniversityId(universityId)
-    if (wbsConfig.enabled) doRequest(universityId, wbsConfig, filterLectures = member.collect { case s: StudentMember if s.mostSignificantCourse.courseType.contains(CourseType.UG) => s }.isDefined)
+    if (wbsConfig.enabled) doRequest(universityId, wbsConfig, filterLectures = member.collect { case s: StudentMember if s.isUG => s }.isDefined)
     else Future.successful(EventList(Nil, None))
   }
 
