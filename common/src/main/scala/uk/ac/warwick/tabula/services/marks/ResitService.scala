@@ -6,6 +6,7 @@ import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.data.model.{RecordedResit, UpstreamAssessmentGroup}
 import uk.ac.warwick.tabula.data.{AutowiringResitDaoComponent, AutowiringTransactionalComponent, ResitDaoComponent, TransactionalComponent}
+import uk.ac.warwick.tabula.services.{AutowiringModuleAndDepartmentServiceComponent, ModuleAndDepartmentServiceComponent}
 import uk.ac.warwick.tabula.services.healthchecks.SitsQueueService
 
 trait ResitService extends SitsQueueService {
@@ -18,7 +19,7 @@ trait ResitService extends SitsQueueService {
 }
 
 class AbstractResitService extends ResitService {
-  self: ResitDaoComponent with TransactionalComponent =>
+  self: ResitDaoComponent with ModuleAndDepartmentServiceComponent with TransactionalComponent =>
 
   override def saveOrUpdate(resit: RecordedResit): RecordedResit = transactional() {
     resitDao.saveOrUpdate(resit)
@@ -51,7 +52,11 @@ class AbstractResitService extends ResitService {
   }
 
   override def allNeedingWritingToSits: Seq[RecordedResit] = transactional(readOnly = true) {
-    resitDao.allNeedingWritingToSits
+    resitDao.allNeedingWritingToSits.filter { resit =>
+        moduleAndDepartmentService.getModuleBySitsCode(resit.moduleCode).forall { module =>
+          module.adminDepartment.canUploadMarksToSitsForYear(resit.academicYear, module)
+        }
+    }
   }
 
   override def mostRecentlyWrittenToSitsDate: Option[DateTime] = transactional(readOnly = true) {
@@ -64,6 +69,7 @@ class AbstractResitService extends ResitService {
 class AutowiringResitService
   extends AbstractResitService
     with AutowiringResitDaoComponent
+    with AutowiringModuleAndDepartmentServiceComponent
     with AutowiringTransactionalComponent
 
 
