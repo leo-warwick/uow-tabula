@@ -378,7 +378,7 @@ trait CachedAssignmentProgress extends AssignmentProgress with AssignmentProgres
         AssignmentStageCategory(
           category = CM2WorkflowCategory.members.find(_.code == c("category").asInstanceOf[String]).get,
           stages = c("stages").asInstanceOf[Seq[Map[String, Any]]].map { s =>
-            val stage = CM2WorkflowStages.of(s("stage").asInstanceOf[String], assignment.cm2MarkingWorkflow.workflowType)
+            val stage = CM2WorkflowStages.of(s("stage").asInstanceOf[String])
 
             AssignmentStage(
               stage = stage,
@@ -404,7 +404,7 @@ trait CachedAssignmentProgress extends AssignmentProgress with AssignmentProgres
       },
       nextStages = map("nextStages").asInstanceOf[Seq[Map[String, Any]]].map { ns =>
         AssignmentNextStage(
-          stage = CM2WorkflowStages.of(ns("stage").asInstanceOf[String], assignment.cm2MarkingWorkflow.workflowType),
+          stage = CM2WorkflowStages.of(ns("stage").asInstanceOf[String]),
           url = ns.get("url").map(_.asInstanceOf[String]),
           count = ns("count").asInstanceOf[Int]
         )

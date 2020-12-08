@@ -126,9 +126,9 @@ trait AssignMarkersSmallGroupsCommandPopulate extends PopulateOnForm {
     this.setAllocations = filteredSetAllocations
     if (setIdWithGroupMarkerAllocations.isEmpty) {
       setIdWithGroupMarkerAllocations = filteredSetAllocations.map { setAllocation =>
-        setAllocation.set.id  -> setAllocation.allocations.flatMap { case (stageName, groups) =>
+        setAllocation.set.id  -> setAllocation.allocations.flatMap { case (allocationName, groups) =>
           groups.map {group =>
-            GroupMarkerAllocation(group.group, MarkingWorkflowStage.fromCode(stageName, assignment.cm2MarkingWorkflow.workflowType), group.tutors.headOption.orNull)
+            GroupMarkerAllocation(group.group, MarkingWorkflowStage.fromCode(allocationName, assignment.cm2MarkingWorkflow.workflowType), group.tutors.headOption.orNull)
           }
         }.toSeq.asJava
       }.toMap.asJava
