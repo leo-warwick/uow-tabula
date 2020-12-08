@@ -30,8 +30,8 @@ class EventOccurrenceServiceTest extends TestBase with Mockito {
   val intervalIncludingOccurrence = DateRange(week1Start, week1end)
   val intervalIncludingTwoOccurrences = DateRange(week1Start, week2End)
 
-  val singleOccurrence = TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, singleWeek, DayOfWeek.Monday, tenAm, tenThirty, None, None, TimetableEvent.Parent(Some(module)), None, Nil, Nil, year, None, Map())
-  val doubleOccurrenence = TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, twoWeeks, DayOfWeek.Monday, tenAm, tenThirty, None, None, TimetableEvent.Parent(Some(module)), None, Nil, Nil, year, None, Map())
+  val singleOccurrence = TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, singleWeek, DayOfWeek.Monday, tenAm, tenThirty, None, None, None, TimetableEvent.Parent(Some(module)), None, Nil, Nil, year, None, Map())
+  val doubleOccurrenence = TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, twoWeeks, DayOfWeek.Monday, tenAm, tenThirty, None, None, None, TimetableEvent.Parent(Some(module)), None, Nil, Nil, year, None, Map())
 
   val intervalOutsideOccurrence = DateRange(new LocalDate(1970, DateTimeConstants.JANUARY, 1), new LocalDate(1970, DateTimeConstants.JANUARY, 2))
 

@@ -35,6 +35,7 @@ trait EventOccurrenceToJsonConverter {
       case _ => null
     }),
     "onlineDeliveryUrl" -> event.onlineDeliveryUrl.orNull,
+    "deliveryMethod" -> event.deliveryMethod.map(_.entryName).orNull,
     "context" -> event.parent.shortName,
     "parent" -> event.parent,
     "comments" -> event.comments.orNull,

@@ -29,6 +29,7 @@ class GetMemberCalendarJsonApiTest extends TestBase with Mockito {
           formattedInterval = "",
           syllabusPlusName = None,
           onlineDeliveryUrl = None,
+          deliveryMethod = None,
           parentType = "Module",
           parentShortName = s"module$j",
           parentFullName = s"Module $j",
@@ -50,6 +51,7 @@ class GetMemberCalendarJsonApiTest extends TestBase with Mockito {
         formattedInterval = "",
         syllabusPlusName = None,
         onlineDeliveryUrl = None,
+        deliveryMethod = None,
         relatedUrl = None
       )
     )
