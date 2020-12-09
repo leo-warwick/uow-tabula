@@ -10,6 +10,7 @@ import uk.ac.warwick.tabula.commands.groups._
 import uk.ac.warwick.tabula.commands.{MemberOrUser, SelfValidating}
 import uk.ac.warwick.tabula.data.model.Member
 import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod.{FaceToFaceOnly, OnlineOnly}
 import uk.ac.warwick.tabula.data.model.groups.{SmallGroupEvent, SmallGroupEventAttendance, SmallGroupEventOccurrence}
 import uk.ac.warwick.tabula.groups.web.Routes
 import uk.ac.warwick.tabula.services.AutowiringSmallGroupServiceComponent
@@ -104,6 +105,8 @@ class RecordAttendanceController extends GroupsController with AutowiringAuditEv
   def form(command: RecordAttendanceCommand.Command): Mav =
     Mav("groups/attendance/form",
       "command" -> command,
+      "showAttendedRemotelyOption" -> (command.event.deliveryMethod != FaceToFaceOnly),
+      "showAttendedInPersonOption" -> (command.event.deliveryMethod != OnlineOnly),
       "allCheckpointStates" -> SmallGroupAttendanceState.values,
       "eventInFuture" -> command.isFutureEvent,
       "returnTo" -> getReturnTo(Routes.tutor.mygroups))
