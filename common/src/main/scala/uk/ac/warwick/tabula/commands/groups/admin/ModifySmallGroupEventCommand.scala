@@ -287,9 +287,10 @@ trait ModifySmallGroupEventValidation extends SelfValidating {
 
     if (startTime != null && endTime != null && endTime.isBefore(startTime)) errors.rejectValue("endTime", "smallGroupEvent.endTime.beforeStartTime")
 
-    if (location.safeContains("|")) errors.rejectValue("location", "smallGroupEvent.location.invalidChar")
-
-    if (!isImport && location.hasText && !locationId.hasText && !useNamedLocation) errors.rejectValue("useNamedLocation", "smallGroupEvent.location.named")
+    if (deliveryMethod != OnlineOnly) {
+      if (location.safeContains("|")) errors.rejectValue("location", "smallGroupEvent.location.invalidChar")
+      if (!isImport && location.hasText && !locationId.hasText && !useNamedLocation) errors.rejectValue("useNamedLocation", "smallGroupEvent.location.named")
+    }
 
     // Verify that the day we're asking for actually exists
     if (weekRanges.nonEmpty && day != null) {
