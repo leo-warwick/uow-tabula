@@ -204,7 +204,9 @@ object CelcatHttpTimetableFetchingService {
         students = Nil,
         year = year,
         relatedUrl = None,
-        attendance = Map()
+        attendance = Map(),
+        sgtGroupId = None,
+        sgtGroupEventId = None
       ))
     }
   }
@@ -314,7 +316,9 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
             event.students,
             event.year,
             event.relatedUrl,
-            event.attendance
+            event.attendance,
+            event.sgtGroupId,
+            event.sgtGroupEventId
           )
       }
     }.toList
@@ -372,7 +376,9 @@ class CelcatHttpTimetableFetchingService(celcatConfiguration: CelcatConfiguratio
             students = Nil,
             year = year,
             relatedUrl = None,
-            attendance = Map()
+            attendance = Map(),
+            sgtGroupId = None,
+            sgtGroupEventId = None
           ))
         })
       case _ => throw new RuntimeException("Could not parse JSON")

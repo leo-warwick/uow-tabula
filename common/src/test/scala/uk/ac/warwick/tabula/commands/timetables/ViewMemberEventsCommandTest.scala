@@ -31,15 +31,15 @@ class ViewMemberEventsCommandTest extends TestBase with Mockito {
     val user: CurrentUser = mock[CurrentUser]
 
     val event: TimetableEvent = {
-      TimetableEvent("", "", "", "", TimetableEventType.Induction, Nil, DayOfWeek.Monday, LocalTime.now, LocalTime.now, None, None, None, TimetableEvent.Parent(), None, Nil, Nil, AcademicYear(2012), None, Map())
+      TimetableEvent("", "", "", "", TimetableEventType.Induction, Nil, DayOfWeek.Monday, LocalTime.now, LocalTime.now, None, None, None, TimetableEvent.Parent(), None, Nil, Nil, AcademicYear(2012), None, Map(), None, None)
     }
     val timetableEvents = Seq(event)
 
-    val occurrence = EventOccurrence("", "", "", "", TimetableEventType.Meeting, LocalDateTime.now, LocalDateTime.now, None, None, None, TimetableEvent.Parent(), None, Nil, None, None)
+    val occurrence = EventOccurrence("", "", "", "", TimetableEventType.Meeting, LocalDateTime.now, LocalDateTime.now, None, None, None, TimetableEvent.Parent(), None, Nil, None, None, None, None)
     val meetingOccurrences = Seq(occurrence)
 
-    val earlierEvent = EventOccurrence("", "", "", "", TimetableEventType.Induction, LocalDateTime.now.minusHours(1), LocalDateTime.now, None, None, None, TimetableEvent.Parent(), None, Nil, None, None)
-    val laterEvent = EventOccurrence("", "", "", "", TimetableEventType.Induction, LocalDateTime.now.plusHours(1), LocalDateTime.now.plusHours(1), None, None, None, TimetableEvent.Parent(), None, Nil, None, None)
+    val earlierEvent = EventOccurrence("", "", "", "", TimetableEventType.Induction, LocalDateTime.now.minusHours(1), LocalDateTime.now, None, None, None, TimetableEvent.Parent(), None, Nil, None, None, None, None)
+    val laterEvent = EventOccurrence("", "", "", "", TimetableEventType.Induction, LocalDateTime.now.plusHours(1), LocalDateTime.now.plusHours(1), None, None, None, TimetableEvent.Parent(), None, Nil, None, None, None, None)
     val eventOccurences = Seq(laterEvent, earlierEvent) // deliberately put them the wrong way round so we can check sorting
 
     val command = new ViewStudentEventsCommandInternal(testStudent, user) with CommandTestSupport

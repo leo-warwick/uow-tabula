@@ -183,7 +183,9 @@ object CombinedTimetableFetchingService {
             groupedEvents.flatMap(_.students).distinct,
             event.year,
             event.relatedUrl,
-            event.attendance
+            event.attendance,
+            event.sgtGroupId,
+            event.sgtGroupEventId
           )
       }
       .values.toSeq)

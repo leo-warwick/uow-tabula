@@ -210,7 +210,9 @@ abstract class AbstractMeetingRecord extends GeneratedId with PermissionsTarget 
         ),
         title = Some("Meeting records")
       )),
-      attendance = None
+      attendance = None,
+      sgtGroupId = None,
+      sgtGroupEventId = None
     ))
   }
 
