@@ -251,27 +251,25 @@ trait AddSitsAssignmentsValidation extends SelfValidating with Logging {
   private[this] lazy val holidayDates: Seq[LocalDate] = new WorkingDaysHelperImpl().getHolidayDates.asScala.toSeq.map(_.asJoda).sorted
 
   def validateDates(errors: Errors): Unit =
-    includedItems.zipWithIndex.foreach { case (item, index) =>
-      errors.pushNestedPath(s"sitsAssignmentItems[$index]")
+      for (item <- includedItems) {
+      val path = "sitsAssignmentItems[%d]".format(sitsAssignmentItems.indexOf(item))
 
       if (item.openDate != null) {
         if (holidayDates.contains(item.openDate) || item.openDate.getDayOfWeek == DateTimeConstants.SATURDAY || item.openDate.getDayOfWeek == DateTimeConstants.SUNDAY) {
-          errors.rejectValue("openDate", "openDate.notWorkingDay")
+          errors.rejectValue(path, "openDate.notWorkingDay")
         }
       }
 
       if (item.closeDate != null && !item.openEnded) {
         if (holidayDates.contains(item.closeDate.toLocalDate) || item.closeDate.getDayOfWeek == DateTimeConstants.SATURDAY || item.closeDate.getDayOfWeek == DateTimeConstants.SUNDAY) {
-          errors.rejectValue("closeDate", "closeDate.notWorkingDay")
+          errors.rejectValue(path, "closeDate.notWorkingDay")
         }
         if(!Assignment.isValidCloseTime(item.closeDate)) {
           val formatter = JodaDateTimeFormat.forPattern("ha")
           val times: Array[AnyRef] = Array(formatter.print(Assignment.CloseTimeStart).toLowerCase, formatter.print(Assignment.CloseTimeEnd).toLowerCase)
-          errors.rejectValue("closeDate", "closeDate.invalidTime", times, "")
+          errors.rejectValue(path, "closeDate.invalidTime", times, "")
         }
       }
-
-      errors.popNestedPath()
     }
 
   private def checkPermissions() = {

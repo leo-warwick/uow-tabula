@@ -157,7 +157,7 @@ first page of the form to setup a bunch of assignments from SITS.
                     <span class="editable-name" id="editable-name-${item_index}">${item.name!''}</span>
                     <#-- TODO expose as click-to-edit -->
                     <#-- render all field errors for sitsAssignmentItems[x] -->
-                    <@bs3form.errors path="*" />
+                    <@bs3form.errors path="" />
                   </td>
                   <#if step="options">
                     <td class="selectable assignment-editable-fields-cell">
