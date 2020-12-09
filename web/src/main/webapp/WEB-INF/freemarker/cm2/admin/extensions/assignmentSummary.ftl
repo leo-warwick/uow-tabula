@@ -5,7 +5,7 @@
 <#--noinspection FtlWellformednessInspection-->
 
 <#macro row graph>
-  <#local state = (graph.extension.state.description)!"No extension" />
+  <#local state = (graph.extension.state.description)!"No extension requested" />
   <tr class="itemContainer"
       data-contentid="${assignment.id}__${(graph.extension.id)!graph.user.userId}"
       data-detailurl="<#if graph.extension??><@routes.cm2.extensionDetail graph.extension /><#else><@routes.cm2.extensiondetail assignment graph.user.userId /></#if>"
