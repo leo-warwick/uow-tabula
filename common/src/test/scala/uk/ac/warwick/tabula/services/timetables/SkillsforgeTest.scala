@@ -87,7 +87,9 @@ class SkillsforgeTest extends TestBase {
       comments = None,
       staff = Nil,
       relatedUrl = None,
-      attendance = None
+      attendance = None,
+      sgtGroupId = None,
+      sgtGroupEventId = None
     ))
   }
 

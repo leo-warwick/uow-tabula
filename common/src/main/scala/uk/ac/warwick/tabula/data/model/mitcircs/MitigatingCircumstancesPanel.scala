@@ -130,7 +130,9 @@ class MitigatingCircumstancesPanel extends GeneratedId with StringId with Serial
           urlString = Routes.mitcircs.Admin.Panels.view(this),
           title = Some("Panel information")
         )),
-        attendance = None
+        attendance = None,
+        sgtGroupId = None,
+        sgtGroupEventId = None
       )
     )
 

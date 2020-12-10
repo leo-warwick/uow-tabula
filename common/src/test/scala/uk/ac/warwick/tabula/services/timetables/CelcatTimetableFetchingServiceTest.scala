@@ -72,7 +72,9 @@ class CelcatTimetableFetchingServiceTest extends TestBase with Mockito {
       Nil,
       AcademicYear.parse("16/17"),
       relatedUrl = None,
-      attendance = Map()
+      attendance = Map(),
+      sgtGroupId = None,
+      sgtGroupEventId = None
     ))
 
     combined(2) should be(TimetableEvent(
@@ -94,7 +96,9 @@ class CelcatTimetableFetchingServiceTest extends TestBase with Mockito {
       Nil,
       AcademicYear.parse("16/17"),
       relatedUrl = None,
-      attendance = Map()
+      attendance = Map(),
+      sgtGroupId = None,
+      sgtGroupEventId = None
     ))
   }
 

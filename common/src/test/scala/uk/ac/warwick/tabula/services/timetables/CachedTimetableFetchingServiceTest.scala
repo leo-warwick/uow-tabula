@@ -18,7 +18,7 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
   private trait Fixture {
     val module: Module = Fixtures.module("cs118")
     val studentId = "studentId"
-    val studentEvents: Seq[TimetableEvent] = Seq(TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map()))
+    val studentEvents: Seq[TimetableEvent] = Seq(TimetableEvent("test", "test", "test", "test", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map(), None, None))
     val delegate: CompleteTimetableFetchingService = mock[CompleteTimetableFetchingService]
 
     delegate.getTimetableForStudent(studentId) returns Future.successful(EventList.fresh(studentEvents))
@@ -51,7 +51,7 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
     // deliberately use the student ID to look up some staff events. The cache key should be the ID + the type of
     // request (staff, student, room, etc) so we should get different results back for student and staff
 
-    val staffEvents = Seq(TimetableEvent("test2", "test2", "test2", "test2", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map()))
+    val staffEvents = Seq(TimetableEvent("test2", "test2", "test2", "test2", TimetableEventType.Lecture, Nil, DayOfWeek.Monday, new LocalTime, new LocalTime, None, None, None, TimetableEvent.Parent(None), None, Nil, Nil, AcademicYear(2013), None, Map(), None, None))
     delegate.getTimetableForStaff(studentId) returns Future.successful(EventList.fresh(staffEvents))
 
     cache.getTimetableForStudent(studentId).futureValue.events should be(studentEvents)
@@ -107,7 +107,9 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
         Seq(student),
         AcademicYear.now(),
         relatedUrl = None,
-        attendance = Map()
+        attendance = Map(),
+        sgtGroupId = None,
+        sgtGroupEventId = None
       ),
       TimetableEvent(
         "event 2 uid",
@@ -128,7 +130,9 @@ class CachedTimetableFetchingServiceTest extends TestBase with Mockito {
         Nil,
         AcademicYear.now(),
         relatedUrl = None,
-        attendance = Map()
+        attendance = Map(),
+        sgtGroupId = None,
+        sgtGroupEventId = None
       )
     )
 

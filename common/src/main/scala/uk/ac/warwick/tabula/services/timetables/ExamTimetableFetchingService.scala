@@ -168,7 +168,9 @@ object ExamTimetableHttpTimetableFetchingService extends Logging {
             students = Nil,
             year = timetableExam.academicYear,
             relatedUrl = None,
-            attendance = Map()
+            attendance = Map(),
+            sgtGroupId = None,
+            sgtGroupEventId = None
           ))
 
         case Failure(t) =>

@@ -280,7 +280,9 @@ private class ScientiaHttpTimetableFetchingService(scientiaConfiguration: Scient
         students = userLookup.usersByWarwickUniIds((activity \\ "student").map(_.text)).values.collect { case FoundUser(u) => u }.toSeq,
         year = year,
         relatedUrl = None,
-        attendance = Map()
+        attendance = Map(),
+        sgtGroupId = None,
+        sgtGroupEventId = None
       )
     }
   }
@@ -422,7 +424,9 @@ class SandboxScientiaHttpTimetableFetchingService extends CompleteTimetableFetch
           students = Nil,
           year = AcademicYear.now(),
           relatedUrl = None,
-          attendance = Map()
+          attendance = Map(),
+          sgtGroupId = None,
+          sgtGroupEventId = None
         )
       }))
     }.getOrElse(Future.successful(EventList.empty))

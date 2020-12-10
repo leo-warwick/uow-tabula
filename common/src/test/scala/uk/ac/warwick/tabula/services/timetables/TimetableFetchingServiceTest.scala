@@ -75,7 +75,9 @@ class TimetableFetchingServiceTest extends TestBase with Mockito {
       students = Nil,
       year = AcademicYear(2012),
       relatedUrl = None,
-      attendance = Map()
+      attendance = Map(),
+      sgtGroupId = None,
+      sgtGroupEventId = None
     ))
     // When faced with multiple rooms - snatch the first and run away
     events(1).location should be(Some(MapLocation("MS.02", "40879", Some("MS.02"))))
