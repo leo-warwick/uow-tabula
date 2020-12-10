@@ -49,8 +49,10 @@ trait EventOccurrenceToJsonConverter {
         "userType" -> user.getUserType
       )
     },
-    "sgtGroupId" -> event.sgtGroupId,
-    "sgtGroupEventId" -> event.sgtGroupEventId
+    "sgtGroup" -> Map(
+      "sgtGroupId" -> event.sgtGroupId,
+      "sgtGroupEventId" -> event.sgtGroupEventId
+    )
   )
 
 }
