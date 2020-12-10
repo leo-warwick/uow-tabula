@@ -196,6 +196,8 @@ trait CommandSmallGroupEventGenerator extends SmallGroupEventGenerator {
     command.title = title
     command.tutors.addAll(tutorUsercodes.asJavaCollection)
 
+    command.deliveryMethod = EventDeliveryMethod.Hybrid
+
     command.apply()
   }
 }
