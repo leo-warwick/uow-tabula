@@ -25,8 +25,6 @@
     </@spring.hasBindErrors>
 
   <@f.form method="post" action="" modelAttribute=commandName>
-
-
     <#assign newRecord=true />
     <#include "_event_fields.ftl" />
 

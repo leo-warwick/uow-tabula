@@ -322,9 +322,9 @@ trait ModifySmallGroupEventValidation extends SelfValidating {
 
     if (isCopy){
       //Not checking relatedUrl/relatedUrlTitle for now but if we want that also to consider can add them. Would expect at least one of these to change
-      val isClonedEventInvalid = existingEvent.forall ( e =>  title == title && e.tutors.users.map(_.getUserId) == tutors.asScala.toSet
+      val isClonedEventInvalid = existingEvent.forall ( e =>  e.title == title && e.tutors.users.map(_.getUserId) == tutors.asScala.toSet
         && e.weekRanges == weekRanges && e.day == day && e.startTime == startTime && e.endTime == endTime
-        && deliveryMethod == deliveryMethod && e.onlinePlatform == Option(onlinePlatform)  && e.onlineDeliveryUrl == onlineDeliveryUrl
+        && e.deliveryMethod == deliveryMethod && e.onlinePlatform == Option(onlinePlatform)  && e.onlineDeliveryUrl == onlineDeliveryUrl
         && Option(e.location).map(_.name).getOrElse("") ==  location
       )
       if(isClonedEventInvalid) {
