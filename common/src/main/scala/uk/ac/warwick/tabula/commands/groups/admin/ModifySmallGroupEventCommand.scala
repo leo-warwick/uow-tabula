@@ -55,6 +55,9 @@ trait ModifySmallGroupEventCommandState {
 
   def isImport: Boolean // true if this isn't a UI action
 
+  //Mainly for performing extra validation
+  def isCopy:Boolean = false
+
   def academicYear: AcademicYear = set.academicYear
 
   var weeks: JSet[JInteger] = JSet()
@@ -106,15 +109,7 @@ class CreateSmallGroupEventCommandInternal(val module: Module, var set: SmallGro
 
   copyFromDefaults(set)
 
-  override def applyInternal(): SmallGroupEvent = transactional() {
-    val event = new SmallGroupEvent(group)
-    copyTo(event)
-    smallGroupService.saveOrUpdate(event)
-    smallGroupService.getOrCreateSmallGroupEventOccurrences(event)
-    group.addEvent(event)
-    smallGroupService.saveOrUpdate(group)
-    event
-  }
+  override def applyInternal(): SmallGroupEvent = createGroupEvent()
 }
 
 class EditSmallGroupEventCommandInternal(val module: Module, val set: SmallGroupSet, val group: SmallGroup, val event: SmallGroupEvent, val isImport: Boolean)
@@ -134,6 +129,7 @@ class EditSmallGroupEventCommandInternal(val module: Module, val set: SmallGroup
 
 abstract class ModifySmallGroupEventCommandInternal
   extends CommandInternal[SmallGroupEvent] with ModifySmallGroupEventCommandState {
+  self: SmallGroupServiceComponent =>
 
   def copyFromDefaults(set: SmallGroupSet): Unit = {
     weekRanges = set.defaultWeekRanges
@@ -236,6 +232,17 @@ abstract class ModifySmallGroupEventCommandInternal
     event.tutors.knownType.includedUserIds = tutors.asScala.toSet
 
   }
+
+  def createGroupEvent(): SmallGroupEvent = transactional() {
+    val event = new SmallGroupEvent(group)
+    copyTo(event)
+    smallGroupService.saveOrUpdate(event)
+    smallGroupService.getOrCreateSmallGroupEventOccurrences(event)
+    group.addEvent(event)
+    smallGroupService.saveOrUpdate(group)
+    event
+  }
+
 }
 
 trait ModifySmallGroupEventBinding extends BindListener {
@@ -312,6 +319,19 @@ trait ModifySmallGroupEventValidation extends SelfValidating {
         onlineDeliveryUrl = s"http://$onlineDeliveryUrl"
       }
       if (!new UrlValidator().isValid(onlineDeliveryUrl)) errors.rejectValue("onlineDeliveryUrl", "smallGroupEvent.url.invalid")
+    }
+
+    if (isCopy){
+      //Not checking relatedUrl/relatedUrlTitle for now but if we want that also to consider can add them. Would expect at least one of these to change
+      val isClonedEventInvalid = existingEvent.forall ( e =>  e.title == title && e.tutors.users.map(_.getUserId) == tutors.asScala.toSet
+        && e.weekRanges == weekRanges && e.day == day && e.startTime == startTime && e.endTime == endTime
+        && e.deliveryMethod == deliveryMethod && e.onlinePlatform == Option(onlinePlatform)  && e.onlineDeliveryUrl == onlineDeliveryUrl
+        && Option(e.location).map(_.name).getOrElse("") ==  location
+      )
+      if(isClonedEventInvalid) {
+        errors.rejectValue("", "smallGroupEvent.invalidCopy")
+      }
+
     }
   }
 }

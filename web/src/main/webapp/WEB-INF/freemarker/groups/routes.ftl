@@ -57,6 +57,9 @@ TODO grab values from the routes.groups object in code, as that's pretty equival
 <#macro editseteventsnewevent group><@_u page="/admin/module/${group.groupSet.module.code}/groups/edit/${group.groupSet.id}/events/${group.id}/new" /></#macro>
 <#macro editseteventseditevent event><@_u page="/admin/module/${event.group.groupSet.module.code}/groups/edit/${event.group.groupSet.id}/events/${event.group.id}/edit/${event.id}" /></#macro>
 
+<#macro createseteventscopyevent event><@_u page="/admin/module/${event.group.groupSet.module.code}/groups/new/${event.group.groupSet.id}/events/${event.id}/copy" /></#macro>
+<#macro editseteventscopyevent event><@_u page="/admin/module/${event.group.groupSet.module.code}/groups/edit/${event.group.groupSet.id}/events/${event.id}/copy" /></#macro>
+
 <#macro createseteventdefaults set><@_u page="/admin/module/${set.module.code}/groups/new/${set.id}/events/defaults" /></#macro>
 <#macro editseteventdefaults set><@_u page="/admin/module/${set.module.code}/groups/edit/${set.id}/events/defaults" /></#macro>
 

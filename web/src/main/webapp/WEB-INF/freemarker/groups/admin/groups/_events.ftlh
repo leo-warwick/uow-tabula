@@ -50,11 +50,14 @@
                     <div class="buttons pull-right">
                       <#if is_edit>
                         <#assign editEventUrl><@routes.groups.editseteventseditevent event.event /></#assign>
+                        <#assign copyEventUrl><@routes.groups.editseteventscopyevent event.event /></#assign>
                       <#else>
                         <#assign editEventUrl><@routes.groups.createseteventseditevent event.event /></#assign>
+                        <#assign copyEventUrl><@routes.groups.createseteventscopyevent event.event /></#assign>
                       </#if>
 
                       <a class="btn btn-xs btn-primary" href="${editEventUrl}">Edit</a>
+                      <a class="btn btn-xs btn-primary" href="${copyEventUrl}">Copy</a>
 
                       <#if event.hasRecordedAttendance>
                         <div tabindex="0" class="use-tooltip" data-container="body" style="display: inline-block;"
