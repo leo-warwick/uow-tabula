@@ -183,7 +183,8 @@ object Skillsforge {
       relatedUrl = None,
       attendance = None,
       sgtGroupId = None,
-      sgtGroupEventId = None
+      sgtGroupEventId = None,
+      week = None
     )
   }
 

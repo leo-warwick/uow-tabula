@@ -185,7 +185,8 @@ case class EventOccurrence(
   relatedUrl: Option[RelatedUrl],
   attendance: Option[AttendanceState],
   sgtGroupId: Option[String],
-  sgtGroupEventId: Option[String]
+  sgtGroupEventId: Option[String],
+  week: Option[WeekRange.Week]
 )
 
 object EventOccurrence {
@@ -204,6 +205,7 @@ object EventOccurrence {
       TimetableEvent.Parent(),
       None,
       Nil,
+      None,
       None,
       None,
       None,
