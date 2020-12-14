@@ -52,7 +52,8 @@ trait EventOccurrenceToJsonConverter {
     "sgtGroup" -> Map(
       "sgtGroupId" -> event.sgtGroupId,
       "sgtGroupEventId" -> event.sgtGroupEventId
-    )
+    ),
+    "week" -> event.week
   )
 
 }

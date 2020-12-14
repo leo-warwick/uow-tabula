@@ -132,7 +132,8 @@ class MitigatingCircumstancesPanel extends GeneratedId with StringId with Serial
         )),
         attendance = None,
         sgtGroupId = None,
-        sgtGroupEventId = None
+        sgtGroupEventId = None,
+        week = None
       )
     )
 

@@ -58,7 +58,8 @@ abstract class TermBasedEventOccurrenceService extends EventOccurrenceService {
         event.relatedUrl,
         event.attendance.get(week),
         event.sgtGroupId,
-        event.sgtGroupEventId
+        event.sgtGroupEventId,
+        Some(week)
       )
     }
 
