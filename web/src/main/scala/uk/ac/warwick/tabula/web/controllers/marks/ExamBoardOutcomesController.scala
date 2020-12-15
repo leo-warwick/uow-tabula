@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation._
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import uk.ac.warwick.tabula.commands.SelfValidating
 import uk.ac.warwick.tabula.commands.marks.ExamBoardOutcomesCommand
-import uk.ac.warwick.tabula.data.model.{ActualProgressionDecision, Department}
+import uk.ac.warwick.tabula.data.model.{ActualProgressionDecision, Department, ProgressionDecisionBoard, ProgressionDecisionLevel}
 import uk.ac.warwick.tabula.web.Routes
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 
@@ -27,7 +27,7 @@ class ExamBoardOutcomesController extends BaseCohortController {
     ExamBoardOutcomesCommand(department, academicYear, currentUser)
 
   @ModelAttribute("decisions")
-  def decisions(): Seq[ActualProgressionDecision] = ActualProgressionDecision.values
+  def decisions(): Map[(ProgressionDecisionBoard, ProgressionDecisionLevel), Seq[ActualProgressionDecision]] = ActualProgressionDecision.bySessionAndLevel
 
   @GetMapping(params = Array("courseSelected"))
   def summary(
@@ -63,7 +63,11 @@ class ExamBoardOutcomesController extends BaseCohortController {
     } else {
       val changes = examBoardOutcomesCommand.studentsToRecord.flatMap { case (sprCode, item) =>
         val record = examBoardOutcomesCommand.studentDecisionRecords(sprCode)
-        val unchanged = record.flatMap(_.existingRecordedDecision).exists(rd => rd.decision == item.decision && rd.notes == item.notes)
+        val unchanged = record.flatMap(_.existingRecordedDecision).exists(rd =>
+          rd.decision == item.decision &&
+          rd.notes == item.notes &&
+          rd.minutes == item.minutes
+        )
         if (unchanged) None else Some(sprCode -> record)
       }
       model.addAttribute("entities", examBoardOutcomesCommand.studentDecisionRecords)

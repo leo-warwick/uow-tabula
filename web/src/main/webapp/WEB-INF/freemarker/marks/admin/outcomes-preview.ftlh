@@ -33,8 +33,9 @@
           <th class="col-sm-1 sortable" data-sorter="text">First name</th>
           <th class="col-sm-1 sortable" data-sorter="text">Last name</th>
           <th class="col-sm-1 sortable" data-sorter="text">Period</th>
-          <th class="col-sm-3">Decision</th>
-          <th class="col-sm-5">Notes</th>
+          <th class="col-sm-2">Decision</th>
+          <th class="col-sm-3">Notes</th>
+          <th class="col-sm-3">Minutes</th>
         </tr>
         </thead>
         <tbody>
@@ -55,31 +56,20 @@
               </td>
               <td>${student.firstName}</td>
               <td>${student.lastName}</td>
-              <td>
-                <#if student.resitting>
-                  <span class="label label-info">Summer vacation exam period</span>
-                <#else>
-                  <span class="label label-info">Summer exam period</span>
-                </#if>
-              </td>
+              <td><span class="label label-info">${student.board.description}</span></td>
               <td>
                 <@f.hidden path="students[${sprCode}].decision" />
-                  <#if student.finalist>
-                    ${(student.existing.decision.finalistDescription)!'-'}
-                    <#if (student.existing.decision.finalistDescription)! != c.decision.finalistDescription!>
-                      <i class="fal fa-arrow-right"></i>
-                      <#if c.decision?has_content>${c.decision.finalistDescription}</#if>
-                    </#if>
-                  <#else>
-                    ${(student.existing.decision.description)!'-'}
-                    <#if (student.existing.decision.description)! != c.decision.description!>
-                      <i class="fal fa-arrow-right"></i>
-                      <#if c.decision?has_content>${c.decision.description}</#if>
-                    </#if>
+                  ${(student.existingRecordedDecision.decision.description)!'-'}
+                  <#if (student.existingRecordedDecision.decision.description)! != c.decision.description!>
+                    <i class="fal fa-arrow-right"></i>
+                    <#if c.decision?has_content>${c.decision.description}</#if>
                   </#if>
               </td>
               <td>
                 <@f.input path="students[${sprCode}].notes" cssClass="form-control" readonly=true tabindex="-1" />
+              </td>
+              <td>
+                <@f.input path="students[${sprCode}].minutes" cssClass="form-control" readonly=true tabindex="-1" />
               </td>
             </tr>
           </#list>

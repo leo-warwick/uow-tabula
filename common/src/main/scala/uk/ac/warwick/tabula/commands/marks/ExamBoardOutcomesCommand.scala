@@ -8,7 +8,9 @@ import uk.ac.warwick.tabula.commands.exams.grids.ExamGridEntity
 import uk.ac.warwick.tabula.commands.marks.CohortCommand.SprCode
 import uk.ac.warwick.tabula.commands.marks.ExamBoardOutcomesCommand._
 import uk.ac.warwick.tabula.data.Transactions._
-import uk.ac.warwick.tabula.data.model.{ActualProgressionDecision, Department, ProgressionDecision, ProgressionDecisionProcessStatus, RecordedDecision, StudentAward}
+import uk.ac.warwick.tabula.data.model.ProgressionDecisionBoard._
+import uk.ac.warwick.tabula.data.model.ProgressionDecisionLevel._
+import uk.ac.warwick.tabula.data.model.{ActualProgressionDecision, Department, ProgressionDecision, ProgressionDecisionBoard, ProgressionDecisionLevel, ProgressionDecisionProcessStatus, RecordedDecision, StudentAward}
 import uk.ac.warwick.tabula.helpers.LazyMaps
 import uk.ac.warwick.tabula.helpers.StringUtils.StringToSuperString
 import uk.ac.warwick.tabula.permissions.{Permission, Permissions}
@@ -27,14 +29,15 @@ object ExamBoardOutcomesCommand {
     firstName: String,
     lastName: String,
     academicYear: AcademicYear,
-    isFinalist: Boolean,
+    studyLevel: ProgressionDecisionLevel,
     existingRecordedDecision: Option[RecordedDecision],
     progressionDecision: ProgressionDecision,
     studentAwards: Seq[StudentAward]
   ) {
     val universityId: String = SprCode.getUniversityId(sprCode)
-    val isResitting: Boolean = progressionDecision.resitPeriod
+    val board: ProgressionDecisionBoard = if (progressionDecision.resitPeriod) September else Summer
     val isAgreed: Boolean = progressionDecision.status == ProgressionDecisionProcessStatus.Complete
+    def decisionsKey: (ProgressionDecisionBoard, ProgressionDecisionLevel) = (board, studyLevel)
   }
 
   class ExamBoardOutcomeItem {
@@ -45,6 +48,7 @@ object ExamBoardOutcomesCommand {
 
     var sprCode: SprCode = _
     var decision: ActualProgressionDecision = _
+    var minutes: String = _
     var notes: String = _
     var record: Boolean = true
   }
@@ -81,7 +85,8 @@ class ExamBoardOutcomesCommandInternal(val department: Department, val academicY
       recordedDecision.sequence = studentDecisionRecord.progressionDecision.sequence
       recordedDecision.decision = item.decision
       recordedDecision.notes = item.notes
-      recordedDecision.resitPeriod = studentDecisionRecord.isResitting
+      recordedDecision.minutes = item.minutes
+      recordedDecision.resitPeriod = studentDecisionRecord.board == September
       recordedDecision.updatedBy = currentUser.apparentUser
       recordedDecision.updatedDate = DateTime.now
       recordedDecision.needsWritingToSitsSince = Some(DateTime.now)
@@ -101,6 +106,7 @@ trait ExamBoardOutcomesCommandPopulateOnForm extends PopulateOnForm {
       val s = new ExamBoardOutcomeItem(sprCode)
       s.decision = existing.decision
       s.notes = existing.notes
+      s.minutes = existing.minutes
       s.record = false
       students.put(sprCode, s)
     }
@@ -125,8 +131,12 @@ trait ExamBoardOutcomesValidation extends SelfValidating {
       errors.pushNestedPath(s"students[$sprCode]")
       if (item.decision == null)
         errors.rejectValue("decision", "NotEmpty")
-      else if (item.decision.notesRequired && !item.notes.hasText)
-        errors.rejectValue("notes", "NotEmpty")
+      else {
+        if (item.decision.notesRequired && !item.notes.hasText)
+          errors.rejectValue("notes", "NotEmpty")
+        if (item.decision.minutesRequired && !item.minutes.hasText)
+          errors.rejectValue("minutes", "NotEmpty")
+      }
       errors.popNestedPath()
     }
   }
@@ -174,21 +184,23 @@ trait ExamBoardOutcomesState extends CohortState {
     e.validYears.lastOption.map(_._2).map { ey =>
       sprCode -> allDecisions.getOrElse(sprCode, Nil).sortBy(_.sequence).lastOption.map { decision =>
 
-        val isFinalist = ey.studentCourseYearDetails.exists { scyd =>
+        val studyLevel: ProgressionDecisionLevel = ey.studentCourseYearDetails.map { scyd =>
           val finalYear: Int = scyd.level.map(_.toYearOfStudy).getOrElse(scyd.studentCourseDetails.courseYearLength)
-          scyd.yearOfStudy >= finalYear
-        }
+          if (scyd.yearOfStudy == 1) FirstYear
+          else if (scyd.yearOfStudy < finalYear) Intermediate
+          else Finalist
+        }.getOrElse(throw new IllegalArgumentException(s"Unable to determine study level for ${e.universityId}"))
 
         val studentAwards = confirmedAwards.getOrElse(sprCode, Nil)
 
         val existingRecordedDecision = existingRecordedDecisions.getOrElse(sprCode, Nil).find(_.sequence == decision.sequence)
 
-        StudentDecisionRecord(
+        StudentDecisionRecord (
           sprCode,
           e.firstName,
           e.lastName,
           academicYear,
-          isFinalist,
+          studyLevel,
           existingRecordedDecision,
           decision,
           studentAwards

@@ -37,6 +37,8 @@ class RecordedDecision extends GeneratedId
 
   var notes: String = _
 
+  var minutes: String = _
+
   @Type(`type` = "uk.ac.warwick.tabula.data.model.SSOUserType")
   @Column(name = "updated_by", nullable = false)
   var updatedBy: User = _

@@ -38,6 +38,7 @@ object ExportDecisionsToSitsService {
        |update $sitsSchema.cam_spi
        |set
        |  spi_note = :note,
+       |  spi_mint = :minutes,
        |  spi_pitc = :decision
        |where
        |  spi_sprc = :sprCode
@@ -51,6 +52,7 @@ object ExportDecisionsToSitsService {
     declareParameter(new SqlParameter("academicYear", Types.VARCHAR))
     declareParameter(new SqlParameter("sequence", Types.VARCHAR))
     declareParameter(new SqlParameter("note", Types.VARCHAR))
+    declareParameter(new SqlParameter("minutes", Types.VARCHAR))
     declareParameter(new SqlParameter("decision", Types.VARCHAR))
     compile()
   }
@@ -65,6 +67,7 @@ class RecordedDecisionsParameterGetter(decision: RecordedDecision) {
     "academicYear" -> decision.academicYear.toString,
     "sequence" -> decision.sequence,
     "note" -> decision.notes,
+    "minutes" -> decision.minutes,
     "decision" -> decision.decision.pitCode
   )
 }

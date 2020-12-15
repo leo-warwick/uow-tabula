@@ -29,8 +29,9 @@
         <th class="col-sm-1 sortable" data-sorter="text">First name</th>
         <th class="col-sm-1 sortable" data-sorter="text">Last name</th>
         <th class="col-sm-1 sortable" data-sorter="text">Period</th>
-        <th class="col-sm-3 sortable" data-sorter="formfield">Decision</th>
-        <th class="col-sm-5 sortable" data-sorter="formfield">Notes</th>
+        <th class="col-sm-2 sortable" data-sorter="formfield">Decision</th>
+        <th class="col-sm-3 sortable" data-sorter="formfield">Notes</th>
+        <th class="col-sm-3 sortable" data-sorter="formfield">Minutes</th>
       </tr>
       </thead>
       <tbody>
@@ -54,13 +55,7 @@
             <td data-sortby="${sprCode}"><@pl.profile_link student.universityId /> ${sprCode}</td>
             <td>${student.firstName}</td>
             <td>${student.lastName}</td>
-            <td>
-              <#if student.resitting>
-                <span class="label label-info">Summer vacation exam period</span>
-              <#else>
-                <span class="label label-info">Summer exam period</span>
-              </#if>
-            </td>
+            <td><span class="label label-info">${student.board.description}</span></td>
             <td>
               <#if student.agreed>
                 ${student.progressionDecision.outcome.description}
@@ -73,12 +68,15 @@
                 <@bs3form.labelled_form_group path="students[${sprCode}].decision">
                   <@f.select id="students${sprCode?replace('/', '_')}.decision" path="students[${sprCode}].decision" cssClass="form-control">
                     <@f.option value="" />
-                    <#list decisions as decision>
-                      <#if student.finalist>
-                        <#if decision.validForFinalists><@f.option value=decision.entryName label=decision.finalistDescription data\-mandatory\-notes="${decision.notesRequired?c}" data\-notes\-help="${decision.notesHelp!''}" /></#if>
-                      <#else>
-                        <@f.option value=decision.entryName label=decision.description data\-mandatory\-notes="${decision.notesRequired?c}" data\-notes\-help="${decision.notesHelp!''}" />
-                      </#if>
+                    <#list mapGet(decisions, student.decisionsKey) as decision>
+                      <@f.option
+                        value=decision.entryName
+                        label=decision.description
+                        data\-mandatory\-notes="${decision.notesRequired?c}"
+                        data\-notes\-help="${decision.notesHelp!''}"
+                        data\-mandatory\-minutes="${decision.minutesRequired?c}"
+                        data\-minutes\-help="${decision.minutesHelp!''}"
+                      />
                     </#list>
                   </@f.select>
                 </@bs3form.labelled_form_group>
@@ -86,10 +84,19 @@
             </td>
             <td>
               <#if student.agreed>
-                ${student.progressionDecision.notes!""} ${student.progressionDecision.minutes!""}
+                ${student.progressionDecision.notes!""}
               <#else>
                 <@bs3form.labelled_form_group path="students[${sprCode}].notes">
-                  <@f.textarea id="students${sprCode?replace('/', '_')}.comments" path="students[${sprCode}].notes" cssClass="form-control" rows="1" />
+                  <@f.textarea id="students${sprCode?replace('/', '_')}.notes" path="students[${sprCode}].notes" cssClass="form-control" rows="1" />
+                </@bs3form.labelled_form_group>
+              </#if>
+            </td>
+            <td>
+              <#if student.agreed>
+                  ${student.progressionDecision.minutes!""}
+              <#else>
+                <@bs3form.labelled_form_group path="students[${sprCode}].minutes">
+                  <@f.textarea id="students${sprCode?replace('/', '_')}.minutes" path="students[${sprCode}].minutes" cssClass="form-control" rows="1" />
                 </@bs3form.labelled_form_group>
               </#if>
             </td>
