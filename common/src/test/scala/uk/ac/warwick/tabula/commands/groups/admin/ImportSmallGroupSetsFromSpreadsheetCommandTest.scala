@@ -2,13 +2,14 @@ package uk.ac.warwick.tabula.commands.groups.admin
 
 import java.io.InputStream
 import java.util.UUID
-
 import com.google.common.io.ByteSource
 import org.joda.time.LocalTime
 import org.springframework.validation.{BindException, BindingResult, Errors}
 import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands.{Appliable, SelfValidating}
 import uk.ac.warwick.tabula.data.FileDao
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod.{FaceToFaceOnly, Hybrid}
+import uk.ac.warwick.tabula.data.model.groups.OnlinePlatform.Teams
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.data.model.{Department, FileAttachment, Module, NamedLocation}
 import uk.ac.warwick.tabula.services.groups.docconversion._
@@ -82,28 +83,28 @@ class ImportSmallGroupSetsFromSpreadsheetCommandTest extends TestBase with Mocki
           name = "Group 1",
           limit = Some(15),
           events = Seq(
-            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Monday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None)
+            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Monday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None, Some(Hybrid), None, None)
           )
         ),
         ExtractedSmallGroup(
           name = "Group 2",
           limit = Some(20),
           events = Seq(
-            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Tuesday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None)
+            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Tuesday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None, Some(FaceToFaceOnly), None, None)
           )
         ),
         ExtractedSmallGroup(
           name = "Group 3",
           limit = Some(9),
           events = Seq(
-            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Wednesday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None)
+            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Wednesday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None, Some(Hybrid), Some("http://tabula.ac.uk"), Some(Teams))
           )
         ),
         ExtractedSmallGroup(
           name = "Group 4",
           limit = Some(15),
           events = Seq(
-            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Thursday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None)
+            ExtractedSmallGroupEvent(None, Seq(cuscav), Seq(WeekRange(15, 24)), Some(DayOfWeek.Thursday), Some(new LocalTime(14, 0)), Some(new LocalTime(16, 0)), Some(NamedLocation("S0.27")), Nil, None, None, None, None, None)
           )
         )
       )

@@ -333,6 +333,10 @@ abstract class SmallGroupSetsSpreadsheetTemplateCommandInternal(val department: 
 
       row.getCell(11).setCellValue(event.relatedUrl)
       row.getCell(12).setCellValue(event.relatedUrlTitle)
+
+      row.getCell(13).setCellValue(event.deliveryMethod.entryName)
+      row.getCell(14).setCellValue(event.onlineDeliveryUrl)
+      row.getCell(15).setCellValue(event.onlinePlatform.map(_.entryName).orNull)
     }
 
     // Day of week validation
