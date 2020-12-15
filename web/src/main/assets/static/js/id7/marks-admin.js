@@ -179,32 +179,39 @@ $(() => {
 
   // cohort progression decision scripts
 
-  $('select[name$="decision"]').on('change', (e) => {
-    const $decision = $(e.target).find('option:selected');
-    const $notes = $decision.closest('tr').find('textarea[name$="notes"]');
-    if ($decision.data('mandatory-notes')) {
-      const notesHelp = $decision.data('notes-help');
-      if (!$notes.data('o-height')) $notes.data('o-height', $notes.get(0).scrollHeight);
-      $notes.animate({ height: '8em' }, 500, () => {
-        $notes.siblings('.help-block').remove();
+
+  function mandatoryComment($decision, $field, fieldName, mandatoryAttr, helpAttr) {
+    if ($decision.data(mandatoryAttr)) {
+      const help = $decision.data(helpAttr);
+      if (!$field.data('o-height')) $field.data('o-height', $field.get(0).scrollHeight);
+      $field.animate({ height: '8em' }, 500, () => {
+        $field.siblings('.help-block').remove();
         $(`<div class="help-block">
-            Comments are mandatory for this decision
-            <span class="tabula-tooltip" data-title="${notesHelp}">
+            ${fieldName} are mandatory for this decision
+            ${help ? `<span class="tabula-tooltip" data-title="${help}">
               <i class="fa-fw fad fa-question-circle" aria-hidden="true"></i>
-              <span class="sr-only">${notesHelp}</span>
-            </span>
+              <span class="sr-only">${help}</span>
+            </span>` : ''}
           </div>
         `)
           .hide()
-          .appendTo($notes.closest('.form-group'))
+          .appendTo($field.closest('.form-group'))
           .fadeIn(500);
       });
     } else {
-      $notes.animate({ height: `${$notes.data('o-height')}` }, 500, () => {
-        $notes.height('auto');
+      $field.animate({ height: `${$field.data('o-height')}` }, 500, () => {
+        $field.height('auto');
       });
-      $notes.closest('.form-group').find('.help-block').fadeOut(500).remove();
+      $field.closest('.form-group').find('.help-block').fadeOut(500).remove();
     }
+  }
+
+  $('select[name$="decision"]').on('change', (e) => {
+    const $decision = $(e.target).find('option:selected');
+    const $notes = $decision.closest('tr').find('textarea[name$="notes"]');
+    const $minutes = $decision.closest('tr').find('textarea[name$="minutes"]');
+    mandatoryComment($decision, $notes, 'Notes', 'mandatory-notes', 'notes-help');
+    mandatoryComment($decision, $minutes, 'Minutes', 'mandatory-minutes', 'minutes-help');
   }).trigger('change');
 
   // This is intentionally at the end, after we've messed around with things
