@@ -19,7 +19,7 @@ import scala.jdk.CollectionConverters._
 
 sealed abstract class SmallGroupAttendanceState(val code:String, val description: String, val attendanceState: AttendanceState) extends EnumEntry {
   override val entryName: String = code
-  def getName: String = entryName
+  def getName: String = this.toString
 }
 
 object SmallGroupAttendanceState extends Enum[SmallGroupAttendanceState] {
