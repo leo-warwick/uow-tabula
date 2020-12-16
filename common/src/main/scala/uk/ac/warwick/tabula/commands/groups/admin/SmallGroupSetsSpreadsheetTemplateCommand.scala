@@ -9,7 +9,7 @@ import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.groups.admin.SmallGroupSetsSpreadsheetTemplateCommand._
 import uk.ac.warwick.tabula.data.model.{AliasedMapLocation, Department, Location, MapLocation}
-import uk.ac.warwick.tabula.data.model.groups.{DayOfWeek, SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupSet}
+import uk.ac.warwick.tabula.data.model.groups.{DayOfWeek, EventDeliveryMethod, OnlinePlatform, SmallGroupAllocationMethod, SmallGroupFormat, SmallGroupSet}
 import uk.ac.warwick.tabula.permissions.Permissions
 import uk.ac.warwick.tabula.services.groups.docconversion.{ExtractedSmallGroup, ExtractedSmallGroupEvent, ExtractedSmallGroupSet}
 import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, SmallGroupServiceComponent}
@@ -71,7 +71,7 @@ abstract class SmallGroupSetsSpreadsheetTemplateCommandInternal(val department: 
     sheet.trackAllColumnsForAutoSizing()
 
     // set style on all columns
-    0 to 2 foreach { col =>
+    0 to 4 foreach { col =>
       sheet.setDefaultColumnStyle(col, style)
     }
 
@@ -93,12 +93,14 @@ abstract class SmallGroupSetsSpreadsheetTemplateCommandInternal(val department: 
     header.getCell(0).setCellValue("Small group set types")
     header.getCell(1).setCellValue("Allocation methods")
     header.getCell(2).setCellValue("Days of the week")
+    header.getCell(3).setCellValue("Delivery types")
+    header.getCell(4).setCellValue("Online delivery methods")
 
-    (0 to 2).foreach { col =>
+    (0 to 4).foreach { col =>
       header.getCell(col).setCellStyle(header.getRowStyle)
     }
 
-    val rows = 1 to (math.max(SmallGroupFormat.members.size, math.max(SmallGroupAllocationMethod.members.size, DayOfWeek.members.size)) + 1) map sheet.createRow
+    val rows = 1 to Seq(SmallGroupFormat.members.size, SmallGroupAllocationMethod.members.size, DayOfWeek.members.size, EventDeliveryMethod.values.size, OnlinePlatform.values.size).max + 1 map sheet.createRow
 
     SmallGroupFormat.members.zipWithIndex.foreach { case (f, index) =>
       val row = rows(index)
@@ -115,7 +117,17 @@ abstract class SmallGroupSetsSpreadsheetTemplateCommandInternal(val department: 
       row.getCell(2).setCellValue(day.name)
     }
 
-    0 to 2 foreach { col =>
+    EventDeliveryMethod.values.zipWithIndex.foreach { case (method, index) =>
+      val row = rows(index)
+      row.getCell(3).setCellValue(method.entryName)
+    }
+
+    OnlinePlatform.values.zipWithIndex.foreach { case (platform, index) =>
+      val row = rows(index)
+      row.getCell(4).setCellValue(platform.entryName)
+    }
+
+    0 to 4 foreach { col =>
       sheet.autoSizeColumn(col)
     }
 
@@ -339,8 +351,8 @@ abstract class SmallGroupSetsSpreadsheetTemplateCommandInternal(val department: 
       row.getCell(15).setCellValue(event.onlinePlatform.map(_.entryName).orNull)
     }
 
-    // Day of week validation
     if (sets.flatMap(_.groups.asScala.sorted).flatMap(_.events.sorted).nonEmpty) {
+      // Day of week validation
       val dropdownRange = new CellRangeAddressList(1, sheet.getLastRowNum + 1000, 6, 6)
       val dvHelper = new XSSFDataValidationHelper(null)
       val dvConstraint =
@@ -348,6 +360,24 @@ abstract class SmallGroupSetsSpreadsheetTemplateCommandInternal(val department: 
       val validation = dvHelper.createValidation(dvConstraint, dropdownRange)
       validation.setShowErrorBox(true)
       sheet.addValidationData(validation)
+
+      // Delivery method validation
+      val deliveryMethodRange = new CellRangeAddressList(1, sheet.getLastRowNum + 1000, 13, 13)
+      val deliveryMethodHelper = new XSSFDataValidationHelper(null)
+      val deliveryMethodConstraint =
+        deliveryMethodHelper.createFormulaListConstraint("Lookups!$D$2:$D$" + (EventDeliveryMethod.values.size + 1))
+      val deliveryMethodValidation = deliveryMethodHelper.createValidation(deliveryMethodConstraint, deliveryMethodRange)
+      deliveryMethodValidation.setShowErrorBox(true)
+      sheet.addValidationData(deliveryMethodValidation)
+
+      // Delivery method validation
+      val onlinePlatformRange = new CellRangeAddressList(1, sheet.getLastRowNum + 1000, 15, 15)
+      val onlinePlatformHelper = new XSSFDataValidationHelper(null)
+      val onlinePlatformConstraint =
+        onlinePlatformHelper.createFormulaListConstraint("Lookups!$E$2:$E$" + (OnlinePlatform.values.size + 1))
+      val onlinePlatformValidation = onlinePlatformHelper.createValidation(onlinePlatformConstraint, onlinePlatformRange)
+      onlinePlatformValidation.setShowErrorBox(true)
+      sheet.addValidationData(onlinePlatformValidation)
     }
 
     // set style on all columns
