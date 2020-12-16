@@ -6,11 +6,12 @@ import uk.ac.warwick.tabula.JavaImports._
 import uk.ac.warwick.tabula.commands._
 import uk.ac.warwick.tabula.commands.groups.admin.ImportSmallGroupSetsFromSpreadsheetCommand._
 import uk.ac.warwick.tabula.data.Transactions._
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod.Hybrid
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.data.model.{AliasedMapLocation, Department, MapLocation, NamedLocation}
 import uk.ac.warwick.tabula.helpers.Logging
 import uk.ac.warwick.tabula.helpers.StringUtils._
-import uk.ac.warwick.tabula.permissions.Permissions
+import uk.ac.warwick.tabula.permissions.{Permission, Permissions}
 import uk.ac.warwick.tabula.services.groups.docconversion._
 import uk.ac.warwick.tabula.services.{AutowiringSmallGroupServiceComponent, SmallGroupServiceComponent}
 import uk.ac.warwick.tabula.system.BindListener
@@ -19,7 +20,7 @@ import uk.ac.warwick.tabula.system.permissions.{PermissionsChecking, Permissions
 import scala.jdk.CollectionConverters._
 
 object ImportSmallGroupSetsFromSpreadsheetCommand {
-  val RequiredPermission = Permissions.SmallGroups.ImportFromExternalSystem
+  val RequiredPermission: Permission = Permissions.SmallGroups.ImportFromExternalSystem
   type CommandType = Appliable[Seq[SmallGroupSet]] with SelfValidating with BindListener with ImportSmallGroupSetsFromSpreadsheetRequest with ImportSmallGroupSetsFromSpreadsheetWarnings
 
   type ModifySetCommand = ModifySmallGroupSetCommand.Command
@@ -247,6 +248,10 @@ trait ImportSmallGroupSetsFromSpreadsheetBinding extends BindListener with Loggi
                 eventCommand.possibleMapLocations = extractedEvent.possibleMapLocations
                 eventCommand.relatedUrl = extractedEvent.relatedUrl.orNull
                 eventCommand.relatedUrlTitle = extractedEvent.relatedUrlTitle.orNull
+
+                eventCommand.deliveryMethod = extractedEvent.deliveryMethod.getOrElse(Hybrid)
+                eventCommand.onlineDeliveryUrl = extractedEvent.onlineDeliveryUrl.orNull
+                eventCommand.onlinePlatform = extractedEvent.onlinePlatform.orNull
 
                 new ModifySmallGroupEventCommandHolder(eventCommand, eventCommandType)
               }

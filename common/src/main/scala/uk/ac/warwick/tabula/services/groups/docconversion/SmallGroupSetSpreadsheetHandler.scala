@@ -87,7 +87,10 @@ case class ExtractedSmallGroupEvent(
   location: Option[Location],
   possibleMapLocations: Seq[WAI2GoLocation],
   relatedUrl: Option[String],
-  relatedUrlTitle: Option[String]
+  relatedUrlTitle: Option[String],
+  deliveryMethod: Option[EventDeliveryMethod],
+  onlineDeliveryUrl: Option[String],
+  onlinePlatform: Option[OnlinePlatform]
 )
 
 object ExtractedSmallGroupEvent {
@@ -106,9 +109,13 @@ object ExtractedSmallGroupEvent {
   val LocationDisplayNameColumn = "Location display name"
   val RelatedUrlColumn = "Link"
   val RelatedUrlTitleColumn = "Link text"
+  val DeliveryMethodColumn = "Delivery Method"
+  val OnlineDeliveryUrlColumn = "Online Delivery URL"
+  val OnlinePlatformColumn = "Online Platform"
 
   val AllColumns = Seq(ModuleColumn, SetNameColumn, GroupNameColumn, TitleColumn, TutorsColumn, WeekRangesColumn, DayColumn,
-    StartTimeColumn, EndTimeColumn, LocationColumn, LocationDisplayNameColumn, RelatedUrlColumn, RelatedUrlTitleColumn)
+    StartTimeColumn, EndTimeColumn, LocationColumn, LocationDisplayNameColumn, RelatedUrlColumn, RelatedUrlTitleColumn,
+    DeliveryMethodColumn, OnlineDeliveryUrlColumn, OnlinePlatformColumn)
   val RequiredColumns = Seq(ModuleColumn, SetNameColumn, GroupNameColumn)
 }
 
@@ -567,6 +574,15 @@ abstract class SmallGroupSetSpreadsheetHandlerImpl extends SmallGroupSetSpreadsh
       val relatedUrl = row.values.get(ExtractedSmallGroupEvent.RelatedUrlColumn).flatMap(_.formattedValue.maybeText)
       val relatedUrlTitle = row.values.get(ExtractedSmallGroupEvent.RelatedUrlTitleColumn).flatMap(_.formattedValue.maybeText)
 
+      val deliveryMethod = row.values.get(ExtractedSmallGroupEvent.DeliveryMethodColumn)
+        .flatMap(_.formattedValue.maybeText)
+        .flatMap(EventDeliveryMethod.withNameOption)
+      val onlineDeliveryUrl = row.values.get(ExtractedSmallGroupEvent.OnlineDeliveryUrlColumn)
+        .flatMap(_.formattedValue.maybeText)
+      val onlinePlatform = row.values.get(ExtractedSmallGroupEvent.OnlinePlatformColumn)
+        .flatMap(_.formattedValue.maybeText)
+        .flatMap(OnlinePlatform.withNameOption)
+
       if (title.nonEmpty || tutors.nonEmpty || weekRanges.nonEmpty || dayOfWeek.nonEmpty || startTime.nonEmpty || endTime.nonEmpty || location.nonEmpty) {
         Seq(ExtractedSmallGroupEvent(
           title,
@@ -578,7 +594,10 @@ abstract class SmallGroupSetSpreadsheetHandlerImpl extends SmallGroupSetSpreadsh
           location,
           possibleMapLocations,
           relatedUrl,
-          relatedUrlTitle
+          relatedUrlTitle,
+          deliveryMethod,
+          onlineDeliveryUrl,
+          onlinePlatform
         ))
       } else {
         Nil
