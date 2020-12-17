@@ -84,6 +84,8 @@ object Routes {
 
     def missingMapLocations(department: Department, academicYear: AcademicYear): String = context + s"/admin/department/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/missing-map-locations"
 
+    def missingOnlineLocations(department: Department, academicYear: AcademicYear): String = context + s"/admin/department/${encoded(department.code)}/${encoded(academicYear.startYear.toString)}/missing-online-locations"
+
     object reusable {
       def apply(department: Department, academicYear: AcademicYear): String =
         context + "/admin/department/%s/%s/groups/reusable".format(encoded(department.code), encoded(academicYear.startYear.toString))

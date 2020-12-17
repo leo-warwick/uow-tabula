@@ -95,6 +95,18 @@
               Events without a map location
             </@fmt.permission_button>
           </li>
+          <li>
+              <#assign open_url><@routes.groups.missing_online_locations department adminCommand.academicYear /></#assign>
+              <@fmt.permission_button
+              permission='SmallGroups.Update'
+              scope=department
+              action_descr='edit small group events'
+              href=open_url
+              >
+                Events without online delivery URL
+              </@fmt.permission_button>
+          </li>
+
 
           <li class="divider"></li>
 
