@@ -47,18 +47,22 @@
         <button type="button" class="btn btn-default btn-authorised" data-state="authorised" aria-label="Set to 'Missed (authorised)'">
           <i class="fa fa-fw fa-times-circle-o" title="Set to 'Missed (authorised)'"></i>
         </button>
-        <#if showAttendedInPersonOption>
-          <button type="button" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip" data-container="body"
-                  title="You can only record authorised absence for future events</#if>" data-state="attended" aria-label="Set to 'Attended'">
+          <button type="button" class="btn btn-default btn-attended
+            <#if !showAttendedInPersonOption> disabled use-tooltip" data-container="body"
+                    title="You cannot record attended-in-person for an online-only event
+            <#elseif eventInFuture> disabled use-tooltip" data-container="body"
+                    title="You can only record authorised absence for future events
+            </#if>" data-state="attended" aria-label="Set to 'Attended'">
             <i class="fa fa-fw fa-user-check" title="Set to 'Attended'"></i>
           </button>
-          </#if>
-        <#if showAttendedRemotelyOption>
-          <button type="button" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip" data-container="body"
-                  title="You can only record authorised absence for future events</#if>" data-state="attended-remotely" aria-label="Set to 'Attended'">
+          <button type="button" class="btn btn-default btn-attended
+            <#if !showAttendedRemotelyOption> disabled use-tooltip" data-container="body"
+                    title="You cannot record attended remotely for a face-to-face only event
+            <#elseif eventInFuture> disabled use-tooltip" data-container="body"
+                    title="You can only record authorised absence for future events
+            </#if>" data-state="attended-remotely" aria-label="Set to 'Attended'">
             <i class="fa fa-fw fa-laptop-house" title="Set to 'Attended - remotely'"></i>
           </button>
-        </#if>
       </div>
     </div>
 
@@ -420,18 +424,20 @@
                     <button type="button" aria-label="Set all to 'Missed (authorised)'" class="btn btn-default btn-authorised">
                       <i class="fa fa fa-times-circle-o fa-fw" title="Set all to 'Missed (authorised)'"></i>
                     </button>
-                    <#if showAttendedInPersonOption>
-                      <button type="button" aria-label="Set all to 'Attended'" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip"
-                              data-container="body" title="You can only record authorised absence for future events</#if>">
-                        <i class="fa fa-user-check fa-fw" title="Set all to 'Attended'"></i>
-                      </button>
-                    </#if>
-                    <#if showAttendedRemotelyOption>
-                      <button type="button" aria-label="Set all to 'Attended - remotely'" class="btn btn-default btn-attended<#if eventInFuture> disabled use-tooltip"
-                              data-container="body" title="You can only record authorised absence for future events</#if>">
-                        <i class="fa fa-laptop-house fa-fw" title="Set all to 'Attended - remotely'"></i>
-                      </button>
-                    </#if>
+                    <button type="button" aria-label="Set all to 'Attended'" class="btn btn-default btn-attended
+                      <#if !showAttendedInPersonOption> disabled use-tooltip" data-container="body" title="You cannot record attended-in-person for an online-only event
+                      <#elseif eventInFuture> disabled use-tooltip" data-container="body" title="You can only record authorised absence for future events
+                      </#if>
+                      ">
+                      <i class="fa fa-user-check fa-fw" title="Set all to 'Attended'"></i>
+                    </button>
+                    <button type="button" aria-label="Set all to 'Attended - remotely'" class="btn btn-default btn-attended
+                      <#if !showAttendedRemotelyOption> disabled use-tooltip" data-container="body" title="You cannot record attended remotely for a face-to-face only event
+                      <#elseif eventInFuture> disabled use-tooltip" data-container="body" title="You can only record authorised absence for future events
+                      </#if>
+                      ">
+                      <i class="fa fa-laptop-house fa-fw" title="Set all to 'Attended - remotely'"></i>
+                    </button>
                   </div>
                   <#if features.attendanceMonitoringNote>
                     <a class="btn btn-default use-tooltip attendance-note bulk-attendance-note"
