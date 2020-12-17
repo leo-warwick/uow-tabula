@@ -49,15 +49,15 @@
         </button>
           <button type="button" class="btn btn-default btn-attended
             <#if !showAttendedInPersonOption> disabled use-tooltip" data-container="body"
-                    title="You cannot record attended-in-person for an online-only event
+                    title="You cannot record in-person attendance for an online-only event
             <#elseif eventInFuture> disabled use-tooltip" data-container="body"
                     title="You can only record authorised absence for future events
-            </#if>" data-state="attended" aria-label="Set to 'Attended'">
-            <i class="fa fa-fw fa-user-check" title="Set to 'Attended'"></i>
+            </#if>" data-state="attended" aria-label="Set to 'Attended - in person'">
+            <i class="fa fa-fw fa-user-check" title="Set to 'Attended - in person'"></i>
           </button>
           <button type="button" class="btn btn-default btn-attended
             <#if !showAttendedRemotelyOption> disabled use-tooltip" data-container="body"
-                    title="You cannot record attended remotely for a face-to-face only event
+                    title="You cannot record remote attendance for a face-to-face only event
             <#elseif eventInFuture> disabled use-tooltip" data-container="body"
                     title="You can only record authorised absence for future events
             </#if>" data-state="attended-remotely" aria-label="Set to 'Attended'">
@@ -397,7 +397,7 @@
                       <p><i class="fa fa-minus fa-fw"></i> Not recorded</p>
                       <p><i class="fa fa-times fa-fw unauthorised"></i> Missed (unauthorised)</p>
                       <p><i class="fa fa fa-times-circle-o fa-fw authorised"></i> Missed (authorised)</p>
-                      <p><i class="fa fa-check fa-fw attended"></i> Attended</p>
+                      <p><i class="fa fa-check fa-fw attended"></i> Attended - in person</p>
                       <p><i class="fa fa-laptop-house fa-fw attended-remotely"></i> Attended - remotely</p>
                     </#assign>
 										<a class="use-popover"
@@ -424,15 +424,15 @@
                     <button type="button" aria-label="Set all to 'Missed (authorised)'" class="btn btn-default btn-authorised">
                       <i class="fa fa fa-times-circle-o fa-fw" title="Set all to 'Missed (authorised)'"></i>
                     </button>
-                    <button type="button" aria-label="Set all to 'Attended'" class="btn btn-default btn-attended
-                      <#if !showAttendedInPersonOption> disabled use-tooltip" data-container="body" title="You cannot record attended-in-person for an online-only event
+                    <button type="button" aria-label="Set all to 'Attended - in person'" class="btn btn-default btn-attended
+                      <#if !showAttendedInPersonOption> disabled use-tooltip" data-container="body" title="You cannot record in-person attendance for an online-only event
                       <#elseif eventInFuture> disabled use-tooltip" data-container="body" title="You can only record authorised absence for future events
                       </#if>
                       ">
-                      <i class="fa fa-user-check fa-fw" title="Set all to 'Attended'"></i>
+                      <i class="fa fa-user-check fa-fw" title="Set all to 'Attended - in person'"></i>
                     </button>
                     <button type="button" aria-label="Set all to 'Attended - remotely'" class="btn btn-default btn-attended
-                      <#if !showAttendedRemotelyOption> disabled use-tooltip" data-container="body" title="You cannot record attended remotely for a face-to-face only event
+                      <#if !showAttendedRemotelyOption> disabled use-tooltip" data-container="body" title="You cannot record remote attendance for a face-to-face only event
                       <#elseif eventInFuture> disabled use-tooltip" data-container="body" title="You can only record authorised absence for future events
                       </#if>
                       ">
