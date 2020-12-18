@@ -89,7 +89,7 @@
             <@fmt.permission_button
             permission='SmallGroups.Update'
             scope=department
-            action_descr='edit small group events'
+            action_descr='events with missing map location'
             href=open_url
             >
               Events without a map location
@@ -100,10 +100,10 @@
               <@fmt.permission_button
               permission='SmallGroups.Update'
               scope=department
-              action_descr='edit small group events'
+              action_descr='events with missing URLs'
               href=open_url
               >
-                Events without online delivery URL
+                Events without an online delivery URL
               </@fmt.permission_button>
           </li>
 

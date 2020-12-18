@@ -3,7 +3,7 @@
   <h1>Events without online delivery URL</h1>
 
   <p>
-    This page displays Online/Hybrid small group events without online delivery URL specified.
+    This page displays Online/Hybrid small group events with no online delivery URL specified.
   </p>
 
   <#if smallGroupSets?size gt 0>
@@ -11,7 +11,7 @@
       <#assign set = pair._1()>
       <#assign module = set.module>
       <#assign deliveryMethodsWithEvents = pair._2()>
-      <#assign delivoryMethods = deliveryMethodsWithEvents?keys>
+      <#assign deliveryMethods = deliveryMethodsWithEvents?keys>
       <h4>
         <span class="mod-code">${module.code?upper_case}</span>
         <span class="groupset-name">
@@ -19,7 +19,7 @@
 				</span>
       </h4>
 
-      <#list delivoryMethods as method>
+      <#list deliveryMethods as method>
         <p><span class="very-subtle">${method.entryName} events:</span> </p>
         <#assign events = mapGet(deliveryMethodsWithEvents, method)>
         <ul>
@@ -34,7 +34,7 @@
     </#list>
   <#else>
     <div class="alert alert-info">
-      All small group events have set some online delivery URL.
+      All small group events have an online delivery URL specified.
     </div>
   </#if>
 </#escape>
