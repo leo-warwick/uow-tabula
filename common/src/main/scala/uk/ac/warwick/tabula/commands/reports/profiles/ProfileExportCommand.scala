@@ -123,4 +123,5 @@ trait ProfileExportCommandState extends FiltersStudents {
   var sprStatuses: JList[SitsStatus] = JArrayList()
   var modules: JList[Module] = JArrayList()
   var hallsOfResidence: JList[String] = JArrayList()
+  var postcodes: JList[String] = JArrayList()
 }

@@ -43,6 +43,8 @@ trait FiltersStudentsBase {
 
   def hallsOfResidence: JList[String]
 
+  def postcodes: JList[String]
+
   var otherCriteria: JList[String] = JArrayList()
 
   protected def modulesForDepartmentAndSubDepartments(department: Department): Seq[Module] =
@@ -68,7 +70,8 @@ trait FiltersStudentsBase {
     sprStatuses.asScala.foreach(p => result.addQueryParameter("sprStatuses", p.code))
     modules.asScala.foreach(p => result.addQueryParameter("modules", p.code))
     hallsOfResidence.asScala.foreach(p => result.addQueryParameter("hallsOfResidence", p))
-    otherCriteria.asScala.foreach(p => result.addQueryParameter("otherCriteria", p.toString))
+    postcodes.asScala.foreach(p => result.addQueryParameter("postcodes", p))
+    otherCriteria.asScala.foreach(p => result.addQueryParameter("otherCriteria", p))
     if (result.getQuery == null)
       ""
     else
@@ -87,6 +90,7 @@ trait FiltersStudentsBase {
       "sprStatuses" -> sprStatuses.asScala.map(_.code).mkString(","),
       "modules" -> modules.asScala.map(_.code).mkString(","),
       "hallsOfResidence" -> hallsOfResidence.asScala.mkString(","),
+      "postcodes" -> postcodes.asScala.mkString(","),
       "otherCriteria" -> otherCriteria.asScala.mkString(",")
     )
   }
@@ -183,6 +187,8 @@ trait DeserializesFilterImpl extends DeserializesFilter with Logging with Filter
     })
     hallsOfResidence.clear()
     params.get("hallsOfResidence").foreach(_.foreach { item => hallsOfResidence.add(item) })
+    postcodes.clear()
+    params.get("postcodes").foreach(_.foreach { item => postcodes.add(item) })
     otherCriteria.clear()
     params.get("otherCriteria").foreach(_.foreach { item => otherCriteria.add(item) })
   }

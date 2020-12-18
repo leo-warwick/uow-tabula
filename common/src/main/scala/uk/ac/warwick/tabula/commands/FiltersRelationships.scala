@@ -35,6 +35,10 @@ object FiltersRelationships {
     "termtimeAddress" -> Seq(
       "student" -> AliasAndJoinType("student"),
       "student.termtimeAddress" -> AliasAndJoinType("termtimeAddress")
+    ),
+    "currentAddress" -> Seq(
+      "student" -> AliasAndJoinType("student"),
+      "student.currentAddress" -> AliasAndJoinType("currentAddress")
     )
   ).toMap
 
