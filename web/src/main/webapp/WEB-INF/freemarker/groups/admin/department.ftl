@@ -89,12 +89,24 @@
             <@fmt.permission_button
             permission='SmallGroups.Update'
             scope=department
-            action_descr='edit small group events'
+            action_descr='events with missing map location'
             href=open_url
             >
               Events without a map location
             </@fmt.permission_button>
           </li>
+          <li>
+              <#assign open_url><@routes.groups.missing_online_locations department adminCommand.academicYear /></#assign>
+              <@fmt.permission_button
+              permission='SmallGroups.Update'
+              scope=department
+              action_descr='events with missing URLs'
+              href=open_url
+              >
+                Events without an online delivery URL
+              </@fmt.permission_button>
+          </li>
+
 
           <li class="divider"></li>
 

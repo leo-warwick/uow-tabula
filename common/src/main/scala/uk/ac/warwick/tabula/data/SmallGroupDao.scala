@@ -1,22 +1,21 @@
 package uk.ac.warwick.tabula.data
 
 import org.hibernate.FetchMode
-import org.hibernate.criterion.Restrictions._
-import org.hibernate.criterion.Projections._
 import org.hibernate.criterion.Order._
+import org.hibernate.criterion.Projections._
+import org.hibernate.criterion.Restrictions._
 import org.hibernate.sql.JoinType
-import org.joda.time.{DateTime, LocalTime}
+import org.joda.time.LocalTime
 import org.springframework.stereotype.Repository
 import uk.ac.warwick.spring.Wire
 import uk.ac.warwick.tabula.AcademicYear
 import uk.ac.warwick.tabula.commands.TaskBenchmarking
 import uk.ac.warwick.tabula.data.model._
 import uk.ac.warwick.tabula.data.model.attendance.AttendanceState
+import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod._
 import uk.ac.warwick.tabula.data.model.groups._
 import uk.ac.warwick.tabula.services.AutowiringUserLookupComponent
 import uk.ac.warwick.userlookup.User
-
-import uk.ac.warwick.tabula.data.model.groups.EventDeliveryMethod._
 
 trait SmallGroupDaoComponent {
   val smallGroupDao: SmallGroupDao
@@ -139,6 +138,8 @@ trait SmallGroupDao {
   def listSetsForMembershipUpdate: Seq[SmallGroupSet]
 
   def listSmallGroupsWithoutLocation(academicYear: AcademicYear, department: Option[Department]): Seq[SmallGroupEvent]
+
+  def listSmallGroupsWithoutOnlineLocation(academicYear: AcademicYear, department: Option[Department]): Seq[SmallGroupEvent]
 
   def findSmallGroupsByNameOrModule(query: FindSmallGroupQuery): Seq[SmallGroup]
 
@@ -651,6 +652,25 @@ class SmallGroupDaoImpl extends SmallGroupDao
 					join e.group as g
 					join g.groupSet as s
 					where s.academicYear = :academicYear and location not like '%|%'
+		 			and s.deleted = false
+		 			$departmentCondition
+			""")
+      .setParameter("academicYear", academicYear)
+
+    department.foreach(d => query.setEntity("department", d))
+
+    query.seq.map(objArray => objArray(0).asInstanceOf[SmallGroupEvent])
+  }
+
+  override def listSmallGroupsWithoutOnlineLocation(academicYear: AcademicYear, department: Option[Department]): Seq[SmallGroupEvent] = {
+    val departmentCondition = department.map(_ => s"and s.module.adminDepartment = :department").getOrElse("")
+
+    val query = session.newQuery[Array[java.lang.Object]](
+      s"""
+					from SmallGroupEvent e
+					join e.group as g
+					join g.groupSet as s
+					where s.academicYear = :academicYear and (onlineDeliveryUrl is null OR onlineDeliveryUrl = '') and deliveryMethod != 'FaceToFaceOnly'
 		 			and s.deleted = false
 		 			$departmentCondition
 			""")
