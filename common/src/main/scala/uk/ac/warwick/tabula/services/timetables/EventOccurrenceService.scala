@@ -129,7 +129,7 @@ abstract class TermBasedEventOccurrenceService extends EventOccurrenceService {
       case _ => None
     }).foreach(name => event.getProperties.add(new Location(name)))
 
-    eventOccurrence.onlineDeliveryUrl.foreach(url => event.getProperties.add(new Url(new java.net.URI(url))))
+    eventOccurrence.onlineDeliveryUrl.filter(_.hasText).foreach(url => event.getProperties.add(new Url(new java.net.URI(url))))
 
     event.getProperties.add(new Uid(eventOccurrence.uid))
     event.getProperties.add(Method.PUBLISH)
