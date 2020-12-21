@@ -38,6 +38,7 @@ trait UserSearchCommandRequest extends RequiresPermissionsChecking with Permissi
   var sprStatuses: JList[SitsStatus] = JArrayList()
   var modules: JList[Module] = JArrayList()
   var hallsOfResidence: JList[String] = JArrayList()
+  var postcodes: JList[String] = JArrayList()
 
   var groupNames: JList[String] = JArrayList()
   var studyRoutes: JList[Route] = JArrayList()

@@ -1,7 +1,7 @@
 package uk.ac.warwick.tabula.data.model
 
 import javax.persistence._
-import org.hibernate.annotations.Proxy
+import org.hibernate.annotations.{Formula, Proxy}
 import org.springframework.util.StringUtils
 import uk.ac.warwick.tabula.ToString
 
@@ -35,6 +35,9 @@ class Address extends GeneratedId with ToString {
   var line5: String = _
   var postcode: String = _
   var telephone: String = _
+
+  @Formula("upper(regexp_replace(postcode, '[^A-Za-z0-9]', '', 'g'))")
+  private var _normalisedPostcode: String = _
 
   @transient var addressType: AddressType = null
 

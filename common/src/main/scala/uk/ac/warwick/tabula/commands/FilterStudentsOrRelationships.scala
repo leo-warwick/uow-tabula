@@ -1,12 +1,14 @@
 package uk.ac.warwick.tabula.commands
 
 import org.hibernate.NullPrecedence
-import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.`type`.{StringType, Type}
+import org.hibernate.criterion.{DetachedCriteria, Restrictions}
 import uk.ac.warwick.tabula.{AcademicYear, CurrentUser}
 import uk.ac.warwick.tabula.data.ScalaRestriction._
 import uk.ac.warwick.tabula.data._
 import uk.ac.warwick.tabula.data.model.Department
 import uk.ac.warwick.tabula.helpers.StringUtils._
+import uk.ac.warwick.tabula.permissions.{Permission, PermissionsTarget}
 import uk.ac.warwick.tabula.permissions.Permissions.Profiles
 import uk.ac.warwick.tabula.services.{ProfileServiceComponent, SecurityServiceComponent}
 import uk.ac.warwick.tabula.system.permissions.PermissionsCheckingMethods
@@ -108,23 +110,38 @@ trait FilterStudentsOrRelationships extends FiltersStudentsBase with Permissions
     getAliasPaths("termtimeAddress"): _*
   )
 
+  def postcodeRestriction: Option[ScalaRestriction] = inIfNotEmpty(
+    "currentAddress._normalisedPostcode", postcodes.asScala.map(_.replaceAll("[^A-Za-z0-9]+", "").toUpperCase),
+    getAliasPaths("currentAddress"): _*
+  )
+
   protected def buildRestrictions(
     user: CurrentUser,
     departments: Seq[Department],
     year: AcademicYear,
     additionalRestrictions: Seq[ScalaRestriction] = Seq.empty
   ): Seq[ScalaRestriction] = {
+    def hasPermissionsOnAllDepartments(permission: Permission): Boolean =
+      if (departments.nonEmpty) departments.forall(d => securityService.can(user, permission, d))
+      else securityService.can(user, permission, PermissionsTarget.Global)
 
     val tier4Restrictions: Seq[ScalaRestriction] = {
       lazy val filteringOnTier4 = otherCriteria.contains("Tier 4 only") ||  otherCriteria.contains("Not Tier 4 only")
-      lazy val hasTier4Permissions = departments.forall(d => securityService.can(user, Profiles.Read.Tier4VisaRequirement, d))
+      lazy val hasTier4Permissions = hasPermissionsOnAllDepartments(Profiles.Read.Tier4VisaRequirement)
       if (filteringOnTier4 && hasTier4Permissions) {
         Seq(tier4Restriction, notTier4Restriction).flatten
       } else {
         Seq()
       }
     }
-    buildRestrictionsInternal(year: AcademicYear, additionalRestrictions ++ tier4Restrictions)
+
+    lazy val hasAddressPermissions = hasPermissionsOnAllDepartments(Profiles.Read.HomeAndTermTimeAddresses)
+    val addressRestrictions: Seq[ScalaRestriction] = Seq(
+      hallOfResidenceRestriction,
+      postcodeRestriction,
+    ).filter(_ => hasAddressPermissions).flatten
+
+    buildRestrictionsInternal(year: AcademicYear, additionalRestrictions ++ tier4Restrictions ++ addressRestrictions)
   }
 
   // have to give this a different name to the method above as both have a default value for additionalRestrictions
@@ -149,7 +166,6 @@ trait FilterStudentsOrRelationships extends FiltersStudentsBase with Permissions
       enrolledOrCompletedRestriction,
       isFinalistRestriction,
       isNotFinalistRestriction,
-      hallOfResidenceRestriction
     ).flatten ++ additionalRestrictions
 
     if (restrictions.exists(_.aliases.keys.exists(key => key.contains("studentCourseYearDetails")))) {

@@ -108,6 +108,7 @@ trait FilterStudentsAttendanceCommandState extends AttendanceFilterExtras {
   var sprStatuses: JList[SitsStatus] = JArrayList()
   var modules: JList[Module] = JArrayList()
   var hallsOfResidence: JList[String] = JArrayList()
+  var postcodes: JList[String] = JArrayList()
 
 }
 

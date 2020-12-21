@@ -136,4 +136,5 @@ trait AdminHomeCommandRequest extends FiltersStudents with AdminHomeCommandState
   override val sortOrder: JList[Order] = JArrayList() // Not used
   override val modules: JList[Module] = JArrayList() // Not used
   override val hallsOfResidence: JList[String] = JArrayList() // Not used
+  override val postcodes: JList[String] = JArrayList() // Not used
 }

@@ -54,6 +54,9 @@ object FiltersStudents {
     ),
     "termtimeAddress" -> Seq(
       "termtimeAddress" -> AliasAndJoinType("termtimeAddress")
+    ),
+    "currentAddress" -> Seq(
+      "currentAddress" -> AliasAndJoinType("currentAddress")
     )
   ).toMap
 
