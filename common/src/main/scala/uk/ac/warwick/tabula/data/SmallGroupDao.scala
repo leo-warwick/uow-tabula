@@ -651,7 +651,7 @@ class SmallGroupDaoImpl extends SmallGroupDao
 					from SmallGroupEvent e
 					join e.group as g
 					join g.groupSet as s
-					where s.academicYear = :academicYear and location not like '%|%'
+					where s.academicYear = :academicYear and location not like '%|%' and deliveryMethod != 'OnlineOnly'
 		 			and s.deleted = false
 		 			$departmentCondition
 			""")
