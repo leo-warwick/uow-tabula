@@ -139,6 +139,34 @@ trait RecordSmallGroupAttendanceApi {
   }
 }
 
+@Controller
+@RequestMapping(Array("/v1/module/{module}/groups/{smallGroupSet}/groups/{smallGroup}/events/{smallGroupEvent}/members"))
+class AddAdditionalSmallGroupStudentControllerForApi extends SmallGroupSetController with AddAdditionalSmallGroupStudentApi
+
+trait AddAdditionalSmallGroupStudentApi {
+  self: SmallGroupSetController =>
+
+  @ModelAttribute("recordAttendanceCommand")
+  def recordAttendanceCommand(@PathVariable smallGroupEvent: SmallGroupEvent, @RequestParam week: Int, user: CurrentUser): RecordAttendanceCommand.Command =
+    RecordAttendanceCommand(mandatory(smallGroupEvent), week, user)
+
+  @RequestMapping(method = Array(PUT), consumes = Array(MediaType.APPLICATION_JSON_VALUE), produces = Array("application/json"))
+  def addStudent(@RequestBody request: SmallGroupAddStudentRequest, @Valid @ModelAttribute("recordAttendanceCommand") command: RecordAttendanceCommand.Command, errors: Errors): Mav = {
+    request.copyTo(command, errors)
+    globalValidator.validate(command, errors)
+    command.validate(errors)
+    if (errors.hasErrors) {
+      Mav(new JSONErrorView(errors))
+    } else {
+      command.addAdditionalStudent(command.members)
+      Mav(new JSONView(Map(
+        "success" -> true,
+        "status" -> "ok"
+      )))
+    }
+  }
+}
+
 
 class SmallGroupEventRequest extends JsonApiRequest[ModifySmallGroupEventCommand] {
   @BeanProperty var title: String = _
@@ -163,10 +191,20 @@ class SmallGroupEventRequest extends JsonApiRequest[ModifySmallGroupEventCommand
 
 class SmallGroupAttendanceRequest extends JsonApiRequest[RecordAttendanceCommand.Command] {
   @BeanProperty var attendance: JMap[UniversityId, SmallGroupAttendanceState] = _
-  @BeanProperty var members: Seq[MemberOrUser] = _
 
   override def copyTo(state: RecordAttendanceCommand.Command, errors: Errors): Unit = {
     state.studentsState.putAll(attendance)
-    state.members.concat(members)
+  }
+}
+
+class SmallGroupAddStudentRequest extends JsonApiRequest[RecordAttendanceCommand.Command] {
+  @BeanProperty var member: Member = _
+  @BeanProperty var replacedWeek: JInteger = _
+  @BeanProperty var replacedEvent: SmallGroupEvent = _
+
+  override def copyTo(state: RecordAttendanceCommand.Command, errors: Errors): Unit = {
+    state.additionalStudent = member
+    state.replacedWeek = replacedWeek
+    state.replacedEvent = replacedEvent
   }
 }
